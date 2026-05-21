@@ -1,0 +1,16 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(unzip -l \"Rubik Black \\(1\\).zip\")",
+      "Bash(unzip -l \"comixno2.zip\")",
+      "Bash(npm run *)",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\\\\n\" http://localhost:5173/)",
+      "Bash(curl -s http://localhost:5173/src/App.jsx)",
+      "Bash(taskkill /F /FI \"ImageName eq node.exe\")",
+      "PowerShell(Stop-Process -Force -ErrorAction SilentlyContinue)",
+      "PowerShell(\"ok\")",
+      "PowerShell(New-Item -ItemType Directory -Force -Path \"c:\\\\workspace\\\\whatsappRecap\\\\.github\\\\workflows\")",
+      "Bash(node -e ' *)"
+    ]
+  }
+}

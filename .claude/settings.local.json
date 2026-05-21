@@ -1,0 +1,15 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npx vite *)",
+      "Bash(git -C \"c:/workspace/whatsappRecap\" rev-parse --git-dir)",
+      "Bash(git -C \"c:/workspace/whatsappRecap\" log --oneline -3)",
+      "Bash(git -C \"c:/workspace\" add whatsappRecap/)",
+      "Bash(git -C c:/workspace commit -m ' *)",
+      "Bash(git -C \"c:/workspace\" push origin main)",
+      "Bash(git -C \"c:/workspace\" pull --rebase origin main)",
+      "Bash(git -C \"c:/workspace\" stash)",
+      "Bash(git -C \"c:/workspace\" stash pop)"
+    ]
+  }
+}

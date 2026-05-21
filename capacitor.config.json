@@ -1,0 +1,13 @@
+{
+  "appId": "com.chatwrapped.app",
+  "appName": "ChatWrapped",
+  "webDir": "dist",
+  "server": {
+    "androidScheme": "https"
+  },
+  "plugins": {
+    "SplashScreen": {
+      "launchShowDuration": 0
+    }
+  }
+}
