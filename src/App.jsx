@@ -169,7 +169,9 @@ function parseWhatsApp(rawText) {
       const isVoice = VOICE_PATTERNS.some(p => p.test(content));
       const linkMatches = content.match(LINK_RE) || [];
       const emojis = (content.match(EMOJI_RE) || []);
-      const cleanContent = content.replace(LINK_RE, '').replace(EMOJI_RE, '').trim();
+      let cleanContent = linkMatches.length > 0 ? content.replace(LINK_RE, '') : content;
+      if (emojis.length > 0) cleanContent = cleanContent.replace(EMOJI_RE, '');
+      cleanContent = cleanContent.trim();
       const wordCount = cleanContent.length > 0 ? cleanContent.split(/\s+/).filter(Boolean).length : 0;
       const isQuestion = /[?؟]/.test(content);
 
@@ -206,29 +208,27 @@ function parseWhatsApp(rawText) {
   }
   if (current) messages.push(current);
 
-  // Now finalize: filter out deleted/system from author lists, but keep counts in diagnostics
+  // Single pass: tally flags (all messages), strip author-name emojis, build realMessages,
+  // and accumulate per-author counts — all in one loop to avoid re-iterating the array.
+  const realMessages = [];
   for (const msg of messages) {
     if (msg.isDeleted) diagnostics.deletedMessages++;
+    // media/voice tallied from all messages (matches original behaviour — deleted msgs may carry flags)
     if (msg.hasMedia) diagnostics.mediaMessages++;
     if (msg.isVoice) diagnostics.voiceMessages++;
-    // Strip author-name emojis from emoji list
     if (msg.emojis.length > 0 && authorNameEmojis.size > 0) {
       msg.emojis = msg.emojis.filter(e => !authorNameEmojis.has(e));
     }
+    if (!msg.isDeleted) {
+      // Per-author counts only for real (non-deleted) messages — fully traceable
+      diagnostics.perAuthorCount[msg.author] = (diagnostics.perAuthorCount[msg.author] || 0) + 1;
+      diagnostics.perAuthorWordCount[msg.author] = (diagnostics.perAuthorWordCount[msg.author] || 0) + msg.wordCount;
+      if (msg.hasMedia) diagnostics.perAuthorMediaCount[msg.author] = (diagnostics.perAuthorMediaCount[msg.author] || 0) + 1;
+      if (msg.isVoice) diagnostics.perAuthorVoiceCount[msg.author] = (diagnostics.perAuthorVoiceCount[msg.author] || 0) + 1;
+      realMessages.push(msg);
+    }
   }
-
-  // Real messages = anything not deleted (deleted messages exist but have no content to analyze)
-  // We include media/voice in counts since they are real signal
-  const realMessages = messages.filter(m => !m.isDeleted);
   diagnostics.parsedMessages = realMessages.length;
-
-  // Per-author counts (built directly from parsed messages — fully traceable)
-  for (const msg of realMessages) {
-    diagnostics.perAuthorCount[msg.author] = (diagnostics.perAuthorCount[msg.author] || 0) + 1;
-    diagnostics.perAuthorWordCount[msg.author] = (diagnostics.perAuthorWordCount[msg.author] || 0) + msg.wordCount;
-    if (msg.hasMedia) diagnostics.perAuthorMediaCount[msg.author] = (diagnostics.perAuthorMediaCount[msg.author] || 0) + 1;
-    if (msg.isVoice) diagnostics.perAuthorVoiceCount[msg.author] = (diagnostics.perAuthorVoiceCount[msg.author] || 0) + 1;
-  }
 
   // Sample first 20 messages for debug screen
   diagnostics.sample = messages.slice(0, 20).map(m => ({
@@ -384,6 +384,12 @@ function argmax(arr, fn) {
   return best;
 }
 
+function argmaxArr(arr) {
+  let best = 0;
+  for (let i = 1; i < arr.length; i++) if (arr[i] > arr[best]) best = i;
+  return best;
+}
+
 function computeAll(messages) {
   if (!messages || messages.length === 0) return null;
 
@@ -414,7 +420,8 @@ function computeAll(messages) {
       dayKeys: new Set(),        // SOURCE: distinct m.dayKey
       wordFreq: {},              // SOURCE: tokenized & stopword-filtered from m.content
       emojiFreq: {},             // SOURCE: from m.emojis
-      responseTimesMins: [],     // SOURCE: for replies under 120 min from another author
+      respSum: 0,
+      respCount: 0,
       currentBurst: 0,
       maxBurst: 0,
       longestAbsenceDays: 0,
@@ -484,9 +491,14 @@ function computeAll(messages) {
 
     // Tokenize content for word freq
     if (!m.hasMedia && !m.isVoice && m.content.length > 0) {
-      const tokens = m.content.replace(LINK_RE, '').replace(EMOJI_RE, '').toLowerCase()
-        .split(/[\s\.,!\?;:()"'\[\]\{\}…—–\-_/\\]+/u);
-      for (const t of tokens) {
+      // Skip LINK_RE scan (costly global regex) when content has no URL prefix
+      const text = m.content.includes('http')
+        ? m.content.replace(LINK_RE, '').replace(EMOJI_RE, '').toLowerCase()
+        : m.content.replace(EMOJI_RE, '').toLowerCase();
+      const rawTokens = text.split(/[\s\.,!\?;:()"'\[\]\{\}…—–\-_/\\]+/u);
+      for (const t of rawTokens) {
+        // replace() can only shorten a string, so skip it for tokens already too short
+        if (t.length < 3) continue;
         const clean = t.replace(/[^\p{L}\p{N}]/gu, '');
         if (clean.length >= 3 && !STOPWORDS.has(clean) && !/^\d+$/.test(clean)) {
           acc.wordFreq[clean] = (acc.wordFreq[clean] || 0) + 1;
@@ -505,7 +517,8 @@ function computeAll(messages) {
     if (prevMsg && prevMsg.author !== m.author) {
       const diffMin = (m.timestamp - prevMsg.timestamp) / 60000;
       if (diffMin <= 120) {
-        acc.responseTimesMins.push(diffMin);
+        acc.respSum += diffMin;
+        acc.respCount++;
         if (!replyMatrix[m.author]) replyMatrix[m.author] = {};
         replyMatrix[m.author][prevMsg.author] = (replyMatrix[m.author][prevMsg.author] || 0) + 1;
       }
@@ -518,12 +531,6 @@ function computeAll(messages) {
         acc.conversationsRevived++;
         u[prevMsg.author].conversationsKilled++;
         u[prevMsg.author].gotNoReplyWithin30++;
-      }
-    } else if (prevMsg && prevMsg.author === m.author) {
-      const diffMin = (m.timestamp - prevMsg.timestamp) / 60000;
-      // Same author follows up after long silence — they're talking to themselves; count for prevMsg
-      if (diffMin >= 720) {
-        // The prev silence was on them, but technically nobody else replied
       }
     }
 
@@ -542,10 +549,11 @@ function computeAll(messages) {
   const userList = authors.map(a => {
     const acc = u[a];
     const days = Array.from(acc.dayKeys).sort();
-    let longestStreak = days.length > 0 ? 1 : 0;
-    let curStreak = days.length > 0 ? 1 : 0;
-    for (let i = 1; i < days.length; i++) {
-      const diff = (new Date(days[i]) - new Date(days[i - 1])) / 86400000;
+    const dayTs = days.map(d => new Date(d).getTime());
+    let longestStreak = dayTs.length > 0 ? 1 : 0;
+    let curStreak = dayTs.length > 0 ? 1 : 0;
+    for (let i = 1; i < dayTs.length; i++) {
+      const diff = (dayTs[i] - dayTs[i - 1]) / 86400000;
       if (Math.round(diff) === 1) {
         curStreak++;
         if (curStreak > longestStreak) longestStreak = curStreak;
@@ -556,15 +564,13 @@ function computeAll(messages) {
 
     const longestAbsenceDays = acc.longestAbsenceDays;
 
-    const avgRespMin = acc.responseTimesMins.length > 0
-      ? acc.responseTimesMins.reduce((s, t) => s + t, 0) / acc.responseTimesMins.length
-      : null;
+    const avgRespMin = acc.respCount > 0 ? acc.respSum / acc.respCount : null;
 
     const topWordEntry = maxEntry(acc.wordFreq);
     const topEmojiEntry = maxEntry(acc.emojiFreq);
 
-    const peakHour = acc.hourCounts.indexOf(Math.max(...acc.hourCounts));
-    const peakWeekday = acc.weekdayCounts.indexOf(Math.max(...acc.weekdayCounts));
+    const peakHour = argmaxArr(acc.hourCounts);
+    const peakWeekday = argmaxArr(acc.weekdayCounts);
 
     const nightPct = (acc.nightMessages / acc.messageCount) * 100;
     const sharePct = (acc.messageCount / sorted.length) * 100;
@@ -594,7 +600,7 @@ function computeAll(messages) {
       longestStreak,
       longestAbsenceDays: Math.round(longestAbsenceDays),
       avgRespMin,
-      respSampleSize: acc.responseTimesMins.length,
+      respSampleSize: acc.respCount,
       topWord: topWordEntry ? topWordEntry[0] : null,
       topWordCount: topWordEntry ? topWordEntry[1] : 0,
       topEmoji: topEmojiEntry ? topEmojiEntry[0] : null,
@@ -621,25 +627,34 @@ function computeAll(messages) {
   // "You sent more than X% of the group" — strictly count OTHERS who scored worse.
   // We compare ourselves to the rest of the group (excluding ourselves once).
   // For a 5-person group where you're #1: you beat 4 others out of 4 = 100% — which is true but
-  // the UI presents this as the share of *others* you outrank, not "all 5 incl you".
+  // the ui presents this as the share of *others* you outrank, not "all 5 incl you".
+  //
+  // arr is the full population including the user themselves. val is their own value.
+  // We remove exactly one occurrence of val (the user) before counting who they beat.
   function pctRank(arr, val, higherIsBetter) {
     if (arr.length <= 1) return null;
-    // Remove ONE instance of val from arr (the user themselves)
-    const others = [...arr];
-    const selfIdx = others.indexOf(val);
-    if (selfIdx >= 0) others.splice(selfIdx, 1);
-    if (others.length === 0) return null;
-    const countWorse = higherIsBetter
-      ? others.filter(v => v < val).length
-      : others.filter(v => v > val).length;
-    return Math.round((countWorse / others.length) * 100);
+    let removedSelf = false;
+    let othersLen = 0;
+    let countWorse = 0;
+    for (const v of arr) {
+      if (!removedSelf && v === val) { removedSelf = true; continue; }
+      othersLen++;
+      if (higherIsBetter ? v < val : v > val) countWorse++;
+    }
+    if (othersLen === 0) return null;
+    return Math.round((countWorse / othersLen) * 100);
   }
+
+  // Hoist arrays that are identical for every user in the loop.
+  const allMessageCounts = userList.map(x => x.messageCount);
+  const speedEligible = userList.filter(x => x.respSampleSize >= 5 && x.avgRespMin != null);
+  const allRespMins = speedEligible.map(x => x.avgRespMin);
+
   for (const user of userList) {
-    user.messagesPercentile = pctRank(userList.map(x => x.messageCount), user.messageCount, true);
+    user.messagesPercentile = pctRank(allMessageCounts, user.messageCount, true);
     if (user.respSampleSize >= 5) {
-      const speedSample = userList.filter(x => x.respSampleSize >= 5 && x.avgRespMin != null);
-      user.speedPercentile = speedSample.length > 1
-        ? pctRank(speedSample.map(x => x.avgRespMin), user.avgRespMin, false)
+      user.speedPercentile = speedEligible.length > 1
+        ? pctRank(allRespMins, user.avgRespMin, false)
         : null;
     } else {
       user.speedPercentile = null;
@@ -743,10 +758,18 @@ function computeAll(messages) {
     const eraStart = slice[0].timestamp;
     const eraEnd = slice[slice.length - 1].timestamp;
     const eraDays = Math.max(1, (eraEnd - eraStart) / 86400000);
-    const eraNightPct = (slice.filter(m => m.hour < 6).length / slice.length) * 100;
-    const eraMediaPct = (slice.filter(m => m.hasMedia).length / slice.length) * 100;
-    const eraVoicePct = (slice.filter(m => m.isVoice).length / slice.length) * 100;
-    const eraQuestionPct = (slice.filter(m => m.isQuestion).length / slice.length) * 100;
+    // Single pass instead of four separate filter passes over the same array
+    let nightCount = 0, mediaCount = 0, voiceCount = 0, questionCount = 0;
+    for (const m of slice) {
+      if (m.hour < 6) nightCount++;
+      if (m.hasMedia) mediaCount++;
+      if (m.isVoice) voiceCount++;
+      if (m.isQuestion) questionCount++;
+    }
+    const eraNightPct = (nightCount / slice.length) * 100;
+    const eraMediaPct = (mediaCount / slice.length) * 100;
+    const eraVoicePct = (voiceCount / slice.length) * 100;
+    const eraQuestionPct = (questionCount / slice.length) * 100;
     const eraMsgPerDay = slice.length / eraDays;
 
     let name;
@@ -3978,7 +4001,6 @@ function ChatWrappedApp() {
 function GlobalStyles() {
   return (
     <style>{`
-      @import url('https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;500;600;700&family=Inter+Tight:wght@300;400;500;600;700;800;900&display=swap');
       @font-face {
         font-family: 'Rubik Black';
         src: url('/fonts/RubikBlack.ttf') format('truetype');
@@ -4481,6 +4503,33 @@ const SLIDES_DEF = [
   'finale',
 ];
 
+const SLIDE_COMPONENTS = {
+  intro:           SlideIntro,
+  message_count:   SlideMessageCount,
+  rank:            SlideRank,
+  vs_everyone:     SlideVsEveryone,
+  title:           SlideTitle,
+  group_describes: SlideGroupDescribes,
+  peak_hour:       SlidePeakHour,
+  night:           SlideNight,
+  streak:          SlideStreak,
+  speed:           SlideSpeed,
+  signature_word:  SlideWord,
+  top_words:       SlideTopWords,
+  top_emoji:       SlideEmoji,
+  drama_role:      SlideDramaRole,
+  roast:           SlideRoast,
+  achievements:    SlideAchievements,
+  most_likely:     SlideMostLikely,
+  duo:             SlideDuo,
+  eras:            SlideEras,
+  chaos_moment:    SlideChaosMoment,
+  group_persona:   SlideGroupPersona,
+  awards:          SlideAwards,
+  peak_day:        SlidePeakDay,
+  finale:          SlideFinale,
+};
+
 // ============================================================
 // ONBOARDING — quick questions for personalized analysis
 // ============================================================
@@ -4761,6 +4810,7 @@ function Wrapped({ analytics, diagnostics, selectedAuthor, setSelectedAuthor, sl
 
   const total = slides.length;
   const current = slides[slide];
+  const SlideComp = SLIDE_COMPONENTS[current];
 
   useEffect(() => {
     if (slide >= total - 1) return;
@@ -4813,30 +4863,7 @@ function Wrapped({ analytics, diagnostics, selectedAuthor, setSelectedAuthor, sl
 
       {/* Slide */}
       <div key={`${current}-${selectedAuthor}`} style={{ flex: 1, position: 'relative', overflow: 'hidden' }}>
-        {current === 'intro' && <SlideIntro a={analytics} t={t} />}
-        {current === 'message_count' && <SlideMessageCount a={analytics} u={user} t={t} />}
-        {current === 'rank' && <SlideRank a={analytics} u={user} t={t} />}
-        {current === 'vs_everyone' && <SlideVsEveryone a={analytics} u={user} t={t} />}
-        {current === 'title' && <SlideTitle u={user} t={t} />}
-        {current === 'group_describes' && <SlideGroupDescribes u={user} t={t} />}
-        {current === 'peak_hour' && <SlidePeakHour a={analytics} u={user} t={t} />}
-        {current === 'night' && <SlideNight a={analytics} u={user} t={t} />}
-        {current === 'streak' && <SlideStreak u={user} t={t} />}
-        {current === 'speed' && <SlideSpeed a={analytics} u={user} t={t} />}
-        {current === 'signature_word' && <SlideWord u={user} t={t} />}
-        {current === 'top_words' && <SlideTopWords a={analytics} t={t} />}
-        {current === 'top_emoji' && <SlideEmoji a={analytics} u={user} t={t} />}
-        {current === 'drama_role' && <SlideDramaRole u={user} t={t} />}
-        {current === 'roast' && <SlideRoast u={user} profile={profile} t={t} />}
-        {current === 'achievements' && <SlideAchievements achievements={userAchievements} t={t} />}
-        {current === 'most_likely' && <SlideMostLikely a={analytics} t={t} />}
-        {current === 'duo' && <SlideDuo a={analytics} u={user} t={t} />}
-        {current === 'eras' && <SlideEras a={analytics} t={t} />}
-        {current === 'chaos_moment' && <SlideChaosMoment a={analytics} t={t} />}
-        {current === 'group_persona' && <SlideGroupPersona a={analytics} t={t} />}
-        {current === 'awards' && <SlideAwards a={analytics} t={t} />}
-        {current === 'peak_day' && <SlidePeakDay a={analytics} t={t} />}
-        {current === 'finale' && <SlideFinale a={analytics} t={t} onExit={onExit} />}
+        {SlideComp && <SlideComp a={analytics} u={user} t={t} profile={profile} achievements={userAchievements} onExit={onExit} />}
       </div>
     </div>
   );
@@ -4846,7 +4873,7 @@ function Wrapped({ analytics, diagnostics, selectedAuthor, setSelectedAuthor, sl
 // SLIDE SHELL
 // ============================================================
 
-function SlideShell({ children, bg, accent = '#a3e635', shake = false }) {
+const SlideShell = React.memo(function SlideShell({ children, bg, accent = '#a3e635', shake = false }) {
   return (
     <div className={shake ? 'a-shake' : ''} style={{
       position: 'absolute', inset: 0, overflow: 'hidden', background: bg,
@@ -4864,13 +4891,13 @@ function SlideShell({ children, bg, accent = '#a3e635', shake = false }) {
       {children}
     </div>
   );
-}
+})
 
 // ============================================================
 // SLIDES — ALL data flows from props (no random/inferred fields)
 // ============================================================
 
-function SlideIntro({ a, t }) {
+const SlideIntro = React.memo(function SlideIntro({ a, t }) {
   const year = new Date().getFullYear();
   return (
     <SlideShell bg="#0a0a0f" accent="#a3e635">
@@ -4900,9 +4927,9 @@ function SlideIntro({ a, t }) {
       </div>
     </SlideShell>
   );
-}
+})
 
-function SlideMessageCount({ a, u, t }) {
+const SlideMessageCount = React.memo(function SlideMessageCount({ a, u, t }) {
   const animatedGroup = useAnimatedNumber(a.totalMessages, 1800, [a.totalMessages]);
   const animatedUser = useAnimatedNumber(u.messageCount, 1600, [u.author]);
   return (
@@ -4967,9 +4994,9 @@ function SlideMessageCount({ a, u, t }) {
       </div>
     </SlideShell>
   );
-}
+})
 
-function SlideRank({ a, u, t }) {
+const SlideRank = React.memo(function SlideRank({ a, u, t }) {
   const rank = a.users.findIndex(x => x.author === u.author) + 1;
   const ordinal = (n) => {
     const s = ['th', 'st', 'nd', 'rd'], v = n % 100;
@@ -5043,9 +5070,9 @@ function SlideRank({ a, u, t }) {
       </div>
     </SlideShell>
   );
-}
+})
 
-function SlideVsEveryone({ a, u, t }) {
+const SlideVsEveryone = React.memo(function SlideVsEveryone({ a, u, t }) {
   const rank = a.users.findIndex(x => x.author === u.author) + 1;
   const totalUsers = a.users.length;
   const others = totalUsers - 1;
@@ -5119,9 +5146,9 @@ function SlideVsEveryone({ a, u, t }) {
       </div>
     </SlideShell>
   );
-}
+})
 
-function SlideTitle({ u, t }) {
+const SlideTitle = React.memo(function SlideTitle({ u, t }) {
   const title = resolveTitle(u, t);
   const evidence = resolveTitleEvidence(u, t);
   return (
@@ -5154,9 +5181,9 @@ function SlideTitle({ u, t }) {
       </div>
     </SlideShell>
   );
-}
+})
 
-function SlideGroupDescribes({ u, t }) {
+const SlideGroupDescribes = React.memo(function SlideGroupDescribes({ u, t }) {
   return (
     <SlideShell bg="#1a0a18" accent="#f472b6">
       <div style={{
@@ -5182,9 +5209,9 @@ function SlideGroupDescribes({ u, t }) {
       </div>
     </SlideShell>
   );
-}
+})
 
-function SlidePeakHour({ a, u, t }) {
+const SlidePeakHour = React.memo(function SlidePeakHour({ a, u, t }) {
   const hour = u.peakHour;
   const hourStr = String(hour).padStart(2, '0');
   const max = Math.max(...a.groupHourly);
@@ -5231,9 +5258,9 @@ function SlidePeakHour({ a, u, t }) {
       </div>
     </SlideShell>
   );
-}
+})
 
-function SlideNight({ a, u, t }) {
+const SlideNight = React.memo(function SlideNight({ a, u, t }) {
   const pct = useAnimatedNumber(Math.round(u.nightPct), 1400, [u.author]);
   return (
     <SlideShell bg="#0a0418" accent="#a78bfa">
@@ -5293,9 +5320,9 @@ function SlideNight({ a, u, t }) {
       </div>
     </SlideShell>
   );
-}
+})
 
-function SlideStreak({ u, t }) {
+const SlideStreak = React.memo(function SlideStreak({ u, t }) {
   const days = useAnimatedNumber(u.longestStreak, 1200, [u.author]);
   const dotCount = Math.min(u.longestStreak, 30);
   return (
@@ -5338,9 +5365,9 @@ function SlideStreak({ u, t }) {
       </div>
     </SlideShell>
   );
-}
+})
 
-function SlideSpeed({ a, u, t }) {
+const SlideSpeed = React.memo(function SlideSpeed({ a, u, t }) {
   if (u.avgRespMin == null) return null;
   const respTime = u.avgRespMin;
   const display = respTime < 1 ? `${Math.round(respTime * 60)}s`
@@ -5379,9 +5406,9 @@ function SlideSpeed({ a, u, t }) {
       </div>
     </SlideShell>
   );
-}
+})
 
-function SlideWord({ u, t }) {
+const SlideWord = React.memo(function SlideWord({ u, t }) {
   const word = u.topWord;
   return (
     <SlideShell bg="#2a0a1a" accent="#f472b6">
@@ -5410,9 +5437,9 @@ function SlideWord({ u, t }) {
       </div>
     </SlideShell>
   );
-}
+})
 
-function SlideTopWords({ a, t }) {
+const SlideTopWords = React.memo(function SlideTopWords({ a, t }) {
   const words = (a.topWordsGroup || []).slice(0, 5);
   if (words.length === 0) return null;
   const maxCount = words[0].count;
@@ -5489,9 +5516,9 @@ function SlideTopWords({ a, t }) {
       </div>
     </SlideShell>
   );
-}
+})
 
-function SlideEmoji({ a, u, t }) {
+const SlideEmoji = React.memo(function SlideEmoji({ a, u, t }) {
   return (
     <SlideShell bg="#1a0a2a" accent="#fbbf24">
       <div style={{ position: 'absolute', inset: 0, pointerEvents: 'none' }}>
@@ -5523,9 +5550,9 @@ function SlideEmoji({ a, u, t }) {
       </div>
     </SlideShell>
   );
-}
+})
 
-function SlideDramaRole({ u, t }) {
+const SlideDramaRole = React.memo(function SlideDramaRole({ u, t }) {
   // Determine role based on actual computed data
   let titleText, count, labelText, copyText, accent, bg;
   if (u.conversationsRevived > u.conversationsKilled && u.conversationsRevived >= 5) {
@@ -5607,9 +5634,9 @@ function SlideDramaRole({ u, t }) {
       </div>
     </SlideShell>
   );
-}
+})
 
-function SlideRoast({ u, profile, t }) {
+const SlideRoast = React.memo(function SlideRoast({ u, profile, t }) {
   const tone = profile?.tone || 'medium';
   const roasts = u.roasts.slice(0, 2);
   const heading = tone === 'mild' ? t.roast_heading_mild
@@ -5681,9 +5708,9 @@ function SlideRoast({ u, profile, t }) {
       </div>
     </SlideShell>
   );
-}
+})
 
-function SlideAchievements({ achievements, t }) {
+const SlideAchievements = React.memo(function SlideAchievements({ achievements, t }) {
   const top = achievements.slice(0, 3);
   return (
     <SlideShell bg="#0a0a14" accent="#fbbf24">
@@ -5741,9 +5768,9 @@ function SlideAchievements({ achievements, t }) {
       </div>
     </SlideShell>
   );
-}
+})
 
-function SlideMostLikely({ a, t }) {
+const SlideMostLikely = React.memo(function SlideMostLikely({ a, t }) {
   return (
     <SlideShell bg="#0a1a2a" accent="#60a5fa">
       <div style={{
@@ -5806,9 +5833,9 @@ function SlideMostLikely({ a, t }) {
       </div>
     </SlideShell>
   );
-}
+})
 
-function SlideDuo({ a, u, t }) {
+const SlideDuo = React.memo(function SlideDuo({ a, u, t }) {
   const [n1, n2] = a.topDuo.names;
   const isInDuo = n1 === u.author || n2 === u.author;
   const partner = n1 === u.author ? n2 : n1;
@@ -5852,11 +5879,11 @@ function SlideDuo({ a, u, t }) {
       </div>
     </SlideShell>
   );
-}
+})
 
 const MONTH_NAMES = ['January','February','March','April','May','June','July','August','September','October','November','December'];
 
-function SlideEras({ a, t }) {
+const SlideEras = React.memo(function SlideEras({ a, t }) {
   return (
     <SlideShell bg="#0a0418" accent="#a3e635">
       <div style={{
@@ -5916,9 +5943,9 @@ function SlideEras({ a, t }) {
       </div>
     </SlideShell>
   );
-}
+})
 
-function SlideChaosMoment({ a, t }) {
+const SlideChaosMoment = React.memo(function SlideChaosMoment({ a, t }) {
   const cm = a.chaosMinute;
   const ts = cm.ts;
   const dateStr = `${MONTH_NAMES[ts.getMonth()]} ${ts.getDate()}`;
@@ -5984,9 +6011,9 @@ function SlideChaosMoment({ a, t }) {
       </div>
     </SlideShell>
   );
-}
+})
 
-function SlideGroupPersona({ a, t }) {
+const SlideGroupPersona = React.memo(function SlideGroupPersona({ a, t }) {
   return (
     <SlideShell bg="#0a0a18" accent="#a3e635">
       <div style={{
@@ -6026,9 +6053,9 @@ function SlideGroupPersona({ a, t }) {
       </div>
     </SlideShell>
   );
-}
+})
 
-function SlideAwards({ a, t }) {
+const SlideAwards = React.memo(function SlideAwards({ a, t }) {
   // Only include awards with valid winners
   const awards = [
     a.fastestResponder && { trophy: '🏆', label: t.awards_fastest, winner: a.fastestResponder.author,
@@ -6102,9 +6129,9 @@ function SlideAwards({ a, t }) {
       </div>
     </SlideShell>
   );
-}
+})
 
-function SlidePeakDay({ a, t }) {
+const SlidePeakDay = React.memo(function SlidePeakDay({ a, t }) {
   if (!a.peakDay) return null;
   const [date, count] = a.peakDay;
   const [yr, mo, dy] = date.split('-').map(Number);
@@ -6145,9 +6172,9 @@ function SlidePeakDay({ a, t }) {
       </div>
     </SlideShell>
   );
-}
+})
 
-function SlideFinale({ a, t, onExit }) {
+const SlideFinale = React.memo(function SlideFinale({ a, t, onExit }) {
   return (
     <SlideShell bg="#0a0a0f" accent="#a3e635">
       <div style={{
@@ -6188,7 +6215,7 @@ function SlideFinale({ a, t, onExit }) {
       </div>
     </SlideShell>
   );
-}
+})
 
 // ============================================================
 // POST MENU — secondary, with debug access

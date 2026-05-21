@@ -9,7 +9,16 @@
       "Bash(git -C \"c:/workspace\" push origin main)",
       "Bash(git -C \"c:/workspace\" pull --rebase origin main)",
       "Bash(git -C \"c:/workspace\" stash)",
-      "Bash(git -C \"c:/workspace\" stash pop)"
+      "Bash(git -C \"c:/workspace\" stash pop)",
+      "Bash(node --input-type=module)",
+      "Bash(wc -l /mnt/c/workspace/whatsappRecap/src/App.jsx)",
+      "Read(//mnt/c/workspace/whatsappRecap/src/**)",
+      "Bash(node -e ' *)",
+      "Bash(git stash *)",
+      "Bash(node -e \"require\\('fs'\\).readFileSync\\('src/App.jsx','utf8'\\)\")",
+      "Bash(npx --yes acorn --ecma2020 --module src/App.jsx)",
+      "Bash(npx esbuild *)",
+      "Bash(node_modules/.bin/esbuild src/App.jsx --bundle=false)"
     ]
   }
 }
