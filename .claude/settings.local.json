@@ -18,7 +18,8 @@
       "Bash(node -e \"require\\('fs'\\).readFileSync\\('src/App.jsx','utf8'\\)\")",
       "Bash(npx --yes acorn --ecma2020 --module src/App.jsx)",
       "Bash(npx esbuild *)",
-      "Bash(node_modules/.bin/esbuild src/App.jsx --bundle=false)"
+      "Bash(node_modules/.bin/esbuild src/App.jsx --bundle=false)",
+      "PowerShell(npm run build 2>&1)"
     ]
   }
 }

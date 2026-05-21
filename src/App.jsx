@@ -4503,33 +4503,6 @@ const SLIDES_DEF = [
   'finale',
 ];
 
-const SLIDE_COMPONENTS = {
-  intro:           SlideIntro,
-  message_count:   SlideMessageCount,
-  rank:            SlideRank,
-  vs_everyone:     SlideVsEveryone,
-  title:           SlideTitle,
-  group_describes: SlideGroupDescribes,
-  peak_hour:       SlidePeakHour,
-  night:           SlideNight,
-  streak:          SlideStreak,
-  speed:           SlideSpeed,
-  signature_word:  SlideWord,
-  top_words:       SlideTopWords,
-  top_emoji:       SlideEmoji,
-  drama_role:      SlideDramaRole,
-  roast:           SlideRoast,
-  achievements:    SlideAchievements,
-  most_likely:     SlideMostLikely,
-  duo:             SlideDuo,
-  eras:            SlideEras,
-  chaos_moment:    SlideChaosMoment,
-  group_persona:   SlideGroupPersona,
-  awards:          SlideAwards,
-  peak_day:        SlidePeakDay,
-  finale:          SlideFinale,
-};
-
 // ============================================================
 // ONBOARDING — quick questions for personalized analysis
 // ============================================================
@@ -6216,6 +6189,33 @@ const SlideFinale = React.memo(function SlideFinale({ a, t, onExit }) {
     </SlideShell>
   );
 })
+
+const SLIDE_COMPONENTS = {
+  intro:           SlideIntro,
+  message_count:   SlideMessageCount,
+  rank:            SlideRank,
+  vs_everyone:     SlideVsEveryone,
+  title:           SlideTitle,
+  group_describes: SlideGroupDescribes,
+  peak_hour:       SlidePeakHour,
+  night:           SlideNight,
+  streak:          SlideStreak,
+  speed:           SlideSpeed,
+  signature_word:  SlideWord,
+  top_words:       SlideTopWords,
+  top_emoji:       SlideEmoji,
+  drama_role:      SlideDramaRole,
+  roast:           SlideRoast,
+  achievements:    SlideAchievements,
+  most_likely:     SlideMostLikely,
+  duo:             SlideDuo,
+  eras:            SlideEras,
+  chaos_moment:    SlideChaosMoment,
+  group_persona:   SlideGroupPersona,
+  awards:          SlideAwards,
+  peak_day:        SlidePeakDay,
+  finale:          SlideFinale,
+};
 
 // ============================================================
 // POST MENU — secondary, with debug access
