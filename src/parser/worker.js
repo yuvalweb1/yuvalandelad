@@ -11,29 +11,35 @@
 //   in : { id, type: 'parseFile', file }   // File (.zip or .txt)
 //        { id, type: 'parseText', text }    // raw transcript text
 //   out: { id, type: 'progress', phase }    // 'unzip' | 'parse'
-//        { id, type: 'result', messages, diagnostics }
+//        { id, type: 'result', messages, diagnostics, media }
 //        { id, type: 'error',  error }
 //
-// Date objects in `messages` survive structured clone, so no
-// (de)serialization step is needed on the main thread.
+// `media` (only for .zip "with media" exports) is an array of
+// { name, mime, author, ts, bytes:Uint8Array } — bytes are transferred
+// zero-copy; the main thread turns them into blob URLs. Date objects in
+// `messages` survive structured clone.
 // ============================================================
 
 import { parseWhatsApp } from './parse.js';
-import { readZipText } from './zip.js';
+import { readZipBundle } from './zip.js';
 
 self.onmessage = async (e) => {
   const { id, type } = e.data || {};
-  const post = (msg) => self.postMessage({ id, ...msg });
+  const post = (msg, transfer) => self.postMessage({ id, ...msg }, transfer || []);
 
   try {
     let text;
+    let media = [];
 
     if (type === 'parseFile') {
       const file = e.data.file;
       const name = (file.name || '').toLowerCase();
-      if (name.endsWith('.zip') || (!name.endsWith('.txt') && (await looksLikeZip(file)))) {
+      const isZip = name.endsWith('.zip') || (!name.endsWith('.txt') && (await looksLikeZip(file)));
+      if (isZip) {
         post({ type: 'progress', phase: 'unzip' });
-        text = await readZipText(file);
+        const bundle = await readZipBundle(file);
+        text = bundle.text;
+        media = bundle.media;
       } else if (name.endsWith('.txt') || name === '') {
         text = await file.text();
       } else {
@@ -47,7 +53,22 @@ self.onmessage = async (e) => {
 
     post({ type: 'progress', phase: 'parse' });
     const { messages, diagnostics } = parseWhatsApp(text);
-    post({ type: 'result', messages, diagnostics });
+
+    // Tie each extracted image to who sent it (and when) via the filename the
+    // chat references. Drop images that don't decode to a known sender only if
+    // we can't place them at all — we still keep them for the group collage.
+    if (media.length > 0) {
+      const byName = {};
+      for (const m of messages) if (m.mediaFile) byName[m.mediaFile] = m;
+      for (const item of media) {
+        const ref = byName[item.name];
+        item.author = ref ? ref.author : null;
+        item.ts = ref ? ref.timestamp : null;
+      }
+    }
+
+    const transfer = media.map(m => m.bytes.buffer);
+    post({ type: 'result', messages, diagnostics, media }, transfer);
   } catch (err) {
     post({ type: 'error', error: err && err.message ? err.message : String(err) });
   }

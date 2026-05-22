@@ -36,6 +36,20 @@ export function stripDirectional(s) {
 }
 
 /**
+ * Pull the attached file's name out of a media message so it can be matched to
+ * the actual file inside the .zip. Handles iOS `<attached: NAME>` / `<מצורף: NAME>`
+ * and Android `NAME (file attached)` styles.
+ * @param {string} content
+ * @returns {string|null}
+ */
+export function extractMediaFile(content) {
+  let m = content.match(/<(?:attached|מצורף):\s*([^>]+?)\s*>/i);
+  if (m) return m[1].trim();
+  m = content.match(/([^\s<>"]+\.(?:jpe?g|png|webp|gif|mp4|opus|m4a|3gp))/i);
+  return m ? m[1].trim() : null;
+}
+
+/**
  * Build a local-time Date from the captured header fields.
  * Assumes DD/MM order (WhatsApp uses the device locale; IL and most regions
  * are day-first). Returns null for impossible dates so callers can count them
@@ -188,6 +202,7 @@ export function parseWhatsApp(rawText) {
         content,
         contentLength: content.length,
         isDeleted, hasMedia, isVoice, hasLink: linkMatches.length > 0,
+        mediaFile: hasMedia ? extractMediaFile(content) : null,
         linkCount: linkMatches.length,
         emojis, wordCount, isQuestion,
         hour: date.getHours(),

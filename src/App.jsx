@@ -1059,17 +1059,17 @@ const I18N = {
     howto_android: 'Android',
     howto_cta: 'Got it — let\'s go →',
     howto_link: 'How to export →',
-    howto_tip: '💡 Pick "Without Media" — it\'s faster, and we only need the text. Nothing leaves your device.',
+    howto_tip: '💡 Pick "Attach Media" and your Wrapped includes real photos 📸 — or "Without Media" for speed. Either way, nothing leaves your device.',
     howto_ios_1: 'Open the chat or group you want to wrap.',
     howto_ios_2: 'Tap the group / contact name at the top.',
     howto_ios_3: 'Scroll down and tap "Export Chat".',
-    howto_ios_4: 'Choose "Without Media".',
+    howto_ios_4: 'Choose "Attach Media" for photos (or "Without Media" for speed).',
     howto_ios_5: 'Save the file (or Share to Files) — then upload it here.',
     howto_and_1: 'Open the chat or group you want to wrap.',
     howto_and_2: 'Tap the ⋮ menu (top right).',
     howto_and_3: 'Tap "More" → "Export chat".',
-    howto_and_4: 'Choose "Without media".',
-    howto_and_5: 'Save the .txt file — then upload it here.',
+    howto_and_4: 'Choose "Include media" for photos (or "Without media" for speed).',
+    howto_and_5: 'Save the file — then upload it here.',
     howto_mock_group: 'The Squad 🔥',
     howto_mock_export: 'Export Chat',
     howto_mock_nomedia: 'Without Media',
@@ -1078,6 +1078,9 @@ const I18N = {
     howto_mock_row_mute: 'Notifications',
     howto_mock_row_clear: 'Clear Chat',
     howto_mock_upload: 'Upload here ↑',
+    photos_eyebrow: 'CAUGHT ON CAMERA',
+    photos_title: '{n} photos this year',
+    photos_sub: 'Straight from your chat · on your device only',
     err_format: 'Upload a .txt or .zip from WhatsApp export.',
     err_no_msgs: 'No messages found. Format may not be supported.',
     onboard_skip: 'Skip',
@@ -1624,17 +1627,17 @@ const I18N = {
     howto_android: 'אנדרואיד',
     howto_cta: 'הבנתי, בוא נתחיל ←',
     howto_link: 'איך מורידים? ←',
-    howto_tip: '💡 בחר/י "ללא מדיה" — מהיר יותר, ואנחנו צריכים רק את הטקסט. שום דבר לא יוצא מהמכשיר.',
+    howto_tip: '💡 בחר/י "צרף מדיה" והסיכום יכלול תמונות אמיתיות 📸 — או "ללא מדיה" למהיר. בכל מקרה הכל נשאר במכשיר שלך.',
     howto_ios_1: 'פתח/י את הצ׳אט או הקבוצה שתרצו לסכם.',
     howto_ios_2: 'הקש/י על שם הקבוצה / איש הקשר למעלה.',
     howto_ios_3: 'גלול/י למטה והקש/י על "ייצוא צ׳אט".',
-    howto_ios_4: 'בחר/י "ללא מדיה".',
+    howto_ios_4: 'בחר/י "צרף מדיה" לתמונות (או "ללא מדיה" למהיר).',
     howto_ios_5: 'שמור/י את הקובץ (או שתף/י ל-Files) — ואז העלו אותו כאן.',
     howto_and_1: 'פתח/י את הצ׳אט או הקבוצה שתרצו לסכם.',
     howto_and_2: 'הקש/י על תפריט שלוש הנקודות (⋮) למעלה.',
     howto_and_3: 'הקש/י על "עוד" ← "ייצוא צ׳אט".',
-    howto_and_4: 'בחר/י "ללא מדיה".',
-    howto_and_5: 'שמור/י את קובץ ה-.txt — ואז העלו אותו כאן.',
+    howto_and_4: 'בחר/י "כלול מדיה" לתמונות (או "ללא מדיה" למהיר).',
+    howto_and_5: 'שמור/י את הקובץ — ואז העלו אותו כאן.',
     howto_mock_group: 'החבר׳ה 🔥',
     howto_mock_export: 'ייצוא צ׳אט',
     howto_mock_nomedia: 'ללא מדיה',
@@ -1643,6 +1646,9 @@ const I18N = {
     howto_mock_row_mute: 'התראות',
     howto_mock_row_clear: 'ניקוי הצ׳אט',
     howto_mock_upload: 'העלו כאן ↑',
+    photos_eyebrow: 'נתפס במצלמה',
+    photos_title: '{n} תמונות השנה',
+    photos_sub: 'ישר מהצ׳אט · רק במכשיר שלך',
     err_format: 'העלה קובץ .txt או .zip מהיצוא של ווצאפ.',
     err_no_msgs: 'לא נמצאו הודעות. ייתכן שהפורמט אינו נתמך.',
     onboard_skip: 'דלג',
@@ -3974,7 +3980,7 @@ function ChatWrappedApp() {
     try {
       // ZIP inflate + parse run in a Web Worker so a huge export never
       // freezes the UI. Progress phases drive the cinematic stage meter.
-      const { messages: parsed, diagnostics: diag } = await parseChat({
+      const { messages: parsed, diagnostics: diag, media } = await parseChat({
         file,
         onProgress: (phase) => setParsingStage(phase === 'unzip' ? 1 : 2),
       });
@@ -3987,6 +3993,7 @@ function ChatWrappedApp() {
       setParsingStage(3);
       await new Promise(r => setTimeout(r, 400));
       const a = computeAll(parsed);
+      a.photos = media || [];   // real images from a "with media" .zip (blob URLs)
       setParsingStage(4);
       await new Promise(r => setTimeout(r, 400));
       setAnalytics(a);
@@ -4025,6 +4032,10 @@ function ChatWrappedApp() {
   }, []);
 
   const reset = () => {
+    // Free any object URLs created for chat photos before dropping analytics.
+    if (analytics && analytics.photos) {
+      for (const p of analytics.photos) { try { URL.revokeObjectURL(p.url); } catch {} }
+    }
     setAnalytics(null);
     setDiagnostics(null);
     setStage('landing');
@@ -4573,8 +4584,8 @@ function WaMock({ kind, t }) {
         <div style={{ height: '100%', background: 'rgba(0,0,0,0.25)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 10 }}>
           <div style={{ background: '#fff', borderRadius: 10, width: '100%', padding: 8, boxShadow: '0 6px 18px rgba(0,0,0,0.3)' }}>
             <div dir="auto" style={{ fontSize: 8, color: '#666', marginBottom: 6 }}>{t.howto_mock_export}?</div>
-            <div dir="auto" style={{ fontSize: 9, fontWeight: 800, color: '#15151d', padding: 7, borderRadius: 6, background: '#FFD700', boxShadow: '0 0 0 2px #FF69B4', textAlign: 'center', marginBottom: 5 }}>{t.howto_mock_nomedia}</div>
-            <div dir="auto" style={{ fontSize: 9, fontWeight: 600, color: '#444', padding: 7, borderRadius: 6, background: '#f0f0f0', textAlign: 'center' }}>{t.howto_mock_media}</div>
+            <div dir="auto" style={{ fontSize: 9, fontWeight: 800, color: '#15151d', padding: 7, borderRadius: 6, background: '#FFD700', boxShadow: '0 0 0 2px #FF69B4', textAlign: 'center', marginBottom: 5 }}>📸 {t.howto_mock_media}</div>
+            <div dir="auto" style={{ fontSize: 9, fontWeight: 600, color: '#444', padding: 7, borderRadius: 6, background: '#f0f0f0', textAlign: 'center' }}>{t.howto_mock_nomedia}</div>
           </div>
         </div>
         <HandPointer style={{ top: 70, insetInlineStart: 26 }} />
@@ -5050,6 +5061,7 @@ const SLIDES_DEF = [
   'per_person',       // messages, % of total, words, avg words/msg
   'signature_words',  // one meaningful word per person
   'group_top',        // group's top emoji + top meaningful word
+  'photos',           // real photos from a "with media" export (skipped if none)
   'awards',           // superlatives from real stats
   'drama_role',       // your role in the group
   'teaser',           // locked cards: roast / duo / profile / chaos → want more
@@ -5316,6 +5328,7 @@ function Wrapped({ analytics, diagnostics, selectedAuthor, setSelectedAuthor, sl
     // Group-first deck: skip a slide only when its verified data is missing.
     if (s === 'signature_words' && !analytics.users.some(x => x.topWord)) return false;
     if (s === 'group_top' && !((analytics.topWordsGroup && analytics.topWordsGroup.length) || (analytics.topEmojisGroup && analytics.topEmojisGroup.length))) return false;
+    if (s === 'photos' && (!analytics.photos || analytics.photos.length === 0)) return false;
     if (s === 'drama_role' && !user) return false;
     return true;
   }), [selectedAuthor, userAchievements.length, user, analytics, profile]);
@@ -7041,6 +7054,42 @@ const SlideGroupTop = React.memo(function SlideGroupTop({ a, t }) {
   );
 })
 
+// Photos — real images extracted on-device from the "with media" .zip
+const SlidePhotos = React.memo(function SlidePhotos({ a, t }) {
+  const photos = a.photos || [];
+  if (photos.length === 0) return null;
+  const shown = photos.slice(0, 9);
+  const tilts = [-3, 2, -2, 3, -1, 2, -3, 1, -2];
+  return (
+    <SlideShell bg="#f3722c" accent="#FF8C00">
+      <div style={{ position: 'relative', height: '100%', display: 'flex', flexDirection: 'column', padding: '32px 22px 22px' }}>
+        <div className="fs-sans a-fade-up" style={{ textAlign: 'center', fontSize: 12, color: '#FF8C00', letterSpacing: '0.15em', fontWeight: 500, textTransform: 'uppercase' }}>
+          {t.photos_eyebrow}
+        </div>
+        <div className="fs-display a-fade-up" style={{ textAlign: 'center', animationDelay: '0.15s', fontSize: 30, lineHeight: 1.12, letterSpacing: '-0.03em', fontWeight: 800, color: '#2a0645', marginTop: 8, marginBottom: 4 }}>
+          {interp(t.photos_title, { n: photos.length.toLocaleString() })}
+        </div>
+        <div className="fs-mono a-fade-up" style={{ textAlign: 'center', animationDelay: '0.2s', fontSize: 11, color: 'rgba(42,6,69,0.5)', marginBottom: 14 }}>
+          {t.photos_sub}
+        </div>
+        <div className="no-sb" style={{ flex: 1, overflowY: 'auto' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 8 }}>
+            {shown.map((p, i) => (
+              <div key={p.url} className="a-spring" style={{
+                aspectRatio: '1 / 1', borderRadius: 12, overflow: 'hidden',
+                background: '#fff', padding: 3, transform: `rotate(${tilts[i % tilts.length]}deg)`,
+                boxShadow: '0 6px 14px -4px rgba(74,14,78,0.4)', animationDelay: `${0.3 + i * 0.07}s`,
+              }}>
+                <img src={p.url} alt="" loading="lazy" style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: 9, display: 'block' }} />
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </SlideShell>
+  );
+})
+
 // 9) Teaser — locked cards that make users want more (Step 4 hook)
 const SlideTeaser = React.memo(function SlideTeaser({ t, onMenu, onExit }) {
   const cards = [
@@ -7078,6 +7127,7 @@ const SLIDE_COMPONENTS = {
   per_person:      SlidePerPerson,
   signature_words: SlideSignatureWords,
   group_top:       SlideGroupTop,
+  photos:          SlidePhotos,
   teaser:          SlideTeaser,
   message_count:   SlideMessageCount,
   rank:            SlideRank,

@@ -18,8 +18,8 @@
 //   const { messages, diagnostics } = await parseChat({ file });
 // ============================================================
 
-export { parseWhatsApp, parseDate, stripDirectional } from './parse.js';
-export { readZipText } from './zip.js';
+export { parseWhatsApp, parseDate, stripDirectional, extractMediaFile } from './parse.js';
+export { readZipText, readZipBundle } from './zip.js';
 export {
   SYSTEM_PATTERNS,
   MEDIA_PATTERNS,

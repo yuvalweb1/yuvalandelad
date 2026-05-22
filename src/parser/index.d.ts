@@ -67,3 +67,19 @@ export function stripDirectional(s: string): string;
 
 /** Extract the chat transcript text from a WhatsApp .zip export (browser-native). */
 export function readZipText(file: Blob): Promise<string>;
+
+/** Pull the attached filename out of a media message ('<attached: x>' / 'x (file attached)'). */
+export function extractMediaFile(content: string): string | null;
+
+/** Raw image extracted from a "with media" .zip (bytes, not yet a blob URL). */
+export interface ZipMedia {
+  name: string;
+  bytes: Uint8Array;
+  mime: string;
+}
+
+/** Extract the chat text AND image files from a WhatsApp "with media" .zip. Memory-guarded. */
+export function readZipBundle(
+  file: Blob,
+  opts?: { maxImages?: number; maxBytes?: number; maxTotalBytes?: number }
+): Promise<{ text: string; media: ZipMedia[] }>;

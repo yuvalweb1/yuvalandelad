@@ -40,6 +40,8 @@ export const MEDIA_PATTERNS = [
   /^.{0,18}הושמטה?>?\s*$/,
   // Android Hebrew variant ("media not included")
   /<מדיה לא נכללה>/, /<המדיה לא נכללה>/,
+  // Android "with media" exports reference the file: "IMG-….jpg (file attached)"
+  /\(file attached\)\s*$/i, /\(קובץ מצורף\)\s*$/,
   /<Media omitted>/i, /image omitted/i, /video omitted/i,
   /sticker omitted/i, /GIF omitted/i, /document omitted/i,
   /<מצורף:/, /<attached:/i,

@@ -42,7 +42,9 @@
       "Bash(awk '{print \"behind: \"$1\" ahead: \"$2}')",
       "Bash(cat)",
       "Bash(node scripts/test-groupname.mjs)",
-      "Bash(node scripts/test-media.mjs)"
+      "Bash(node scripts/test-media.mjs)",
+      "Bash(rm -f scripts/test-media-zip.mjs)",
+      "Bash(node scripts/test-media-zip.mjs)"
     ]
   }
 }
