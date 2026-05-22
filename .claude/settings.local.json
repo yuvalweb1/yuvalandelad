@@ -26,7 +26,12 @@
       "Bash(npx playwright *)",
       "Read(//c/tmp/**)",
       "Bash(grep -v \"fs-display\\\\|fs-mono\\\\|Bricolage\\\\|//\")",
-      "Bash(node scripts/apply-theme.js)"
+      "Bash(node scripts/apply-theme.js)",
+      "Bash(npm install *)",
+      "Bash(node -e \"const {chromium}=require\\('playwright'\\); chromium.executablePath ? console.log\\('exe:', \\(\\(\\)=>{try{return chromium.executablePath\\(\\)}catch\\(e\\){return 'unknown'}}\\)\\(\\)\\) : 0\")",
+      "Bash(node scripts/verify-demo.mjs)",
+      "Bash(git checkout *)",
+      "Bash(git add *)"
     ]
   }
 }

@@ -1,0 +1,49 @@
+{
+  "name": "whatsapp-wrapped-parser",
+  "version": "0.1.0",
+  "description": "Dependency-free, 100% client-side WhatsApp chat export parser (iOS + Android, multiline, Hebrew/RTL) with honest diagnostics and an optional Web Worker.",
+  "type": "module",
+  "main": "index.js",
+  "module": "index.js",
+  "types": "index.d.ts",
+  "exports": {
+    ".": "./index.js",
+    "./client": "./client.js",
+    "./worker": "./worker.js"
+  },
+  "files": [
+    "index.js",
+    "parse.js",
+    "patterns.js",
+    "zip.js",
+    "worker.js",
+    "client.js",
+    "index.d.ts",
+    "client.d.ts",
+    "README.md"
+  ],
+  "sideEffects": [
+    "./worker.js"
+  ],
+  "keywords": [
+    "whatsapp",
+    "parser",
+    "chat",
+    "export",
+    "wrapped",
+    "client-side",
+    "privacy",
+    "web-worker",
+    "hebrew",
+    "rtl"
+  ],
+  "author": "yuvalweb1",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/yuvalweb1/whatsapp-wrapped-parser.git"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

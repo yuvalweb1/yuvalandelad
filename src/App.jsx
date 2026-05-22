@@ -1,330 +1,13 @@
 ﻿import React, { useState, useMemo, useCallback, useRef, useEffect } from 'react';
+import { parseChat } from './parser/client.js';
+import { EMOJI_RE, LINK_RE } from './parser/index.js';
 
 // ============================================================
-// PARSER — with full diagnostics
+// PARSER + ZIP — extracted to ./parser (open-source: whatsapp-wrapped-parser).
+// parseWhatsApp + readZipText now run off the main thread in a Web Worker,
+// driven by parseChat() from ./parser/client.js. EMOJI_RE / LINK_RE are
+// re-imported above for the analytics tokenizer in computeAll below.
 // ============================================================
-
-// System message patterns (HE + EN, common WhatsApp variants)
-// We keep these strict so we don't accidentally drop real content
-const SYSTEM_PATTERNS = [
-  // Hebrew
-  /^הצטרפת לקבוצה/, /הצטרף\/ה? באמצעות הקישור/, /הצטרפ.{0,3} באמצעות/,
-  /הוסיף\/ה? את/, /הסיר\/ה? את/, /יצא\/ה? מ?הקבוצה/, /יצאת מהקבוצה/,
-  /שינה\/תה? את שם הקבוצה/, /שינה\/תה? את התיאור/, /שינה\/תה? את התמונה/,
-  /נוצרה הקבוצה/, /יצרת קבוצה/, /יצר\/ה? את הקבוצה/,
-  /^ההודעות והשיחות מוצפנות/, /הצפנה מקצה לקצה/,
-  /ההודעה הזו נמחקה/, /מחקת את ההודעה הזו/,
-  // English
-  /^.+ joined using this group/i, /^.+ was added/i, /^.+ added .+/i,
-  /^.+ left$/i, /^.+ was removed/i, /^.+ removed .+/i,
-  /^.+ changed the subject/i, /^.+ changed this group/i,
-  /^.+ changed the group description/i, /changed the group's icon/i,
-  /^.+ created group/i, /^.+ created this group/i,
-  /^Messages and calls are end-to-end encrypted/i,
-  /^This message was deleted$/i, /^You deleted this message$/i,
-  /^Missed (voice|video) call$/i,
-];
-
-const MEDIA_PATTERNS = [
-  /<המדיה הושמטה>/, /<מדיה הושמטה>/,
-  /<Media omitted>/i, /image omitted/i, /video omitted/i,
-  /sticker omitted/i, /GIF omitted/i, /document omitted/i,
-  /<מצורף:/, /<attached:/i,
-];
-
-const VOICE_PATTERNS = [
-  /הודעה קולית הושמטה/, /audio omitted/i, /voice message omitted/i,
-  /PTT-.*\.opus/, /\.opus/,
-];
-
-const DELETED_PATTERNS = [
-  /^ההודעה הזו נמחקה$/, /^מחקת את ההודעה הזו$/,
-  /^This message was deleted$/, /^You deleted this message$/,
-];
-
-const LINK_RE = /(https?:\/\/[^\s]+)/g;
-const EMOJI_RE = /[\u{1F300}-\u{1F9FF}\u{2600}-\u{27BF}\u{2700}-\u{27BF}\u{1F000}-\u{1F02F}\u{1F0A0}-\u{1F0FF}\u{1F100}-\u{1F64F}\u{1F910}-\u{1F96B}\u{1F980}-\u{1F9E0}\u{1F1E6}-\u{1F1FF}]/gu;
-
-// Two header formats with all known variants
-// iOS: [DD.MM.YYYY, HH:MM:SS] Sender: msg   (also DD/MM/YYYY, DD-MM-YYYY, with/without AM/PM)
-// Android: DD/MM/YY, HH:MM - Sender: msg   (with/without AM/PM)
-const HEADER_PATTERNS = [
-  {
-    name: 'ios_bracket',
-    re: /^\[(\d{1,2})[./\-](\d{1,2})[./\-](\d{2,4}),?\s+(\d{1,2}):(\d{2})(?::(\d{2}))?(?:\s?([AaPp][Mm]))?\]\s*([^:]{1,80}?):\s?(.*)$/,
-  },
-  {
-    name: 'android_dash',
-    re: /^(\d{1,2})[./\-](\d{1,2})[./\-](\d{2,4}),?\s+(\d{1,2}):(\d{2})(?::(\d{2}))?(?:\s?([AaPp][Mm]))?\s+[-–—]\s+([^:]{1,80}?):\s?(.*)$/,
-  },
-];
-
-// Date-only headers (no sender, no colon) — system events
-const SYSTEM_HEADER_PATTERNS = [
-  /^\[\d{1,2}[./\-]\d{1,2}[./\-]\d{2,4},?\s+\d{1,2}:\d{2}(?::\d{2})?(?:\s?[AaPp][Mm])?\]\s*[^:]+$/,
-  /^\d{1,2}[./\-]\d{1,2}[./\-]\d{2,4},?\s+\d{1,2}:\d{2}(?::\d{2})?(?:\s?[AaPp][Mm])?\s+[-–—]\s+[^:]+$/,
-];
-
-function stripDirectional(s) {
-  // U+200E, U+200F LRM/RLM; U+202A-U+202E directional; U+2066-U+2069 isolates
-  return s.replace(/[\u200E\u200F\u202A\u202B\u202C\u202D\u202E\u2066\u2067\u2068\u2069]/g, '');
-}
-
-function parseDate(d, mo, y, h, mi, ampm) {
-  let year = parseInt(y, 10);
-  if (year < 100) year = year < 50 ? 2000 + year : 1900 + year;
-  let hour = parseInt(h, 10);
-  if (ampm) {
-    const isPM = ampm.toLowerCase() === 'pm';
-    if (isPM && hour < 12) hour += 12;
-    if (!isPM && hour === 12) hour = 0;
-  }
-  // Note: WhatsApp uses local day/month order (DD/MM in most regions including IL).
-  // We assume DD/MM. If first number > 12 we know that's the day.
-  const day = parseInt(d, 10);
-  const month = parseInt(mo, 10);
-  if (day < 1 || day > 31 || month < 1 || month > 12 || hour < 0 || hour > 23) return null;
-  const date = new Date(year, month - 1, day, hour, parseInt(mi, 10));
-  return isNaN(date.getTime()) ? null : date;
-}
-
-function parseWhatsApp(rawText) {
-  const diagnostics = {
-    rawLineCount: 0,
-    nonEmptyLines: 0,
-    parsedMessages: 0,
-    continuationLines: 0,
-    systemMessages: 0,
-    deletedMessages: 0,
-    mediaMessages: 0,
-    voiceMessages: 0,
-    skippedUnparseable: 0,
-    warnings: [],
-    sample: [],
-    detectedFormat: null,
-    perAuthorCount: {},
-    perAuthorWordCount: {},
-    perAuthorMediaCount: {},
-    perAuthorVoiceCount: {},
-    hadBOM: false,
-    hadDirectionalMarks: false,
-  };
-
-  if (rawText.charCodeAt(0) === 0xFEFF) {
-    diagnostics.hadBOM = true;
-    rawText = rawText.slice(1);
-  }
-  if (/[\u200E\u200F\u202A-\u202E\u2066-\u2069]/.test(rawText)) {
-    diagnostics.hadDirectionalMarks = true;
-  }
-
-  const lines = rawText.split(/\r?\n/);
-  diagnostics.rawLineCount = lines.length;
-
-  const messages = [];
-  const authorNameEmojis = new Set();
-  let current = null;
-
-  for (let rawLineIdx = 0; rawLineIdx < lines.length; rawLineIdx++) {
-    const line = stripDirectional(lines[rawLineIdx]);
-    if (!line.trim()) continue;
-    diagnostics.nonEmptyLines++;
-
-    let matched = null;
-    for (const pat of HEADER_PATTERNS) {
-      const m = line.match(pat.re);
-      if (m) { matched = { pat, m }; break; }
-    }
-
-    if (matched) {
-      if (!diagnostics.detectedFormat) diagnostics.detectedFormat = matched.pat.name;
-
-      const [, d, mo, y, h, mi, , ampm, author, content] = matched.m;
-      const date = parseDate(d, mo, y, h, mi, ampm);
-      if (!date) {
-        diagnostics.skippedUnparseable++;
-        continue;
-      }
-
-      // Check if this header is actually a system-event header (sender contains a system pattern)
-      const cleanAuthor = author.trim();
-      const isSystemEvent = SYSTEM_PATTERNS.some(p => p.test(cleanAuthor)) ||
-                            SYSTEM_PATTERNS.some(p => p.test(content));
-
-      if (current) {
-        messages.push(current);
-        current = null;
-      }
-
-      if (isSystemEvent) {
-        diagnostics.systemMessages++;
-        continue;
-      }
-
-      // Track emojis in author names (we'll exclude these from emoji counts later)
-      (cleanAuthor.match(EMOJI_RE) || []).forEach(e => authorNameEmojis.add(e));
-
-      const isDeleted = DELETED_PATTERNS.some(p => p.test(content));
-      const hasMedia = MEDIA_PATTERNS.some(p => p.test(content));
-      const isVoice = VOICE_PATTERNS.some(p => p.test(content));
-      const linkMatches = content.match(LINK_RE) || [];
-      const emojis = (content.match(EMOJI_RE) || []);
-      let cleanContent = linkMatches.length > 0 ? content.replace(LINK_RE, '') : content;
-      if (emojis.length > 0) cleanContent = cleanContent.replace(EMOJI_RE, '');
-      cleanContent = cleanContent.trim();
-      const wordCount = cleanContent.length > 0 ? cleanContent.split(/\s+/).filter(Boolean).length : 0;
-      const isQuestion = /[?؟]/.test(content);
-
-      current = {
-        rawLineIdx,
-        rawLine: line,
-        timestamp: date,
-        author: cleanAuthor,
-        content,
-        contentLength: content.length,
-        isDeleted, hasMedia, isVoice, hasLink: linkMatches.length > 0,
-        linkCount: linkMatches.length,
-        emojis, wordCount, isQuestion,
-        hour: date.getHours(),
-        weekday: date.getDay(),
-        dayKey: `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`,
-      };
-    } else if (SYSTEM_HEADER_PATTERNS.some(p => p.test(line))) {
-      // A header with no sender — system message
-      if (current) { messages.push(current); current = null; }
-      diagnostics.systemMessages++;
-    } else if (current) {
-      // Continuation of previous message
-      current.content += '\n' + line;
-      current.contentLength += line.length + 1;
-      const newWords = line.split(/\s+/).filter(Boolean).length;
-      current.wordCount += newWords;
-      diagnostics.continuationLines++;
-    } else {
-      // Unparseable orphan line (no current message to attach to)
-      // This typically happens at the start of a file with malformed exports
-      diagnostics.skippedUnparseable++;
-    }
-  }
-  if (current) messages.push(current);
-
-  // Single pass: tally flags (all messages), strip author-name emojis, build realMessages,
-  // and accumulate per-author counts — all in one loop to avoid re-iterating the array.
-  const realMessages = [];
-  for (const msg of messages) {
-    if (msg.isDeleted) diagnostics.deletedMessages++;
-    // media/voice tallied from all messages (matches original behaviour — deleted msgs may carry flags)
-    if (msg.hasMedia) diagnostics.mediaMessages++;
-    if (msg.isVoice) diagnostics.voiceMessages++;
-    if (msg.emojis.length > 0 && authorNameEmojis.size > 0) {
-      msg.emojis = msg.emojis.filter(e => !authorNameEmojis.has(e));
-    }
-    if (!msg.isDeleted) {
-      // Per-author counts only for real (non-deleted) messages — fully traceable
-      diagnostics.perAuthorCount[msg.author] = (diagnostics.perAuthorCount[msg.author] || 0) + 1;
-      diagnostics.perAuthorWordCount[msg.author] = (diagnostics.perAuthorWordCount[msg.author] || 0) + msg.wordCount;
-      if (msg.hasMedia) diagnostics.perAuthorMediaCount[msg.author] = (diagnostics.perAuthorMediaCount[msg.author] || 0) + 1;
-      if (msg.isVoice) diagnostics.perAuthorVoiceCount[msg.author] = (diagnostics.perAuthorVoiceCount[msg.author] || 0) + 1;
-      realMessages.push(msg);
-    }
-  }
-  diagnostics.parsedMessages = realMessages.length;
-
-  // Sample first 20 messages for debug screen
-  diagnostics.sample = messages.slice(0, 20).map(m => ({
-    rawLineIdx: m.rawLineIdx,
-    rawLine: m.rawLine.length > 140 ? m.rawLine.slice(0, 140) + '…' : m.rawLine,
-    timestamp: m.timestamp.toISOString(),
-    author: m.author,
-    contentPreview: m.content.length > 80 ? m.content.slice(0, 80) + '…' : m.content,
-    flags: [
-      m.isDeleted && 'DELETED',
-      m.hasMedia && 'MEDIA',
-      m.isVoice && 'VOICE',
-      m.hasLink && 'LINK',
-      m.isQuestion && 'QUESTION',
-    ].filter(Boolean).join(','),
-  }));
-
-  // Warnings
-  const totalLines = diagnostics.rawLineCount;
-  const skipRatio = totalLines > 0 ? diagnostics.skippedUnparseable / totalLines : 0;
-  if (skipRatio > 0.05) {
-    diagnostics.warnings.push(`${(skipRatio * 100).toFixed(1)}% of lines could not be parsed. Format may be unusual.`);
-  }
-  if (diagnostics.parsedMessages < 20) {
-    diagnostics.warnings.push(`Only ${diagnostics.parsedMessages} messages parsed. Some metrics will be unreliable.`);
-  }
-  if (Object.keys(diagnostics.perAuthorCount).length === 1) {
-    diagnostics.warnings.push(`Only one participant detected. This may be a 1-on-1 chat or a parsing issue.`);
-  }
-  if (!diagnostics.detectedFormat) {
-    diagnostics.warnings.push(`No standard WhatsApp header format was detected.`);
-  }
-
-  // Confidence score
-  let confidence = 100;
-  if (skipRatio > 0.02) confidence -= Math.min(40, skipRatio * 400);
-  if (diagnostics.parsedMessages < 50) confidence -= 20;
-  if (diagnostics.parsedMessages < 10) confidence -= 30;
-  if (!diagnostics.detectedFormat) confidence -= 50;
-  diagnostics.confidence = Math.max(0, Math.round(confidence));
-
-  return { messages: realMessages, diagnostics };
-}
-
-// ============================================================
-// ZIP DECODING — same as before, browser-native
-// ============================================================
-
-async function readZipText(file) {
-  const buf = new Uint8Array(await file.arrayBuffer());
-  const dv = new DataView(buf.buffer);
-  let eocd = -1;
-  for (let i = buf.length - 22; i >= Math.max(0, buf.length - 65557); i--) {
-    if (dv.getUint32(i, true) === 0x06054b50) { eocd = i; break; }
-  }
-  if (eocd < 0) throw new Error('Invalid ZIP file');
-  const cdOffset = dv.getUint32(eocd + 16, true);
-  const cdEntries = dv.getUint16(eocd + 10, true);
-  const txtEntries = [];
-  let p = cdOffset;
-  for (let i = 0; i < cdEntries; i++) {
-    if (dv.getUint32(p, true) !== 0x02014b50) break;
-    const method = dv.getUint16(p + 10, true);
-    const compSize = dv.getUint32(p + 20, true);
-    const nameLen = dv.getUint16(p + 28, true);
-    const extraLen = dv.getUint16(p + 30, true);
-    const commentLen = dv.getUint16(p + 32, true);
-    const localOffset = dv.getUint32(p + 42, true);
-    const name = new TextDecoder().decode(buf.slice(p + 46, p + 46 + nameLen));
-    if (name.toLowerCase().endsWith('.txt') && !name.endsWith('/')) {
-      txtEntries.push({ name, method, compSize, localOffset });
-    }
-    p += 46 + nameLen + extraLen + commentLen;
-  }
-  if (txtEntries.length === 0) throw new Error('No .txt file inside ZIP');
-  const entry = txtEntries.find(e => e.name.toLowerCase().endsWith('_chat.txt'))
-             || txtEntries.find(e => e.name.toLowerCase().includes('chat'))
-             || txtEntries[0];
-  const lo = entry.localOffset;
-  if (dv.getUint32(lo, true) !== 0x04034b50) throw new Error('Bad local header');
-  const lNameLen = dv.getUint16(lo + 26, true);
-  const lExtraLen = dv.getUint16(lo + 28, true);
-  const dataStart = lo + 30 + lNameLen + lExtraLen;
-  const raw = buf.slice(dataStart, dataStart + entry.compSize);
-  let decompressed;
-  if (entry.method === 0) {
-    decompressed = raw;
-  } else if (entry.method === 8) {
-    const ds = new DecompressionStream('deflate-raw');
-    const stream = new Blob([raw]).stream().pipeThrough(ds);
-    decompressed = new Uint8Array(await new Response(stream).arrayBuffer());
-  } else {
-    throw new Error('Unsupported compression method ' + entry.method);
-  }
-  return new TextDecoder('utf-8').decode(decompressed);
-}
 
 // ============================================================
 // ANALYTICS — every output derived strictly from parsed messages
@@ -408,6 +91,7 @@ function computeAll(messages) {
       author: a,
       messageCount: 0,           // SOURCE: count of msgs where m.author === a
       wordCount: 0,              // SOURCE: sum of m.wordCount
+      charCount: 0,              // SOURCE: sum of m.contentLength (drives "The Novelist")
       emojiCount: 0,             // SOURCE: sum of m.emojis.length
       questionCount: 0,          // SOURCE: count where m.isQuestion === true
       mediaCount: 0,             // SOURCE: count where m.hasMedia === true
@@ -460,6 +144,7 @@ function computeAll(messages) {
 
     acc.messageCount++;
     acc.wordCount += m.wordCount;
+    acc.charCount += m.contentLength;
     acc.emojiCount += m.emojis.length;
     if (m.isQuestion) acc.questionCount++;
     if (m.hasMedia) acc.mediaCount++;
@@ -569,6 +254,10 @@ function computeAll(messages) {
     const topWordEntry = maxEntry(acc.wordFreq);
     const topEmojiEntry = maxEntry(acc.emojiFreq);
 
+    // Vibe Check — top 5 words + emojis for THIS participant (not the group)
+    const top5Words = topNEntries(acc.wordFreq, 5).map(([word, count]) => ({ word, count }));
+    const top5Emojis = topNEntries(acc.emojiFreq, 5).map(([emoji, count]) => ({ emoji, count }));
+
     const peakHour = argmaxArr(acc.hourCounts);
     const peakWeekday = argmaxArr(acc.weekdayCounts);
 
@@ -605,10 +294,12 @@ function computeAll(messages) {
       topWordCount: topWordEntry ? topWordEntry[1] : 0,
       topEmoji: topEmojiEntry ? topEmojiEntry[0] : null,
       topEmojiCount: topEmojiEntry ? topEmojiEntry[1] : 0,
+      top5Words, top5Emojis,
       peakHour, peakWeekday,
       nightPct, sharePct,
       questionRate, mediaRate, voiceRate,
       avgWordsPerMsg: acc.wordCount / acc.messageCount,
+      avgCharsPerMsg: acc.charCount / acc.messageCount,
       maxBurst: acc.maxBurst,
       conversationsRevived: acc.conversationsRevived,
       conversationsKilled: acc.conversationsKilled,
@@ -666,6 +357,18 @@ function computeAll(messages) {
   const fastestResponder = eligibleResponders.length > 0
     ? argmax(eligibleResponders, u => -u.avgRespMin)
     : null;
+  // The Ghoster — slowest average reply (highest avgRespMin). Distinct from
+  // `ghost` (longest disappearance). Needs >= 2 eligible responders so the
+  // slowest isn't just the only person who ever replied.
+  const slowResponder = eligibleResponders.length >= 2
+    ? argmax(eligibleResponders, u => u.avgRespMin)
+    : null;
+  // The Novelist — longest average message by character count. Require a
+  // minimum sample so one long one-off message can't crown someone.
+  const eligibleNovelists = userList.filter(x => x.messageCount >= 20);
+  const novelist = (eligibleNovelists.length > 0
+    ? argmax(eligibleNovelists, u => u.avgCharsPerMsg)
+    : argmax(userList, u => u.avgCharsPerMsg)) || null;
   const yapper = userList[0];
   const lurker = userList[userList.length - 1];
   const nightOwl = userList[0].nightMessages > 0
@@ -1079,6 +782,7 @@ function computeAll(messages) {
     // Superlatives (may be null when no eligible winner)
     fastestResponder, yapper, lurker, nightOwl, emojiKing,
     spammer, ghost, voiceNoteUser, reviver, killer, finalWorder,
+    slowResponder, novelist,
     // Day-level
     peakDay,
     longestSilenceDays, silenceFromDate,
@@ -1350,6 +1054,12 @@ const I18N = {
     // Emoji
     emoji_eyebrow: 'YOUR SPIRIT EMOJI',
     emoji_used: '{n} times. That\'s a lot.',
+    novelist_eyebrow: '✍️ THE NOVELIST',
+    novelist_chars: 'characters per message. ~{words} words each — nobody in the group writes longer.',
+    ghoster_eyebrow: '👻 THE GHOSTER',
+    ghoster_reply: 'average reply time. The slowest to text back. (based on {n} replies)',
+    vibe_eyebrow: '✨ VIBE CHECK',
+    vibe_title: '{name}\'s vibe, decoded',
     // Drama role
     drama_eyebrow: '✦ YOUR ROLE IN ALL OF THIS',
     drama_defib: 'The Defibrillator',
@@ -1730,6 +1440,12 @@ const I18N = {
     top_words_subtitle: 'שכולם חזרו עליהן',
     emoji_eyebrow: 'האימוג׳י הכי נפוץ אצלך',
     emoji_used: 'השתמשת ב-{n} פעמים.',
+    novelist_eyebrow: '✍️ הסופר/ת של הקבוצה',
+    novelist_chars: 'תווים בהודעה בממוצע. ~{words} מילים כל אחת — אף אחד לא כותב יותר ארוך.',
+    ghoster_eyebrow: '👻 אלוף/ת הגוסטינג',
+    ghoster_reply: 'זמן תגובה ממוצע. הכי איטי/ת לענות. (לפי {n} תגובות)',
+    vibe_eyebrow: '✨ בדיקת וַייב',
+    vibe_title: 'הוַייב של {name}',
     drama_eyebrow: '✦ התפקיד שלך בדרמה',
     drama_defib: 'מחייה הצ׳אטים',
     drama_defib_label: 'שיחות מתות שהחיית',
@@ -1928,75 +1644,75 @@ const I18N = {
     st_ach_ev_lastword: 'סגר {n} ימים',
     // Social Layer — Roasts (line + kicker per scenario)
     st_r_speed_blink_l: 'זמן תגובה ממוצע: {s} שניות.',
-    st_r_speed_blink_k: 'אתה בסדר? תמצמץ פעמיים.',
+    st_r_speed_blink_k: 'זה לא ריז, זה ברייןרוט קליני. תמצמץ פעמיים אם אתה צריך עזרה.',
     st_r_speed_flat_l: 'עונה תוך {m} דקות בדיוק.',
-    st_r_speed_flat_k: 'איזו עבודה. אילו תחביבים. איזה חיים.',
+    st_r_speed_flat_k: 'אין job, אין hobbies, אין life. chronically online ברמות.',
     st_r_speed_slow_l: 'לוקח לך {h} שעות לענות בממוצע.',
-    st_r_speed_slow_k: 'הטלפון קיים. ראינו אותך באינסטגרם.',
+    st_r_speed_slow_k: 'ראינו אותך online באינסטה. זה גוסטינג, וזה -10,000 אורה.',
     st_r_vol_pod_l: '{pct}% מכל הודעה שנשלחה פה היו אתה.',
-    st_r_vol_pod_k: 'זה לא צ׳אט קבוצתי. זה הפודקאסט שלך.',
+    st_r_vol_pod_k: 'זה לא צ׳אט, זה הפודקאסט שלך. mogging את כולם בכמות, אפס באיכות.',
     st_r_vol_dom_l: 'אמרת {pct}% מהכל.',
-    st_r_vol_dom_k: 'האחרים ניסו לדבר.',
+    st_r_vol_dom_k: 'ניסינו לתת לך to cook, אבל נשרף הכל. תן למישהו אחר לדבר.',
     st_r_vol_tiny_l: '{pct}% מהשיחה. {n} הודעות בכל השנה.',
-    st_r_vol_tiny_k: 'אתה... בסדר? כדאי שנבדוק מה איתך?',
+    st_r_vol_tiny_k: 'NPC מובהק. או סיגמה ששכח לחבר את עצמו ל-Wi-Fi.',
     st_r_vol_watch_l: '{pct}% מהצ׳אט שייכים לך.',
-    st_r_vol_watch_k: 'אתה צופה. מתכנן. שומר הכל לבית משפט.',
+    st_r_vol_watch_k: 'אתה רק צופה ושומר הכל ל-court. אאורה של NPC ברקע.',
     st_r_burst_hostage_l: 'פעם שלחת {n} הודעות ברצף.',
-    st_r_burst_hostage_k: 'זה לא הודעות. זה מצב חטופים.',
+    st_r_burst_hostage_k: 'זה לא טקסט, זה מצב חטופים. אתה edging את כל הקבוצה.',
     st_r_burst_uninterr_l: '{n} הודעות ברצף. ללא הפסקה.',
-    st_r_burst_uninterr_k: 'אף אחד לא ביקש. גם אף אחד לא הצליח לעצור אותך.',
+    st_r_burst_uninterr_k: 'אף אחד לא ביקש. let him cook? אחי, הוא כבר cooked לגמרי.',
     st_r_burst_record_l: 'השיא שלך: {n} הודעות, אף אחד לא ענה.',
-    st_r_burst_record_k: 'פשוט המשכת. יש בזה משהו יפה.',
+    st_r_burst_record_k: 'let him cook... אבל הוא לבד במטבח ואף אחד לא בא לאכול.',
     st_r_night_tab_l: '{pct}% מההודעות שלך בין חצות ל-6 בבוקר.',
-    st_r_night_tab_k: 'אין לך שעות שינה. יש לך טאב פתוח.',
+    st_r_night_tab_k: 'המיטה ממש שם. זה לא דדיקיישן, זה ברייןרוט של 3 לפנות בוקר.',
     st_r_night_close_l: '{pct}% מההודעות שלך אחרי חצות.',
-    st_r_night_close_k: 'מה שלא עובר עליך — תסגור את האפליקציה.',
+    st_r_night_close_k: 'עדיין ער, עדיין מקליד. דלולו לחשוב שמישהו ער איתך.',
     st_r_night_crisis_l: 'השעה הכי פעילה שלך היא {h} לפנות בוקר.',
-    st_r_night_crisis_k: 'זה לא "מאוחר בלילה". זה "משבר מוקדם בבוקר".',
+    st_r_night_crisis_k: 'זה לא "מאוחר בלילה", זה סקיבידי משבר. לך לישון.',
     st_r_ghost_iconic_l: 'נעלמת ל-{n} ימים רצופים.',
-    st_r_ghost_iconic_k: 'ואז חזרת כאילו כלום. אייקוני.',
+    st_r_ghost_iconic_k: 'סיגמה lone-wolf? לא. סתם נעלמת. אבל האאורה של הקאמבק — אגדית.',
     st_r_ghost_vanish_l: 'בנקודה מסוימת — {n} ימים של שתיקה.',
-    st_r_ghost_vanish_k: 'בלי "היי". בלי הסבר. פשוט נעלמת.',
+    st_r_ghost_vanish_k: 'בלי "היי", בלי הסבר. גוסטינג ברמה אולימפית. -אורה.',
     st_r_voice_beg_l: '{n} הקלטות קוליות נשלחו.',
-    st_r_voice_beg_k: 'אנחנו מתחננים, תקליד. פשוט תקליד. בבקשה.',
+    st_r_voice_beg_k: 'אף אחד לא שומע אותן. תקליד. כל voice note זה -500 אורה.',
     st_r_voice_mono_l: '{n} הקלטות. אדם ממוצע: 3.',
-    st_r_voice_mono_k: 'לאף אחד אין זמן לשמוע את המונולוג של 47 שניות שלך.',
+    st_r_voice_mono_k: 'זה לא שיחה, זה TED talk של 47 שניות בלי קהל. edging אותנו למוות.',
     st_r_q_google_l: '{pct}% מההודעות שלך הן שאלות.',
-    st_r_q_google_k: 'אין לך אישיות. יש לך שורת חיפוש בגוגל.',
+    st_r_q_google_k: 'אין לך אישיות, יש לך שורת חיפוש. לגוגל יש יותר ריז ממך.',
     st_r_q_tired_l: '1 מכל 4 הודעות ממך זאת שאלה.',
-    st_r_q_tired_k: 'הקבוצה עייפה. כל כך עייפה.',
+    st_r_q_tired_k: 'NPC עם סימן שאלה מובנה. הקבוצה עייפה, אחי.',
     st_r_media_fwd_l: '{pct}% ממה שאתה שולח זה מדיה.',
-    st_r_media_fwd_k: 'אתה לא מדבר. אתה מעביר הלאה.',
+    st_r_media_fwd_k: 'דוד-בקבוצה energy. אפס ריז, אפס אאורה, רק פורוורדים.',
     st_r_media_redist_l: '{pct}% ממים. {rest}% תוכן אמיתי.',
-    st_r_media_redist_k: 'התרומה שלך: הפצה מחדש של בדיחות של אחרים.',
+    st_r_media_redist_k: 'התרומה שלך: ממים של אחרים. אישיות לא נמצאה. NPC מאשר.',
     st_r_ign_thumb_l: '{pct}% מההודעות שלך לא קיבלו שום תגובה תוך 30 דקות.',
-    st_r_ign_thumb_k: 'אפילו לא לייק. קהל קשוח.',
+    st_r_ign_thumb_k: 'אפילו לא 👍. negative rizz קליני, קהל קשוח.',
     st_r_ign_said_l: '{pct}% ממה שאתה אומר נשאר ללא תגובה.',
-    st_r_ign_said_k: 'זה לא מה שאמרת. זה שאתה אמרת את זה.',
+    st_r_ign_said_k: 'אף אחד לא mogg אותך — אתה פשוט שקוף. אמרת משהו?',
     st_r_kill_arg_l: '{n} שיחות נגמרו תוך דקות אחרי שדיברת.',
-    st_r_kill_arg_k: 'אתה לא משתתף. אתה טיעון מסכם.',
+    st_r_kill_arg_k: 'כל הודעה שלך = הצ׳אט cooked. אתה הסתימה של השיחה.',
     st_r_kill_susp_l: '{n} צ׳אטים מתו מיד אחרי שכתבת.',
-    st_r_kill_susp_k: 'חשוד. החקירה ממתינה.',
+    st_r_kill_susp_k: 'שיחות מתות אחריך. חשוד. סקיבידי אנרגיה.',
     st_r_emoji_help_l: '{n} אימוג׳ים נשלחו. בערך {per} להודעה.',
-    st_r_emoji_help_k: 'המקלדת שלך 80% תמונות. תקבל עזרה.',
+    st_r_emoji_help_k: 'אין מילים, רק ברייןרוט ויזואלי. תקבל עזרה.',
     st_r_emoji_words_l: '{n} אימוג׳ים בשנה אחת.',
-    st_r_emoji_words_k: 'מילים קיימות. הן חינם. תנסה אותן.',
+    st_r_emoji_words_k: 'אימוג׳ים במקום מילים. אתה עושה mewing על המקלדת.',
     st_r_emoji_zero_l: '{n} הודעות. אפס אימוג׳ים.',
-    st_r_emoji_zero_k: 'מה קרה לך. מי פגע בך.',
+    st_r_emoji_zero_k: 'סיגמה? או סתם אבן עם Wi-Fi. אפס אאורה רגשית.',
     st_r_len_ted_l: '{n} מילים להודעה בממוצע.',
-    st_r_len_ted_k: 'זה צ׳אט. לא הרצאת TED.',
+    st_r_len_ted_k: 'זה צ׳אט, לא הרצאת TED. אתה edging כל פסקה.',
     st_r_len_tldr_l: 'הודעה ממוצעת: {n} מילים.',
-    st_r_len_tldr_k: 'TL;DR. אנחנו מתחננים.',
+    st_r_len_tldr_k: 'TL;DR. אף אחד לא קרא, אבל יש לך אאורה של מרצה משעמם.',
     st_r_len_poem_l: 'הודעה ממוצעת שלך: {n} מילים.',
-    st_r_len_poem_k: '"אוקיי" "ק" "חחח" — אוסף שירה.',
+    st_r_len_poem_k: '"ק" "חחח" "סבבה" — משורר/ת, או NPC שנגמרה לו הסוללה?',
     st_r_rev_bless_l: '{n} פעמים שברת שתיקה של 12+ שעות.',
-    st_r_rev_bless_k: 'תודה לך. הצ׳אט היה מת בלעדיך.',
+    st_r_rev_bless_k: 'גיבור/ה, או הכי delulu שמישהו רצה לדבר. בכל זאת — אאורה.',
     st_r_streak_grass_l: '{n} ימים רצופים של הודעות.',
-    st_r_streak_grass_k: 'תיגע בעשב. תלטף כלב. תראה את השמש.',
+    st_r_streak_grass_k: 'תיגע בדשא. ברייןרוט קליני ברמה הכי גבוהה שיש.',
     st_r_streak_love_l: 'רצף שליחה של {n} ימים.',
-    st_r_streak_love_k: 'התראות היו שפת האהבה שלך.',
+    st_r_streak_love_k: 'נאמנות או chronically online? התשובה: כן.',
     st_r_fallback_l: '{n} הודעות. יציב. צפוי.',
-    st_r_fallback_k: 'בלי דרמה, בלי כאוס, בלי הערות. המשתנה הקבוע של הקבוצה.',
+    st_r_fallback_k: 'NPC נייטרלי לגמרי. אין דרמה, אין כאוס — אפילו לרוסט אין לך מספיק אאורה.',
   },
   es: {
     landing_eyebrow: 'NUEVO · WHATSAPP UNWRAPPED',
@@ -3826,21 +3542,19 @@ function ChatWrappedApp() {
     setParseError(null);
     setStage('parsing');
     setParsingStage(0);
+    const lname = file.name.toLowerCase();
+    if (!lname.endsWith('.zip') && !lname.endsWith('.txt')) {
+      setParseError('Upload a .txt or .zip from WhatsApp export.');
+      setStage('landing');
+      return;
+    }
     try {
-      let text;
-      const lname = file.name.toLowerCase();
-      if (lname.endsWith('.zip')) {
-        setParsingStage(1);
-        await new Promise(r => setTimeout(r, 400));
-        text = await readZipText(file);
-      } else if (lname.endsWith('.txt')) {
-        text = await file.text();
-      } else {
-        throw new Error('Upload a .txt or .zip from WhatsApp export.');
-      }
-      setParsingStage(2);
-      await new Promise(r => setTimeout(r, 500));
-      const { messages: parsed, diagnostics: diag } = parseWhatsApp(text);
+      // ZIP inflate + parse run in a Web Worker so a huge export never
+      // freezes the UI. Progress phases drive the cinematic stage meter.
+      const { messages: parsed, diagnostics: diag } = await parseChat({
+        file,
+        onProgress: (phase) => setParsingStage(phase === 'unzip' ? 1 : 2),
+      });
       setDiagnostics(diag);
       if (parsed.length === 0) {
         setParseError(t.err_no_msgs);
@@ -3848,7 +3562,7 @@ function ChatWrappedApp() {
         return;
       }
       setParsingStage(3);
-      await new Promise(r => setTimeout(r, 600));
+      await new Promise(r => setTimeout(r, 400));
       const a = computeAll(parsed);
       setParsingStage(4);
       await new Promise(r => setTimeout(r, 400));
@@ -3869,9 +3583,11 @@ function ChatWrappedApp() {
     setStage('parsing');
     setParsingStage(0);
     await new Promise(r => setTimeout(r, 400));
-    setParsingStage(2);
     const text = generateSampleText();
-    const { messages: parsed, diagnostics: diag } = parseWhatsApp(text);
+    const { messages: parsed, diagnostics: diag } = await parseChat({
+      text,
+      onProgress: () => setParsingStage(2),
+    });
     setDiagnostics(diag);
     await new Promise(r => setTimeout(r, 600));
     setParsingStage(3);
@@ -4592,15 +4308,18 @@ const SLIDES_DEF = [
   'message_count',
   'rank',
   'vs_everyone',
+  'novelist',
   'title',
   'group_describes',
   'peak_hour',
   'night',
   'streak',
   'speed',
+  'ghoster',
   'signature_word',
   'top_words',
   'top_emoji',
+  'vibe_check',
   'drama_role',
   'roast',
   'achievements',
@@ -4880,9 +4599,12 @@ function Wrapped({ analytics, diagnostics, selectedAuthor, setSelectedAuthor, sl
     if (s === 'eras' && (!analytics.eras || analytics.eras.length < 2)) return false;
     if (s === 'chaos_moment' && !analytics.chaosMinute) return false;
     if (s === 'speed' && user.avgRespMin == null) return false;
+    if (s === 'ghoster' && !analytics.slowResponder) return false;
+    if (s === 'novelist' && !analytics.novelist) return false;
     if (s === 'top_emoji' && !user.topEmoji) return false;
     if (s === 'signature_word' && !user.topWord) return false;
     if (s === 'top_words' && (!analytics.topWordsGroup || analytics.topWordsGroup.length === 0)) return false;
+    if (s === 'vibe_check' && (!user.top5Words || user.top5Words.length === 0) && (!user.top5Emojis || user.top5Emojis.length === 0)) return false;
     if (s === 'most_likely' && analytics.mostLikely.length === 0) return false;
     return true;
   }), [selectedAuthor, userAchievements.length, user, analytics, profile]);
@@ -5625,6 +5347,167 @@ const SlideEmoji = React.memo(function SlideEmoji({ a, u, t }) {
   );
 })
 
+// The Novelist — group reveal of the longest-average-message writer (by chars)
+const SlideNovelist = React.memo(function SlideNovelist({ a, t }) {
+  const n = a.novelist;
+  if (!n) return null;
+  const chars = Math.round(n.avgCharsPerMsg);
+  const name = n.author;
+  return (
+    <SlideShell bg="#577590" accent="#8338ec">
+      <div style={{
+        position: 'relative', height: '100%',
+        display: 'flex', flexDirection: 'column', justifyContent: 'center',
+        textAlign: 'center', padding: '0 24px',
+      }}>
+        <div className="a-spring" style={{ animationDelay: '0.1s', fontSize: 64, lineHeight: 1, marginBottom: 8 }}>✍️</div>
+        <div className="fs-sans a-fade-up" style={{ fontSize: 12, color: '#8338ec', letterSpacing: '0.15em', fontWeight: 500, textTransform: 'uppercase' }}>
+          {t.novelist_eyebrow}
+        </div>
+        <div className="a-spring" style={{ animationDelay: '0.3s', marginTop: 24 }}>
+          <div className="fs-display" dir="auto" style={{
+            fontSize: name.length > 10 ? 40 : name.length > 6 ? 52 : 60,
+            lineHeight: 1.05, letterSpacing: '-0.03em', color: '#8338ec',
+            fontStyle: 'italic', wordBreak: 'break-word', fontWeight: 800,
+          }}>
+            {name}
+          </div>
+        </div>
+        <div className="a-fade-up" style={{ animationDelay: '0.9s', marginTop: 36 }}>
+          <div className="fs-display" style={{ fontSize: 48, fontWeight: 800, color: '#2a0645', letterSpacing: '-0.03em', lineHeight: 1 }}>
+            {chars.toLocaleString()}
+          </div>
+          <div className="fs-sans" style={{ marginTop: 8, fontSize: 16, color: 'rgba(42,6,69,0.85)', lineHeight: 1.4 }}>
+            {interp(t.novelist_chars, { n: chars, words: Math.round(n.avgWordsPerMsg) })}
+          </div>
+        </div>
+      </div>
+    </SlideShell>
+  );
+})
+
+// The Ghoster — group reveal of the slowest average replier
+const SlideGhoster = React.memo(function SlideGhoster({ a, t }) {
+  const g = a.slowResponder;
+  if (!g || g.avgRespMin == null) return null;
+  const rt = g.avgRespMin;
+  const display = rt < 60 ? `${rt.toFixed(0)}m`
+    : rt < 1440 ? `${(rt / 60).toFixed(1)}h`
+    : `${(rt / 1440).toFixed(1)}d`;
+  const name = g.author;
+  return (
+    <SlideShell bg="#2a0645" accent="#577590">
+      <div style={{ position: 'absolute', inset: 0, pointerEvents: 'none' }}>
+        {[20, 55, 82].map((left, i) => (
+          <div key={i} className="a-float" style={{
+            position: 'absolute', left: `${left}%`, bottom: 90, fontSize: 30,
+            opacity: 0.5, animationDelay: `${i * 0.7}s`,
+          }}>👻</div>
+        ))}
+      </div>
+      <div style={{
+        position: 'relative', height: '100%',
+        display: 'flex', flexDirection: 'column', justifyContent: 'center',
+        textAlign: 'center', padding: '0 24px',
+      }}>
+        <div className="a-spring" style={{ animationDelay: '0.1s', fontSize: 72, lineHeight: 1, marginBottom: 8 }}>👻</div>
+        <div className="fs-sans a-fade-up" style={{ fontSize: 12, color: '#577590', letterSpacing: '0.15em', fontWeight: 500, textTransform: 'uppercase' }}>
+          {t.ghoster_eyebrow}
+        </div>
+        <div className="a-spring" style={{ animationDelay: '0.3s', marginTop: 24 }}>
+          <div className="fs-display" dir="auto" style={{
+            fontSize: name.length > 10 ? 40 : name.length > 6 ? 52 : 60,
+            lineHeight: 1.05, letterSpacing: '-0.03em', color: '#577590',
+            fontStyle: 'italic', wordBreak: 'break-word', fontWeight: 800,
+          }}>
+            {name}
+          </div>
+        </div>
+        <div className="a-fade-up" style={{ animationDelay: '0.9s', marginTop: 36 }}>
+          <div className="fs-display" style={{ fontSize: 48, fontWeight: 800, color: '#2a0645', letterSpacing: '-0.03em', lineHeight: 1 }}>
+            {display}
+          </div>
+          <div className="fs-sans" style={{ marginTop: 8, fontSize: 16, color: 'rgba(42,6,69,0.85)', lineHeight: 1.4 }}>
+            {interp(t.ghoster_reply, { n: g.respSampleSize })}
+          </div>
+        </div>
+      </div>
+    </SlideShell>
+  );
+})
+
+// Vibe Check — the SELECTED participant's top-5 words + most-used emojis
+const SlideVibeCheck = React.memo(function SlideVibeCheck({ u, t }) {
+  const words = (u.top5Words || []).filter(w => w.count > 0);
+  const emojis = (u.top5Emojis || []).filter(e => e.count > 0);
+  if (words.length === 0 && emojis.length === 0) return null;
+  const maxCount = words.length ? words[0].count : 1;
+  return (
+    <SlideShell bg="#f94144" accent="#f94144">
+      <div style={{
+        position: 'relative', height: '100%',
+        display: 'flex', flexDirection: 'column', padding: '32px 24px 24px',
+      }}>
+        <div className="fs-sans a-fade-up" style={{ textAlign: 'center', fontSize: 12, color: '#f94144', letterSpacing: '0.15em', fontWeight: 500, textTransform: 'uppercase' }}>
+          {t.vibe_eyebrow}
+        </div>
+        <div className="fs-display a-fade-up" dir="auto" style={{
+          textAlign: 'center', animationDelay: '0.15s',
+          fontSize: 30, lineHeight: 1.15, letterSpacing: '-0.03em', fontWeight: 800, color: '#1a1a2e',
+          marginTop: 10, marginBottom: 16,
+        }}>
+          {interp(t.vibe_title, { name: u.author })}
+        </div>
+        {emojis.length > 0 && (
+          <div className="a-fade-up" style={{ animationDelay: '0.4s', display: 'flex', justifyContent: 'center', gap: 12, marginBottom: 18, flexWrap: 'wrap' }}>
+            {emojis.map((e, i) => (
+              <div key={e.emoji} className="a-spring" style={{ animationDelay: `${0.5 + i * 0.1}s`, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2 }}>
+                <div style={{ fontSize: i === 0 ? 40 : 30, lineHeight: 1 }}>{e.emoji}</div>
+                <div className="fs-mono" style={{ fontSize: 11, color: 'rgba(26,26,46,0.6)', fontWeight: 700 }}>{e.count}×</div>
+              </div>
+            ))}
+          </div>
+        )}
+        <div className="no-sb" style={{ flex: 1, overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: 10 }}>
+          {words.map((w, i) => {
+            const pct = Math.max(8, Math.round((w.count / maxCount) * 100));
+            return (
+              <div key={w.word} dir="auto" className="a-slide-up-far" style={{
+                position: 'relative', padding: '13px 18px',
+                background: 'rgba(249,65,68,0.08)', borderRadius: 16,
+                overflow: 'hidden', animationDelay: `${0.7 + i * 0.12}s`,
+              }}>
+                <div className="a-slide-right" style={{
+                  position: 'absolute', top: 0, bottom: 0, insetInlineStart: 0,
+                  background: 'linear-gradient(90deg, rgba(249,65,68,0.16) 0%, rgba(249,65,68,0.02) 100%)',
+                  width: `${pct}%`, animationDelay: `${0.9 + i * 0.12}s`, pointerEvents: 'none',
+                }} />
+                <div style={{ position: 'relative', display: 'flex', alignItems: 'center', gap: 12 }}>
+                  <div className="fs-display" style={{ fontSize: 20, fontWeight: 800, color: i === 0 ? '#f94144' : 'rgba(249,65,68,0.4)', width: 24, flexShrink: 0, lineHeight: 1 }}>
+                    {i + 1}
+                  </div>
+                  <div className="fs-display" style={{
+                    flex: 1, minWidth: 0,
+                    fontSize: w.word.length > 12 ? 17 : w.word.length > 8 ? 20 : 24,
+                    lineHeight: 1.1, letterSpacing: '-0.02em',
+                    fontStyle: 'italic', color: '#1a1a2e', fontWeight: 700,
+                    overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+                  }}>
+                    "{w.word}"
+                  </div>
+                  <div className="fs-mono" style={{ fontSize: 14, color: '#f94144', fontWeight: 700, letterSpacing: '0.05em', flexShrink: 0 }}>
+                    {w.count.toLocaleString()}×
+                  </div>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    </SlideShell>
+  );
+})
+
 const SlideDramaRole = React.memo(function SlideDramaRole({ u, t }) {
   // Determine role based on actual computed data
   let titleText, count, labelText, copyText, accent, bg;
@@ -6291,15 +6174,18 @@ const SLIDE_COMPONENTS = {
   message_count:   SlideMessageCount,
   rank:            SlideRank,
   vs_everyone:     SlideVsEveryone,
+  novelist:        SlideNovelist,
   title:           SlideTitle,
   group_describes: SlideGroupDescribes,
   peak_hour:       SlidePeakHour,
   night:           SlideNight,
   streak:          SlideStreak,
   speed:           SlideSpeed,
+  ghoster:         SlideGhoster,
   signature_word:  SlideWord,
   top_words:       SlideTopWords,
   top_emoji:       SlideEmoji,
+  vibe_check:      SlideVibeCheck,
   drama_role:      SlideDramaRole,
   roast:           SlideRoast,
   achievements:    SlideAchievements,
