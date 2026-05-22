@@ -3965,6 +3965,7 @@ function ChatWrappedApp() {
               profile={profile}
               t={t}
               onExit={() => setStage('landing')}
+              onMenu={() => setStage('menu')}
             />
           )}
           {stage === 'menu' && analytics && (
@@ -4925,7 +4926,7 @@ function Onboarding({ analytics, t, profile, setProfile, onComplete, onSkip }) {
   );
 }
 
-function Wrapped({ analytics, diagnostics, selectedAuthor, setSelectedAuthor, slide, setSlide, profile, t, onExit }) {
+function Wrapped({ analytics, diagnostics, selectedAuthor, setSelectedAuthor, slide, setSlide, profile, t, onExit, onMenu }) {
   const user = analytics.userMap[selectedAuthor];
   if (!user) return null;
   const userAchievements = analytics.achievementsByUser[selectedAuthor] || [];
@@ -4990,7 +4991,7 @@ function Wrapped({ analytics, diagnostics, selectedAuthor, setSelectedAuthor, sl
       <div key={`${current}-${selectedAuthor}`}
         className={dirRef.current >= 0 ? 'slide-in-right' : 'slide-in-left'}
         style={{ flex: 1, position: 'relative', overflow: 'hidden', zIndex: 1 }}>
-        {SlideComp && <SlideComp a={analytics} u={user} t={t} profile={profile} achievements={userAchievements} onExit={onExit} />}
+        {SlideComp && <SlideComp a={analytics} u={user} t={t} profile={profile} achievements={userAchievements} onExit={onExit} onMenu={onMenu} />}
       </div>
     </div>
   );
@@ -6302,7 +6303,7 @@ const SlidePeakDay = React.memo(function SlidePeakDay({ a, t }) {
   );
 })
 
-const SlideFinale = React.memo(function SlideFinale({ a, t, onExit }) {
+const SlideFinale = React.memo(function SlideFinale({ a, t, onExit, onMenu }) {
   return (
     <SlideShell bg="#577590" accent="#f94144">
       <div style={{
@@ -6333,7 +6334,7 @@ const SlideFinale = React.memo(function SlideFinale({ a, t, onExit }) {
           animationDelay: '1.4s', display: 'flex', gap: 8,
           justifyContent: 'center', marginTop: 32,
         }}>
-          <button onClick={onExit} className="press fs-sans" style={{
+          <button onClick={onMenu || onExit} className="press fs-sans" style={{
             padding: '14px 28px', background: '#f9c74f', color: '#0a0a0f',
             border: 'none', borderRadius: 999, fontSize: 18, fontWeight: 700, cursor: 'pointer',
           }}>
