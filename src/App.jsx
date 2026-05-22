@@ -76,6 +76,19 @@ function argmaxArr(arr) {
   return best;
 }
 
+// Deterministic string hash → stable pick. Lets the same stat land a different
+// roast for different people WITHOUT randomness (same author → same joke).
+function rHash(s) {
+  let h = 0;
+  for (let i = 0; i < s.length; i++) h = (Math.imul(h, 31) + s.charCodeAt(i)) >>> 0;
+  return h;
+}
+function rPick(seed, keys) {
+  // Salt with the first key so the same author varies across different tiers
+  // (not always "variant #0"), while staying fully deterministic.
+  return keys[rHash(seed + '|' + keys[0]) % keys.length];
+}
+
 function computeAll(messages) {
   if (!messages || messages.length === 0) return null;
 
@@ -609,127 +622,198 @@ function computeAll(messages) {
   for (const user of userList) user.groupDescriptionKey = groupDescriptionFor(user);
 
   // Roasts — savage, specific, screenshot-worthy. Every one tied to actual numbers.
-  function roastsFor(user) {
+  // Each matched trigger yields a CANDIDATE with its variant pool + a `metric`
+  // (how extreme this person is at that trait). A group pass then makes roasts
+  // UNIQUE per person: for each trait, people are ranked by metric and the
+  // most-guilty ones get DISTINCT punchlines; only the top few keep a trait, so
+  // every person is roasted mainly for what they personally lead the group in.
+  const V = (...n) => n; // tiny helper for readability
+  function roastCandidates(user) {
     const out = [];
 
     // ===== TIER 1: Speed-based =====
     if (user.avgRespMin !== null && user.avgRespMin < 0.5 && user.respSampleSize >= 30) {
-      out.push({ lineKey: 'st_r_speed_blink_l', kickerKey: 'st_r_speed_blink_k', vars: { s: Math.round(user.avgRespMin * 60) } });
+      out.push({ lineKey: 'st_r_speed_blink_l', kvars: V('st_r_speed_blink_k', 'st_r_speed_blink_k2', 'st_r_speed_blink_k3'), vars: { s: Math.round(user.avgRespMin * 60) }, metric: -user.avgRespMin });
     } else if (user.avgRespMin !== null && user.avgRespMin < 2 && user.respSampleSize >= 30) {
-      out.push({ lineKey: 'st_r_speed_flat_l', kickerKey: 'st_r_speed_flat_k', vars: { m: user.avgRespMin.toFixed(1) } });
+      out.push({ lineKey: 'st_r_speed_flat_l', kvars: V('st_r_speed_flat_k', 'st_r_speed_flat_k2', 'st_r_speed_flat_k3'), vars: { m: user.avgRespMin.toFixed(1) }, metric: -user.avgRespMin });
     } else if (user.avgRespMin !== null && user.avgRespMin > 240 && user.respSampleSize >= 10) {
-      out.push({ lineKey: 'st_r_speed_slow_l', kickerKey: 'st_r_speed_slow_k', vars: { h: (user.avgRespMin / 60).toFixed(1) } });
+      out.push({ lineKey: 'st_r_speed_slow_l', kvars: V('st_r_speed_slow_k', 'st_r_speed_slow_k2', 'st_r_speed_slow_k3'), vars: { h: (user.avgRespMin / 60).toFixed(1) }, metric: user.avgRespMin });
     }
 
     // ===== TIER 2: Volume-based =====
     if (user.sharePct > 40) {
-      out.push({ lineKey: 'st_r_vol_pod_l', kickerKey: 'st_r_vol_pod_k', vars: { pct: user.sharePct.toFixed(0) } });
+      out.push({ lineKey: 'st_r_vol_pod_l', kvars: V('st_r_vol_pod_k', 'st_r_vol_pod_k2', 'st_r_vol_pod_k3'), vars: { pct: user.sharePct.toFixed(0) }, metric: user.sharePct });
     } else if (user.sharePct > 30) {
-      out.push({ lineKey: 'st_r_vol_dom_l', kickerKey: 'st_r_vol_dom_k', vars: { pct: user.sharePct.toFixed(0) } });
+      out.push({ lineKey: 'st_r_vol_dom_l', kvars: V('st_r_vol_dom_k', 'st_r_vol_dom_k2', 'st_r_vol_dom_k3'), vars: { pct: user.sharePct.toFixed(0) }, metric: user.sharePct });
     } else if (user.sharePct < 2 && user.messageCount >= 5) {
-      out.push({ lineKey: 'st_r_vol_tiny_l', kickerKey: 'st_r_vol_tiny_k', vars: { pct: user.sharePct.toFixed(1), n: user.messageCount } });
+      out.push({ lineKey: 'st_r_vol_tiny_l', kvars: V('st_r_vol_tiny_k', 'st_r_vol_tiny_k2', 'st_r_vol_tiny_k3'), vars: { pct: user.sharePct.toFixed(1), n: user.messageCount }, metric: -user.sharePct });
     } else if (user.sharePct < 5 && user.messageCount >= 10) {
-      out.push({ lineKey: 'st_r_vol_watch_l', kickerKey: 'st_r_vol_watch_k', vars: { pct: user.sharePct.toFixed(1) } });
+      out.push({ lineKey: 'st_r_vol_watch_l', kvars: V('st_r_vol_watch_k', 'st_r_vol_watch_k2', 'st_r_vol_watch_k3'), vars: { pct: user.sharePct.toFixed(1) }, metric: -user.sharePct });
     }
 
     // ===== TIER 3: Spam bursts =====
     if (user.maxBurst >= 20) {
-      out.push({ lineKey: 'st_r_burst_hostage_l', kickerKey: 'st_r_burst_hostage_k', vars: { n: user.maxBurst } });
+      out.push({ lineKey: 'st_r_burst_hostage_l', kvars: V('st_r_burst_hostage_k', 'st_r_burst_hostage_k2', 'st_r_burst_hostage_k3'), vars: { n: user.maxBurst }, metric: user.maxBurst });
     } else if (user.maxBurst >= 12) {
-      out.push({ lineKey: 'st_r_burst_uninterr_l', kickerKey: 'st_r_burst_uninterr_k', vars: { n: user.maxBurst } });
+      out.push({ lineKey: 'st_r_burst_uninterr_l', kvars: V('st_r_burst_uninterr_k', 'st_r_burst_uninterr_k2', 'st_r_burst_uninterr_k3'), vars: { n: user.maxBurst }, metric: user.maxBurst });
     } else if (user.maxBurst >= 8) {
-      out.push({ lineKey: 'st_r_burst_record_l', kickerKey: 'st_r_burst_record_k', vars: { n: user.maxBurst } });
+      out.push({ lineKey: 'st_r_burst_record_l', kvars: V('st_r_burst_record_k', 'st_r_burst_record_k2', 'st_r_burst_record_k3'), vars: { n: user.maxBurst }, metric: user.maxBurst });
     }
 
     // ===== TIER 4: Night activity =====
     if (user.nightPct > 45) {
-      out.push({ lineKey: 'st_r_night_tab_l', kickerKey: 'st_r_night_tab_k', vars: { pct: user.nightPct.toFixed(0) } });
+      out.push({ lineKey: 'st_r_night_tab_l', kvars: V('st_r_night_tab_k', 'st_r_night_tab_k2', 'st_r_night_tab_k3'), vars: { pct: user.nightPct.toFixed(0) }, metric: user.nightPct });
     } else if (user.nightPct > 30) {
-      out.push({ lineKey: 'st_r_night_close_l', kickerKey: 'st_r_night_close_k', vars: { pct: user.nightPct.toFixed(0) } });
+      out.push({ lineKey: 'st_r_night_close_l', kvars: V('st_r_night_close_k', 'st_r_night_close_k2', 'st_r_night_close_k3'), vars: { pct: user.nightPct.toFixed(0) }, metric: user.nightPct });
     } else if (user.peakHour === 3 || user.peakHour === 4) {
-      out.push({ lineKey: 'st_r_night_crisis_l', kickerKey: 'st_r_night_crisis_k', vars: { h: user.peakHour } });
+      out.push({ lineKey: 'st_r_night_crisis_l', kvars: V('st_r_night_crisis_k', 'st_r_night_crisis_k2', 'st_r_night_crisis_k3'), vars: { h: user.peakHour }, metric: user.nightMessages });
     }
 
     // ===== TIER 5: Ghosting =====
     if (user.longestAbsenceDays >= 60 && user.messageCount >= 30) {
-      out.push({ lineKey: 'st_r_ghost_iconic_l', kickerKey: 'st_r_ghost_iconic_k', vars: { n: user.longestAbsenceDays } });
+      out.push({ lineKey: 'st_r_ghost_iconic_l', kvars: V('st_r_ghost_iconic_k', 'st_r_ghost_iconic_k2', 'st_r_ghost_iconic_k3'), vars: { n: user.longestAbsenceDays }, metric: user.longestAbsenceDays });
     } else if (user.longestAbsenceDays >= 21 && user.messageCount >= 20) {
-      out.push({ lineKey: 'st_r_ghost_vanish_l', kickerKey: 'st_r_ghost_vanish_k', vars: { n: user.longestAbsenceDays } });
+      out.push({ lineKey: 'st_r_ghost_vanish_l', kvars: V('st_r_ghost_vanish_k', 'st_r_ghost_vanish_k2', 'st_r_ghost_vanish_k3'), vars: { n: user.longestAbsenceDays }, metric: user.longestAbsenceDays });
     }
 
     // ===== TIER 6: Voice notes =====
     if (user.voiceCount >= 50) {
-      out.push({ lineKey: 'st_r_voice_beg_l', kickerKey: 'st_r_voice_beg_k', vars: { n: user.voiceCount } });
+      out.push({ lineKey: 'st_r_voice_beg_l', kvars: V('st_r_voice_beg_k', 'st_r_voice_beg_k2', 'st_r_voice_beg_k3'), vars: { n: user.voiceCount }, metric: user.voiceCount });
     } else if (user.voiceCount >= 25) {
-      out.push({ lineKey: 'st_r_voice_mono_l', kickerKey: 'st_r_voice_mono_k', vars: { n: user.voiceCount } });
+      out.push({ lineKey: 'st_r_voice_mono_l', kvars: V('st_r_voice_mono_k', 'st_r_voice_mono_k2', 'st_r_voice_mono_k3'), vars: { n: user.voiceCount }, metric: user.voiceCount });
     }
 
     // ===== TIER 7: Questions =====
     if (user.questionRate > 0.35) {
-      out.push({ lineKey: 'st_r_q_google_l', kickerKey: 'st_r_q_google_k', vars: { pct: Math.round(user.questionRate * 100) } });
+      out.push({ lineKey: 'st_r_q_google_l', kvars: V('st_r_q_google_k', 'st_r_q_google_k2', 'st_r_q_google_k3'), vars: { pct: Math.round(user.questionRate * 100) }, metric: user.questionRate });
     } else if (user.questionRate > 0.25) {
-      out.push({ lineKey: 'st_r_q_tired_l', kickerKey: 'st_r_q_tired_k', vars: {} });
+      out.push({ lineKey: 'st_r_q_tired_l', kvars: V('st_r_q_tired_k', 'st_r_q_tired_k2', 'st_r_q_tired_k3'), vars: {}, metric: user.questionRate });
     }
 
     // ===== TIER 8: Media spam =====
     if (user.mediaRate > 0.35) {
-      out.push({ lineKey: 'st_r_media_fwd_l', kickerKey: 'st_r_media_fwd_k', vars: { pct: Math.round(user.mediaRate * 100) } });
+      out.push({ lineKey: 'st_r_media_fwd_l', kvars: V('st_r_media_fwd_k', 'st_r_media_fwd_k2', 'st_r_media_fwd_k3'), vars: { pct: Math.round(user.mediaRate * 100) }, metric: user.mediaRate });
     } else if (user.mediaRate > 0.25) {
-      out.push({ lineKey: 'st_r_media_redist_l', kickerKey: 'st_r_media_redist_k', vars: { pct: Math.round(user.mediaRate * 100), rest: Math.round((1 - user.mediaRate) * 100) } });
+      out.push({ lineKey: 'st_r_media_redist_l', kvars: V('st_r_media_redist_k', 'st_r_media_redist_k2', 'st_r_media_redist_k3'), vars: { pct: Math.round(user.mediaRate * 100), rest: Math.round((1 - user.mediaRate) * 100) }, metric: user.mediaRate });
     }
 
     // ===== TIER 9: Being ignored =====
     if (user.ignoredRate > 0.40 && user.messageCount >= 30) {
-      out.push({ lineKey: 'st_r_ign_thumb_l', kickerKey: 'st_r_ign_thumb_k', vars: { pct: Math.round(user.ignoredRate * 100) } });
+      out.push({ lineKey: 'st_r_ign_thumb_l', kvars: V('st_r_ign_thumb_k', 'st_r_ign_thumb_k2', 'st_r_ign_thumb_k3'), vars: { pct: Math.round(user.ignoredRate * 100) }, metric: user.ignoredRate });
     } else if (user.ignoredRate > 0.25 && user.messageCount >= 30) {
-      out.push({ lineKey: 'st_r_ign_said_l', kickerKey: 'st_r_ign_said_k', vars: { pct: Math.round(user.ignoredRate * 100) } });
+      out.push({ lineKey: 'st_r_ign_said_l', kvars: V('st_r_ign_said_k', 'st_r_ign_said_k2', 'st_r_ign_said_k3'), vars: { pct: Math.round(user.ignoredRate * 100) }, metric: user.ignoredRate });
     }
 
     // ===== TIER 10: Conversation killing =====
     if (user.conversationsKilled >= 15) {
-      out.push({ lineKey: 'st_r_kill_arg_l', kickerKey: 'st_r_kill_arg_k', vars: { n: user.conversationsKilled } });
+      out.push({ lineKey: 'st_r_kill_arg_l', kvars: V('st_r_kill_arg_k', 'st_r_kill_arg_k2', 'st_r_kill_arg_k3'), vars: { n: user.conversationsKilled }, metric: user.conversationsKilled });
     } else if (user.conversationsKilled >= 8) {
-      out.push({ lineKey: 'st_r_kill_susp_l', kickerKey: 'st_r_kill_susp_k', vars: { n: user.conversationsKilled } });
+      out.push({ lineKey: 'st_r_kill_susp_l', kvars: V('st_r_kill_susp_k', 'st_r_kill_susp_k2', 'st_r_kill_susp_k3'), vars: { n: user.conversationsKilled }, metric: user.conversationsKilled });
     }
 
     // ===== TIER 11: Emoji abuse =====
     if (user.emojiCount >= 1000) {
-      out.push({ lineKey: 'st_r_emoji_help_l', kickerKey: 'st_r_emoji_help_k', vars: { n: user.emojiCount.toLocaleString(), per: Math.round(user.emojiCount / user.messageCount) } });
+      out.push({ lineKey: 'st_r_emoji_help_l', kvars: V('st_r_emoji_help_k', 'st_r_emoji_help_k2', 'st_r_emoji_help_k3'), vars: { n: user.emojiCount.toLocaleString(), per: Math.round(user.emojiCount / user.messageCount) }, metric: user.emojiCount });
     } else if (user.emojiCount >= 500) {
-      out.push({ lineKey: 'st_r_emoji_words_l', kickerKey: 'st_r_emoji_words_k', vars: { n: user.emojiCount } });
+      out.push({ lineKey: 'st_r_emoji_words_l', kvars: V('st_r_emoji_words_k', 'st_r_emoji_words_k2', 'st_r_emoji_words_k3'), vars: { n: user.emojiCount }, metric: user.emojiCount });
     } else if (user.emojiCount === 0 && user.messageCount >= 50) {
-      out.push({ lineKey: 'st_r_emoji_zero_l', kickerKey: 'st_r_emoji_zero_k', vars: { n: user.messageCount } });
+      out.push({ lineKey: 'st_r_emoji_zero_l', kvars: V('st_r_emoji_zero_k', 'st_r_emoji_zero_k2', 'st_r_emoji_zero_k3'), vars: { n: user.messageCount }, metric: user.messageCount });
     }
 
     // ===== TIER 12: Length =====
     if (user.avgWordsPerMsg > 40) {
-      out.push({ lineKey: 'st_r_len_ted_l', kickerKey: 'st_r_len_ted_k', vars: { n: user.avgWordsPerMsg.toFixed(0) } });
+      out.push({ lineKey: 'st_r_len_ted_l', kvars: V('st_r_len_ted_k', 'st_r_len_ted_k2', 'st_r_len_ted_k3'), vars: { n: user.avgWordsPerMsg.toFixed(0) }, metric: user.avgWordsPerMsg });
     } else if (user.avgWordsPerMsg > 25) {
-      out.push({ lineKey: 'st_r_len_tldr_l', kickerKey: 'st_r_len_tldr_k', vars: { n: user.avgWordsPerMsg.toFixed(0) } });
+      out.push({ lineKey: 'st_r_len_tldr_l', kvars: V('st_r_len_tldr_k', 'st_r_len_tldr_k2', 'st_r_len_tldr_k3'), vars: { n: user.avgWordsPerMsg.toFixed(0) }, metric: user.avgWordsPerMsg });
     } else if (user.avgWordsPerMsg < 2 && user.messageCount >= 50) {
-      out.push({ lineKey: 'st_r_len_poem_l', kickerKey: 'st_r_len_poem_k', vars: { n: user.avgWordsPerMsg.toFixed(1) } });
+      out.push({ lineKey: 'st_r_len_poem_l', kvars: V('st_r_len_poem_k', 'st_r_len_poem_k2', 'st_r_len_poem_k3'), vars: { n: user.avgWordsPerMsg.toFixed(1) }, metric: user.messageCount });
     }
 
     // ===== TIER 13: Reviver =====
     if (user.conversationsRevived >= 15) {
-      out.push({ lineKey: 'st_r_rev_bless_l', kickerKey: 'st_r_rev_bless_k', vars: { n: user.conversationsRevived } });
+      out.push({ lineKey: 'st_r_rev_bless_l', kvars: V('st_r_rev_bless_k', 'st_r_rev_bless_k2', 'st_r_rev_bless_k3'), vars: { n: user.conversationsRevived }, metric: user.conversationsRevived });
     }
 
     // ===== TIER 14: Streak =====
     if (user.longestStreak >= 60) {
-      out.push({ lineKey: 'st_r_streak_grass_l', kickerKey: 'st_r_streak_grass_k', vars: { n: user.longestStreak } });
+      out.push({ lineKey: 'st_r_streak_grass_l', kvars: V('st_r_streak_grass_k', 'st_r_streak_grass_k2', 'st_r_streak_grass_k3'), vars: { n: user.longestStreak }, metric: user.longestStreak });
     } else if (user.longestStreak >= 30) {
-      out.push({ lineKey: 'st_r_streak_love_l', kickerKey: 'st_r_streak_love_k', vars: { n: user.longestStreak } });
+      out.push({ lineKey: 'st_r_streak_love_l', kvars: V('st_r_streak_love_k', 'st_r_streak_love_k2', 'st_r_streak_love_k3'), vars: { n: user.longestStreak }, metric: user.longestStreak });
     }
 
-    // ===== Fallback if nothing extreme =====
-    if (out.length === 0) {
-      out.push({ lineKey: 'st_r_fallback_l', kickerKey: 'st_r_fallback_k', vars: { n: user.messageCount } });
+    // ===== TIER 15: Novelist (longest messages by characters) =====
+    if (user.avgCharsPerMsg > 160) {
+      out.push({ lineKey: 'st_r_novel_l', kvars: V('st_r_novel_k', 'st_r_novel_k2', 'st_r_novel_k3'), vars: { n: Math.round(user.avgCharsPerMsg) }, metric: user.avgCharsPerMsg });
+    }
+
+    // ===== TIER 16: Link spammer =====
+    if (user.linkCount >= 30) {
+      out.push({ lineKey: 'st_r_link_l', kvars: V('st_r_link_k', 'st_r_link_k2', 'st_r_link_k3'), vars: { n: user.linkCount.toLocaleString() }, metric: user.linkCount });
+    }
+
+    // ===== TIER 17: Last-word obsession =====
+    if (user.finalMessagesOfDay >= 30) {
+      out.push({ lineKey: 'st_r_last_l', kvars: V('st_r_last_k', 'st_r_last_k2', 'st_r_last_k3'), vars: { n: user.finalMessagesOfDay }, metric: user.finalMessagesOfDay });
+    }
+
+    // ===== TIER 18: Main character (gets replies) =====
+    if (user.replyReceivedRate > 0.6 && user.messageCount >= 30) {
+      out.push({ lineKey: 'st_r_loved_l', kvars: V('st_r_loved_k', 'st_r_loved_k2', 'st_r_loved_k3'), vars: { pct: Math.round(user.replyReceivedRate * 100) }, metric: user.replyReceivedRate });
+    }
+
+    // ===== TIER 19: Early bird =====
+    if (user.peakHour >= 5 && user.peakHour <= 9 && user.messageCount >= 20) {
+      out.push({ lineKey: 'st_r_morn_l', kvars: V('st_r_morn_k', 'st_r_morn_k2', 'st_r_morn_k3'), vars: { h: user.peakHour }, metric: user.messageCount });
+    }
+
+    // ===== TIER 20: One-trick vocabulary =====
+    if (user.topWord && user.topWordCount >= 80) {
+      out.push({ lineKey: 'st_r_oneword_l', kvars: V('st_r_oneword_k', 'st_r_oneword_k2', 'st_r_oneword_k3'), vars: { word: user.topWord, n: user.topWordCount.toLocaleString() }, metric: user.topWordCount });
     }
 
     return out;
   }
-  for (const user of userList) user.roasts = roastsFor(user);
+
+  // --- Group pass: assign UNIQUE roasts so no two people share a punchline ---
+  const byTrait = {}; // lineKey -> [{ user, cand }]
+  for (const user of userList) {
+    user._cands = roastCandidates(user);
+    for (const cand of user._cands) (byTrait[cand.lineKey] = byTrait[cand.lineKey] || []).push({ user, cand });
+  }
+  for (const lineKey in byTrait) {
+    // most-guilty first; tiebreak by name hash so it's stable but not alphabetical
+    const matchers = byTrait[lineKey].sort((a, b) =>
+      (b.cand.metric - a.cand.metric) || (rHash(a.user.author) - rHash(b.user.author)));
+    matchers.forEach((m, rank) => {
+      if (rank < m.cand.kvars.length) {
+        m.cand.kickerKey = m.cand.kvars[rank]; // distinct punchline per person
+        m.cand.rank = rank;                    // 0 = they own this trait
+      }
+      // beyond the variant pool → leave unresolved so the trait isn't reused
+    });
+  }
+  // Filler pool for "normies" who don't lead any trait — assigned with global
+  // de-dup so even the unremarkable people each get a DIFFERENT generic burn.
+  const FALLBACK_KEYS = V('st_r_fallback_k', 'st_r_fallback_k2', 'st_r_fallback_k3', 'st_r_fallback_k4', 'st_r_fallback_k5', 'st_r_fallback_k6', 'st_r_fallback_k7', 'st_r_fallback_k8');
+  const fbUsed = new Set();
+  for (const user of userList) {
+    const roasts = user._cands
+      .filter(c => c.kickerKey)
+      .sort((a, b) => a.rank - b.rank) // lead with the traits they top the group in
+      .map(c => ({ lineKey: c.lineKey, kickerKey: c.kickerKey, vars: c.vars }));
+    if (roasts.length === 0) {
+      const start = rHash(user.author) % FALLBACK_KEYS.length;
+      let chosen = FALLBACK_KEYS[start];
+      for (let o = 0; o < FALLBACK_KEYS.length; o++) {
+        const k = FALLBACK_KEYS[(start + o) % FALLBACK_KEYS.length];
+        if (!fbUsed.has(k)) { chosen = k; break; }
+      }
+      fbUsed.add(chosen);
+      roasts.push({ lineKey: 'st_r_fallback_l', kickerKey: chosen, vars: { n: user.messageCount } });
+    }
+    user.roasts = roasts;
+    delete user._cands;
+  }
 
   // Most likely to — only show if there's a real winner with the trait
   const mostLikely = [];
@@ -1381,6 +1465,108 @@ const I18N = {
     st_r_streak_love_k: 'Notifications were your love language.',
     st_r_fallback_l: '{n} messages. Steady. Predictable.',
     st_r_fallback_k: 'No drama, no chaos, no notes. The control variable of this group.',
+    st_r_fallback_k2: 'So balanced it\'s suspicious. Beige flag energy, zero aura.',
+    // alternate kickers (deterministic per person, for variety)
+    st_r_speed_slow_k2: 'A reply? Maybe tomorrow. Maybe never. Silent ghosting, -aura.',
+    st_r_vol_dom_k2: 'Let everyone else breathe, monologue champion.',
+    st_r_night_close_k2: 'Your body wants sleep, your thumb wants more. delulu.',
+    st_r_q_tired_k2: 'Fewer questions, more personality. NPC with a question mark.',
+    st_r_emoji_words_k2: 'Keyboard? Never heard of her. Just stickers and brainrot.',
+    st_r_len_tldr_k2: 'Wrote a whole novel. Nobody bought it. edging.',
+    // new roast tiers
+    st_r_novel_l: 'Averages {n} characters per message.',
+    st_r_novel_k: 'That\'s not a text, it\'s a thesis. edging every paragraph — nobody reads to the end.',
+    st_r_link_l: 'Dropped {n} links.',
+    st_r_link_k: 'You don\'t talk, you forward. Human RSS feed, zero rizz.',
+    st_r_last_l: 'Got the last word {n} times.',
+    st_r_last_k: 'You NEED the last word. Every night. Not a chat, a competition. NPC with FOMO.',
+    st_r_loved_l: '{pct}% of your messages got an instant reply.',
+    st_r_loved_k: 'Main-character energy. Either they love you or they fear you.',
+    st_r_morn_l: 'Most active at {h} in the morning.',
+    st_r_morn_k: 'Good morning, uncle. Big "rise & shine forward" energy. -aura.',
+    st_r_oneword_l: 'Said "{word}" {n} times.',
+    st_r_oneword_k: 'One word, all year. Expand the vocab, NPC.',
+    // ---- extra kicker variants (deterministic per person, anti-repeat) ----
+    st_r_speed_blink_k2: 'Replies faster than your brain loads. Real-time brainrot.',
+    st_r_speed_blink_k3: 'When do you sleep? When do you eat? Sigma with no off-switch.',
+    st_r_speed_flat_k2: 'No job, no hobbies, just notifications. chronically online champ.',
+    st_r_speed_flat_k3: 'Phone welded to the hand. mewing on the screen 24/7.',
+    st_r_speed_slow_k3: 'By the time you reply we forgot the question. -aura.',
+    st_r_vol_pod_k2: 'The group is your audience. mogging everyone on quantity, zero quality.',
+    st_r_vol_pod_k3: 'Let someone else type, monologue royalty.',
+    st_r_vol_dom_k3: '30% of the chat is you. The group is your personal blog.',
+    st_r_vol_tiny_k2: '{n} messages all year. You\'re a ghost with Wi-Fi.',
+    st_r_vol_tiny_k3: 'Background-NPC presence. Barely rendered.',
+    st_r_vol_watch_k2: 'Reads everything, types nothing. Group spy.',
+    st_r_vol_watch_k3: 'Professional lurker. Saving it all for court.',
+    st_r_burst_hostage_k2: '{n} in a row. We\'re hostages, not a group chat.',
+    st_r_burst_hostage_k3: 'Nobody could reply. edging on the keyboard.',
+    st_r_burst_uninterr_k2: 'A {n}-message monologue. skibidi.',
+    st_r_burst_uninterr_k3: 'Nobody asked for this episode. let you cook? burnt.',
+    st_r_burst_record_k2: 'Talked to yourself {n} times. NPC with an echo.',
+    st_r_burst_record_k3: 'Talking-to-a-wall energy. -aura.',
+    st_r_night_tab_k2: 'The bed is crying. {pct}% after midnight. nocturnal brainrot.',
+    st_r_night_tab_k3: 'You don\'t sleep, you doomscroll. delulu.',
+    st_r_night_close_k3: 'One more "last message" at 2am. sure.',
+    st_r_night_crisis_k2: 'Peak at {h}am. Close the phone, bro.',
+    st_r_night_crisis_k3: 'Who texts at {h}? Just you and the brainrot.',
+    st_r_ghost_iconic_k2: 'Gone {n} days, back like nothing. ghost aura.',
+    st_r_ghost_iconic_k3: 'Sigma lone-wolf? Nah, Olympic ghosting.',
+    st_r_ghost_vanish_k2: '{n} days, no signs of life. ghosting tier, -aura.',
+    st_r_ghost_vanish_k3: 'No "bye", no reason. Vanished like smoke.',
+    st_r_voice_beg_k2: '{n} recordings. Nobody hit play. Type.',
+    st_r_voice_beg_k3: 'A 3-minute voice monologue? sir this is a chat.',
+    st_r_voice_mono_k2: '{n} voice notes. A podcast with no listeners.',
+    st_r_voice_mono_k3: 'Nobody listens. edging us with 0:47.',
+    st_r_q_google_k2: 'Not a friend, a search bar. Google has more rizz.',
+    st_r_q_google_k3: 'Question after question. NPC in interrogation mode.',
+    st_r_q_tired_k3: 'The group is tired of the questions. fewer "?", more personality.',
+    st_r_media_fwd_k2: '{pct}% forwards. group-uncle energy, zero rizz.',
+    st_r_media_fwd_k3: 'You don\'t talk, you forward other people\'s memes.',
+    st_r_media_redist_k2: '{pct}% media, personality {rest}% — not found.',
+    st_r_media_redist_k3: 'Reposting other people\'s content. NPC with a share button.',
+    st_r_ign_thumb_k2: '{pct}% of your texts get a 👍 and silence. negative rizz.',
+    st_r_ign_thumb_k3: 'Tough crowd. Even a bot would reply to you.',
+    st_r_ign_said_k2: 'Nobody mogs you — you\'re just invisible.',
+    st_r_ign_said_k3: '{pct}% ignored. Did you say something? Didn\'t hear it.',
+    st_r_kill_arg_k2: 'Every message = a chat cooked. Certified conversation-ender.',
+    st_r_kill_arg_k3: '{n} chats died after you. serial killer.',
+    st_r_kill_susp_k2: 'After you — silence. Suspicious, skibidi energy.',
+    st_r_kill_susp_k3: '{n} chats dropped. You\'re the group\'s lights-out.',
+    st_r_emoji_help_k2: '{n} emojis. Words? Never met her. visual brainrot.',
+    st_r_emoji_help_k3: 'Keyboard is 80% pictures. get help.',
+    st_r_emoji_words_k3: 'Emoji instead of a sentence. mewing on the keyboard.',
+    st_r_emoji_zero_k2: 'Zero emoji in {n} messages. Sigma or a rock?',
+    st_r_emoji_zero_k3: 'Dry as a desert. zero emotional aura.',
+    st_r_len_ted_k2: '{n} words a message. It\'s a chat, not a TED talk.',
+    st_r_len_ted_k3: 'edging every paragraph. nobody read it, btw.',
+    st_r_len_tldr_k3: 'TL;DR. Wrote a book, nobody bought it.',
+    st_r_len_poem_k2: '"k" "lol" "same" — an NPC poetry collection.',
+    st_r_len_poem_k3: '{n} words on average. Battery died?',
+    st_r_rev_bless_k2: 'Revived {n} dead chats. Hero, or peak delulu.',
+    st_r_rev_bless_k3: 'The chat was dead — you revived it. main character or desperate.',
+    st_r_streak_grass_k2: '{n} days straight. touch grass, please.',
+    st_r_streak_grass_k3: 'Top-tier clinical brainrot. No days off.',
+    st_r_streak_love_k2: '{n} days straight. Loyalty or chronically online? yes.',
+    st_r_streak_love_k3: 'Notifications were your love language. -aura.',
+    st_r_novel_k2: 'Not a message, a scroll. infinite scrolling.',
+    st_r_novel_k3: 'Wrote a thesis in the chat. edging everyone.',
+    st_r_link_k2: '{n} links. Human RSS feed, zero rizz.',
+    st_r_link_k3: 'You don\'t talk, you share. group-uncle.',
+    st_r_last_k2: 'You NEED the last word. Every. Time. NPC with FOMO.',
+    st_r_last_k3: 'The last-word contest — you\'re alone in it.',
+    st_r_loved_k2: 'Every message gets a reply. main character energy.',
+    st_r_loved_k3: 'They love you or fear you. Either way — aura.',
+    st_r_morn_k2: 'Good morning, uncle. "rise & shine forward" energy.',
+    st_r_morn_k3: 'Who\'s up at {h}? Just you and the coffee. -aura.',
+    st_r_oneword_k2: '"{word}" × {n}. Expand the vocab, NPC.',
+    st_r_oneword_k3: 'One word, all year. The NPC vocab.',
+    st_r_fallback_k3: 'The most normal one here. Which is... concerning. beige flag.',
+    st_r_fallback_k4: 'Statistically present. Emotionally? TBD. A balanced NPC.',
+    st_r_fallback_k5: 'So average the algorithm fell asleep. -aura.',
+    st_r_fallback_k6: 'Not hot, not cold. Lukewarm. A walking beige flag.',
+    st_r_fallback_k7: 'A guest star in your own group chat. Sigma? No, just quiet.',
+    st_r_fallback_k8: 'Nothing to roast, and that\'s the roast. cooked without cooking.',
   },
   he: {
     landing_eyebrow: 'חדש · WHATSAPP UNWRAPPED',
@@ -1790,6 +1976,108 @@ const I18N = {
     st_r_streak_love_k: 'נאמנות או chronically online? התשובה: כן.',
     st_r_fallback_l: '{n} הודעות. יציב. צפוי.',
     st_r_fallback_k: 'NPC נייטרלי לגמרי. אין דרמה, אין כאוס — אפילו לרוסט אין לך מספיק אאורה.',
+    st_r_fallback_k2: 'כל כך מאוזן/ת שזה חשוד. beige flag, אפס אאורה.',
+    // קיקרים חלופיים (נבחרים דטרמיניסטית לכל אדם, לגיוון)
+    st_r_speed_slow_k2: 'תשובה? אולי מחר. אולי בכלל לא. גוסטינג שקט, ‎-אורה.',
+    st_r_vol_dom_k2: 'תן/י לאחרים לבלוע אוויר, אלוף/ת המונולוגים.',
+    st_r_night_close_k2: 'הגוף מבקש שינה, האגודל מבקש עוד הודעה. delulu קלאסי.',
+    st_r_q_tired_k2: 'פחות שאלות, יותר אישיות. NPC עם סימן שאלה מובנה.',
+    st_r_emoji_words_k2: 'מקלדת? לא מכיר/ה. רק סטיקרים וברייןרוט.',
+    st_r_len_tldr_k2: 'כתבת רומן שלם. אף אחד לא קנה. edging טהור.',
+    // טירים חדשים
+    st_r_novel_l: 'ממוצע {n} תווים בהודעה.',
+    st_r_novel_k: 'זאת לא הודעה, זאת תזה. edging כל פסקה — אף אחד לא מגיע לסוף.',
+    st_r_link_l: 'זרקת {n} לינקים.',
+    st_r_link_k: 'אתה לא מדבר, אתה מפיץ. RSS אנושי, אפס ריז.',
+    st_r_last_l: 'תפסת מילה אחרונה {n} פעמים.',
+    st_r_last_k: 'חייב/ת מילה אחרונה, כל לילה. זאת לא שיחה, זאת תחרות. NPC עם FOMO.',
+    st_r_loved_l: '{pct}% מההודעות שלך נענו מיד.',
+    st_r_loved_k: 'main-character אנרגיה. או שאוהבים אותך, או שמפחדים ממך.',
+    st_r_morn_l: 'הכי פעיל/ה ב-{h} בבוקר.',
+    st_r_morn_k: 'בוקר טוב, דוד. אאורה של פורוורד "ברכת השכמה". ‎-אורה.',
+    st_r_oneword_l: 'אמרת "{word}" {n} פעמים.',
+    st_r_oneword_k: 'מילה אחת, כל השנה. תרחיב/י אוצר מילים, NPC.',
+    // ---- וריאציות קיקר נוספות (דטרמיניסטי לכל אדם, נגד חזרתיות) ----
+    st_r_speed_blink_k2: 'עונה מהר יותר ממה שהמוח טוען. ברייןרוט בזמן אמת.',
+    st_r_speed_blink_k3: 'מתי ישנים? מתי אוכלים? סיגמה בלי כפתור כיבוי.',
+    st_r_speed_flat_k2: 'אין job, אין hobbies, רק התראות. chronically online אלוף.',
+    st_r_speed_flat_k3: 'הטלפון מולחם ליד. mewing על המסך 24/7.',
+    st_r_speed_slow_k3: 'עד שאתה עונה כבר שכחנו מה שאלנו. ‎-אורה.',
+    st_r_vol_pod_k2: 'הקבוצה זה הקהל שלך. mogging את כולם בכמות, אפס באיכות.',
+    st_r_vol_pod_k3: 'תן/י למישהו אחר להקליד, מלך/ת המונולוגים.',
+    st_r_vol_dom_k3: '30% מהצ׳אט זה אתה. הקבוצה זה הבלוג האישי שלך.',
+    st_r_vol_tiny_k2: '{n} הודעות בשנה. רוח רפאים עם Wi-Fi.',
+    st_r_vol_tiny_k3: 'נוכחות של NPC ברקע. בקושי טוענים אותך.',
+    st_r_vol_watch_k2: 'קורא/ת הכל, כותב/ת כלום. מרגל/ת בקבוצה.',
+    st_r_vol_watch_k3: 'lurker מקצועי/ת. שומר/ת הכל ל-court.',
+    st_r_burst_hostage_k2: '{n} ברצף. אנחנו בני ערובה, לא קבוצה.',
+    st_r_burst_hostage_k3: 'אף אחד לא הספיק לענות. edging במקלדת.',
+    st_r_burst_uninterr_k2: 'מונולוג של {n} הודעות. סקיבידי.',
+    st_r_burst_uninterr_k3: 'אף אחד לא ביקש את הפרק הזה. let you cook? נשרף.',
+    st_r_burst_record_k2: 'דיברת לעצמך {n} פעמים. NPC עם הד.',
+    st_r_burst_record_k3: 'שיחה עם הקיר אנרגיה. ‎-אורה.',
+    st_r_night_tab_k2: 'המיטה בוכה. {pct}% אחרי חצות. ברייןרוט לילי.',
+    st_r_night_tab_k3: 'אתה לא ישן, אתה doomscroll. delulu.',
+    st_r_night_close_k3: 'עוד "הודעה אחרונה" ב-2 בלילה. כן, בטח.',
+    st_r_night_crisis_k2: 'השיא ב-{h} לפנות בוקר. תסגור את הטלפון, אחי.',
+    st_r_night_crisis_k3: 'מי מקליד ב-{h}? רק את/ה והברייןרוט.',
+    st_r_ghost_iconic_k2: 'נעלמת {n} ימים וחזרת כאילו כלום. אאורה של רוח.',
+    st_r_ghost_iconic_k3: 'סיגמה lone-wolf? לא, גוסטינג אולימפי.',
+    st_r_ghost_vanish_k2: '{n} ימים בלי סימן חיים. גוסטינג ברמה, ‎-אורה.',
+    st_r_ghost_vanish_k3: 'בלי "ביי", בלי הסבר. נמוג/ה כמו עשן.',
+    st_r_voice_beg_k2: '{n} הקלטות. אף אחד לא לחץ play. תקליד/י.',
+    st_r_voice_beg_k3: 'מונולוג קולי של 3 דקות? sir, זה צ׳אט.',
+    st_r_voice_mono_k2: '{n} voice notes. פודקאסט בלי מאזינים.',
+    st_r_voice_mono_k3: 'אף אחד לא שומע. edging אותנו עם 0:47.',
+    st_r_q_google_k2: 'לא חבר, שורת חיפוש. לגוגל יש יותר ריז.',
+    st_r_q_google_k3: 'שאלה על שאלה. NPC במצב חקירה.',
+    st_r_q_tired_k3: 'הקבוצה עייפה מהשאלות. פחות "?", יותר אישיות.',
+    st_r_media_fwd_k2: '{pct}% פורוורדים. דוד-בקבוצה energy, אפס ריז.',
+    st_r_media_fwd_k3: 'אתה לא מדבר, אתה מפיץ ממים של אחרים.',
+    st_r_media_redist_k2: '{pct}% מדיה, אישיות {rest}% — לא נמצאה.',
+    st_r_media_redist_k3: 'מפיץ/ה תוכן של אחרים. NPC עם כפתור share.',
+    st_r_ign_thumb_k2: '{pct}% מההודעות שלך — 👍 ודממה. negative rizz.',
+    st_r_ign_thumb_k3: 'קהל קשוח. אפילו בוט היה עונה לך.',
+    st_r_ign_said_k2: 'אף אחד לא mogg אותך — את/ה פשוט שקוף/ה.',
+    st_r_ign_said_k3: '{pct}% התעלמו. אמרת משהו? לא נשמע.',
+    st_r_kill_arg_k2: 'כל הודעה = שיחה cooked. סתימת שיחות מוסמכת.',
+    st_r_kill_arg_k3: '{n} שיחות מתו אחריך. רוצח/ת סדרתי/ת.',
+    st_r_kill_susp_k2: 'אחריך — שקט. חשוד, סקיבידי אנרגיה.',
+    st_r_kill_susp_k3: '{n} צ׳אטים נפלו. את/ה כיבוי האורות של הקבוצה.',
+    st_r_emoji_help_k2: '{n} אימוג׳ים. מילים? לא מכיר/ה. ברייןרוט ויזואלי.',
+    st_r_emoji_help_k3: 'מקלדת = 80% תמונות. תקבל/י עזרה.',
+    st_r_emoji_words_k3: 'אימוג׳י במקום משפט. mewing על המקלדת.',
+    st_r_emoji_zero_k2: 'אפס אימוג׳י ב-{n} הודעות. סיגמה או אבן?',
+    st_r_emoji_zero_k3: 'יבש/ה כמו מדבר. אפס אאורה רגשית.',
+    st_r_len_ted_k2: '{n} מילים בהודעה. זה צ׳אט, לא הרצאת TED.',
+    st_r_len_ted_k3: 'edging כל פסקה. תכל׳ס אף אחד לא קרא.',
+    st_r_len_tldr_k3: 'TL;DR. כתבת ספר, אף אחד לא קנה.',
+    st_r_len_poem_k2: '"ק" "חחח" "סבבה" — אסופת שירה של NPC.',
+    st_r_len_poem_k3: '{n} מילים בממוצע. נגמרה הסוללה?',
+    st_r_rev_bless_k2: 'החייאת {n} שיחות מתות. גיבור/ה או הכי delulu.',
+    st_r_rev_bless_k3: 'הצ׳אט מת — את/ה החזרת אותו. main character או נואש/ת.',
+    st_r_streak_grass_k2: '{n} ימים ברצף. תיגע/י בדשא, בבקשה.',
+    st_r_streak_grass_k3: 'ברייןרוט קליני ברמה הכי גבוהה. אין יום חופש.',
+    st_r_streak_love_k2: '{n} ימים רצוף. נאמנות או chronically online? כן.',
+    st_r_streak_love_k3: 'התראות = שפת האהבה שלך. ‎-אורה.',
+    st_r_novel_k2: 'הודעה? לא, מגילה. גלילה אינסופית.',
+    st_r_novel_k3: 'כתבת תזה בצ׳אט. edging את כולם.',
+    st_r_link_k2: '{n} לינקים. RSS אנושי, אפס ריז.',
+    st_r_link_k3: 'אתה לא מדבר, אתה משתף. דוד-בקבוצה.',
+    st_r_last_k2: 'חייב/ת מילה אחרונה. כל. פעם. NPC עם FOMO.',
+    st_r_last_k3: 'תחרות המילה האחרונה — את/ה לבד בה.',
+    st_r_loved_k2: 'כל הודעה שלך נענית. main character אנרגיה.',
+    st_r_loved_k3: 'או שאוהבים אותך או שמפחדים. בכל מקרה — אאורה.',
+    st_r_morn_k2: 'בוקר טוב, דוד. פורוורד "ברכת השכמה" energy.',
+    st_r_morn_k3: 'מי ער ב-{h}? רק את/ה והקפה. ‎-אורה.',
+    st_r_oneword_k2: '"{word}" × {n}. תרחיב/י אוצר מילים, NPC.',
+    st_r_oneword_k3: 'מילה אחת, כל השנה. ה-vocab של NPC.',
+    st_r_fallback_k3: 'הכי נורמלי/ת בקבוצה. וזה... מדאיג. beige flag.',
+    st_r_fallback_k4: 'סטטיסטית קיים/ת. רגשית? נראה. NPC מאוזן.',
+    st_r_fallback_k5: 'כל כך ממוצע/ת שהאלגוריתם נרדם. ‎-אורה.',
+    st_r_fallback_k6: 'לא חם, לא קר. פושר/ת. beige flag מהלך/ת.',
+    st_r_fallback_k7: 'הופעת אורח בקבוצה של עצמך. סיגמה? לא, סתם שקט/ה.',
+    st_r_fallback_k8: 'אין עליך מה לכתוב, וזה הרוסט. cooked בלי בכלל לבשל.',
   },
   es: {
     landing_eyebrow: 'NUEVO · WHATSAPP UNWRAPPED',
