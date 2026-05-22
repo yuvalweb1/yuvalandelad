@@ -3680,7 +3680,8 @@ function ChatWrappedApp() {
               setSlide={setSlide}
               profile={profile}
               t={t}
-              onExit={() => setStage('menu')}
+              onExit={() => setStage('landing')}
+              onMenu={() => setStage('menu')}
             />
           )}
           {stage === 'menu' && analytics && (
@@ -4038,20 +4039,39 @@ function Landing({ onFile, onDemo, parseError, t, lang, setLang }) {
   const [langOpen, setLangOpen] = useState(false);
   const currentLang = LANGUAGES.find(l => l.code === lang) || LANGUAGES[0];
 
+  const featureCards = [
+    { icon: '📊', label: t.landing_feat_stats || 'Stats', sub: t.landing_feat_stats_sub || 'Who typed the most' },
+    { icon: '🔥', label: t.landing_feat_roasts || 'Roasts', sub: t.landing_feat_roasts_sub || 'Brutal honest verdicts' },
+    { icon: '🎭', label: t.landing_feat_drama || 'Drama', sub: t.landing_feat_drama_sub || 'Chaos moments & ghosts' },
+  ];
+
   return (
     <div style={{
       position: 'relative', display: 'flex', flexDirection: 'column',
-      padding: '20px 24px 28px', height: '100%',
+      padding: '20px 22px 26px', height: '100%',
+      background: '#faf6f0',
+      overflow: 'hidden',
     }}>
-      <div className="a-pulse-glow" style={{
-        position: 'absolute', top: 60, right: -60, width: 240, height: 240,
-        borderRadius: '50%', background: '#f9c74f', opacity: 0.20,
-        filter: 'blur(70px)', pointerEvents: 'none',
+      {/* Background blobs */}
+      <div style={{
+        position: 'absolute', top: -60, right: -70, width: 230, height: 230,
+        borderRadius: '50%', background: '#ffd972', opacity: 0.55,
+        filter: 'blur(72px)', pointerEvents: 'none',
       }} />
       <div style={{
-        position: 'absolute', bottom: 100, left: -60, width: 220, height: 220,
-        borderRadius: '50%', background: '#f3722c', opacity: 0.14,
-        filter: 'blur(70px)', pointerEvents: 'none',
+        position: 'absolute', top: 80, left: -80, width: 200, height: 200,
+        borderRadius: '50%', background: '#f06449', opacity: 0.28,
+        filter: 'blur(72px)', pointerEvents: 'none',
+      }} />
+      <div style={{
+        position: 'absolute', bottom: 60, right: -50, width: 200, height: 200,
+        borderRadius: '50%', background: '#9cf6f6', opacity: 0.50,
+        filter: 'blur(68px)', pointerEvents: 'none',
+      }} />
+      <div style={{
+        position: 'absolute', bottom: -40, left: -40, width: 180, height: 180,
+        borderRadius: '50%', background: '#f1e4f3', opacity: 0.70,
+        filter: 'blur(60px)', pointerEvents: 'none',
       }} />
 
       {/* Top row: eyebrow + language picker */}
@@ -4060,48 +4080,80 @@ function Landing({ onFile, onDemo, parseError, t, lang, setLang }) {
         display: 'flex', justifyContent: 'space-between', alignItems: 'center',
       }}>
         <div className="fs-mono a-fade-up" style={{
-          fontSize: 20, color: '#f9c74f', letterSpacing: '0.3em',
+          fontSize: 11, color: '#f06449', letterSpacing: '0.22em',
+          fontWeight: 700, textTransform: 'uppercase',
         }}>
           ✦ {t.landing_eyebrow}
         </div>
         <button onClick={() => setLangOpen(true)} className="press" aria-label={t.a11y_change_language || `Change language. Current: ${currentLang.name}`} style={{
           display: 'flex', alignItems: 'center', justifyContent: 'center',
-          width: 44, height: 44, borderRadius: 999,
-          background: 'rgba(255,255,255,0.06)', border: '1px solid #2a2a36',
-          color: '#f4f4f8', fontSize: 20, cursor: 'pointer',
+          width: 38, height: 38, borderRadius: 999,
+          background: 'rgba(87,50,128,0.08)', border: '1px solid rgba(87,50,128,0.18)',
+          color: '#573280', fontSize: 18, cursor: 'pointer',
         }}>
           {currentLang.flag}
         </button>
       </div>
 
+      {/* Headline */}
       <div className="a-fade-up" style={{
-        position: 'relative', zIndex: 10, flex: 1,
-        display: 'flex', flexDirection: 'column', justifyContent: 'center',
-        animationDelay: '0.15s',
+        position: 'relative', zIndex: 10,
+        marginTop: 22,
+        animationDelay: '0.12s',
       }}>
         <h1 className="fs-display" style={{
-          fontSize: 64, lineHeight: 0.92, letterSpacing: '-0.05em',
-          fontWeight: 400, margin: '0 0 18px',
+          fontSize: 46, lineHeight: 1.0, letterSpacing: '-0.04em',
+          fontWeight: 800, margin: 0, color: '#2a0645',
         }}>
-          {t.landing_h1_a}<br/>
-          <span style={{ fontStyle: 'italic', color: '#f9c74f' }}>{t.landing_h1_b}</span><br/>
+          {t.landing_h1_a}{' '}
+          <span style={{ fontStyle: 'italic', color: '#f06449' }}>{t.landing_h1_b}</span>{' '}
           {t.landing_h1_c}<br/>
-          <span style={{ fontStyle: 'italic' }}>{t.landing_h1_d}</span>{t.landing_h1_e ? ' ' : ''}
-          {t.landing_h1_e && <>{t.landing_h1_e}</>}
+          <span style={{ fontStyle: 'italic', color: '#ffd972' }}>{t.landing_h1_d}</span>
+          {t.landing_h1_e ? <> {t.landing_h1_e}</> : null}
         </h1>
-        <p style={{ fontSize: 22, lineHeight: 1.5, color: '#d0d0e0', margin: '14px 0 0', maxWidth: 280 }}>
-          {t.landing_sub}
-        </p>
+      </div>
+
+      {/* Feature cards */}
+      <div className="a-fade-up" style={{
+        position: 'relative', zIndex: 10,
+        marginTop: 20, display: 'flex', flexDirection: 'column', gap: 9,
+        animationDelay: '0.25s',
+      }}>
+        {featureCards.map((card, i) => (
+          <div key={i} className="a-slide-right" style={{
+            display: 'flex', alignItems: 'center', gap: 14,
+            padding: '12px 18px',
+            background: i === 0 ? 'rgba(255,217,114,0.28)' : i === 1 ? 'rgba(240,100,73,0.10)' : 'rgba(156,246,246,0.28)',
+            borderRadius: 18,
+            boxShadow: '0 2px 12px rgba(87,50,128,0.06)',
+            animationDelay: `${0.35 + i * 0.1}s`,
+          }}>
+            <span style={{ fontSize: 22, flexShrink: 0 }}>{card.icon}</span>
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <div className="fs-display" style={{
+                fontSize: 16, fontWeight: 700, color: '#2a0645',
+                letterSpacing: '-0.02em',
+              }}>{card.label}</div>
+              <div className="fs-mono" style={{
+                fontSize: 12, color: 'rgba(42,6,69,0.55)', marginTop: 1,
+              }}>{card.sub}</div>
+            </div>
+            <div className="fs-display" style={{
+              fontSize: 26, fontWeight: 800, color: 'rgba(87,50,128,0.18)',
+              flexShrink: 0,
+            }}>{i + 1}</div>
+          </div>
+        ))}
       </div>
 
       {parseError && (
         <div role="alert" className="a-scale-in" style={{
           position: 'relative', zIndex: 10,
-          display: 'flex', gap: 10, marginBottom: 12,
-          background: '#f3722c20', border: '1px solid #fb560770',
-          borderRadius: 12, padding: 14,
+          display: 'flex', gap: 10, marginTop: 12,
+          background: 'rgba(240,100,73,0.10)', border: '1px solid rgba(240,100,73,0.35)',
+          borderRadius: 14, padding: 14,
         }}>
-          <div style={{ flexShrink: 0, marginTop: 2, color: '#f3722c' }}>
+          <div style={{ flexShrink: 0, marginTop: 2, color: '#f06449' }}>
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2"
               strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
               <circle cx="12" cy="12" r="10"/>
@@ -4109,38 +4161,40 @@ function Landing({ onFile, onDemo, parseError, t, lang, setLang }) {
               <line x1="12" y1="16" x2="12.01" y2="16"/>
             </svg>
           </div>
-          <div style={{ fontSize: 23, lineHeight: 1.5, color: '#f4f4f8' }}>{parseError}</div>
+          <div style={{ fontSize: 14, lineHeight: 1.5, color: '#2a0645' }}>{parseError}</div>
         </div>
       )}
 
-      <div className="a-fade-up" style={{ position: 'relative', zIndex: 10, animationDelay: '0.3s' }}>
+      <div style={{ flex: 1 }} />
+
+      <div className="a-fade-up" style={{ position: 'relative', zIndex: 10, animationDelay: '0.45s' }}>
         <input ref={fileInputRef} type="file" accept=".txt,.zip,application/zip,text/plain"
           style={{ display: 'none' }}
           onChange={e => { const f = e.target.files?.[0]; if (f) onFile(f); e.target.value = ''; }} />
         <button onClick={() => fileInputRef.current?.click()} className="press lift a-gradient-shift" style={{
           width: '100%', position: 'relative', overflow: 'hidden',
-          padding: 20, color: '#0a0a0f',
-          background: 'linear-gradient(135deg, #f9c74f 0%, #ffd340 50%, #d4a820 100%)',
+          padding: 18, color: '#2a0645',
+          background: 'linear-gradient(135deg, #ffd972 0%, #f9c74f 50%, #f0b429 100%)',
           backgroundSize: '200% 200%',
-          border: 'none', borderRadius: 18, fontSize: 17, fontWeight: 800,
+          border: 'none', borderRadius: 18, fontSize: 16, fontWeight: 800,
           cursor: 'pointer', letterSpacing: '-0.01em',
-          boxShadow: '0 12px 32px rgba(249,199,79,0.45)',
+          boxShadow: '0 8px 28px rgba(255,217,114,0.55)',
         }}>
           <div className="a-shine" style={{ position: 'absolute', inset: 0 }} />
           {t.cta_play}
         </button>
         <button onClick={onDemo} className="fs-mono press" style={{
-          width: '100%', marginTop: 10, padding: 16, minHeight: 48,
-          background: 'transparent', border: '1px solid #3a3a48',
-          color: '#cfcfdc', borderRadius: 14, fontSize: 22,
-          cursor: 'pointer', letterSpacing: '0.15em', fontWeight: 600,
+          width: '100%', marginTop: 9, padding: 14, minHeight: 48,
+          background: 'rgba(87,50,128,0.07)', border: '1px solid rgba(87,50,128,0.18)',
+          color: '#573280', borderRadius: 16, fontSize: 14,
+          cursor: 'pointer', letterSpacing: '0.12em', fontWeight: 600,
         }}>
           {t.cta_demo}
         </button>
 
         <div className="fs-mono" style={{
-          textAlign: 'center', marginTop: 16,
-          fontSize: 20, color: '#c8c8dc', letterSpacing: '0.15em',
+          textAlign: 'center', marginTop: 12,
+          fontSize: 11, color: 'rgba(42,6,69,0.40)', letterSpacing: '0.12em',
         }}>
           {t.privacy_note}
         </div>
@@ -4200,49 +4254,54 @@ function Parsing({ fileName, parsingStage, diagnostics, t }) {
       position: 'relative', height: '100%', overflow: 'hidden',
       display: 'flex', flexDirection: 'column', justifyContent: 'space-between',
       padding: '32px 28px',
+      background: '#faf6f0',
     }}>
-      <div className="a-pulse-glow" style={{
-        position: 'absolute', top: '40%', left: '50%', transform: 'translate(-50%, -50%)',
-        width: 320, height: 320, borderRadius: '50%',
-        background: '#f9c74f', opacity: 0.18, filter: 'blur(80px)',
+      {/* Background blobs matching landing page */}
+      <div style={{
+        position: 'absolute', top: -60, right: -70, width: 230, height: 230,
+        borderRadius: '50%', background: '#ffd972', opacity: 0.55,
+        filter: 'blur(72px)', pointerEvents: 'none',
+      }} />
+      <div style={{
+        position: 'absolute', top: 80, left: -80, width: 200, height: 200,
+        borderRadius: '50%', background: '#f06449', opacity: 0.25,
+        filter: 'blur(72px)', pointerEvents: 'none',
+      }} />
+      <div style={{
+        position: 'absolute', bottom: 60, right: -50, width: 200, height: 200,
+        borderRadius: '50%', background: '#9cf6f6', opacity: 0.50,
+        filter: 'blur(68px)', pointerEvents: 'none',
+      }} />
+      <div style={{
+        position: 'absolute', bottom: -40, left: -40, width: 180, height: 180,
+        borderRadius: '50%', background: '#f1e4f3', opacity: 0.70,
+        filter: 'blur(60px)', pointerEvents: 'none',
       }} />
 
-      <div style={{
-        position: 'absolute', top: '40%', left: '50%', width: 1, height: 1, pointerEvents: 'none',
-      }}>
-        {[0, 1, 2].map(i => (
-          <div key={i} style={{
-            position: 'absolute', width: 8, height: 8,
-            background: ['#f9c74f', '#f3722c', '#277da1'][i],
-            borderRadius: '50%',
-            animation: `orbit ${4 + i}s linear infinite`,
-            animationDelay: `${-i * 0.8}s`,
-            filter: 'blur(1px)',
-            boxShadow: `0 0 20px ${['#f9c74f', '#f3722c', '#277da1'][i]}`,
-          }} />
-        ))}
-      </div>
-
       <div style={{ position: 'relative', zIndex: 10 }}>
-        <div className="fs-mono a-fade-up" style={{ fontSize: 20, color: '#f9c74f', letterSpacing: '0.3em' }}>
+        <div className="fs-mono a-fade-up" style={{
+          fontSize: 11, color: '#f06449', letterSpacing: '0.22em',
+          fontWeight: 700, textTransform: 'uppercase',
+        }}>
           ✦ {t.parsing_msg_parsed}
         </div>
         <div className="fs-mono a-fade-in" style={{
-          fontSize: 21, color: '#c8c8dc', marginTop: 8, wordBreak: 'break-all',
-          animationDelay: '0.2s',
+          fontSize: 13, color: '#573280', marginTop: 6, wordBreak: 'break-all',
+          opacity: 0.7, animationDelay: '0.2s',
         }}>
           {fileName}
         </div>
       </div>
 
       <div style={{ position: 'relative', zIndex: 10, textAlign: 'center' }}>
-        <div className="fs-display a-spring a-pulse-glow" style={{
-          fontSize: 96, lineHeight: 1, letterSpacing: '-0.05em', color: '#f9c74f',
+        <div className="fs-display a-spring" style={{
+          fontSize: 96, lineHeight: 1, letterSpacing: '-0.05em', color: '#573280',
         }}>
           {fakeCount.toLocaleString()}
         </div>
         <div className="fs-mono" style={{
-          fontSize: 21, color: '#d0d0e0', marginTop: 8, letterSpacing: '0.15em',
+          fontSize: 13, color: '#573280', marginTop: 8, letterSpacing: '0.15em',
+          opacity: 0.6, fontWeight: 700, textTransform: 'uppercase',
         }}>
           {t.parsing_msg_parsed}
         </div>
@@ -4259,14 +4318,14 @@ function Parsing({ fileName, parsingStage, diagnostics, t }) {
               animationDelay: `${i * 0.1}s`,
             }}>
               <div style={{
-                width: 18, height: 18, borderRadius: '50%', flexShrink: 0,
-                background: done ? '#f9c74f' : 'transparent',
-                border: done ? 'none' : `2px solid ${active ? '#f9c74f' : '#2a2a36'}`,
+                width: 20, height: 20, borderRadius: '50%', flexShrink: 0,
+                background: done ? '#f06449' : 'transparent',
+                border: done ? 'none' : `2px solid ${active ? '#f06449' : 'rgba(87,50,128,0.25)'}`,
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
                 position: 'relative',
               }}>
                 {done && (
-                  <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#0a0a0f"
+                  <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#fff"
                     strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round">
                     <polyline points="20 6 9 17 4 12"/>
                   </svg>
@@ -4274,18 +4333,19 @@ function Parsing({ fileName, parsingStage, diagnostics, t }) {
                 {active && (
                   <div className="a-spin" style={{
                     position: 'absolute', inset: -2,
-                    border: '2px solid transparent', borderTopColor: '#f9c74f',
+                    border: '2px solid transparent', borderTopColor: '#f06449',
                     borderRadius: '50%',
                   }} />
                 )}
               </div>
               <div style={{ flex: 1, minWidth: 0 }}>
-                <div style={{ fontSize: 23, fontWeight: active ? 700 : 500, color: done || active ? '#fff' : '#c8c8dc' }}>
+                <div style={{ fontSize: 16, fontWeight: active ? 700 : 500, color: done || active ? '#2a0645' : '#573280' }}>
                   {s.label}
                 </div>
                 {active && (
                   <div className="fs-mono a-fade-in" style={{
-                    fontSize: 20, color: '#f9c74f', marginTop: 2, letterSpacing: '0.1em',
+                    fontSize: 11, color: '#f06449', marginTop: 2,
+                    letterSpacing: '0.08em', fontWeight: 700,
                   }}>
                     {s.detail}…
                   </div>
@@ -4585,7 +4645,7 @@ function Onboarding({ analytics, t, profile, setProfile, onComplete, onSkip }) {
   );
 }
 
-function Wrapped({ analytics, diagnostics, selectedAuthor, setSelectedAuthor, slide, setSlide, profile, t, onExit }) {
+function Wrapped({ analytics, diagnostics, selectedAuthor, setSelectedAuthor, slide, setSlide, profile, t, onExit, onMenu }) {
   const user = analytics.userMap[selectedAuthor];
   if (!user) return null;
   const userAchievements = analytics.achievementsByUser[selectedAuthor] || [];
@@ -4647,13 +4707,13 @@ function Wrapped({ analytics, diagnostics, selectedAuthor, setSelectedAuthor, sl
 
       {/* Tap zones — pure touch convenience, hidden from assistive tech */}
       <div onClick={prev} aria-hidden="true" style={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: '30%', zIndex: 4 }} />
-      <div onClick={next} aria-hidden="true" style={{ position: 'absolute', right: 0, top: 0, bottom: 0, width: '70%', zIndex: 4 }} />
+      {slide < total - 1 && <div onClick={next} aria-hidden="true" style={{ position: 'absolute', right: 0, top: 0, bottom: 0, width: '70%', zIndex: 4 }} />}
 
       {/* Slide with directional transition */}
       <div key={`${current}-${selectedAuthor}`}
         className={dirRef.current >= 0 ? 'slide-in-right' : 'slide-in-left'}
         style={{ flex: 1, position: 'relative', overflow: 'hidden', zIndex: 1 }}>
-        {SlideComp && <SlideComp a={analytics} u={user} t={t} profile={profile} achievements={userAchievements} onExit={onExit} />}
+        {SlideComp && <SlideComp a={analytics} u={user} t={t} profile={profile} achievements={userAchievements} onExit={onExit} onMenu={onMenu} />}
       </div>
     </div>
   );
@@ -6126,7 +6186,7 @@ const SlidePeakDay = React.memo(function SlidePeakDay({ a, t }) {
   );
 })
 
-const SlideFinale = React.memo(function SlideFinale({ a, t, onExit }) {
+const SlideFinale = React.memo(function SlideFinale({ a, t, onExit, onMenu }) {
   return (
     <SlideShell bg="#577590" accent="#f94144">
       <div style={{
@@ -6157,7 +6217,7 @@ const SlideFinale = React.memo(function SlideFinale({ a, t, onExit }) {
           animationDelay: '1.4s', display: 'flex', gap: 8,
           justifyContent: 'center', marginTop: 32,
         }}>
-          <button onClick={onExit} className="press fs-sans" style={{
+          <button onClick={onMenu || onExit} className="press fs-sans" style={{
             padding: '14px 28px', background: '#f9c74f', color: '#0a0a0f',
             border: 'none', borderRadius: 999, fontSize: 18, fontWeight: 700, cursor: 'pointer',
           }}>
@@ -6213,18 +6273,36 @@ function PostMenu({ analytics, diagnostics, selectedAuthor, setSelectedAuthor, t
   return (
     <div className="no-sb" style={{
       height: '100%', overflowY: 'auto', position: 'relative',
+      background: '#faf6f0',
     }}>
-      <div style={{ padding: '16px 20px 32px' }}>
+      {/* Background blobs */}
+      <div style={{
+        position: 'fixed', top: -50, right: -60, width: 200, height: 200,
+        borderRadius: '50%', background: '#ffd972', opacity: 0.50,
+        filter: 'blur(65px)', pointerEvents: 'none', zIndex: 0,
+      }} />
+      <div style={{
+        position: 'fixed', bottom: 80, left: -50, width: 180, height: 180,
+        borderRadius: '50%', background: '#9cf6f6', opacity: 0.45,
+        filter: 'blur(60px)', pointerEvents: 'none', zIndex: 0,
+      }} />
+      <div style={{
+        position: 'fixed', top: '40%', left: -70, width: 160, height: 160,
+        borderRadius: '50%', background: '#f1e4f3', opacity: 0.70,
+        filter: 'blur(55px)', pointerEvents: 'none', zIndex: 0,
+      }} />
+
+      <div style={{ padding: '16px 20px 32px', position: 'relative', zIndex: 1 }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 }}>
-          <div style={{ fontWeight: 800, fontSize: 18, letterSpacing: '-0.02em' }}>
-            chat<span style={{ color: '#f9c74f' }}>wrapped</span>
+          <div style={{ fontWeight: 800, fontSize: 18, letterSpacing: '-0.02em', color: '#2a0645' }}>
+            chat<span style={{ color: '#f06449' }}>wrapped</span>
           </div>
           <button onClick={onReset} className="press" aria-label={t.a11y_start_over || 'Start over'} style={{
-            background: '#15151d', border: '1px solid #2a2a36', color: '#cfcfdc',
-            width: 44, height: 44, borderRadius: 999, cursor: 'pointer',
+            background: 'rgba(87,50,128,0.08)', border: '1px solid rgba(87,50,128,0.18)', color: '#573280',
+            width: 40, height: 40, borderRadius: 999, cursor: 'pointer',
             display: 'flex', alignItems: 'center', justifyContent: 'center',
           }}>
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor"
               strokeWidth="2.2" strokeLinecap="round" aria-hidden="true">
               <polyline points="23 4 23 10 17 10"/>
               <polyline points="1 20 1 14 7 14"/>
@@ -6233,55 +6311,54 @@ function PostMenu({ analytics, diagnostics, selectedAuthor, setSelectedAuthor, t
           </button>
         </div>
 
-        <div style={{ height: 18 }} />
+        <div style={{ height: 14 }} />
 
         {/* CTAs: Replay + Roast Mode side by side */}
         <div style={{ display: 'flex', gap: 10 }}>
           <button onClick={onReplay} className="a-scale-in press lift" style={{
             flex: 1, position: 'relative', overflow: 'hidden', textAlign: 'left',
-            background: 'linear-gradient(135deg, #f9c74f 0%, #ffd340 100%)',
-            border: 'none', borderRadius: 18, padding: '18px 16px', cursor: 'pointer',
-            color: '#0a0a0f', boxShadow: '0 14px 30px rgba(249,199,79,0.35)',
+            background: 'linear-gradient(135deg, #ffd972 0%, #f9c74f 100%)',
+            border: 'none', borderRadius: 18, padding: '16px 14px', cursor: 'pointer',
+            color: '#2a0645', boxShadow: '0 8px 24px rgba(255,217,114,0.50)',
           }}>
             <div className="a-shine" style={{ position: 'absolute', inset: 0 }} />
             <div className="fs-display" style={{
-              position: 'absolute', right: -14, top: -10, fontSize: 90,
-              opacity: 0.18, lineHeight: 1,
+              position: 'absolute', right: -14, top: -10, fontSize: 80,
+              opacity: 0.15, lineHeight: 1,
             }}>✦</div>
             <div className="fs-mono" style={{
-              fontSize: 20, letterSpacing: '0.22em', opacity: 0.85, fontWeight: 700,
+              fontSize: 10, letterSpacing: '0.22em', opacity: 0.70, fontWeight: 700,
             }}>
               {t.menu_replay}
             </div>
             <div className="fs-display" style={{
-              fontSize: 24, lineHeight: 0.95, letterSpacing: '-0.03em', marginTop: 4,
-              whiteSpace: 'pre-line',
+              fontSize: 21, lineHeight: 1.0, letterSpacing: '-0.03em', marginTop: 4,
+              whiteSpace: 'pre-line', fontWeight: 800,
             }}>
               {t.menu_watch}
             </div>
           </button>
 
-          <button onClick={onRoastMode} className="a-scale-in press lift a-gradient-shift" style={{
+          <button onClick={onRoastMode} className="a-scale-in press lift" style={{
             flex: 1, position: 'relative', overflow: 'hidden', textAlign: 'left',
-            background: 'linear-gradient(135deg, #f3722c 0%, #f3722c 50%, #f3722c 100%)',
-            backgroundSize: '200% 200%',
-            border: 'none', borderRadius: 18, padding: '18px 16px', cursor: 'pointer',
-            color: '#fff', boxShadow: '0 14px 30px rgba(243,114,44,0.40)',
+            background: 'linear-gradient(135deg, #f06449 0%, #e8533a 100%)',
+            border: 'none', borderRadius: 18, padding: '16px 14px', cursor: 'pointer',
+            color: '#fff', boxShadow: '0 8px 24px rgba(240,100,73,0.40)',
             animationDelay: '0.05s',
           }}>
             <div className="a-shine" style={{ position: 'absolute', inset: 0 }} />
             <div style={{
-              position: 'absolute', right: -8, top: -10, fontSize: 70,
-              opacity: 0.22, lineHeight: 1,
+              position: 'absolute', right: -8, top: -8, fontSize: 60,
+              opacity: 0.20, lineHeight: 1,
             }}>🔥</div>
             <div className="fs-mono" style={{
-              fontSize: 20, letterSpacing: '0.22em', opacity: 0.95, fontWeight: 700,
+              fontSize: 10, letterSpacing: '0.22em', opacity: 0.90, fontWeight: 700,
             }}>
               {t.menu_roast_mode}
             </div>
             <div className="fs-display" style={{
-              fontSize: 24, lineHeight: 0.95, letterSpacing: '-0.03em', marginTop: 4,
-              whiteSpace: 'pre-line',
+              fontSize: 21, lineHeight: 1.0, letterSpacing: '-0.03em', marginTop: 4,
+              whiteSpace: 'pre-line', fontWeight: 800,
             }}>
               {t.menu_roast_everyone}
             </div>
@@ -6290,22 +6367,23 @@ function PostMenu({ analytics, diagnostics, selectedAuthor, setSelectedAuthor, t
 
         {/* Person picker */}
         <button onClick={() => setPickerOpen(true)} className="press" style={{
-          width: '100%', marginTop: 12,
-          padding: '14px 16px',
-          background: '#15151d', border: '1px solid #2a2a36',
-          borderRadius: 14, cursor: 'pointer',
+          width: '100%', marginTop: 10,
+          padding: '13px 16px',
+          background: 'rgba(241,228,243,0.60)', border: '1px solid rgba(87,50,128,0.15)',
+          borderRadius: 16, cursor: 'pointer',
           display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+          boxShadow: '0 2px 10px rgba(87,50,128,0.06)',
         }}>
           <div style={{ textAlign: 'left' }}>
-            <div className="fs-mono" style={{ fontSize: 20, color: '#c8c8dc', letterSpacing: '0.18em' }}>
+            <div className="fs-mono" style={{ fontSize: 10, color: 'rgba(42,6,69,0.50)', letterSpacing: '0.18em', textTransform: 'uppercase' }}>
               {t.menu_viewing_as}
             </div>
-            <div style={{ fontSize: 23, fontWeight: 700, marginTop: 3 }}>{selectedAuthor}</div>
+            <div style={{ fontSize: 16, fontWeight: 700, marginTop: 3, color: '#2a0645' }}>{selectedAuthor}</div>
             <div className="fs-mono" style={{
-              fontSize: 20, color: '#f9c74f', marginTop: 4, fontStyle: 'italic',
+              fontSize: 11, color: '#573280', marginTop: 3, fontStyle: 'italic',
             }}>"{resolveTitle(u, t)}"</div>
           </div>
-          <div className="fs-mono" style={{ fontSize: 20, color: '#f9c74f', letterSpacing: '0.1em' }}>
+          <div className="fs-mono" style={{ fontSize: 12, color: '#f06449', letterSpacing: '0.1em', fontWeight: 700 }}>
             {t.menu_switch}
           </div>
         </button>
@@ -6313,87 +6391,93 @@ function PostMenu({ analytics, diagnostics, selectedAuthor, setSelectedAuthor, t
         {/* Verified data badge */}
         <button onClick={onDebug} className="press" style={{
           width: '100%', textAlign: 'left',
-          marginTop: 16, padding: '14px 16px',
-          background: diagnostics?.confidence >= 80 ? 'rgba(249,199,79,0.10)' : 'rgba(249,199,79,0.10)',
-          border: `1px solid ${diagnostics?.confidence >= 80 ? 'rgba(249,199,79,0.30)' : 'rgba(249,199,79,0.35)'}`,
-          borderRadius: 12, cursor: 'pointer', color: '#f4f4f8',
+          marginTop: 10, padding: '13px 16px',
+          background: 'rgba(255,217,114,0.20)',
+          border: '1px solid rgba(255,217,114,0.45)',
+          borderRadius: 14, cursor: 'pointer', color: '#2a0645',
           display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-          minHeight: 56,
+          minHeight: 52, boxShadow: '0 2px 10px rgba(255,217,114,0.15)',
         }}>
           <div>
             <div className="fs-mono" style={{
-              fontSize: 21, color: diagnostics?.confidence >= 80 ? '#f9c74f' : '#f9c74f',
-              letterSpacing: '0.2em', fontWeight: 700,
+              fontSize: 11, color: '#573280', letterSpacing: '0.2em', fontWeight: 700,
             }}>
               {interp(t.menu_verified, { n: diagnostics?.confidence ?? 0 })}
             </div>
-            <div style={{ fontSize: 22, color: '#dcdcec', marginTop: 5 }}>
+            <div style={{ fontSize: 13, color: 'rgba(42,6,69,0.70)', marginTop: 4 }}>
               {interp(t.menu_msgs_senders, {
                 msgs: diagnostics?.parsedMessages.toLocaleString(),
                 senders: Object.keys(diagnostics?.perAuthorCount || {}).length,
               })}
             </div>
             {diagnostics?.warnings.length > 0 && (
-              <div style={{ fontSize: 21, color: '#f9c74f', marginTop: 4 }}>
+              <div style={{ fontSize: 11, color: '#f06449', marginTop: 3 }}>
                 {diagnostics.warnings[0]}
               </div>
             )}
           </div>
-          <div className="fs-mono" style={{ fontSize: 21, color: '#cfcfdc', letterSpacing: '0.1em', fontWeight: 600 }}>
+          <div className="fs-mono" style={{ fontSize: 11, color: 'rgba(42,6,69,0.40)', letterSpacing: '0.1em', fontWeight: 600 }}>
             {t.menu_verify}
           </div>
         </button>
 
         {/* Group personality */}
         <div style={{
-          marginTop: 20, padding: 18,
-          background: 'linear-gradient(135deg, #1a1a25 0%, #15151d 100%)',
-          border: '1px solid rgba(249,199,79,0.2)', borderRadius: 16,
+          marginTop: 14, padding: 16,
+          background: 'rgba(87,50,128,0.07)',
+          border: '1px solid rgba(87,50,128,0.14)', borderRadius: 16,
+          boxShadow: '0 2px 12px rgba(87,50,128,0.06)',
         }}>
           <div className="fs-mono" style={{
-            fontSize: 20, color: '#f9c74f', letterSpacing: '0.2em', marginBottom: 8,
+            fontSize: 10, color: '#f06449', letterSpacing: '0.2em', marginBottom: 6,
+            fontWeight: 700, textTransform: 'uppercase',
           }}>
-            {t.menu_this_group_is}
+            ✦ {t.menu_this_group_is}
           </div>
           <div className="fs-display" style={{
-            fontSize: 26, lineHeight: 1, letterSpacing: '-0.03em',
-            fontStyle: 'italic', color: '#f9c74f',
+            fontSize: 22, lineHeight: 1.05, letterSpacing: '-0.03em',
+            fontStyle: 'italic', color: '#573280', fontWeight: 800,
           }}>
             {analytics.groupPersonality}
           </div>
-          <div style={{ fontSize: 22, color: '#d0d0e0', marginTop: 10, lineHeight: 1.4 }}>
+          <div style={{ fontSize: 13, color: 'rgba(42,6,69,0.65)', marginTop: 8, lineHeight: 1.5 }}>
             {analytics.groupPersonalityReason}
           </div>
         </div>
 
         {/* Eras */}
         {analytics.eras && analytics.eras.length >= 2 && (
-          <div style={{ marginTop: 24 }}>
+          <div style={{ marginTop: 20 }}>
             <div className="fs-mono" style={{
-              fontSize: 20, color: '#c8c8dc', letterSpacing: '0.2em', marginBottom: 10,
+              fontSize: 10, color: 'rgba(42,6,69,0.45)', letterSpacing: '0.2em', marginBottom: 8,
+              fontWeight: 700, textTransform: 'uppercase',
             }}>
               {t.menu_eras}
             </div>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 7 }}>
               {analytics.eras.map((era, i) => (
                 <div key={i} style={{
                   display: 'flex', alignItems: 'center', gap: 12,
-                  padding: '11px 13px',
-                  background: '#15151d', border: '1px solid #2a2a36', borderRadius: 12,
+                  padding: '11px 14px',
+                  background: i === 0 ? 'rgba(255,217,114,0.22)' : 'rgba(241,228,243,0.50)',
+                  border: '1px solid rgba(87,50,128,0.10)',
+                  borderRadius: 14,
+                  boxShadow: '0 1px 6px rgba(87,50,128,0.05)',
                 }}>
                   <div className="fs-mono" style={{
-                    fontSize: 20, color: '#f9c74f', fontWeight: 700, width: 24,
+                    fontSize: 13, color: i === 0 ? '#f06449' : 'rgba(87,50,128,0.50)', fontWeight: 700, width: 22,
                   }}>
                     {String(i + 1).padStart(2, '0')}
                   </div>
                   <div style={{ flex: 1, minWidth: 0 }}>
                     <div className="fs-display" style={{
-                      fontSize: 16, fontStyle: 'italic', letterSpacing: '-0.01em',
+                      fontSize: 15, fontStyle: 'italic', letterSpacing: '-0.01em',
                       overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+                      color: '#2a0645', fontWeight: 700,
                     }}>
                       {era.name}
                     </div>
-                    <div className="fs-mono" style={{ fontSize: 20, color: '#c8c8dc', marginTop: 1 }}>
+                    <div className="fs-mono" style={{ fontSize: 11, color: 'rgba(42,6,69,0.50)', marginTop: 1 }}>
                       {era.messageCount.toLocaleString()} {t.eras_msgs} · {era.days}d
                     </div>
                   </div>
@@ -6404,13 +6488,14 @@ function PostMenu({ analytics, diagnostics, selectedAuthor, setSelectedAuthor, t
         )}
 
         {/* Highlights */}
-        <div style={{ marginTop: 24 }}>
+        <div style={{ marginTop: 20 }}>
           <div className="fs-mono" style={{
-            fontSize: 20, color: '#c8c8dc', letterSpacing: '0.2em', marginBottom: 10,
+            fontSize: 10, color: 'rgba(42,6,69,0.45)', letterSpacing: '0.2em', marginBottom: 8,
+            fontWeight: 700, textTransform: 'uppercase',
           }}>
             {t.menu_highlights}
           </div>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 7 }}>
             <HighlightCard value={u.messageCount.toLocaleString()} label={t.menu_hl_messages} accent />
             <HighlightCard value={`#${rank}`} label={interp(t.menu_hl_of, { n: analytics.users.length })} />
             <HighlightCard value={`${u.peakHour}:00`} label={t.menu_hl_peak_hour} />
@@ -6428,25 +6513,26 @@ function PostMenu({ analytics, diagnostics, selectedAuthor, setSelectedAuthor, t
 
         {/* Achievements */}
         {userAchievements.length > 0 && (
-          <div style={{ marginTop: 24 }}>
+          <div style={{ marginTop: 20 }}>
             <div className="fs-mono" style={{
-              fontSize: 20, color: '#c8c8dc', letterSpacing: '0.2em', marginBottom: 10,
+              fontSize: 10, color: 'rgba(42,6,69,0.45)', letterSpacing: '0.2em', marginBottom: 8,
+              fontWeight: 700, textTransform: 'uppercase',
             }}>
               {t.menu_badges} · {userAchievements.length}
             </div>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 7 }}>
               {userAchievements.map((ach, i) => (
                 <div key={i} style={{
                   display: 'flex', alignItems: 'center', gap: 12,
-                  padding: '10px 12px',
-                  background: `${ach.color}10`,
+                  padding: '10px 13px',
+                  background: `${ach.color}18`,
                   border: `1px solid ${ach.color}30`,
-                  borderRadius: 12,
+                  borderRadius: 13,
                 }}>
-                  <div style={{ fontSize: 18 }}>🏆</div>
+                  <div style={{ fontSize: 16 }}>🏆</div>
                   <div style={{ flex: 1, minWidth: 0 }}>
-                    <div style={{ fontSize: 23, fontWeight: 700, color: ach.color }}>{t[ach.labelKey] || ach.labelKey}</div>
-                    <div className="fs-mono" style={{ fontSize: 20, color: '#c8c8dc', marginTop: 1 }}>{interp(t[ach.evidenceKey] || '', ach.vars || {})}</div>
+                    <div style={{ fontSize: 14, fontWeight: 700, color: ach.color }}>{t[ach.labelKey] || ach.labelKey}</div>
+                    <div className="fs-mono" style={{ fontSize: 11, color: 'rgba(42,6,69,0.50)', marginTop: 1 }}>{interp(t[ach.evidenceKey] || '', ach.vars || {})}</div>
                   </div>
                 </div>
               ))}
@@ -6455,48 +6541,45 @@ function PostMenu({ analytics, diagnostics, selectedAuthor, setSelectedAuthor, t
         )}
 
         {/* Leaderboard */}
-        <div style={{ marginTop: 24 }}>
+        <div style={{ marginTop: 20 }}>
           <div className="fs-mono" style={{
-            fontSize: 20, color: '#c8c8dc', letterSpacing: '0.2em', marginBottom: 10,
+            fontSize: 10, color: 'rgba(42,6,69,0.45)', letterSpacing: '0.2em', marginBottom: 8,
+            fontWeight: 700, textTransform: 'uppercase',
           }}>
             {t.menu_leaderboard}
           </div>
-          <div style={{
-            overflow: 'hidden', background: '#15151d',
-            border: '1px solid #2a2a36', borderRadius: 14,
-          }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 7 }}>
             {analytics.users.map((user, i) => {
-              const pct = (user.messageCount / analytics.totalMessages) * 100;
               const isUser = user.author === selectedAuthor;
+              const isFirst = i === 0;
               return (
                 <div key={user.author} dir="auto" style={{
-                  position: 'relative', padding: '11px 12px',
-                  borderBottom: i < analytics.users.length - 1 ? '1px solid #2a2a36' : 'none',
+                  padding: '12px 14px',
+                  background: isFirst ? 'rgba(255,217,114,0.28)' : isUser ? 'rgba(241,228,243,0.60)' : 'rgba(241,228,243,0.35)',
+                  border: `1px solid ${isFirst ? 'rgba(255,217,114,0.40)' : 'rgba(87,50,128,0.10)'}`,
+                  borderRadius: 16,
+                  boxShadow: '0 1px 6px rgba(87,50,128,0.05)',
                 }}>
                   <div style={{
-                    position: 'absolute', top: 0, bottom: 0, insetInlineStart: 0,
-                    width: `${Math.min(pct * 2.5, 100)}%`,
-                    background: isUser ? 'rgba(249,199,79,0.10)' : 'rgba(249,199,79,0.04)',
-                  }} />
-                  <div style={{
-                    position: 'relative', display: 'flex',
+                    display: 'flex',
                     justifyContent: 'space-between', alignItems: 'center',
                   }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 10, minWidth: 0, flex: 1 }}>
                       <div className="fs-mono" style={{
-                        fontSize: 20, color: '#c8c8dc', width: 16, fontWeight: 700,
+                        fontSize: 12, color: isFirst ? '#f06449' : 'rgba(87,50,128,0.35)', width: 18, fontWeight: 700,
                       }}>
                         {String(i + 1).padStart(2, '0')}
                       </div>
                       <div style={{ minWidth: 0, flex: 1 }}>
                         <div style={{
-                          fontSize: 23, fontWeight: isUser ? 700 : 500,
+                          fontSize: 14, fontWeight: isUser || isFirst ? 700 : 500,
                           overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+                          color: '#2a0645',
                         }}>
-                          {user.author}{isUser && <span style={{ color: '#f9c74f' }}> {t.rank_you}</span>}
+                          {user.author}{isUser && <span style={{ color: '#f06449', fontSize: 11 }}> {t.rank_you}</span>}
                         </div>
                         <div className="fs-mono" style={{
-                          fontSize: 20, color: '#c8c8dc', marginTop: 1, fontStyle: 'italic',
+                          fontSize: 11, color: 'rgba(42,6,69,0.45)', marginTop: 1, fontStyle: 'italic',
                           overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
                         }}>
                           {resolveTitle(user, t)}
@@ -6504,7 +6587,7 @@ function PostMenu({ analytics, diagnostics, selectedAuthor, setSelectedAuthor, t
                       </div>
                     </div>
                     <div className="fs-mono" style={{
-                      fontSize: 21, color: isUser ? '#f9c74f' : '#d0d0e0',
+                      fontSize: 13, color: isFirst ? '#f06449' : 'rgba(42,6,69,0.60)',
                       fontWeight: 600, flexShrink: 0,
                     }}>
                       {user.messageCount.toLocaleString()}
@@ -6553,16 +6636,20 @@ function PostMenu({ analytics, diagnostics, selectedAuthor, setSelectedAuthor, t
 function HighlightCard({ value, label, accent, small }) {
   return (
     <div style={{
-      background: '#15151d', border: '1px solid #2a2a36', borderRadius: 14,
-      padding: 13, minHeight: 86,
+      background: accent ? 'rgba(255,217,114,0.22)' : 'rgba(241,228,243,0.50)',
+      border: `1px solid ${accent ? 'rgba(255,217,114,0.40)' : 'rgba(87,50,128,0.10)'}`,
+      borderRadius: 14, padding: 13, minHeight: 80,
+      boxShadow: '0 1px 6px rgba(87,50,128,0.05)',
     }}>
       <div className="fs-display" style={{
-        fontSize: small ? 18 : 28, letterSpacing: '-0.02em', lineHeight: 1,
-        color: accent ? '#f9c74f' : '#f4f4f8',
+        fontSize: small ? 16 : 24, letterSpacing: '-0.02em', lineHeight: 1,
+        color: accent ? '#f06449' : '#2a0645',
         overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+        fontWeight: 800,
       }}>{value}</div>
       <div className="fs-mono" style={{
-        fontSize: 20, color: '#c8c8dc', letterSpacing: '0.12em', marginTop: 8, textTransform: 'uppercase',
+        fontSize: 10, color: 'rgba(42,6,69,0.45)', letterSpacing: '0.12em', marginTop: 7,
+        textTransform: 'uppercase',
       }}>{label}</div>
     </div>
   );

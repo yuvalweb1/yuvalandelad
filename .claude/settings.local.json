@@ -34,7 +34,10 @@
       "Bash(git add *)",
       "Bash(git commit -q -m ' *)",
       "Bash(git commit *)",
-      "Bash(git merge *)"
+      "Bash(git merge *)",
+      "Bash(git --no-pager diff .claude/settings.local.json)",
+      "Bash(dir \"c:\\\\workspace\\\\whatsappRecap\" /b)",
+      "Bash(dir \"c:\\\\workspace\\\\whatsappRecap\\\\ios\\\\App\")"
     ]
   }
 }
