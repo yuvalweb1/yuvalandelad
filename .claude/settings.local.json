@@ -39,7 +39,9 @@
       "Bash(dir \"c:\\\\workspace\\\\whatsappRecap\" /b)",
       "Bash(dir \"c:\\\\workspace\\\\whatsappRecap\\\\ios\\\\App\")",
       "Bash(git rev-list *)",
-      "Bash(awk '{print \"behind: \"$1\" ahead: \"$2}')"
+      "Bash(awk '{print \"behind: \"$1\" ahead: \"$2}')",
+      "Bash(cat)",
+      "Bash(node scripts/test-groupname.mjs)"
     ]
   }
 }

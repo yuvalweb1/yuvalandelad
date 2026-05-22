@@ -48,6 +48,20 @@ export const DELETED_PATTERNS = [
   /^This message was deleted$/, /^You deleted this message$/,
 ];
 
+// Group-IDENTITY notices: the end-to-end-encryption notice is attributed by
+// iOS exports to the group's own subject as the "sender" (e.g.
+// `[date] My Group: Messages and calls are end-to-end encrypted…`). A real
+// person never sends these, so the sender of such a line IS the group name —
+// we use this to stop the group name being counted as a participant.
+// Deliberately excludes deleted/media/member-action notices (those ARE
+// attributed to real people) to avoid ever dropping a real participant.
+export const GROUP_IDENTITY_PATTERNS = [
+  /ההודעות והשיחות מוצפנות/, /הודעות והשיחות מוצפנות/, /מוצפנות מקצה לקצה/, /הצפנה מקצה לקצה/,
+  /messages and calls are end-to-end encrypted/i,
+  /messages (you send )?to this group are now secured/i,
+  /your messages are secured with end-to-end encryption/i,
+];
+
 export const LINK_RE = /(https?:\/\/[^\s]+)/g;
 export const EMOJI_RE = /[\u{1F300}-\u{1F9FF}\u{2600}-\u{27BF}\u{2700}-\u{27BF}\u{1F000}-\u{1F02F}\u{1F0A0}-\u{1F0FF}\u{1F100}-\u{1F64F}\u{1F910}-\u{1F96B}\u{1F980}-\u{1F9E0}\u{1F1E6}-\u{1F1FF}]/gu;
 

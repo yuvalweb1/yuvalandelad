@@ -954,6 +954,16 @@ const I18N = {
     cta_play: 'Play my Wrapped →',
     cta_demo: 'OR PREVIEW WITH DEMO →',
     privacy_note: 'PROCESSED ENTIRELY ON YOUR DEVICE',
+    landing_promise_sub: 'Stats, roasts, drama, and moments nobody remembers.',
+    feat_stats_t: 'STATS',
+    feat_stats_q: 'Who talked the most?',
+    feat_roasts_t: 'ROASTS',
+    feat_roasts_q: 'AI roasts everyone',
+    feat_drama_t: 'DRAMA',
+    feat_drama_q: 'Who started the chaos?',
+    landing_cta: 'Reveal the group →',
+    landing_demo_soft: 'Just want a peek? Try the demo',
+    landing_trust: 'Everything is processed locally. Your chat never leaves your device.',
     err_format: 'Upload a .txt or .zip from WhatsApp export.',
     err_no_msgs: 'No messages found. Format may not be supported.',
     onboard_skip: 'Skip',
@@ -1380,6 +1390,16 @@ const I18N = {
     cta_play: 'תפעיל לי את ה-Wrapped ←',
     cta_demo: 'או הצג עם דוגמה ←',
     privacy_note: 'הכל מעובד על המכשיר שלך בלבד',
+    landing_promise_sub: 'סטטיסטיקות, ירידות, דרמה ורגעים שאף אחד לא זוכר.',
+    feat_stats_t: 'סטטיסטיקות',
+    feat_stats_q: 'מי חפר הכי הרבה?',
+    feat_roasts_t: 'רוסטים',
+    feat_roasts_q: 'AI ירד על כולם',
+    feat_drama_t: 'דרמה',
+    feat_drama_q: 'מי התחיל את הבלאגן?',
+    landing_cta: 'חשוף את הקבוצה ←',
+    landing_demo_soft: 'רק רוצים לראות? נסו את הדמו',
+    landing_trust: 'הכל מעובד מקומית. הצ׳אט שלך לא עוזב את המכשיר.',
     err_format: 'העלה קובץ .txt או .zip מהיצוא של ווצאפ.',
     err_no_msgs: 'לא נמצאו הודעות. ייתכן שהפורמט אינו נתמך.',
     onboard_skip: 'דלג',
@@ -4013,6 +4033,44 @@ function GlobalStyles() {
       .lift:active { transform: scale(0.97) translateY(2px); }
       .cw-frame * { box-sizing: border-box; }
 
+      /* ===== Ultra-Pop "Roast Cards" — high-contrast, rounded, floating ===== */
+      .roast-card {
+        background: var(--card-bg);
+        color: #fff;
+        border-radius: 28px;
+        padding: 20px 22px;
+        border: 3px solid rgba(255,255,255,0.07);
+        box-shadow: 0 10px 0 rgba(74,14,78,0.22), 0 22px 45px -8px rgba(74,14,78,0.45);
+      }
+      .roast-card.is-navy {
+        background: var(--card-bg-alt);
+        box-shadow: 0 10px 0 rgba(10,25,47,0.25), 0 22px 45px -8px rgba(10,25,47,0.5);
+      }
+      .roast-card.is-floating { animation: popFloat 4.5s ease-in-out infinite; }
+      @keyframes popFloat {
+        0%, 100% { transform: translateY(0) rotate(-0.6deg); }
+        50%      { transform: translateY(-9px) rotate(0.6deg); }
+      }
+
+      /* ===== Ultra-Pop CTA buttons — chunky, game-UI press ===== */
+      .pop-btn {
+        display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+        background: var(--cta); color: var(--ink-alt);
+        border: none; border-radius: 999px;
+        padding: 15px 30px; font-weight: 800; font-size: 17px;
+        cursor: pointer; -webkit-tap-highlight-color: transparent;
+        box-shadow: 0 6px 0 rgba(0,0,0,0.2), 0 12px 26px -4px rgba(0,191,255,0.5);
+        transition: transform 0.08s ease, box-shadow 0.08s ease;
+      }
+      .pop-btn.is-pink {
+        background: var(--cta-2); color: #fff;
+        box-shadow: 0 6px 0 rgba(0,0,0,0.2), 0 12px 26px -4px rgba(255,105,180,0.5);
+      }
+      .pop-btn:active {
+        transform: translateY(4px);
+        box-shadow: 0 2px 0 rgba(0,0,0,0.2), 0 6px 14px -4px rgba(0,0,0,0.35);
+      }
+
       /* Keyboard focus indicator — does not appear on mouse/touch click. */
       .cw-frame :focus { outline: none; }
       .cw-frame :focus-visible {
@@ -4094,39 +4152,47 @@ function Landing({ onFile, onDemo, parseError, t, lang, setLang }) {
   const currentLang = LANGUAGES.find(l => l.code === lang) || LANGUAGES[0];
 
   const featureCards = [
-    { icon: '📊', label: t.landing_feat_stats || 'Stats', sub: t.landing_feat_stats_sub || 'Who typed the most' },
-    { icon: '🔥', label: t.landing_feat_roasts || 'Roasts', sub: t.landing_feat_roasts_sub || 'Brutal honest verdicts' },
-    { icon: '🎭', label: t.landing_feat_drama || 'Drama', sub: t.landing_feat_drama_sub || 'Chaos moments & ghosts' },
+    { icon: '📊', label: t.feat_stats_t || 'STATS', q: t.feat_stats_q || 'Who talked the most?', bg: '#DAF3FF', accent: '#00BFFF', deep: '#0089C4' },
+    { icon: '🔥', label: t.feat_roasts_t || 'ROASTS', q: t.feat_roasts_q || 'AI roasts everyone', bg: '#FFE1EE', accent: '#FF69B4', deep: '#D63384' },
+    { icon: '🎭', label: t.feat_drama_t || 'DRAMA', q: t.feat_drama_q || 'Who started the chaos?', bg: '#FFEFC2', accent: '#FF8C00', deep: '#D17000' },
   ];
 
   return (
     <div style={{
       position: 'relative', display: 'flex', flexDirection: 'column',
-      padding: '20px 22px 26px', height: '100%',
-      background: '#faf6f0',
+      padding: '18px 20px 22px', height: '100%',
+      background: 'linear-gradient(180deg, #FFF6D6 0%, #FFF0E2 46%, #FDE6F1 100%)',
       overflow: 'hidden',
     }}>
-      {/* Background blobs */}
-      <div style={{
-        position: 'absolute', top: -60, right: -70, width: 230, height: 230,
-        borderRadius: '50%', background: '#ffd972', opacity: 0.55,
-        filter: 'blur(72px)', pointerEvents: 'none',
-      }} />
-      <div style={{
-        position: 'absolute', top: 80, left: -80, width: 200, height: 200,
-        borderRadius: '50%', background: '#f06449', opacity: 0.28,
-        filter: 'blur(72px)', pointerEvents: 'none',
-      }} />
-      <div style={{
-        position: 'absolute', bottom: 60, right: -50, width: 200, height: 200,
-        borderRadius: '50%', background: '#9cf6f6', opacity: 0.50,
-        filter: 'blur(68px)', pointerEvents: 'none',
-      }} />
-      <div style={{
-        position: 'absolute', bottom: -40, left: -40, width: 180, height: 180,
-        borderRadius: '50%', background: '#f1e4f3', opacity: 0.70,
-        filter: 'blur(60px)', pointerEvents: 'none',
-      }} />
+      {/* ===== Decorative energy layer (gradient blobs + chat bubbles + emoji stickers) ===== */}
+      <div aria-hidden="true" style={{ position: 'absolute', inset: 0, overflow: 'hidden', pointerEvents: 'none' }}>
+        {/* gradient blobs */}
+        <div style={{ position: 'absolute', top: -70, right: -70, width: 240, height: 240, borderRadius: '50%', background: '#FFD700', opacity: 0.55, filter: 'blur(72px)' }} />
+        <div style={{ position: 'absolute', top: 90, left: -90, width: 210, height: 210, borderRadius: '50%', background: '#FF69B4', opacity: 0.35, filter: 'blur(74px)' }} />
+        <div style={{ position: 'absolute', bottom: 70, right: -60, width: 210, height: 210, borderRadius: '50%', background: '#00BFFF', opacity: 0.40, filter: 'blur(70px)' }} />
+        <div style={{ position: 'absolute', bottom: -50, left: -50, width: 190, height: 190, borderRadius: '50%', background: '#FF8C00', opacity: 0.34, filter: 'blur(64px)' }} />
+
+        {/* floating chat bubbles */}
+        <div className="a-float" style={{ position: 'absolute', top: 150, left: 16, width: 58, height: 38, background: '#fff', borderRadius: '18px 18px 18px 4px', boxShadow: '0 8px 20px rgba(74,14,78,0.14)', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 4, animationDelay: '0.2s' }}>
+          {[0, 1, 2].map(d => <span key={d} style={{ width: 6, height: 6, borderRadius: 999, background: '#FF69B4' }} />)}
+        </div>
+        <div className="a-float" style={{ position: 'absolute', top: 232, right: 14, width: 46, height: 32, background: '#4A0E4E', borderRadius: '16px 16px 4px 16px', boxShadow: '0 8px 18px rgba(74,14,78,0.22)', animationDelay: '1.1s' }} />
+
+        {/* emoji stickers */}
+        {[
+          { e: '😂', top: 116, right: 26, rot: -14, size: 30, delay: '0s' },
+          { e: '🔥', top: 300, left: 22, rot: 12, size: 26, delay: '0.7s' },
+          { e: '👀', top: 360, right: 30, rot: -8, size: 24, delay: '1.4s' },
+          { e: '💀', bottom: 168, left: 30, rot: 10, size: 24, delay: '0.4s' },
+          { e: '✨', top: 88, left: 96, rot: 0, size: 20, delay: '1.8s' },
+        ].map((s, i) => (
+          <span key={i} className="a-float" style={{
+            position: 'absolute', top: s.top, bottom: s.bottom, left: s.left, right: s.right,
+            fontSize: s.size, transform: `rotate(${s.rot}deg)`,
+            filter: 'drop-shadow(0 4px 6px rgba(74,14,78,0.28))', animationDelay: s.delay, opacity: 0.92,
+          }}>{s.e}</span>
+        ))}
+      </div>
 
       {/* Top row: eyebrow + language picker */}
       <div style={{
@@ -4149,54 +4215,78 @@ function Landing({ onFile, onDemo, parseError, t, lang, setLang }) {
         </button>
       </div>
 
-      {/* Headline */}
+      {/* Scrollable middle — hero + cards. Keeps the CTA pinned & always visible. */}
+      <div className="no-sb" style={{ position: 'relative', zIndex: 10, flex: 1, minHeight: 0, overflowY: 'auto', display: 'flex', flexDirection: 'column' }}>
+      {/* Hero — emotional promise + subtitle */}
       <div className="a-fade-up" style={{
         position: 'relative', zIndex: 10,
-        marginTop: 22,
+        marginTop: 26,
         animationDelay: '0.12s',
       }}>
         <h1 className="fs-display" style={{
-          fontSize: 46, lineHeight: 1.0, letterSpacing: '-0.04em',
-          fontWeight: 800, margin: 0, color: '#2a0645',
+          fontSize: 54, lineHeight: 0.98, letterSpacing: '-0.045em',
+          fontWeight: 800, margin: 0, color: '#4A0E4E',
+          textShadow: '0 2px 0 rgba(255,255,255,0.6)',
         }}>
           {t.landing_h1_a}{' '}
-          <span style={{ fontStyle: 'italic', color: '#f06449' }}>{t.landing_h1_b}</span>{' '}
+          <span style={{ fontStyle: 'italic', color: '#FF8C00' }}>{t.landing_h1_b}</span>{' '}
           {t.landing_h1_c}<br/>
-          <span style={{ fontStyle: 'italic', color: '#ffd972' }}>{t.landing_h1_d}</span>
+          <span style={{ fontStyle: 'italic', color: '#FF69B4' }}>{t.landing_h1_d}</span>
           {t.landing_h1_e ? <> {t.landing_h1_e}</> : null}
         </h1>
+        <p className="fs-sans" style={{
+          margin: '14px 0 0', maxWidth: 300,
+          fontSize: 16, lineHeight: 1.45, fontWeight: 500,
+          color: 'rgba(74,14,78,0.66)',
+        }}>
+          {t.landing_promise_sub}
+        </p>
       </div>
 
-      {/* Feature cards */}
+      {/* Feature cards — big, colorful, sticker-like */}
       <div className="a-fade-up" style={{
         position: 'relative', zIndex: 10,
-        marginTop: 20, display: 'flex', flexDirection: 'column', gap: 9,
+        marginTop: 22, display: 'flex', flexDirection: 'column', gap: 12,
         animationDelay: '0.25s',
       }}>
         {featureCards.map((card, i) => (
-          <div key={i} className="a-slide-right" style={{
+          <button key={i} type="button"
+            onClick={() => fileInputRef.current?.click()}
+            aria-label={`${card.label} — ${card.q}`}
+            className="a-slide-right press lift" style={{
+            width: '100%', textAlign: 'start', font: 'inherit', appearance: 'none',
             display: 'flex', alignItems: 'center', gap: 14,
-            padding: '12px 18px',
-            background: i === 0 ? 'rgba(255,217,114,0.28)' : i === 1 ? 'rgba(240,100,73,0.10)' : 'rgba(156,246,246,0.28)',
-            borderRadius: 18,
-            boxShadow: '0 2px 12px rgba(87,50,128,0.06)',
+            padding: '16px 18px',
+            background: card.bg,
+            borderRadius: 24,
+            border: '2px solid rgba(255,255,255,0.7)',
+            boxShadow: `0 7px 0 ${card.deep}33, 0 16px 30px -8px ${card.deep}55`,
             animationDelay: `${0.35 + i * 0.1}s`,
+            cursor: 'pointer',
           }}>
-            <span style={{ fontSize: 22, flexShrink: 0 }}>{card.icon}</span>
+            {/* icon sticker badge */}
+            <div style={{
+              flexShrink: 0, width: 52, height: 52, borderRadius: 16,
+              background: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center',
+              fontSize: 28, boxShadow: `0 4px 0 ${card.deep}22`, transform: 'rotate(-4deg)',
+            }}>{card.icon}</div>
             <div style={{ flex: 1, minWidth: 0 }}>
-              <div className="fs-display" style={{
-                fontSize: 16, fontWeight: 700, color: '#2a0645',
-                letterSpacing: '-0.02em',
-              }}>{card.label}</div>
               <div className="fs-mono" style={{
-                fontSize: 12, color: 'rgba(42,6,69,0.55)', marginTop: 1,
-              }}>{card.sub}</div>
+                fontSize: 11, fontWeight: 700, color: card.deep,
+                letterSpacing: '0.14em', textTransform: 'uppercase',
+              }}>{card.label}</div>
+              <div className="fs-display" style={{
+                fontSize: 20, fontWeight: 800, color: '#4A0E4E',
+                letterSpacing: '-0.02em', lineHeight: 1.12, marginTop: 2,
+              }}>{card.q}</div>
             </div>
-            <div className="fs-display" style={{
-              fontSize: 26, fontWeight: 800, color: 'rgba(87,50,128,0.18)',
-              flexShrink: 0,
-            }}>{i + 1}</div>
-          </div>
+            <div style={{
+              flexShrink: 0, width: 30, height: 30, borderRadius: 999,
+              background: card.accent, color: '#fff',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              fontSize: 17, fontWeight: 800, boxShadow: `0 3px 0 ${card.deep}55`,
+            }}>←</div>
+          </button>
         ))}
       </div>
 
@@ -4218,39 +4308,45 @@ function Landing({ onFile, onDemo, parseError, t, lang, setLang }) {
           <div style={{ fontSize: 14, lineHeight: 1.5, color: '#2a0645' }}>{parseError}</div>
         </div>
       )}
+      </div>
 
-      <div style={{ flex: 1 }} />
-
-      <div className="a-fade-up" style={{ position: 'relative', zIndex: 10, animationDelay: '0.45s' }}>
+      <div className="a-fade-up" style={{ position: 'relative', zIndex: 10, flexShrink: 0, paddingTop: 16, animationDelay: '0.45s' }}>
         <input ref={fileInputRef} type="file" accept=".txt,.zip,application/zip,text/plain"
           style={{ display: 'none' }}
           onChange={e => { const f = e.target.files?.[0]; if (f) onFile(f); e.target.value = ''; }} />
-        <button onClick={() => fileInputRef.current?.click()} className="press lift a-gradient-shift" style={{
+        {/* Main CTA — big, exciting, the obvious next action */}
+        <button onClick={() => fileInputRef.current?.click()} className="press a-gradient-shift" style={{
           width: '100%', position: 'relative', overflow: 'hidden',
-          padding: 18, color: '#2a0645',
-          background: 'linear-gradient(135deg, #ffd972 0%, #f9c74f 50%, #f0b429 100%)',
+          padding: '20px 18px', color: '#4A0E4E',
+          background: 'linear-gradient(135deg, #FFE45C 0%, #FFD700 50%, #FFB800 100%)',
           backgroundSize: '200% 200%',
-          border: 'none', borderRadius: 18, fontSize: 16, fontWeight: 800,
-          cursor: 'pointer', letterSpacing: '-0.01em',
-          boxShadow: '0 8px 28px rgba(255,217,114,0.55)',
+          border: '2px solid rgba(255,255,255,0.7)', borderRadius: 22,
+          fontSize: 20, fontWeight: 800, cursor: 'pointer', letterSpacing: '-0.01em',
+          boxShadow: '0 8px 0 #E0A800, 0 18px 34px -6px rgba(224,168,0,0.6)',
         }}>
           <div className="a-shine" style={{ position: 'absolute', inset: 0 }} />
-          {t.cta_play}
+          <span className="fs-display" style={{ position: 'relative' }}>{t.landing_cta}</span>
         </button>
-        <button onClick={onDemo} className="fs-mono press" style={{
-          width: '100%', marginTop: 9, padding: 14, minHeight: 48,
-          background: 'rgba(87,50,128,0.07)', border: '1px solid rgba(87,50,128,0.18)',
-          color: '#573280', borderRadius: 16, fontSize: 14,
-          cursor: 'pointer', letterSpacing: '0.12em', fontWeight: 600,
+        {/* Demo CTA — secondary, soft */}
+        <button onClick={onDemo} className="press fs-sans" style={{
+          display: 'block', width: '100%', marginTop: 12, padding: '8px',
+          background: 'transparent', border: 'none',
+          color: 'rgba(74,14,78,0.55)', fontSize: 14, fontWeight: 600,
+          cursor: 'pointer', textDecoration: 'underline', textUnderlineOffset: 3,
         }}>
-          {t.cta_demo}
+          {t.landing_demo_soft}
         </button>
 
-        <div className="fs-mono" style={{
+        {/* Trust footer */}
+        <div className="fs-sans" style={{
+          display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
           textAlign: 'center', marginTop: 12,
-          fontSize: 11, color: 'rgba(42,6,69,0.40)', letterSpacing: '0.12em',
+          fontSize: 11.5, color: 'rgba(74,14,78,0.45)', lineHeight: 1.4,
         }}>
-          {t.privacy_note}
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" style={{ flexShrink: 0 }}>
+            <rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+          </svg>
+          {t.landing_trust}
         </div>
       </div>
 

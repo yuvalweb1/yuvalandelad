@@ -27,11 +27,33 @@
 
     <style>
       :root {
-        --amber-gold: #ffbe0b;
-        --blaze-orange: #fb5607;
-        --neon-pink: #ff006e;
-        --blue-violet: #8338ec;
-        --azure-blue: #3a86ff;
+        /* ===== Ultra-Pop Social palette ===== */
+        /* Primary backgrounds — joyful & energetic */
+        --pop-banana: #FFD700;
+        --pop-mango:  #FF8C00;
+        /* High-contrast typography & card backgrounds */
+        --pop-eggplant: #4A0E4E;
+        --pop-navy:     #0A192F;
+        /* Accents & calls-to-action */
+        --pop-sky:  #00BFFF;
+        --pop-pink: #FF69B4;
+
+        /* Semantic roles */
+        --bg-joyful: var(--pop-banana);
+        --bg-energetic: var(--pop-mango);
+        --ink: var(--pop-eggplant);
+        --ink-alt: var(--pop-navy);
+        --card-bg: var(--pop-eggplant);
+        --card-bg-alt: var(--pop-navy);
+        --cta: var(--pop-sky);
+        --cta-2: var(--pop-pink);
+
+        /* Background orbs (BlobBackground) repointed to the new palette */
+        --amber-gold: var(--pop-banana);
+        --blaze-orange: var(--pop-mango);
+        --neon-pink: var(--pop-pink);
+        --blue-violet: var(--pop-sky);
+        --azure-blue: var(--pop-mango);
       }
       html, body, #root { height: 100%; margin: 0; padding: 0; background: #0a0a0f; }
       body {

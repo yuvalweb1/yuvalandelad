@@ -16,6 +16,7 @@ import {
   MEDIA_PATTERNS,
   VOICE_PATTERNS,
   DELETED_PATTERNS,
+  GROUP_IDENTITY_PATTERNS,
   HEADER_PATTERNS,
   SYSTEM_HEADER_PATTERNS,
   LINK_RE,
@@ -102,6 +103,8 @@ export function parseWhatsApp(rawText) {
     perAuthorVoiceCount: {},
     hadBOM: false,
     hadDirectionalMarks: false,
+    groupNameMessages: 0,
+    detectedGroupName: null,
   };
 
   if (rawText.charCodeAt(0) === 0xFEFF) {
@@ -117,6 +120,7 @@ export function parseWhatsApp(rawText) {
 
   const messages = [];
   const authorNameEmojis = new Set();
+  const groupNames = new Set(); // the chat's own subject — never a participant
   let current = null;
 
   for (let rawLineIdx = 0; rawLineIdx < lines.length; rawLineIdx++) {
@@ -152,6 +156,11 @@ export function parseWhatsApp(rawText) {
 
       if (isSystemEvent) {
         diagnostics.systemMessages++;
+        // The E2E-encryption notice carries the group's own subject as its
+        // "sender" — remember it so it's never counted as a participant.
+        if (cleanAuthor && GROUP_IDENTITY_PATTERNS.some(p => p.test(content))) {
+          groupNames.add(cleanAuthor);
+        }
         continue;
       }
 
@@ -206,6 +215,13 @@ export function parseWhatsApp(rawText) {
   // and accumulate per-author counts — all in one loop to avoid re-iterating the array.
   const realMessages = [];
   for (const msg of messages) {
+    // Lines whose "sender" is the group's own name (iOS attributes group-level
+    // notices to the subject) are group events, not a participant — drop them.
+    if (groupNames.size > 0 && groupNames.has(msg.author)) {
+      diagnostics.systemMessages++;
+      diagnostics.groupNameMessages++;
+      continue;
+    }
     if (msg.isDeleted) diagnostics.deletedMessages++;
     // media/voice tallied from all messages (deleted msgs may still carry flags)
     if (msg.hasMedia) diagnostics.mediaMessages++;
@@ -223,6 +239,10 @@ export function parseWhatsApp(rawText) {
     }
   }
   diagnostics.parsedMessages = realMessages.length;
+  if (groupNames.size > 0) {
+    diagnostics.detectedGroupName = [...groupNames].join(', ');
+    diagnostics.warnings.push(`Group name "${diagnostics.detectedGroupName}" was excluded from participants (${diagnostics.groupNameMessages} group-event line(s)).`);
+  }
 
   // Sample first 20 messages for the debug/verify screen
   diagnostics.sample = messages.slice(0, 20).map(m => ({
