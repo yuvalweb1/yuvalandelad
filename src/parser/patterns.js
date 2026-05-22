@@ -33,6 +33,13 @@ export const SYSTEM_PATTERNS = [
 
 export const MEDIA_PATTERNS = [
   /<המדיה הושמטה>/, /<מדיה הושמטה>/,
+  // Hebrew "<type> omitted" notices (iOS export). The per-type word varies
+  // (תמונה/סרטון/מדבקה/קובץ/GIF…) but the tail is always הושמט / הושמטה.
+  // Anchored + length-capped so it only matches a short standalone notice,
+  // never a long real sentence that happens to end in הושמט.
+  /^.{0,18}הושמטה?>?\s*$/,
+  // Android Hebrew variant ("media not included")
+  /<מדיה לא נכללה>/, /<המדיה לא נכללה>/,
   /<Media omitted>/i, /image omitted/i, /video omitted/i,
   /sticker omitted/i, /GIF omitted/i, /document omitted/i,
   /<מצורף:/, /<attached:/i,

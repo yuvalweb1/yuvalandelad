@@ -168,8 +168,10 @@ export function parseWhatsApp(rawText) {
       (cleanAuthor.match(EMOJI_RE) || []).forEach(e => authorNameEmojis.add(e));
 
       const isDeleted = DELETED_PATTERNS.some(p => p.test(content));
-      const hasMedia = MEDIA_PATTERNS.some(p => p.test(content));
+      // Voice takes precedence: a voice note ("הודעה קולית הושמטה") also matches
+      // the generic media "omitted" tail, so resolve it as voice only.
       const isVoice = VOICE_PATTERNS.some(p => p.test(content));
+      const hasMedia = !isVoice && MEDIA_PATTERNS.some(p => p.test(content));
       const linkMatches = content.match(LINK_RE) || [];
       const emojis = (content.match(EMOJI_RE) || []);
       let cleanContent = linkMatches.length > 0 ? content.replace(LINK_RE, '') : content;
