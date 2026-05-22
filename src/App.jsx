@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useCallback, useRef, useEffect } from 'react';
+﻿import React, { useState, useMemo, useCallback, useRef, useEffect } from 'react';
 
 // ============================================================
 // PARSER — with full diagnostics
@@ -868,19 +868,19 @@ function computeAll(messages) {
   // Achievements — each with explicit evidence
   function achievementsFor(user) {
     const acks = [];
-    if (user.nightPct > 30) acks.push({ labelKey: 'st_ach_night', evidenceKey: 'st_ach_ev_night', vars: { pct: user.nightPct.toFixed(0) }, color: '#a78bfa' });
-    if (user.maxBurst >= 12) acks.push({ labelKey: 'st_ach_sprint', evidenceKey: 'st_ach_ev_sprint', vars: { n: user.maxBurst }, color: '#f472b6' });
-    if (user.voiceCount >= 30) acks.push({ labelKey: 'st_ach_voice', evidenceKey: 'st_ach_ev_voice', vars: { n: user.voiceCount }, color: '#fbbf24' });
-    if (user.longestAbsenceDays >= 21) acks.push({ labelKey: 'st_ach_ghost', evidenceKey: 'st_ach_ev_ghost', vars: { n: user.longestAbsenceDays }, color: '#94a3b8' });
-    if (user.longestStreak >= 30) acks.push({ labelKey: 'st_ach_iron', evidenceKey: 'st_ach_ev_iron', vars: { n: user.longestStreak }, color: '#a3e635' });
-    if (user.conversationsRevived >= 8) acks.push({ labelKey: 'st_ach_defib', evidenceKey: 'st_ach_ev_defib', vars: { n: user.conversationsRevived }, color: '#34d399' });
-    if (user.conversationsKilled >= 8) acks.push({ labelKey: 'st_ach_assassin', evidenceKey: 'st_ach_ev_assassin', vars: { n: user.conversationsKilled }, color: '#ef4444' });
-    if (user.emojiCount >= 500) acks.push({ labelKey: 'st_ach_emoji_hof', evidenceKey: 'st_ach_ev_emoji_hof', vars: { n: user.emojiCount }, color: '#fbbf24' });
+    if (user.nightPct > 30) acks.push({ labelKey: 'st_ach_night', evidenceKey: 'st_ach_ev_night', vars: { pct: user.nightPct.toFixed(0) }, color: '#9cf6f6' });
+    if (user.maxBurst >= 12) acks.push({ labelKey: 'st_ach_sprint', evidenceKey: 'st_ach_ev_sprint', vars: { n: user.maxBurst }, color: '#f06449' });
+    if (user.voiceCount >= 30) acks.push({ labelKey: 'st_ach_voice', evidenceKey: 'st_ach_ev_voice', vars: { n: user.voiceCount }, color: '#ffd972' });
+    if (user.longestAbsenceDays >= 21) acks.push({ labelKey: 'st_ach_ghost', evidenceKey: 'st_ach_ev_ghost', vars: { n: user.longestAbsenceDays }, color: '#f1e4f3' });
+    if (user.longestStreak >= 30) acks.push({ labelKey: 'st_ach_iron', evidenceKey: 'st_ach_ev_iron', vars: { n: user.longestStreak }, color: '#ffd972' });
+    if (user.conversationsRevived >= 8) acks.push({ labelKey: 'st_ach_defib', evidenceKey: 'st_ach_ev_defib', vars: { n: user.conversationsRevived }, color: '#9cf6f6' });
+    if (user.conversationsKilled >= 8) acks.push({ labelKey: 'st_ach_assassin', evidenceKey: 'st_ach_ev_assassin', vars: { n: user.conversationsKilled }, color: '#f06449' });
+    if (user.emojiCount >= 500) acks.push({ labelKey: 'st_ach_emoji_hof', evidenceKey: 'st_ach_ev_emoji_hof', vars: { n: user.emojiCount }, color: '#ffd972' });
     if (user.avgRespMin !== null && user.avgRespMin < 1.5 && user.respSampleSize >= 50)
-      acks.push({ labelKey: 'st_ach_submin', evidenceKey: 'st_ach_ev_submin', vars: { s: (user.avgRespMin*60).toFixed(0), n: user.respSampleSize }, color: '#60a5fa' });
-    if (user.sharePct > 40) acks.push({ labelKey: 'st_ach_solo', evidenceKey: 'st_ach_ev_solo', vars: { pct: user.sharePct.toFixed(0) }, color: '#f472b6' });
+      acks.push({ labelKey: 'st_ach_submin', evidenceKey: 'st_ach_ev_submin', vars: { s: (user.avgRespMin*60).toFixed(0), n: user.respSampleSize }, color: '#9cf6f6' });
+    if (user.sharePct > 40) acks.push({ labelKey: 'st_ach_solo', evidenceKey: 'st_ach_ev_solo', vars: { pct: user.sharePct.toFixed(0) }, color: '#f06449' });
     if (user.finalMessagesOfDay >= durationDays * 0.3)
-      acks.push({ labelKey: 'st_ach_lastword', evidenceKey: 'st_ach_ev_lastword', vars: { n: user.finalMessagesOfDay }, color: '#a3e635' });
+      acks.push({ labelKey: 'st_ach_lastword', evidenceKey: 'st_ach_ev_lastword', vars: { n: user.finalMessagesOfDay }, color: '#ffd972' });
     return acks;
   }
   const achievementsByUser = {};
@@ -1166,7 +1166,7 @@ class ErrorBoundary extends React.Component {
           minHeight: '100vh', background: '#0a0a0f', color: '#f4f4f8',
           padding: 24, fontFamily: 'monospace', fontSize: 23,
         }}>
-          <div style={{ color: '#ef4444', fontWeight: 700, marginBottom: 12 }}>
+          <div style={{ color: '#f06449', fontWeight: 700, marginBottom: 12 }}>
             ChatWrapped hit an unexpected error.
           </div>
           <div style={{ marginBottom: 6 }}>{String(this.state.error)}</div>
@@ -1174,7 +1174,7 @@ class ErrorBoundary extends React.Component {
             {this.state.error?.stack?.slice(0, 800)}
           </div>
           <button onClick={() => this.setState({ error: null })} style={{
-            marginTop: 20, padding: '8px 14px', background: '#a3e635',
+            marginTop: 20, padding: '8px 14px', background: '#ffd972',
             color: '#0a0a0f', border: 'none', borderRadius: 8, cursor: 'pointer',
           }}>Try again</button>
         </div>
@@ -3909,8 +3909,10 @@ function ChatWrappedApp() {
         border: '1px solid #1a1a24',
         boxShadow: '0 30px 80px rgba(0,0,0,0.5), 0 0 0 6px #0a0a10',
         color: '#f4f4f8',
-        fontFamily: '"Inter Tight", "Comix CLM", -apple-system, sans-serif',
+        fontFamily: '"DM Sans", "Comix CLM", -apple-system, sans-serif',
+        isolation: 'isolate',
       }}>
+        <BlobBackground />
         <StatusBar />
         <div style={{ flex: 1, position: 'relative', overflow: 'hidden' }} dir={isRTL ? 'rtl' : 'ltr'}>
           {stage === 'landing' && (
@@ -3995,6 +3997,46 @@ function ChatWrappedApp() {
 }
 
 // ============================================================
+// BLOB BACKGROUND
+// ============================================================
+
+function BlobBackground() {
+  const reducedMotion = typeof window !== 'undefined' &&
+    window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const blob = (name, dur, reverse = false) =>
+    reducedMotion ? 'none' : `${name} ${dur}s ease-in-out infinite${reverse ? ' reverse' : ''}`;
+  return (
+    <div style={{ position: 'absolute', inset: 0, zIndex: -1, pointerEvents: 'none', overflow: 'hidden' }}>
+      <div style={{
+        position: 'absolute', width: 280, height: 280, borderRadius: '50%',
+        background: 'var(--tomato)', opacity: 0.35, filter: 'blur(80px)',
+        top: '-60px', left: '-60px', animation: blob('blobDrift1', 18),
+      }} />
+      <div style={{
+        position: 'absolute', width: 320, height: 260, borderRadius: '50%',
+        background: 'var(--indigo-velvet)', opacity: 0.35, filter: 'blur(80px)',
+        top: '30%', right: '-80px', animation: blob('blobDrift2', 22),
+      }} />
+      <div style={{
+        position: 'absolute', width: 300, height: 300, borderRadius: '50%',
+        background: 'var(--jasmine)', opacity: 0.35, filter: 'blur(80px)',
+        bottom: '-40px', left: '10%', animation: blob('blobDrift3', 25),
+      }} />
+      <div style={{
+        position: 'absolute', width: 200, height: 200, borderRadius: '50%',
+        background: 'var(--soft-cyan)', opacity: 0.35, filter: 'blur(80px)',
+        top: '15%', left: '-20px', animation: blob('blobDrift1', 20, true),
+      }} />
+      <div style={{
+        position: 'absolute', width: 250, height: 220, borderRadius: '50%',
+        background: 'var(--lavender-veil)', opacity: 0.35, filter: 'blur(80px)',
+        top: '55%', right: '-30px', animation: blob('blobDrift2', 15, true),
+      }} />
+    </div>
+  );
+}
+
+// ============================================================
 // GLOBAL STYLES
 // ============================================================
 
@@ -4027,9 +4069,9 @@ function GlobalStyles() {
         font-display: swap;
         unicode-range: U+0590-05FF, U+FB1D-FB4F, U+200F, U+200E;
       }
-      .fs-display { font-family: 'Instrument Serif', 'Rubik Black', 'Comix CLM', serif; }
+      .fs-display { font-family: 'Bricolage Grotesque', 'Rubik Black', 'Comix CLM', serif; }
       .fs-mono { font-family: 'JetBrains Mono', 'Comix CLM', monospace; font-feature-settings: 'tnum' on; font-variant-numeric: tabular-nums; }
-      .fs-sans { font-family: 'Inter Tight', 'Comix CLM', -apple-system, sans-serif; }
+      .fs-sans { font-family: 'DM Sans', 'Comix CLM', -apple-system, sans-serif; }
       @keyframes fadeUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
       @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
       @keyframes scaleSpring { 0% { opacity: 0; transform: scale(0.5); } 60% { transform: scale(1.08); } 100% { opacity: 1; transform: scale(1); } }
@@ -4038,8 +4080,8 @@ function GlobalStyles() {
       @keyframes slideUpFar { from { opacity: 0; transform: translateY(40px); } to { opacity: 1; transform: translateY(0); } }
       @keyframes spin360 { to { transform: rotate(360deg); } }
       @keyframes pulseGlow {
-        0%, 100% { filter: drop-shadow(0 0 14px rgba(163,230,53,0.45)); }
-        50% { filter: drop-shadow(0 0 30px rgba(163,230,53,0.9)); }
+        0%, 100% { filter: drop-shadow(0 0 14px rgba(255,217,114,0.45)); }
+        50% { filter: drop-shadow(0 0 30px rgba(255,217,114,0.9)); }
       }
       @keyframes floatUp {
         0% { opacity: 0; transform: translateY(20px) scale(0.6); }
@@ -4100,6 +4142,21 @@ function GlobalStyles() {
         0%, 100% { opacity: 1; }
         50% { opacity: 0.6; }
       }
+      @keyframes blobDrift1 {
+        0%, 100% { transform: translate(0px, 0px) scale(1); }
+        33% { transform: translate(40px, -30px) scale(1.08); }
+        66% { transform: translate(-20px, 20px) scale(0.96); }
+      }
+      @keyframes blobDrift2 {
+        0%, 100% { transform: translate(0px, 0px) scale(1); }
+        40% { transform: translate(-35px, 25px) scale(1.06); }
+        70% { transform: translate(25px, -15px) scale(0.94); }
+      }
+      @keyframes blobDrift3 {
+        0%, 100% { transform: translate(0px, 0px) scale(1); }
+        30% { transform: translate(20px, 30px) scale(1.1); }
+        60% { transform: translate(-30px, -20px) scale(0.92); }
+      }
       .a-fade-up { animation: fadeUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) both; }
       .a-fade-in { animation: fadeIn 0.6s ease-out both; }
       .a-scale-in { animation: scaleIn 0.5s cubic-bezier(0.16, 1, 0.3, 1) both; }
@@ -4135,15 +4192,15 @@ function GlobalStyles() {
       /* Keyboard focus indicator — does not appear on mouse/touch click. */
       .cw-frame :focus { outline: none; }
       .cw-frame :focus-visible {
-        outline: 2px solid #a3e635;
+        outline: 2px solid #ffd972;
         outline-offset: 2px;
         border-radius: 4px;
       }
       .cw-frame button:focus-visible,
       .cw-frame [role="button"]:focus-visible {
-        outline: 2px solid #a3e635;
+        outline: 2px solid #ffd972;
         outline-offset: 3px;
-        box-shadow: 0 0 0 4px rgba(163,230,53,0.18);
+        box-shadow: 0 0 0 4px rgba(255,217,114,0.18);
       }
 
       /* Respect reduced-motion preference: stop infinite/decorative animations. */
@@ -4218,12 +4275,12 @@ function Landing({ onFile, onDemo, parseError, t, lang, setLang }) {
     }}>
       <div className="a-pulse-glow" style={{
         position: 'absolute', top: 60, right: -60, width: 240, height: 240,
-        borderRadius: '50%', background: '#a3e635', opacity: 0.20,
+        borderRadius: '50%', background: '#ffd972', opacity: 0.20,
         filter: 'blur(70px)', pointerEvents: 'none',
       }} />
       <div style={{
         position: 'absolute', bottom: 100, left: -60, width: 220, height: 220,
-        borderRadius: '50%', background: '#f472b6', opacity: 0.14,
+        borderRadius: '50%', background: '#f06449', opacity: 0.14,
         filter: 'blur(70px)', pointerEvents: 'none',
       }} />
 
@@ -4233,7 +4290,7 @@ function Landing({ onFile, onDemo, parseError, t, lang, setLang }) {
         display: 'flex', justifyContent: 'space-between', alignItems: 'center',
       }}>
         <div className="fs-mono a-fade-up" style={{
-          fontSize: 20, color: '#a3e635', letterSpacing: '0.3em',
+          fontSize: 20, color: '#ffd972', letterSpacing: '0.3em',
         }}>
           ✦ {t.landing_eyebrow}
         </div>
@@ -4257,7 +4314,7 @@ function Landing({ onFile, onDemo, parseError, t, lang, setLang }) {
           fontWeight: 400, margin: '0 0 18px',
         }}>
           {t.landing_h1_a}<br/>
-          <span style={{ fontStyle: 'italic', color: '#a3e635' }}>{t.landing_h1_b}</span><br/>
+          <span style={{ fontStyle: 'italic', color: '#ffd972' }}>{t.landing_h1_b}</span><br/>
           {t.landing_h1_c}<br/>
           <span style={{ fontStyle: 'italic' }}>{t.landing_h1_d}</span>{t.landing_h1_e ? ' ' : ''}
           {t.landing_h1_e && <>{t.landing_h1_e}</>}
@@ -4271,10 +4328,10 @@ function Landing({ onFile, onDemo, parseError, t, lang, setLang }) {
         <div role="alert" className="a-scale-in" style={{
           position: 'relative', zIndex: 10,
           display: 'flex', gap: 10, marginBottom: 12,
-          background: '#ef444420', border: '1px solid #ef444470',
+          background: '#f0644920', border: '1px solid #f0644970',
           borderRadius: 12, padding: 14,
         }}>
-          <div style={{ flexShrink: 0, marginTop: 2, color: '#ff6b6b' }}>
+          <div style={{ flexShrink: 0, marginTop: 2, color: '#f06449' }}>
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2"
               strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
               <circle cx="12" cy="12" r="10"/>
@@ -4293,11 +4350,11 @@ function Landing({ onFile, onDemo, parseError, t, lang, setLang }) {
         <button onClick={() => fileInputRef.current?.click()} className="press lift a-gradient-shift" style={{
           width: '100%', position: 'relative', overflow: 'hidden',
           padding: 20, color: '#0a0a0f',
-          background: 'linear-gradient(135deg, #a3e635 0%, #d4f04a 50%, #84cc16 100%)',
+          background: 'linear-gradient(135deg, #ffd972 0%, #ffe896 50%, #d4a820 100%)',
           backgroundSize: '200% 200%',
           border: 'none', borderRadius: 18, fontSize: 17, fontWeight: 800,
           cursor: 'pointer', letterSpacing: '-0.01em',
-          boxShadow: '0 12px 32px rgba(163,230,53,0.45)',
+          boxShadow: '0 12px 32px rgba(255,217,114,0.45)',
         }}>
           <div className="a-shine" style={{ position: 'absolute', inset: 0 }} />
           {t.cta_play}
@@ -4336,7 +4393,7 @@ function Landing({ onFile, onDemo, parseError, t, lang, setLang }) {
                 <span style={{ fontSize: 23, fontWeight: 600 }}>{l.name}</span>
               </div>
               {l.code === lang && (
-                <span style={{ color: '#a3e635', fontSize: 18 }}>✓</span>
+                <span style={{ color: '#ffd972', fontSize: 18 }}>✓</span>
               )}
             </button>
           ))}
@@ -4377,7 +4434,7 @@ function Parsing({ fileName, parsingStage, diagnostics, t }) {
       <div className="a-pulse-glow" style={{
         position: 'absolute', top: '40%', left: '50%', transform: 'translate(-50%, -50%)',
         width: 320, height: 320, borderRadius: '50%',
-        background: '#a3e635', opacity: 0.18, filter: 'blur(80px)',
+        background: '#ffd972', opacity: 0.18, filter: 'blur(80px)',
       }} />
 
       <div style={{
@@ -4386,18 +4443,18 @@ function Parsing({ fileName, parsingStage, diagnostics, t }) {
         {[0, 1, 2].map(i => (
           <div key={i} style={{
             position: 'absolute', width: 8, height: 8,
-            background: ['#a3e635', '#f472b6', '#60a5fa'][i],
+            background: ['#ffd972', '#f06449', '#9cf6f6'][i],
             borderRadius: '50%',
             animation: `orbit ${4 + i}s linear infinite`,
             animationDelay: `${-i * 0.8}s`,
             filter: 'blur(1px)',
-            boxShadow: `0 0 20px ${['#a3e635', '#f472b6', '#60a5fa'][i]}`,
+            boxShadow: `0 0 20px ${['#ffd972', '#f06449', '#9cf6f6'][i]}`,
           }} />
         ))}
       </div>
 
       <div style={{ position: 'relative', zIndex: 10 }}>
-        <div className="fs-mono a-fade-up" style={{ fontSize: 20, color: '#a3e635', letterSpacing: '0.3em' }}>
+        <div className="fs-mono a-fade-up" style={{ fontSize: 20, color: '#ffd972', letterSpacing: '0.3em' }}>
           ✦ {t.parsing_msg_parsed}
         </div>
         <div className="fs-mono a-fade-in" style={{
@@ -4410,7 +4467,7 @@ function Parsing({ fileName, parsingStage, diagnostics, t }) {
 
       <div style={{ position: 'relative', zIndex: 10, textAlign: 'center' }}>
         <div className="fs-display a-spring a-pulse-glow" style={{
-          fontSize: 96, lineHeight: 1, letterSpacing: '-0.05em', color: '#a3e635',
+          fontSize: 96, lineHeight: 1, letterSpacing: '-0.05em', color: '#ffd972',
         }}>
           {fakeCount.toLocaleString()}
         </div>
@@ -4433,8 +4490,8 @@ function Parsing({ fileName, parsingStage, diagnostics, t }) {
             }}>
               <div style={{
                 width: 18, height: 18, borderRadius: '50%', flexShrink: 0,
-                background: done ? '#a3e635' : 'transparent',
-                border: done ? 'none' : `2px solid ${active ? '#a3e635' : '#2a2a36'}`,
+                background: done ? '#ffd972' : 'transparent',
+                border: done ? 'none' : `2px solid ${active ? '#ffd972' : '#2a2a36'}`,
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
                 position: 'relative',
               }}>
@@ -4447,7 +4504,7 @@ function Parsing({ fileName, parsingStage, diagnostics, t }) {
                 {active && (
                   <div className="a-spin" style={{
                     position: 'absolute', inset: -2,
-                    border: '2px solid transparent', borderTopColor: '#a3e635',
+                    border: '2px solid transparent', borderTopColor: '#ffd972',
                     borderRadius: '50%',
                   }} />
                 )}
@@ -4458,7 +4515,7 @@ function Parsing({ fileName, parsingStage, diagnostics, t }) {
                 </div>
                 {active && (
                   <div className="fs-mono a-fade-in" style={{
-                    fontSize: 20, color: '#a3e635', marginTop: 2, letterSpacing: '0.1em',
+                    fontSize: 20, color: '#ffd972', marginTop: 2, letterSpacing: '0.1em',
                   }}>
                     {s.detail}…
                   </div>
@@ -4539,9 +4596,9 @@ function Onboarding({ analytics, t, profile, setProfile, onComplete, onSkip }) {
       question: t.q_tone,
       type: 'tone',
       options: [
-        { value: 'mild', label: t.q_tone_mild, desc: t.q_tone_mild_d, color: '#60a5fa', icon: '😊' },
-        { value: 'medium', label: t.q_tone_medium, desc: t.q_tone_medium_d, color: '#a3e635', icon: '😏' },
-        { value: 'spicy', label: t.q_tone_spicy, desc: t.q_tone_spicy_d, color: '#ef4444', icon: '🔥' },
+        { value: 'mild', label: t.q_tone_mild, desc: t.q_tone_mild_d, color: '#9cf6f6', icon: '😊' },
+        { value: 'medium', label: t.q_tone_medium, desc: t.q_tone_medium_d, color: '#ffd972', icon: '😏' },
+        { value: 'spicy', label: t.q_tone_spicy, desc: t.q_tone_spicy_d, color: '#f06449', icon: '🔥' },
       ],
     },
   ];
@@ -4565,7 +4622,7 @@ function Onboarding({ analytics, t, profile, setProfile, onComplete, onSkip }) {
       background: 'radial-gradient(ellipse at top, #1a1a2e 0%, #050507 70%)',
     }}>
       <div style={{ position: 'absolute', top: 60, right: -80, width: 220, height: 220,
-        borderRadius: '50%', background: '#a3e635', opacity: 0.15, filter: 'blur(80px)',
+        borderRadius: '50%', background: '#ffd972', opacity: 0.15, filter: 'blur(80px)',
         pointerEvents: 'none' }} />
 
       <div style={{
@@ -4580,7 +4637,7 @@ function Onboarding({ analytics, t, profile, setProfile, onComplete, onSkip }) {
             {steps.map((_, i) => (
               <div key={i} style={{
                 width: i === step ? 28 : 8, height: 4, borderRadius: 999,
-                background: i <= step ? '#a3e635' : 'rgba(255,255,255,0.18)',
+                background: i <= step ? '#ffd972' : 'rgba(255,255,255,0.18)',
                 transition: 'width 0.35s, background 0.3s',
               }} />
             ))}
@@ -4621,9 +4678,9 @@ function Onboarding({ analytics, t, profile, setProfile, onComplete, onSkip }) {
                       width: '100%', textAlign: 'left',
                       padding: '14px 16px', cursor: 'pointer',
                       background: selected
-                        ? 'linear-gradient(135deg, rgba(163,230,53,0.18), rgba(163,230,53,0.04))'
+                        ? 'linear-gradient(135deg, rgba(255,217,114,0.18), rgba(255,217,114,0.04))'
                         : '#15151d',
-                      border: `1px solid ${selected ? '#a3e635' : '#2a2a36'}`,
+                      border: `1px solid ${selected ? '#ffd972' : '#2a2a36'}`,
                       borderRadius: 14, color: '#f4f4f8',
                       display: 'flex', justifyContent: 'space-between', alignItems: 'center',
                       animation: `fadeUp 0.4s cubic-bezier(0.16,1,0.3,1) ${i * 0.04}s both`,
@@ -4643,7 +4700,7 @@ function Onboarding({ analytics, t, profile, setProfile, onComplete, onSkip }) {
                     </div>
                     {selected && (
                       <div style={{
-                        width: 24, height: 24, borderRadius: '50%', background: '#a3e635',
+                        width: 24, height: 24, borderRadius: '50%', background: '#ffd972',
                         color: '#0a0a0f', display: 'flex', alignItems: 'center', justifyContent: 'center',
                         flexShrink: 0,
                       }}>
@@ -4669,9 +4726,9 @@ function Onboarding({ analytics, t, profile, setProfile, onComplete, onSkip }) {
                       width: '100%', textAlign: 'left',
                       padding: '16px 18px', cursor: 'pointer',
                       background: selected
-                        ? 'linear-gradient(135deg, rgba(163,230,53,0.18), rgba(163,230,53,0.04))'
+                        ? 'linear-gradient(135deg, rgba(255,217,114,0.18), rgba(255,217,114,0.04))'
                         : '#15151d',
-                      border: `1px solid ${selected ? '#a3e635' : '#2a2a36'}`,
+                      border: `1px solid ${selected ? '#ffd972' : '#2a2a36'}`,
                       borderRadius: 14, color: '#f4f4f8',
                       display: 'flex', alignItems: 'center', gap: 14,
                       animation: `fadeUp 0.4s cubic-bezier(0.16,1,0.3,1) ${i * 0.05}s both`,
@@ -4682,7 +4739,7 @@ function Onboarding({ analytics, t, profile, setProfile, onComplete, onSkip }) {
                     </div>
                     {selected && (
                       <div style={{
-                        width: 22, height: 22, borderRadius: '50%', background: '#a3e635',
+                        width: 22, height: 22, borderRadius: '50%', background: '#ffd972',
                         color: '#0a0a0f', display: 'flex', alignItems: 'center', justifyContent: 'center',
                       }}>
                         <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor"
@@ -4743,14 +4800,14 @@ function Onboarding({ analytics, t, profile, setProfile, onComplete, onSkip }) {
             width: '100%', marginTop: 22, position: 'relative', overflow: 'hidden',
             padding: 18, minHeight: 56,
             background: canContinue
-              ? 'linear-gradient(135deg, #a3e635 0%, #d4f04a 50%, #84cc16 100%)'
+              ? 'linear-gradient(135deg, #ffd972 0%, #ffe896 50%, #d4a820 100%)'
               : '#3a3a48',
             backgroundSize: '200% 200%',
             color: canContinue ? '#0a0a0f' : '#d6d6e0',
             border: 'none', borderRadius: 16,
             fontSize: 17, fontWeight: 800, letterSpacing: '-0.01em',
             cursor: canContinue ? 'pointer' : 'not-allowed',
-            boxShadow: canContinue ? '0 12px 32px rgba(163,230,53,0.40)' : 'none',
+            boxShadow: canContinue ? '0 12px 32px rgba(255,217,114,0.40)' : 'none',
           }}>
           {canContinue && <div className="a-shine" style={{ position: 'absolute', inset: 0 }} />}
           {isLast ? t.onboard_done : t.onboard_continue}
@@ -4846,7 +4903,7 @@ function Wrapped({ analytics, diagnostics, selectedAuthor, setSelectedAuthor, sl
 // SLIDE SHELL
 // ============================================================
 
-const SlideShell = React.memo(function SlideShell({ children, bg, accent = '#a3e635', shake = false }) {
+const SlideShell = React.memo(function SlideShell({ children, bg, accent = '#ffd972', shake = false }) {
   return (
     <div className={shake ? 'a-shake' : ''} style={{
       position: 'absolute', inset: 0, overflow: 'hidden', background: bg,
@@ -4873,23 +4930,23 @@ const SlideShell = React.memo(function SlideShell({ children, bg, accent = '#a3e
 const SlideIntro = React.memo(function SlideIntro({ a, t }) {
   const year = new Date().getFullYear();
   return (
-    <SlideShell bg="#0a0a0f" accent="#a3e635">
+    <SlideShell bg="#0a0a0f" accent="#ffd972">
       <div style={{
         position: 'relative', height: '100%',
         display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center',
         textAlign: 'center', padding: '0 24px',
       }}>
-        <div className="fs-mono a-fade-up" style={{ fontSize: 21, color: '#a3e635', letterSpacing: '0.3em' }}>
+        <div className="fs-mono a-fade-up" style={{ fontSize: 14, color: '#ffd972', letterSpacing: '0.15em' }}>
           {t.intro_eyebrow} · {year}
         </div>
-        <div className="a-spring" style={{ animationDelay: '0.3s', marginTop: 32 }}>
-          <div className="fs-display" style={{ fontSize: 72, lineHeight: 0.88, letterSpacing: '-0.05em' }}>
+        <div className="a-spring" style={{ animationDelay: '0.3s', marginTop: 48 }}>
+          <div className="fs-display" style={{ fontSize: 56, lineHeight: 1.1, letterSpacing: '-0.04em', fontWeight: 800 }}>
             {t.intro_get && <span style={{ display: 'block' }}>{t.intro_get}</span>}
-            {t.intro_ready && <span style={{ display: 'block', fontStyle: 'italic', color: '#a3e635' }}>{t.intro_ready}</span>}
+            {t.intro_ready && <span style={{ display: 'block', fontStyle: 'italic', color: '#ffd972' }}>{t.intro_ready}</span>}
           </div>
         </div>
-        <div className="a-fade-up" style={{
-          animationDelay: '0.8s', marginTop: 28, fontSize: 22, color: '#d0d0e0', maxWidth: 260,
+        <div className="fs-sans a-fade-up" style={{
+          animationDelay: '0.8s', marginTop: 32, fontSize: 18, color: '#d0d0e0', maxWidth: 280, lineHeight: 1.45,
         }}>
           {interp(t.intro_summary, {
             msgs: a.totalMessages.toLocaleString(),
@@ -4906,35 +4963,35 @@ const SlideMessageCount = React.memo(function SlideMessageCount({ a, u, t }) {
   const animatedGroup = useAnimatedNumber(a.totalMessages, 1800, [a.totalMessages]);
   const animatedUser = useAnimatedNumber(u.messageCount, 1600, [u.author]);
   return (
-    <SlideShell bg="#0a0a1f" accent="#a3e635">
+    <SlideShell bg="#0a0a1f" accent="#ffd972">
       <div style={{
         position: 'relative', height: '100%',
         display: 'flex', flexDirection: 'column', justifyContent: 'center',
         textAlign: 'center', padding: '0 24px',
       }}>
-        <div className="fs-mono a-fade-up" style={{ fontSize: 20, color: '#a3e635', letterSpacing: '0.3em' }}>
+        <div className="fs-mono a-fade-up" style={{ fontSize: 14, color: '#ffd972', letterSpacing: '0.15em' }}>
           {t.msg_eyebrow}
         </div>
         <div className="fs-display a-spring a-pulse-glow" style={{
           animationDelay: '0.2s',
-          fontSize: a.totalMessages > 99999 ? 80 : a.totalMessages > 9999 ? 96 : 120,
-          lineHeight: 1, letterSpacing: '-0.05em', color: '#a3e635',
-          marginTop: 8, fontWeight: 400,
+          fontSize: a.totalMessages > 99999 ? 56 : a.totalMessages > 9999 ? 60 : 64,
+          lineHeight: 1.1, letterSpacing: '-0.04em', color: '#ffd972',
+          marginTop: 48, fontWeight: 800,
         }}>
           {animatedGroup.toLocaleString()}
         </div>
         <div className="fs-display a-fade-up" style={{
-          animationDelay: '0.6s', fontSize: 32, marginTop: 4, fontStyle: 'italic',
+          animationDelay: '0.6s', fontSize: 20, marginTop: 8, fontStyle: 'italic', fontWeight: 500,
         }}>
           {t.msg_word}
         </div>
 
         <div className="a-fade-up" style={{
-          animationDelay: '1.5s', marginTop: 32,
-          paddingTop: 22, borderTop: '1px solid rgba(255,255,255,0.08)',
+          animationDelay: '1.5s', marginTop: 40,
+          paddingTop: 24, borderTop: '1px solid rgba(255,255,255,0.08)',
         }}>
           <div className="fs-mono" style={{
-            fontSize: 20, color: '#c8c8dc', letterSpacing: '0.25em', marginBottom: 10,
+            fontSize: 14, color: '#c8c8dc', letterSpacing: '0.15em', marginBottom: 12,
           }}>
             {t.msg_your_share}
           </div>
@@ -4942,11 +4999,11 @@ const SlideMessageCount = React.memo(function SlideMessageCount({ a, u, t }) {
             display: 'flex', alignItems: 'baseline', justifyContent: 'center', gap: 10,
           }}>
             <div className="fs-display" style={{
-              fontSize: 44, color: '#fff', fontWeight: 400, letterSpacing: '-0.03em', lineHeight: 1,
+              fontSize: 48, color: '#fff', fontWeight: 800, letterSpacing: '-0.03em', lineHeight: 1,
             }}>
               {animatedUser.toLocaleString()}
             </div>
-            <div className="fs-mono" style={{ fontSize: 22, color: '#d0d0e0' }}>
+            <div className="fs-mono" style={{ fontSize: 18, color: '#d0d0e0' }}>
               · {u.sharePct.toFixed(1)}%
             </div>
           </div>
@@ -4958,7 +5015,7 @@ const SlideMessageCount = React.memo(function SlideMessageCount({ a, u, t }) {
           }}>
             <div style={{
               height: '100%', width: `${u.sharePct}%`,
-              background: '#a3e635', borderRadius: 999,
+              background: '#ffd972', borderRadius: 999,
               transformOrigin: 'left',
               animation: 'barGrow 1.2s cubic-bezier(0.16, 1, 0.3, 1) 1.8s both',
             }} />
@@ -4979,36 +5036,36 @@ const SlideRank = React.memo(function SlideRank({ a, u, t }) {
   const maxMsgs = top5[0].messageCount;
 
   return (
-    <SlideShell bg="#1f0a2a" accent="#f472b6">
+    <SlideShell bg="#1f0a2a" accent="#f06449">
       <div style={{
         position: 'relative', height: '100%',
         display: 'flex', flexDirection: 'column', justifyContent: 'center',
         padding: '0 24px',
       }}>
-        <div className="fs-mono a-fade-up" style={{ fontSize: 20, color: '#f472b6', letterSpacing: '0.3em' }}>
+        <div className="fs-mono a-fade-up" style={{ fontSize: 14, color: '#f06449', letterSpacing: '0.15em' }}>
           {t.rank_eyebrow}
         </div>
         <div className="fs-display a-fade-up" style={{
-          animationDelay: '0.2s', fontSize: 42, lineHeight: 0.95, letterSpacing: '-0.04em', marginTop: 14,
+          animationDelay: '0.2s', fontSize: 32, lineHeight: 1.15, letterSpacing: '-0.03em', marginTop: 20, fontWeight: 700,
         }}>
           {t.rank_finished}<br/>
-          <span style={{ color: '#f472b6', fontStyle: 'italic' }}>{ordinal(rank)}</span> {interp(t.rank_of, { n: a.users.length })}
+          <span style={{ color: '#f06449', fontStyle: 'italic' }}>{ordinal(rank)}</span> {interp(t.rank_of, { n: a.users.length })}
         </div>
-        <div style={{ marginTop: 24, display: 'flex', flexDirection: 'column', gap: 6 }}>
+        <div style={{ marginTop: 32, display: 'flex', flexDirection: 'column', gap: 10 }}>
           {top5.map((row, i) => {
             const isUser = row.author === u.author;
             return (
               <div key={row.author} className="a-slide-right" style={{
-                position: 'relative', padding: '10px 12px',
-                background: isUser ? 'rgba(244,114,182,0.15)' : 'rgba(255,255,255,0.04)',
-                border: isUser ? '1px solid rgba(244,114,182,0.5)' : '1px solid rgba(255,255,255,0.06)',
+                position: 'relative', padding: '12px 16px',
+                background: isUser ? 'rgba(240,100,73,0.15)' : 'rgba(255,255,255,0.04)',
+                border: isUser ? '1px solid rgba(240,100,73,0.5)' : '1px solid rgba(255,255,255,0.06)',
                 borderRadius: 12, overflow: 'hidden',
                 animationDelay: `${0.5 + i * 0.1}s`,
               }}>
                 <div className="a-bar" style={{
                   position: 'absolute', top: 0, bottom: 0, left: 0,
                   width: `${(row.messageCount / maxMsgs) * 100}%`,
-                  background: isUser ? 'rgba(244,114,182,0.18)' : 'rgba(255,255,255,0.03)',
+                  background: isUser ? 'rgba(240,100,73,0.18)' : 'rgba(255,255,255,0.03)',
                   animationDelay: `${0.7 + i * 0.1}s`,
                 }} />
                 <div style={{
@@ -5017,21 +5074,21 @@ const SlideRank = React.memo(function SlideRank({ a, u, t }) {
                 }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 10, minWidth: 0 }}>
                     <div className="fs-mono" style={{
-                      fontSize: 21, color: isUser ? '#f472b6' : '#c8c8dc',
+                      fontSize: 14, color: isUser ? '#f06449' : '#c8c8dc',
                       width: 18, fontWeight: 700,
                     }}>
                       {String(i + 1).padStart(2, '0')}
                     </div>
                     <div style={{
-                      fontSize: 22, fontWeight: isUser ? 700 : 500,
+                      fontSize: 16, fontWeight: isUser ? 700 : 500,
                       overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
                     }}>
-                      {row.author} {isUser && <span style={{ color: '#f472b6' }}>{t.rank_you}</span>}
+                      {row.author} {isUser && <span style={{ color: '#f06449' }}>{t.rank_you}</span>}
                     </div>
                   </div>
                   <div className="fs-mono" style={{
-                    fontSize: 22, fontWeight: 600,
-                    color: isUser ? '#f472b6' : '#d0d0e0',
+                    fontSize: 16, fontWeight: 600,
+                    color: isUser ? '#f06449' : '#d0d0e0',
                   }}>
                     {row.messageCount.toLocaleString()}
                   </div>
@@ -5063,28 +5120,28 @@ const SlideVsEveryone = React.memo(function SlideVsEveryone({ a, u, t }) {
     : interp(t.vs_avg_h, { h: (fastestAvg / 60).toFixed(1) });
 
   return (
-    <SlideShell bg="#0a1a2a" accent="#60a5fa">
+    <SlideShell bg="#0a1a2a" accent="#9cf6f6">
       <div style={{
         position: 'relative', height: '100%',
         display: 'flex', flexDirection: 'column', justifyContent: 'center',
         textAlign: 'center', padding: '0 24px',
       }}>
-        <div className="fs-mono a-fade-up" style={{ fontSize: 20, color: '#60a5fa', letterSpacing: '0.3em' }}>
+        <div className="fs-mono a-fade-up" style={{ fontSize: 14, color: '#9cf6f6', letterSpacing: '0.15em' }}>
           {t.vs_eyebrow}
         </div>
 
-        <div className="a-spring a-pulse-glow" style={{ animationDelay: '0.2s', marginTop: 16 }}>
+        <div className="a-spring a-pulse-glow" style={{ animationDelay: '0.2s', marginTop: 48 }}>
           <div className="fs-display" style={{
-            fontSize: 132, lineHeight: 1, letterSpacing: '-0.05em',
-            color: '#60a5fa',
+            fontSize: 64, lineHeight: 1.1, letterSpacing: '-0.04em',
+            color: '#9cf6f6', fontWeight: 800,
           }}>
-            {animatedBeat}<span style={{ fontSize: 50, color: '#d0d0e0' }}>/{animatedTotal}</span>
+            {animatedBeat}<span style={{ fontSize: 36, color: '#d0d0e0' }}>/{animatedTotal}</span>
           </div>
         </div>
 
-        <div className="a-fade-up" style={{ animationDelay: '0.7s', marginTop: 12 }}>
+        <div className="a-fade-up" style={{ animationDelay: '0.7s', marginTop: 20 }}>
           <div className="fs-display" style={{
-            fontSize: 24, lineHeight: 1.25, fontStyle: 'italic', letterSpacing: '-0.02em',
+            fontSize: 20, lineHeight: 1.35, fontStyle: 'italic', letterSpacing: '-0.02em',
             whiteSpace: 'pre-line',
           }}>
             {isFirst && others > 0 && t.vs_outsent_all}
@@ -5095,23 +5152,23 @@ const SlideVsEveryone = React.memo(function SlideVsEveryone({ a, u, t }) {
         </div>
 
         <div className="fs-mono a-fade-up" style={{
-          animationDelay: '1.0s', marginTop: 22, fontSize: 21, color: '#d0d0e0', letterSpacing: '0.1em',
+          animationDelay: '1.0s', marginTop: 20, fontSize: 16, color: '#d0d0e0', letterSpacing: '0.08em',
         }}>
           {interp(t.vs_ranked, { msgs: u.messageCount.toLocaleString(), rank, total: totalUsers })}
         </div>
 
         {a.fastestResponder && a.fastestResponder.author !== u.author && a.fastestResponder.avgRespMin != null && (
-          <div className="a-fade-up" style={{ animationDelay: '1.3s', marginTop: 28 }}>
-            <div className="fs-mono" style={{ fontSize: 21, color: '#c8c8dc', letterSpacing: '0.15em' }}>
+          <div className="a-fade-up" style={{ animationDelay: '1.3s', marginTop: 24 }}>
+            <div className="fs-mono" style={{ fontSize: 14, color: '#c8c8dc', letterSpacing: '0.12em' }}>
               {t.vs_fastest}
             </div>
             <div className="fs-display" style={{
-              fontSize: 24, color: '#60a5fa', fontStyle: 'italic',
-              marginTop: 8, letterSpacing: '-0.02em',
+              fontSize: 20, color: '#9cf6f6', fontStyle: 'italic',
+              marginTop: 6, letterSpacing: '-0.02em',
             }}>
               {a.fastestResponder.author}
             </div>
-            <div className="fs-mono" style={{ fontSize: 20, color: '#c8c8dc', marginTop: 2 }}>
+            <div className="fs-mono" style={{ fontSize: 16, color: '#c8c8dc', marginTop: 2 }}>
               {fastestAvgText}
             </div>
           </div>
@@ -5125,29 +5182,29 @@ const SlideTitle = React.memo(function SlideTitle({ u, t }) {
   const title = resolveTitle(u, t);
   const evidence = resolveTitleEvidence(u, t);
   return (
-    <SlideShell bg="#0a0a0f" accent="#a3e635">
+    <SlideShell bg="#0a0a0f" accent="#ffd972">
       <div style={{
         position: 'relative', height: '100%',
         display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center',
         textAlign: 'center', padding: '0 24px',
       }}>
-        <div className="fs-mono a-fade-up" style={{ fontSize: 20, color: '#a3e635', letterSpacing: '0.3em' }}>
+        <div className="fs-mono a-fade-up" style={{ fontSize: 14, color: '#ffd972', letterSpacing: '0.15em' }}>
           {t.title_eyebrow}
         </div>
-        <div className="a-spring a-pulse-glow" style={{ animationDelay: '0.3s', marginTop: 28 }}>
+        <div className="a-spring a-pulse-glow" style={{ animationDelay: '0.3s', marginTop: 48 }}>
           <div className="fs-display" style={{
-            fontSize: title.length > 22 ? 38 : title.length > 16 ? 46 : 60,
-            lineHeight: 0.95, letterSpacing: '-0.04em',
-            color: '#a3e635', fontStyle: 'italic',
+            fontSize: title.length > 22 ? 32 : title.length > 16 ? 40 : 52,
+            lineHeight: 1.1, letterSpacing: '-0.03em',
+            color: '#ffd972', fontStyle: 'italic', fontWeight: 800,
           }}>
             {title}
           </div>
         </div>
-        <div className="a-fade-up" style={{ animationDelay: '1.0s', marginTop: 28 }}>
-          <div className="fs-mono" style={{ fontSize: 21, color: '#d0d0e0', letterSpacing: '0.15em' }}>
+        <div className="a-fade-up" style={{ animationDelay: '1.0s', marginTop: 40 }}>
+          <div className="fs-mono" style={{ fontSize: 14, color: '#d0d0e0', letterSpacing: '0.12em' }}>
             {t.title_based_on}
           </div>
-          <div className="fs-mono" style={{ fontSize: 23, color: '#fff', marginTop: 6, fontWeight: 600 }}>
+          <div className="fs-sans" style={{ fontSize: 18, color: '#fff', marginTop: 8, fontWeight: 500, lineHeight: 1.4 }}>
             {evidence}
           </div>
         </div>
@@ -5158,24 +5215,24 @@ const SlideTitle = React.memo(function SlideTitle({ u, t }) {
 
 const SlideGroupDescribes = React.memo(function SlideGroupDescribes({ u, t }) {
   return (
-    <SlideShell bg="#1a0a18" accent="#f472b6">
+    <SlideShell bg="#1a0a18" accent="#f06449">
       <div style={{
         position: 'relative', height: '100%',
         display: 'flex', flexDirection: 'column', justifyContent: 'center',
         padding: '0 24px',
       }}>
-        <div className="fs-mono a-fade-up" style={{ fontSize: 20, color: '#f472b6', letterSpacing: '0.3em' }}>
+        <div className="fs-mono a-fade-up" style={{ fontSize: 14, color: '#f06449', letterSpacing: '0.15em' }}>
           {t.descr_eyebrow}
         </div>
-        <div className="a-spring" style={{ animationDelay: '0.3s', marginTop: 24 }}>
+        <div className="a-spring" style={{ animationDelay: '0.3s', marginTop: 48 }}>
           <div className="fs-display" style={{
-            fontSize: 52, lineHeight: 0.95, letterSpacing: '-0.04em', fontStyle: 'italic',
+            fontSize: 36, lineHeight: 1.2, letterSpacing: '-0.03em', fontStyle: 'italic', fontWeight: 700,
           }}>
             "{t[u.groupDescriptionKey] || u.groupDescriptionKey}"
           </div>
         </div>
-        <div className="a-fade-up" style={{
-          animationDelay: '1.0s', marginTop: 32, fontSize: 23, lineHeight: 1.6, color: '#d0d0e0',
+        <div className="fs-sans a-fade-up" style={{
+          animationDelay: '1.0s', marginTop: 40, fontSize: 18, lineHeight: 1.5, color: '#d0d0e0',
         }}>
           {t.descr_footnote}
         </div>
@@ -5189,38 +5246,38 @@ const SlidePeakHour = React.memo(function SlidePeakHour({ a, u, t }) {
   const hourStr = String(hour).padStart(2, '0');
   const max = Math.max(...a.groupHourly);
   return (
-    <SlideShell bg="#1a0a2f" accent="#60a5fa">
+    <SlideShell bg="#1a0a2f" accent="#9cf6f6">
       <div style={{
         position: 'relative', height: '100%',
         display: 'flex', flexDirection: 'column', justifyContent: 'center',
         textAlign: 'center', padding: '0 24px',
       }}>
-        <div className="fs-mono a-fade-up" style={{ fontSize: 20, color: '#60a5fa', letterSpacing: '0.3em' }}>
+        <div className="fs-mono a-fade-up" style={{ fontSize: 14, color: '#9cf6f6', letterSpacing: '0.15em' }}>
           {t.peak_eyebrow}
         </div>
         <div className="fs-display a-spring" style={{
-          animationDelay: '0.2s', fontSize: 140, lineHeight: 1,
-          letterSpacing: '-0.05em', marginTop: 12,
+          animationDelay: '0.2s', fontSize: 64, lineHeight: 1.1,
+          letterSpacing: '-0.04em', marginTop: 48, fontWeight: 800,
         }}>
-          {hourStr}<span style={{ color: '#60a5fa' }}>:00</span>
+          {hourStr}<span style={{ color: '#9cf6f6' }}>:00</span>
         </div>
         <div className="a-fade-up" style={{
           display: 'flex', alignItems: 'flex-end', justifyContent: 'center',
-          gap: 2, marginTop: 24, height: 40,
+          gap: 2, marginTop: 32, height: 56,
           animationDelay: '0.7s',
         }}>
           {a.groupHourly.map((c, h) => (
             <div key={h} className="a-bar" style={{
-              width: 7, height: `${(c / max) * 40}px`,
-              background: h === hour ? '#60a5fa' : 'rgba(255,255,255,0.2)',
+              width: 7, height: `${(c / max) * 56}px`,
+              background: h === hour ? '#9cf6f6' : 'rgba(255,255,255,0.2)',
               borderRadius: 1,
               animationDelay: `${0.9 + h * 0.02}s`,
             }} />
           ))}
         </div>
-        <div className="a-fade-up" style={{
-          animationDelay: '1.2s', marginTop: 28, fontSize: 22, lineHeight: 1.5,
-          color: '#d0d0e0', maxWidth: 280, margin: '28px auto 0',
+        <div className="fs-sans a-fade-up" style={{
+          animationDelay: '1.2s', marginTop: 32, fontSize: 18, lineHeight: 1.5,
+          color: '#d0d0e0', maxWidth: 280, margin: '32px auto 0',
         }}>
           {hour >= 0 && hour < 5 && t.peak_3am}
           {hour >= 5 && hour < 11 && t.peak_morning}
@@ -5236,7 +5293,7 @@ const SlidePeakHour = React.memo(function SlidePeakHour({ a, u, t }) {
 const SlideNight = React.memo(function SlideNight({ a, u, t }) {
   const pct = useAnimatedNumber(Math.round(u.nightPct), 1400, [u.author]);
   return (
-    <SlideShell bg="#0a0418" accent="#a78bfa">
+    <SlideShell bg="#0a0418" accent="#9cf6f6">
       <div style={{ position: 'absolute', inset: 0, pointerEvents: 'none' }}>
         {[20, 50, 80].map((left, i) => (
           <div key={i} className="a-float" style={{
@@ -5250,32 +5307,32 @@ const SlideNight = React.memo(function SlideNight({ a, u, t }) {
         display: 'flex', flexDirection: 'column', justifyContent: 'center',
         textAlign: 'center', padding: '0 24px',
       }}>
-        <div className="fs-mono a-fade-up" style={{ fontSize: 20, color: '#a3e635', letterSpacing: '0.3em' }}>
+        <div className="fs-mono a-fade-up" style={{ fontSize: 14, color: '#ffd972', letterSpacing: '0.15em' }}>
           {t.night_eyebrow}
         </div>
         <div className="fs-display a-spring" style={{
-          animationDelay: '0.2s', fontSize: 156, lineHeight: 1,
-          letterSpacing: '-0.05em', color: '#a3e635', marginTop: 8,
+          animationDelay: '0.2s', fontSize: 64, lineHeight: 1.1,
+          letterSpacing: '-0.04em', color: '#ffd972', marginTop: 48, fontWeight: 800,
         }}>
-          {pct}<span style={{ fontSize: 60 }}>%</span>
+          {pct}<span style={{ fontSize: 32 }}>%</span>
         </div>
         <div className="fs-display a-fade-up" style={{
-          animationDelay: '0.6s', fontSize: 24, fontStyle: 'italic', marginTop: 4,
+          animationDelay: '0.6s', fontSize: 20, fontStyle: 'italic', marginTop: 10, fontWeight: 500,
         }}>
           {t.night_of_msgs}
         </div>
         <div className="fs-mono a-fade-up" style={{
-          animationDelay: '0.9s', fontSize: 22, color: '#d0d0e0',
-          marginTop: 14, letterSpacing: '0.1em',
+          animationDelay: '0.9s', fontSize: 16, color: '#d0d0e0',
+          marginTop: 16, letterSpacing: '0.08em',
         }}>
           {interp(t.night_count, {
             night: u.nightMessages.toLocaleString(),
             total: u.messageCount.toLocaleString(),
           })}
         </div>
-        <div className="a-fade-up" style={{
-          animationDelay: '1.2s', marginTop: 28, fontSize: 22, lineHeight: 1.5,
-          color: '#d0d0e0', maxWidth: 280, margin: '28px auto 0',
+        <div className="fs-sans a-fade-up" style={{
+          animationDelay: '1.2s', marginTop: 32, fontSize: 18, lineHeight: 1.5,
+          color: '#d0d0e0', maxWidth: 280, margin: '32px auto 0',
         }}>
           {u.nightPct > 30 && t.night_diag_strong}
           {u.nightPct > 15 && u.nightPct <= 30 && t.night_diag_med}
@@ -5284,8 +5341,8 @@ const SlideNight = React.memo(function SlideNight({ a, u, t }) {
         </div>
         {a.nightOwl?.author === u.author && (
           <div className="fs-mono a-fade-up" style={{
-            animationDelay: '1.5s', fontSize: 21, color: '#a3e635',
-            marginTop: 20, letterSpacing: '0.2em', fontWeight: 700,
+            animationDelay: '1.5s', fontSize: 14, color: '#ffd972',
+            marginTop: 20, letterSpacing: '0.15em', fontWeight: 700,
           }}>
             {t.night_owl}
           </div>
@@ -5299,37 +5356,37 @@ const SlideStreak = React.memo(function SlideStreak({ u, t }) {
   const days = useAnimatedNumber(u.longestStreak, 1200, [u.author]);
   const dotCount = Math.min(u.longestStreak, 30);
   return (
-    <SlideShell bg="#1a2e0a" accent="#a3e635">
+    <SlideShell bg="#1a1a08" accent="#ffd972">
       <div style={{
         position: 'relative', height: '100%',
         display: 'flex', flexDirection: 'column', justifyContent: 'center',
         textAlign: 'center', padding: '0 24px',
       }}>
-        <div className="fs-mono a-fade-up" style={{ fontSize: 20, color: '#a3e635', letterSpacing: '0.3em' }}>
+        <div className="fs-mono a-fade-up" style={{ fontSize: 14, color: '#ffd972', letterSpacing: '0.15em' }}>
           {t.streak_eyebrow}
         </div>
-        <div className="a-spring" style={{ animationDelay: '0.2s', marginTop: 16 }}>
+        <div className="a-spring" style={{ animationDelay: '0.2s', marginTop: 48 }}>
           <div className="fs-display" style={{
-            fontSize: 180, lineHeight: 1, letterSpacing: '-0.05em',
-            color: '#a3e635', fontWeight: 400,
+            fontSize: 64, lineHeight: 1.1, letterSpacing: '-0.04em',
+            color: '#ffd972', fontWeight: 800,
           }}>
             {days}
           </div>
           <div className="fs-display" style={{
-            fontSize: 32, fontStyle: 'italic', marginTop: -8,
+            fontSize: 20, fontStyle: 'italic', marginTop: 10, fontWeight: 500,
           }}>
             {u.longestStreak === 1 ? t.streak_day : t.streak_days}
           </div>
         </div>
         <div className="a-fade-up" style={{
           display: 'flex', justifyContent: 'center', gap: 4, flexWrap: 'wrap',
-          maxWidth: 240, margin: '24px auto 0',
+          maxWidth: 240, margin: '40px auto 0',
           animationDelay: '0.8s',
         }}>
           {Array.from({ length: dotCount }).map((_, i) => (
             <div key={i} style={{
               width: 8, height: 8, borderRadius: 2,
-              background: '#a3e635',
+              background: '#ffd972',
               opacity: 0.4 + (i / dotCount) * 0.6,
               animation: `scaleIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) ${1 + i * 0.03}s both`,
             }} />
@@ -5348,31 +5405,31 @@ const SlideSpeed = React.memo(function SlideSpeed({ a, u, t }) {
     : `${(respTime / 60).toFixed(1)}h`;
   const pct = u.speedPercentile ?? 50;
   return (
-    <SlideShell bg="#0a1f2a" accent="#60a5fa">
+    <SlideShell bg="#0a1f2a" accent="#9cf6f6">
       <div style={{
         position: 'relative', height: '100%',
         display: 'flex', flexDirection: 'column', justifyContent: 'center',
         textAlign: 'center', padding: '0 24px',
       }}>
-        <div className="fs-mono a-fade-up" style={{ fontSize: 20, color: '#60a5fa', letterSpacing: '0.3em' }}>
+        <div className="fs-mono a-fade-up" style={{ fontSize: 14, color: '#9cf6f6', letterSpacing: '0.15em' }}>
           {t.speed_eyebrow}
         </div>
         <div className="fs-display a-spring" style={{
-          animationDelay: '0.2s', fontSize: 110, lineHeight: 1,
-          letterSpacing: '-0.05em', color: '#60a5fa', marginTop: 12,
+          animationDelay: '0.2s', fontSize: 56, lineHeight: 1.1,
+          letterSpacing: '-0.04em', color: '#9cf6f6', marginTop: 48, fontWeight: 800,
         }}>
           {display}
         </div>
-        <div className="a-fade-up" style={{ animationDelay: '0.8s', marginTop: 32 }}>
+        <div className="a-fade-up" style={{ animationDelay: '0.8s', marginTop: 40 }}>
           <div className="fs-display" style={{
-            fontSize: 32, lineHeight: 1.15, letterSpacing: '-0.03em', fontStyle: 'italic',
+            fontSize: 28, lineHeight: 1.2, letterSpacing: '-0.02em', fontStyle: 'italic', fontWeight: 700,
           }}>
             {t.speed_faster}<br/>
-            <span style={{ color: '#60a5fa', fontStyle: 'normal' }}>{pct}%</span> {t.speed_of_group}
+            <span style={{ color: '#9cf6f6', fontStyle: 'normal' }}>{pct}%</span> {t.speed_of_group}
           </div>
         </div>
         <div className="fs-mono a-fade-up" style={{
-          animationDelay: '1.3s', marginTop: 24, fontSize: 20, color: '#c8c8dc', letterSpacing: '0.15em',
+          animationDelay: '1.3s', marginTop: 24, fontSize: 14, color: '#c8c8dc', letterSpacing: '0.12em',
         }}>
           {interp(t.speed_based, { n: u.respSampleSize })}
         </div>
@@ -5384,26 +5441,26 @@ const SlideSpeed = React.memo(function SlideSpeed({ a, u, t }) {
 const SlideWord = React.memo(function SlideWord({ u, t }) {
   const word = u.topWord;
   return (
-    <SlideShell bg="#2a0a1a" accent="#f472b6">
+    <SlideShell bg="#2a0a1a" accent="#f06449">
       <div style={{
         position: 'relative', height: '100%',
         display: 'flex', flexDirection: 'column', justifyContent: 'center',
         textAlign: 'center', padding: '0 24px',
       }}>
-        <div className="fs-mono a-fade-up" style={{ fontSize: 20, color: '#f472b6', letterSpacing: '0.3em' }}>
+        <div className="fs-mono a-fade-up" style={{ fontSize: 14, color: '#f06449', letterSpacing: '0.15em' }}>
           {t.word_eyebrow}
         </div>
-        <div className="a-spring" style={{ animationDelay: '0.3s', marginTop: 20 }}>
+        <div className="a-spring" style={{ animationDelay: '0.3s', marginTop: 48 }}>
           <div className="fs-display" style={{
-            fontSize: word.length > 10 ? 48 : word.length > 6 ? 72 : 92,
-            lineHeight: 1, letterSpacing: '-0.04em', color: '#f472b6',
-            fontStyle: 'italic', wordBreak: 'break-word',
+            fontSize: word.length > 10 ? 40 : word.length > 6 ? 56 : 64,
+            lineHeight: 1.1, letterSpacing: '-0.03em', color: '#f06449',
+            fontStyle: 'italic', wordBreak: 'break-word', fontWeight: 800,
           }}>
             "{word}"
           </div>
         </div>
-        <div className="a-fade-up" style={{
-          animationDelay: '1.0s', marginTop: 36, fontSize: 22, lineHeight: 1.5, color: '#d0d0e0',
+        <div className="fs-sans a-fade-up" style={{
+          animationDelay: '1.0s', marginTop: 40, fontSize: 18, lineHeight: 1.5, color: '#d0d0e0',
         }}>
           {interp(t.word_used, { n: u.topWordCount })}
         </div>
@@ -5418,65 +5475,65 @@ const SlideTopWords = React.memo(function SlideTopWords({ a, t }) {
   const maxCount = words[0].count;
 
   return (
-    <SlideShell bg="#0a1f1a" accent="#2dd4bf">
+    <SlideShell bg="#0a1a1f" accent="#9cf6f6">
       <div style={{
         position: 'relative', height: '100%',
         display: 'flex', flexDirection: 'column',
-        padding: '50px 20px 30px',
+        padding: '32px 24px 24px',
       }}>
         <div className="fs-mono a-fade-up" style={{
-          textAlign: 'center', fontSize: 20, color: '#2dd4bf', letterSpacing: '0.3em',
+          textAlign: 'center', fontSize: 14, color: '#9cf6f6', letterSpacing: '0.15em',
         }}>
           {t.top_words_eyebrow}
         </div>
         <div className="fs-display a-fade-up" style={{
           textAlign: 'center', animationDelay: '0.2s',
-          fontSize: 36, lineHeight: 0.95, letterSpacing: '-0.04em',
-          marginTop: 12, marginBottom: 22,
+          fontSize: 32, lineHeight: 1.15, letterSpacing: '-0.03em', fontWeight: 700,
+          marginTop: 12, marginBottom: 20,
         }}>
-          {t.top_words_title}<br/><span style={{ fontStyle: 'italic', color: '#2dd4bf' }}>{t.top_words_subtitle}</span>
+          {t.top_words_title}<br/><span style={{ fontStyle: 'italic', color: '#9cf6f6' }}>{t.top_words_subtitle}</span>
         </div>
         <div className="no-sb" style={{
           flex: 1, overflowY: 'auto',
-          display: 'flex', flexDirection: 'column', gap: 10,
+          display: 'flex', flexDirection: 'column', gap: 12,
         }}>
           {words.map((w, i) => {
             const pct = Math.max(8, Math.round((w.count / maxCount) * 100));
             return (
               <div key={w.word} className="a-slide-up-far" style={{
                 position: 'relative',
-                padding: '12px 14px',
-                background: 'rgba(45,212,191,0.08)',
-                border: '1px solid rgba(45,212,191,0.22)',
+                padding: '14px 16px',
+                background: 'rgba(156,246,246,0.08)',
+                border: '1px solid rgba(156,246,246,0.22)',
                 borderRadius: 14,
                 overflow: 'hidden',
                 animationDelay: `${0.5 + i * 0.13}s`,
               }}>
                 <div className="a-slide-right" style={{
                   position: 'absolute', inset: 0,
-                  background: 'linear-gradient(90deg, rgba(45,212,191,0.18) 0%, rgba(45,212,191,0.04) 100%)',
+                  background: 'linear-gradient(90deg, rgba(156,246,246,0.18) 0%, rgba(156,246,246,0.04) 100%)',
                   width: `${pct}%`,
                   animationDelay: `${0.7 + i * 0.13}s`,
                   pointerEvents: 'none',
                 }} />
                 <div style={{ position: 'relative', display: 'flex', alignItems: 'center', gap: 14 }}>
                   <div className="fs-mono" style={{
-                    fontSize: 22, color: '#2dd4bf', fontWeight: 700,
-                    width: 28, textAlign: 'center', opacity: 0.85,
+                    fontSize: 14, color: '#9cf6f6', fontWeight: 700,
+                    width: 20, textAlign: 'center', opacity: 0.85,
                   }}>
                     {i + 1}
                   </div>
                   <div className="fs-display" style={{
                     flex: 1, minWidth: 0,
-                    fontSize: w.word.length > 12 ? 22 : w.word.length > 8 ? 28 : 34,
-                    lineHeight: 1, letterSpacing: '-0.03em',
-                    fontStyle: 'italic', color: '#fff',
+                    fontSize: w.word.length > 12 ? 18 : w.word.length > 8 ? 22 : 28,
+                    lineHeight: 1.1, letterSpacing: '-0.02em',
+                    fontStyle: 'italic', color: '#fff', fontWeight: 700,
                     overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
                   }}>
                     "{w.word}"
                   </div>
                   <div className="fs-mono" style={{
-                    fontSize: 21, color: '#2dd4bf', fontWeight: 700,
+                    fontSize: 16, color: '#9cf6f6', fontWeight: 700,
                     letterSpacing: '0.05em', flexShrink: 0,
                   }}>
                     {w.count.toLocaleString()}×
@@ -5493,7 +5550,7 @@ const SlideTopWords = React.memo(function SlideTopWords({ a, t }) {
 
 const SlideEmoji = React.memo(function SlideEmoji({ a, u, t }) {
   return (
-    <SlideShell bg="#1a0a2a" accent="#fbbf24">
+    <SlideShell bg="#1a0a2a" accent="#ffd972">
       <div style={{ position: 'absolute', inset: 0, pointerEvents: 'none' }}>
         {[15, 40, 65, 85].map((left, i) => (
           <div key={i} className="a-float" style={{
@@ -5507,16 +5564,16 @@ const SlideEmoji = React.memo(function SlideEmoji({ a, u, t }) {
         display: 'flex', flexDirection: 'column', justifyContent: 'center',
         textAlign: 'center', padding: '0 24px',
       }}>
-        <div className="fs-mono a-fade-up" style={{ fontSize: 20, color: '#fbbf24', letterSpacing: '0.3em' }}>
+        <div className="fs-mono a-fade-up" style={{ fontSize: 14, color: '#ffd972', letterSpacing: '0.15em' }}>
           {t.emoji_eyebrow}
         </div>
         <div className="a-spring" style={{
-          animationDelay: '0.2s', fontSize: 180, lineHeight: 1, marginTop: 12,
+          animationDelay: '0.2s', fontSize: 100, lineHeight: 1, marginTop: 48,
         }}>
           {u.topEmoji}
         </div>
-        <div className="a-fade-up" style={{
-          animationDelay: '0.8s', marginTop: 24, fontSize: 22, color: '#d0d0e0',
+        <div className="fs-sans a-fade-up" style={{
+          animationDelay: '0.8s', marginTop: 40, fontSize: 18, color: '#d0d0e0', lineHeight: 1.4,
         }}>
           {interp(t.emoji_used, { n: u.topEmojiCount })}
         </div>
@@ -5533,35 +5590,35 @@ const SlideDramaRole = React.memo(function SlideDramaRole({ u, t }) {
     count = u.conversationsRevived;
     labelText = t.drama_defib_label;
     copyText = t.drama_defib_copy;
-    accent = '#34d399';
+    accent = '#9cf6f6';
     bg = '#0a1a14';
   } else if (u.conversationsKilled > u.conversationsRevived && u.conversationsKilled >= 5) {
     titleText = t.drama_killer;
     count = u.conversationsKilled;
     labelText = t.drama_killer_label;
     copyText = t.drama_killer_copy;
-    accent = '#ef4444';
+    accent = '#f06449';
     bg = '#1a0a0a';
   } else if (u.replyReceivedRate > 0.5 && u.messageCount >= 20) {
     titleText = t.drama_replied;
     count = Math.round(u.replyReceivedRate * 100);
     labelText = t.drama_replied_label;
     copyText = t.drama_replied_copy;
-    accent = '#a3e635';
-    bg = '#1a2e0a';
+    accent = '#ffd972';
+    bg = '#1a1a08';
   } else if (u.ignoredRate > 0.25 && u.messageCount >= 20) {
     titleText = t.drama_ignored;
     count = Math.round(u.ignoredRate * 100);
     labelText = t.drama_ignored_label;
     copyText = t.drama_ignored_copy;
-    accent = '#94a3b8';
+    accent = '#f1e4f3';
     bg = '#0a0a14';
   } else {
     titleText = t.drama_steady;
     count = u.finalMessagesOfDay;
     labelText = t.drama_steady_label;
     copyText = t.drama_steady_copy;
-    accent = '#60a5fa';
+    accent = '#9cf6f6';
     bg = '#0a141f';
   }
 
@@ -5576,31 +5633,31 @@ const SlideDramaRole = React.memo(function SlideDramaRole({ u, t }) {
         display: 'flex', flexDirection: 'column', justifyContent: 'center',
         textAlign: 'center', padding: '0 24px',
       }}>
-        <div className="fs-mono a-fade-up" style={{ fontSize: 20, color: accent, letterSpacing: '0.3em' }}>
+        <div className="fs-mono a-fade-up" style={{ fontSize: 14, color: accent, letterSpacing: '0.15em' }}>
           {t.drama_eyebrow}
         </div>
-        <div className="a-spring" style={{ animationDelay: '0.3s', marginTop: 22 }}>
+        <div className="a-spring" style={{ animationDelay: '0.3s', marginTop: 32 }}>
           <div className="fs-display" style={{
-            fontSize: titleText.length > 20 ? 38 : 48,
-            lineHeight: 0.95, letterSpacing: '-0.04em', fontStyle: 'italic', color: accent,
+            fontSize: titleText.length > 20 ? 28 : 36,
+            lineHeight: 1.15, letterSpacing: '-0.03em', fontStyle: 'italic', color: accent, fontWeight: 700,
           }}>
             {titleText}
           </div>
         </div>
-        <div className="a-spring" style={{ animationDelay: '0.7s', marginTop: 30 }}>
+        <div className="a-spring" style={{ animationDelay: '0.7s', marginTop: 40 }}>
           <div className="fs-display" style={{
-            fontSize: 96, lineHeight: 1, letterSpacing: '-0.05em', color: '#fff',
+            fontSize: 56, lineHeight: 1.1, letterSpacing: '-0.04em', color: '#fff', fontWeight: 800,
           }}>
             {animated}{isPercent ? '%' : ''}
           </div>
           <div className="fs-mono" style={{
-            fontSize: 21, color: '#d0d0e0', letterSpacing: '0.1em', marginTop: 6,
+            fontSize: 16, color: '#d0d0e0', letterSpacing: '0.08em', marginTop: 8,
           }}>
             {cleanLabel}
           </div>
         </div>
-        <div className="a-fade-up" style={{
-          animationDelay: '1.3s', marginTop: 28, fontSize: 23, lineHeight: 1.5, color: '#d0d0e0',
+        <div className="fs-sans a-fade-up" style={{
+          animationDelay: '1.3s', marginTop: 32, fontSize: 18, lineHeight: 1.5, color: '#d0d0e0',
         }}>
           {copyText}
         </div>
@@ -5619,50 +5676,50 @@ const SlideRoast = React.memo(function SlideRoast({ u, profile, t }) {
     : tone === 'mild' ? t.roast_eyebrow_mild
     : t.roast_eyebrow_med;
   return (
-    <SlideShell bg="#1a0a14" accent="#f472b6">
+    <SlideShell bg="#1a0a14" accent="#f06449">
       <div style={{
         position: 'relative', height: '100%',
         display: 'flex', flexDirection: 'column', justifyContent: 'center',
         padding: '0 22px',
       }}>
         <div className="fs-mono a-fade-up" style={{
-          fontSize: 20, color: '#f472b6', letterSpacing: '0.3em',
+          fontSize: 14, color: '#f06449', letterSpacing: '0.15em',
         }}>
           {eyebrow}
         </div>
         <div className="fs-display a-fade-up" style={{
-          animationDelay: '0.15s', fontSize: 38, lineHeight: 1,
-          letterSpacing: '-0.04em', marginTop: 14, fontStyle: 'italic',
+          animationDelay: '0.15s', fontSize: 32, lineHeight: 1.15,
+          letterSpacing: '-0.03em', marginTop: 16, fontStyle: 'italic', fontWeight: 700,
         }}>
           {heading}
         </div>
-        <div style={{ marginTop: 26, display: 'flex', flexDirection: 'column', gap: 14 }}>
+        <div style={{ marginTop: 28, display: 'flex', flexDirection: 'column', gap: 16 }}>
           {roasts.map((roast, i) => (
             <div key={i} className="a-roast-card" style={{
               position: 'relative', overflow: 'hidden',
-              padding: '18px 18px 16px',
-              background: 'linear-gradient(135deg, rgba(244,114,182,0.14) 0%, rgba(244,114,182,0.04) 100%)',
-              border: '1px solid rgba(244,114,182,0.35)',
+              padding: '20px 20px 18px',
+              background: 'linear-gradient(135deg, rgba(240,100,73,0.14) 0%, rgba(240,100,73,0.04) 100%)',
+              border: '1px solid rgba(240,100,73,0.35)',
               borderRadius: 18,
               animationDelay: `${0.5 + i * 0.5}s`,
-              boxShadow: '0 8px 24px rgba(244,114,182,0.10)',
+              boxShadow: '0 8px 24px rgba(240,100,73,0.10)',
             }}>
               <div className="fs-mono" style={{
-                fontSize: 20, color: '#f472b6', letterSpacing: '0.2em',
-                opacity: 0.55, marginBottom: 8, fontWeight: 700,
+                fontSize: 14, color: '#f06449', letterSpacing: '0.15em',
+                opacity: 0.55, marginBottom: 10, fontWeight: 700,
               }}>
                 #{String(i + 1).padStart(2, '0')}
               </div>
-              <div className="fs-display" style={{
-                fontSize: 20, lineHeight: 1.25, letterSpacing: '-0.01em',
+              <div className="fs-sans" style={{
+                fontSize: 18, lineHeight: 1.45, letterSpacing: '-0.01em',
                 color: '#fff', fontWeight: 400,
               }}>
                 {interp(t[roast.lineKey] || '', roast.vars || {})}
               </div>
               {tone !== 'mild' && (
-                <div className="fs-display" style={{
-                  marginTop: 8, fontSize: 17, lineHeight: 1.3, letterSpacing: '-0.01em',
-                  color: '#f472b6', fontStyle: 'italic',
+                <div className="fs-sans" style={{
+                  marginTop: 10, fontSize: 16, lineHeight: 1.4, letterSpacing: '-0.01em',
+                  color: '#f06449', fontStyle: 'italic',
                 }}>
                   {interp(t[roast.kickerKey] || '', roast.vars || {})}
                 </div>
@@ -5672,8 +5729,8 @@ const SlideRoast = React.memo(function SlideRoast({ u, profile, t }) {
         </div>
         {u.roasts.length > 2 && (
           <div className="fs-mono a-fade-up" style={{
-            animationDelay: '1.8s', textAlign: 'center', marginTop: 18,
-            fontSize: 20, color: '#c8c8dc', letterSpacing: '0.2em',
+            animationDelay: '1.8s', textAlign: 'center', marginTop: 16,
+            fontSize: 14, color: '#c8c8dc', letterSpacing: '0.12em',
           }}>
             {interp(t.roast_more, { n: u.roasts.length - 2 })}
           </div>
@@ -5686,27 +5743,27 @@ const SlideRoast = React.memo(function SlideRoast({ u, profile, t }) {
 const SlideAchievements = React.memo(function SlideAchievements({ achievements, t }) {
   const top = achievements.slice(0, 3);
   return (
-    <SlideShell bg="#0a0a14" accent="#fbbf24">
+    <SlideShell bg="#0a0a14" accent="#ffd972">
       <div style={{
         position: 'relative', height: '100%',
         display: 'flex', flexDirection: 'column', justifyContent: 'center',
-        padding: '0 20px',
+        padding: '0 24px',
       }}>
-        <div className="fs-mono a-fade-up" style={{ fontSize: 20, color: '#fbbf24', letterSpacing: '0.3em' }}>
+        <div className="fs-mono a-fade-up" style={{ fontSize: 14, color: '#ffd972', letterSpacing: '0.15em' }}>
           {t.ach_eyebrow}
         </div>
         <div className="fs-display a-fade-up" style={{
-          animationDelay: '0.2s', fontSize: 40, lineHeight: 0.95,
-          letterSpacing: '-0.04em', marginTop: 14,
+          animationDelay: '0.2s', fontSize: 32, lineHeight: 1.15,
+          letterSpacing: '-0.03em', marginTop: 20, fontWeight: 700,
         }}>
           {t.ach_earned}<br/>
-          <span style={{ fontStyle: 'italic', color: '#fbbf24' }}>{achievements.length}</span>{' '}
+          <span style={{ fontStyle: 'italic', color: '#ffd972' }}>{achievements.length}</span>{' '}
           {achievements.length === 1 ? t.ach_badges : t.ach_badges_plural}.
         </div>
-        <div style={{ marginTop: 28, display: 'flex', flexDirection: 'column', gap: 12 }}>
+        <div style={{ marginTop: 32, display: 'flex', flexDirection: 'column', gap: 16 }}>
           {top.map((ach, i) => (
             <div key={i} className="a-spring" style={{
-              position: 'relative', overflow: 'hidden', padding: '16px',
+              position: 'relative', overflow: 'hidden', padding: '18px',
               background: `linear-gradient(135deg, ${ach.color}22 0%, ${ach.color}08 100%)`,
               border: `1px solid ${ach.color}40`,
               borderRadius: 16,
@@ -5716,12 +5773,12 @@ const SlideAchievements = React.memo(function SlideAchievements({ achievements, 
                 <div style={{ fontSize: 28, lineHeight: 1 }}>🏆</div>
                 <div style={{ flex: 1, minWidth: 0 }}>
                   <div className="fs-display" style={{
-                    fontSize: 20, lineHeight: 1.1, color: ach.color, letterSpacing: '-0.01em',
+                    fontSize: 18, lineHeight: 1.2, color: ach.color, letterSpacing: '-0.01em', fontWeight: 700,
                   }}>
                     {t[ach.labelKey] || ach.labelKey}
                   </div>
-                  <div className="fs-mono" style={{
-                    fontSize: 20, color: '#d0d0e0', marginTop: 4, letterSpacing: '0.05em',
+                  <div className="fs-sans" style={{
+                    fontSize: 16, color: '#d0d0e0', marginTop: 6, lineHeight: 1.4,
                   }}>
                     {interp(t[ach.evidenceKey] || '', ach.vars || {})}
                   </div>
@@ -5732,8 +5789,8 @@ const SlideAchievements = React.memo(function SlideAchievements({ achievements, 
         </div>
         {achievements.length > 3 && (
           <div className="fs-mono a-fade-up" style={{
-            animationDelay: '1.5s', textAlign: 'center', marginTop: 14,
-            fontSize: 21, color: '#c8c8dc', letterSpacing: '0.15em',
+            animationDelay: '1.5s', textAlign: 'center', marginTop: 16,
+            fontSize: 14, color: '#c8c8dc', letterSpacing: '0.12em',
           }}>
             {interp(t.ach_more, { n: achievements.length - 3 })}
           </div>
@@ -5745,33 +5802,33 @@ const SlideAchievements = React.memo(function SlideAchievements({ achievements, 
 
 const SlideMostLikely = React.memo(function SlideMostLikely({ a, t }) {
   return (
-    <SlideShell bg="#0a1a2a" accent="#60a5fa">
+    <SlideShell bg="#0a1a2a" accent="#9cf6f6">
       <div style={{
         position: 'relative', height: '100%',
         display: 'flex', flexDirection: 'column',
-        padding: '50px 20px 30px',
+        padding: '32px 24px 24px',
       }}>
         <div className="fs-mono a-fade-up" style={{
-          textAlign: 'center', fontSize: 20, color: '#60a5fa', letterSpacing: '0.3em',
+          textAlign: 'center', fontSize: 14, color: '#9cf6f6', letterSpacing: '0.15em',
         }}>
           {t.likely_eyebrow}
         </div>
         <div className="fs-display a-fade-up" style={{
           textAlign: 'center', animationDelay: '0.2s',
-          fontSize: 36, lineHeight: 0.95, letterSpacing: '-0.04em',
+          fontSize: 32, lineHeight: 1.15, letterSpacing: '-0.03em', fontWeight: 700,
           marginTop: 12, marginBottom: 20,
         }}>
-          {t.likely_title}<br/><span style={{ fontStyle: 'italic', color: '#60a5fa' }}>{t.likely_verdicts}</span>
+          {t.likely_title}<br/><span style={{ fontStyle: 'italic', color: '#9cf6f6' }}>{t.likely_verdicts}</span>
         </div>
         <div className="no-sb" style={{
           flex: 1, overflowY: 'auto',
-          display: 'flex', flexDirection: 'column', gap: 10,
+          display: 'flex', flexDirection: 'column', gap: 12,
         }}>
           {a.mostLikely.map((card, i) => (
             <div key={i} className="a-slide-right" style={{
-              padding: '12px 14px',
-              background: 'rgba(96,165,250,0.10)',
-              border: '1px solid rgba(96,165,250,0.25)',
+              padding: '14px 16px',
+              background: 'rgba(156,246,246,0.10)',
+              border: '1px solid rgba(156,246,246,0.25)',
               borderRadius: 14,
               animationDelay: `${0.5 + i * 0.11}s`,
             }}>
@@ -5779,23 +5836,23 @@ const SlideMostLikely = React.memo(function SlideMostLikely({ a, t }) {
                 <div style={{ fontSize: 22, lineHeight: 1 }}>{card.icon}</div>
                 <div style={{ flex: 1, minWidth: 0 }}>
                   <div className="fs-mono" style={{
-                    fontSize: 20, color: '#60a5fa', letterSpacing: '0.15em', fontWeight: 700,
+                    fontSize: 14, color: '#9cf6f6', letterSpacing: '0.12em', fontWeight: 700,
                   }}>
                     {t.likely_label}
                   </div>
-                  <div style={{ fontSize: 22, color: '#fff', marginTop: 2, fontWeight: 500 }}>
+                  <div className="fs-sans" style={{ fontSize: 16, color: '#fff', marginTop: 4, fontWeight: 500, lineHeight: 1.3 }}>
                     {t[card.labelKey] || card.labelKey}
                   </div>
                 </div>
                 <div style={{ textAlign: 'right' }}>
                   <div className="fs-display" style={{
-                    fontSize: 20, color: '#60a5fa', fontStyle: 'italic',
+                    fontSize: 18, color: '#9cf6f6', fontStyle: 'italic',
                     letterSpacing: '-0.02em', maxWidth: 100,
                     overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
                   }}>
                     {card.winner}
                   </div>
-                  <div className="fs-mono" style={{ fontSize: 20, color: '#c8c8dc', marginTop: 2 }}>
+                  <div className="fs-mono" style={{ fontSize: 14, color: '#c8c8dc', marginTop: 4 }}>
                     {card.metric}
                   </div>
                 </div>
@@ -5813,37 +5870,37 @@ const SlideDuo = React.memo(function SlideDuo({ a, u, t }) {
   const isInDuo = n1 === u.author || n2 === u.author;
   const partner = n1 === u.author ? n2 : n1;
   return (
-    <SlideShell bg="#1f0a1a" accent="#f472b6">
+    <SlideShell bg="#1f0a1a" accent="#f06449">
       <div style={{
         position: 'relative', height: '100%',
         display: 'flex', flexDirection: 'column', justifyContent: 'center',
         textAlign: 'center', padding: '0 24px',
       }}>
         <div className="fs-mono a-fade-up" style={{
-          fontSize: 20, color: '#f472b6', letterSpacing: '0.3em',
+          fontSize: 14, color: '#f06449', letterSpacing: '0.15em',
         }}>
           {t.duo_eyebrow}
         </div>
-        <div className="a-spring" style={{ animationDelay: '0.3s', marginTop: 22 }}>
+        <div className="a-spring" style={{ animationDelay: '0.3s', marginTop: 40 }}>
           <div className="fs-display" style={{
-            fontSize: 42, lineHeight: 0.95, letterSpacing: '-0.04em',
+            fontSize: 36, lineHeight: 1.15, letterSpacing: '-0.03em', fontWeight: 700,
           }}>
-            <span style={{ fontStyle: 'italic', color: '#f472b6' }}>{n1}</span>
-            <span style={{ display: 'block', margin: '8px 0', fontSize: 20, color: '#c8c8dc' }}>&</span>
-            <span style={{ fontStyle: 'italic', color: '#f472b6' }}>{n2}</span>
+            <span style={{ fontStyle: 'italic', color: '#f06449' }}>{n1}</span>
+            <span style={{ display: 'block', margin: '12px 0', fontSize: 16, color: '#c8c8dc' }}>&</span>
+            <span style={{ fontStyle: 'italic', color: '#f06449' }}>{n2}</span>
           </div>
         </div>
-        <div className="a-fade-up" style={{ animationDelay: '0.9s', marginTop: 32 }}>
+        <div className="a-fade-up" style={{ animationDelay: '0.9s', marginTop: 48 }}>
           <div className="fs-display" style={{
-            fontSize: 28, lineHeight: 1.2, letterSpacing: '-0.02em',
+            fontSize: 24, lineHeight: 1.3, letterSpacing: '-0.02em', fontWeight: 700,
           }}>
-            {t.duo_traded} <span style={{ color: '#f472b6', fontWeight: 600 }}>{a.topDuo.count.toLocaleString()}</span><br/>
+            {t.duo_traded} <span style={{ color: '#f06449' }}>{a.topDuo.count.toLocaleString()}</span><br/>
             {t.duo_replies_between}
           </div>
         </div>
-        <div className="a-fade-up" style={{
-          animationDelay: '1.4s', marginTop: 26, fontSize: 23,
-          color: '#d0d0e0', maxWidth: 280, margin: '26px auto 0',
+        <div className="fs-sans a-fade-up" style={{
+          animationDelay: '1.4s', marginTop: 32, fontSize: 18,
+          color: '#d0d0e0', maxWidth: 280, margin: '32px auto 0', lineHeight: 1.45,
         }}>
           {isInDuo
             ? interp(t.duo_in_with, { partner })
@@ -5858,26 +5915,26 @@ const MONTH_NAMES = ['January','February','March','April','May','June','July','A
 
 const SlideEras = React.memo(function SlideEras({ a, t }) {
   return (
-    <SlideShell bg="#0a0418" accent="#a3e635">
+    <SlideShell bg="#0a0418" accent="#ffd972">
       <div style={{
         position: 'relative', height: '100%',
-        display: 'flex', flexDirection: 'column', padding: '48px 20px 30px',
+        display: 'flex', flexDirection: 'column', padding: '32px 24px 24px',
       }}>
         <div className="fs-mono a-fade-up" style={{
-          textAlign: 'center', fontSize: 20, color: '#a3e635', letterSpacing: '0.3em',
+          textAlign: 'center', fontSize: 14, color: '#ffd972', letterSpacing: '0.15em',
         }}>
           {t.eras_eyebrow}
         </div>
         <div className="fs-display a-fade-up" style={{
           textAlign: 'center', animationDelay: '0.2s',
-          fontSize: 36, lineHeight: 0.95, letterSpacing: '-0.04em',
+          fontSize: 32, lineHeight: 1.15, letterSpacing: '-0.03em', fontWeight: 700,
           marginTop: 12, marginBottom: 20,
         }}>
-          {t.eras_title}<br/><span style={{ fontStyle: 'italic', color: '#a3e635' }}>{t.eras_subtitle}</span>
+          {t.eras_title}<br/><span style={{ fontStyle: 'italic', color: '#ffd972' }}>{t.eras_subtitle}</span>
         </div>
         <div className="no-sb" style={{
           flex: 1, overflowY: 'auto',
-          display: 'flex', flexDirection: 'column', gap: 10,
+          display: 'flex', flexDirection: 'column', gap: 12,
         }}>
           {a.eras.map((era, i) => {
             const startMonth = MONTH_NAMES[era.startDate.getMonth()];
@@ -5888,24 +5945,24 @@ const SlideEras = React.memo(function SlideEras({ a, t }) {
             return (
               <div key={i} className="a-fade-up" style={{
                 padding: '14px 16px',
-                background: 'rgba(163,230,53,0.08)',
-                border: '1px solid rgba(163,230,53,0.20)',
+                background: 'rgba(255,217,114,0.08)',
+                border: '1px solid rgba(255,217,114,0.20)',
                 borderRadius: 14,
                 animationDelay: `${0.5 + i * 0.18}s`,
               }}>
                 <div className="fs-mono" style={{
-                  fontSize: 20, color: '#a3e635', letterSpacing: '0.2em', fontWeight: 700,
+                  fontSize: 14, color: '#ffd972', letterSpacing: '0.15em', fontWeight: 700,
                 }}>
                   {t.eras_chapter} {String(i + 1).padStart(2, '0')}
                 </div>
                 <div className="fs-display" style={{
-                  fontSize: 22, lineHeight: 1.1, letterSpacing: '-0.02em',
-                  marginTop: 4, fontStyle: 'italic',
+                  fontSize: 20, lineHeight: 1.2, letterSpacing: '-0.02em',
+                  marginTop: 4, fontStyle: 'italic', fontWeight: 700,
                 }}>
                   {era.name}
                 </div>
                 <div className="fs-mono" style={{
-                  fontSize: 20, color: '#d0d0e0', marginTop: 6, letterSpacing: '0.05em',
+                  fontSize: 14, color: '#d0d0e0', marginTop: 6, letterSpacing: '0.03em',
                 }}>
                   {dateRange} · {era.messageCount.toLocaleString()} {t.eras_msgs} · {interp(t.eras_per_day, { n: era.msgPerDay })}
                 </div>
@@ -5931,14 +5988,14 @@ const SlideChaosMoment = React.memo(function SlideChaosMoment({ a, t }) {
   }));
 
   return (
-    <SlideShell bg="#1a0a14" accent="#f472b6" shake={true}>
+    <SlideShell bg="#1a0a14" accent="#f06449" shake={true}>
       <div style={{ position: 'absolute', inset: 0, pointerEvents: 'none', overflow: 'hidden' }}>
         {bubbles.map((b, i) => (
           <div key={i} style={{
             position: 'absolute', left: `${b.left}%`, top: -30,
             width: 60, height: 26, borderRadius: 8,
-            background: 'rgba(244,114,182,0.20)',
-            border: '1px solid rgba(244,114,182,0.35)',
+            background: 'rgba(240,100,73,0.20)',
+            border: '1px solid rgba(240,100,73,0.35)',
             animation: `notifRain 3s linear ${b.delay}s infinite`,
           }} />
         ))}
@@ -5949,35 +6006,35 @@ const SlideChaosMoment = React.memo(function SlideChaosMoment({ a, t }) {
         textAlign: 'center', padding: '0 24px',
       }}>
         <div className="fs-mono a-fade-up" style={{
-          fontSize: 20, color: '#f472b6', letterSpacing: '0.3em',
+          fontSize: 14, color: '#f06449', letterSpacing: '0.15em',
         }}>
           {t.chaos_eyebrow}
         </div>
-        <div className="a-fade-up" style={{ animationDelay: '0.3s', marginTop: 20 }}>
+        <div className="a-fade-up" style={{ animationDelay: '0.3s', marginTop: 24 }}>
           <div className="fs-display" style={{
-            fontSize: 38, lineHeight: 0.95, letterSpacing: '-0.03em',
+            fontSize: 32, lineHeight: 1.15, letterSpacing: '-0.03em', fontWeight: 700,
           }}>
             <span style={{ fontStyle: 'italic' }}>{dateStr}</span>
-            <span style={{ display: 'block', color: '#f472b6', marginTop: 4 }}>
+            <span style={{ display: 'block', color: '#f06449', marginTop: 6 }}>
               {interp(t.chaos_at, { time: timeStr })}
             </span>
           </div>
         </div>
-        <div className="a-spring" style={{ animationDelay: '0.8s', marginTop: 32 }}>
+        <div className="a-spring" style={{ animationDelay: '0.8s', marginTop: 48 }}>
           <div className="fs-display" style={{
-            fontSize: 110, lineHeight: 1, letterSpacing: '-0.05em', color: '#f472b6',
+            fontSize: 56, lineHeight: 1.1, letterSpacing: '-0.04em', color: '#f06449', fontWeight: 800,
           }}>
             {animated}
           </div>
           <div className="fs-display" style={{
-            fontSize: 22, marginTop: -2, color: '#fff', fontStyle: 'italic',
+            fontSize: 20, marginTop: 8, color: '#fff', fontStyle: 'italic', fontWeight: 500,
           }}>
             {t.chaos_msgs_minute}
           </div>
         </div>
-        <div className="a-fade-up" style={{
-          animationDelay: '1.6s', marginTop: 28, fontSize: 23, lineHeight: 1.6,
-          color: '#d0d0e0', maxWidth: 280, margin: '28px auto 0',
+        <div className="fs-sans a-fade-up" style={{
+          animationDelay: '1.6s', marginTop: 32, fontSize: 18, lineHeight: 1.5,
+          color: '#d0d0e0', maxWidth: 280, margin: '32px auto 0',
         }}>
           {t.chaos_lost_control}
         </div>
@@ -5988,38 +6045,38 @@ const SlideChaosMoment = React.memo(function SlideChaosMoment({ a, t }) {
 
 const SlideGroupPersona = React.memo(function SlideGroupPersona({ a, t }) {
   return (
-    <SlideShell bg="#0a0a18" accent="#a3e635">
+    <SlideShell bg="#0a0a18" accent="#ffd972">
       <div style={{
         position: 'relative', height: '100%',
         display: 'flex', flexDirection: 'column', justifyContent: 'center',
         padding: '0 24px',
       }}>
         <div className="fs-mono a-fade-up" style={{
-          fontSize: 20, color: '#a3e635', letterSpacing: '0.3em',
+          fontSize: 14, color: '#ffd972', letterSpacing: '0.15em',
         }}>
           {t.persona_eyebrow}
         </div>
         <div className="fs-display a-fade-up" style={{
-          animationDelay: '0.2s', fontSize: 28, lineHeight: 1,
-          letterSpacing: '-0.03em', marginTop: 16, color: '#d0d0e0',
+          animationDelay: '0.2s', fontSize: 20, lineHeight: 1.2,
+          letterSpacing: '-0.02em', marginTop: 20, color: '#d0d0e0', fontWeight: 500,
         }}>
           {t.persona_this_group}
         </div>
-        <div className="a-spring a-pulse-glow" style={{ animationDelay: '0.5s', marginTop: 20 }}>
+        <div className="a-spring a-pulse-glow" style={{ animationDelay: '0.5s', marginTop: 24 }}>
           <div className="fs-display" style={{
-            fontSize: 56, lineHeight: 0.95, letterSpacing: '-0.04em',
-            color: '#a3e635', fontStyle: 'italic',
+            fontSize: 48, lineHeight: 1.1, letterSpacing: '-0.03em',
+            color: '#ffd972', fontStyle: 'italic', fontWeight: 800,
           }}>
             {a.groupPersonality}
           </div>
         </div>
-        <div className="a-fade-up" style={{ animationDelay: '1.2s', marginTop: 32 }}>
+        <div className="a-fade-up" style={{ animationDelay: '1.2s', marginTop: 48 }}>
           <div className="fs-mono" style={{
-            fontSize: 21, color: '#c8c8dc', letterSpacing: '0.15em', marginBottom: 8,
+            fontSize: 14, color: '#c8c8dc', letterSpacing: '0.12em', marginBottom: 10,
           }}>
             {t.persona_evidence}
           </div>
-          <div style={{ fontSize: 23, color: '#fff', lineHeight: 1.5, fontWeight: 500 }}>
+          <div className="fs-sans" style={{ fontSize: 18, color: '#fff', lineHeight: 1.5, fontWeight: 400 }}>
             {a.groupPersonalityReason}
           </div>
         </div>
@@ -6032,67 +6089,67 @@ const SlideAwards = React.memo(function SlideAwards({ a, t }) {
   // Only include awards with valid winners
   const awards = [
     a.fastestResponder && { trophy: '🏆', label: t.awards_fastest, winner: a.fastestResponder.author,
-      sub: interp(t.awards_fastest_sub, { m: a.fastestResponder.avgRespMin.toFixed(1) }), color: '#60a5fa' },
+      sub: interp(t.awards_fastest_sub, { m: a.fastestResponder.avgRespMin.toFixed(1) }), color: '#9cf6f6' },
     a.yapper && { trophy: '🎤', label: t.awards_yapper, winner: a.yapper.author,
-      sub: interp(t.awards_yapper_sub, { n: a.yapper.messageCount.toLocaleString() }), color: '#f472b6' },
+      sub: interp(t.awards_yapper_sub, { n: a.yapper.messageCount.toLocaleString() }), color: '#f06449' },
     a.nightOwl && a.nightOwl.nightPct > 5 && { trophy: '🌙', label: t.awards_nightowl,
-      winner: a.nightOwl.author, sub: interp(t.awards_nightowl_sub, { pct: a.nightOwl.nightPct.toFixed(0) }), color: '#a78bfa' },
+      winner: a.nightOwl.author, sub: interp(t.awards_nightowl_sub, { pct: a.nightOwl.nightPct.toFixed(0) }), color: '#9cf6f6' },
     a.ghost && a.ghost.longestAbsenceDays >= 7 && { trophy: '👻', label: t.awards_ghost,
-      winner: a.ghost.author, sub: interp(t.awards_ghost_sub, { n: a.ghost.longestAbsenceDays }), color: '#94a3b8' },
+      winner: a.ghost.author, sub: interp(t.awards_ghost_sub, { n: a.ghost.longestAbsenceDays }), color: '#f1e4f3' },
     a.killer && a.killer.conversationsKilled >= 3 && { trophy: '💀', label: t.awards_killer,
-      winner: a.killer.author, sub: interp(t.awards_killer_sub, { n: a.killer.conversationsKilled }), color: '#ef4444' },
+      winner: a.killer.author, sub: interp(t.awards_killer_sub, { n: a.killer.conversationsKilled }), color: '#f06449' },
     a.reviver && a.reviver.conversationsRevived >= 3 && { trophy: '✨', label: t.awards_defib,
-      winner: a.reviver.author, sub: interp(t.awards_defib_sub, { n: a.reviver.conversationsRevived }), color: '#34d399' },
+      winner: a.reviver.author, sub: interp(t.awards_defib_sub, { n: a.reviver.conversationsRevived }), color: '#9cf6f6' },
   ].filter(Boolean).slice(0, 6);
 
   return (
-    <SlideShell bg="#0a0a14" accent="#fbbf24">
+    <SlideShell bg="#0a0a14" accent="#ffd972">
       <div style={{
         position: 'relative', height: '100%',
-        display: 'flex', flexDirection: 'column', padding: '48px 20px 30px',
+        display: 'flex', flexDirection: 'column', padding: '32px 24px 24px',
       }}>
         <div className="fs-mono a-fade-up" style={{
-          textAlign: 'center', fontSize: 20, color: '#fbbf24', letterSpacing: '0.3em',
+          textAlign: 'center', fontSize: 14, color: '#ffd972', letterSpacing: '0.15em',
         }}>
           {t.awards_eyebrow}
         </div>
         <div className="fs-display a-fade-up" style={{
           textAlign: 'center', animationDelay: '0.2s',
-          fontSize: 36, lineHeight: 0.95, letterSpacing: '-0.04em',
+          fontSize: 32, lineHeight: 1.15, letterSpacing: '-0.03em', fontWeight: 700,
           marginTop: 10, marginBottom: 18,
         }}>
-          {t.awards_title}<br/><span style={{ fontStyle: 'italic', color: '#fbbf24' }}>{t.awards_are}</span>
+          {t.awards_title}<br/><span style={{ fontStyle: 'italic', color: '#ffd972' }}>{t.awards_are}</span>
         </div>
         <div className="no-sb" style={{
           flex: 1, overflowY: 'auto',
-          display: 'flex', flexDirection: 'column', gap: 8,
+          display: 'flex', flexDirection: 'column', gap: 10,
         }}>
           {awards.map((aw, i) => (
             <div key={aw.label} className="a-slide-up-far" style={{
-              display: 'flex', alignItems: 'center', gap: 12,
-              padding: '11px 13px',
+              display: 'flex', alignItems: 'center', gap: 14,
+              padding: '14px 16px',
               background: 'rgba(255,255,255,0.04)',
               border: '1px solid rgba(255,255,255,0.06)',
               borderRadius: 12,
               animationDelay: `${0.5 + i * 0.15}s`,
             }}>
-              <div style={{ fontSize: 20, lineHeight: 1 }}>{aw.trophy}</div>
+              <div style={{ fontSize: 24, lineHeight: 1, flexShrink: 0 }}>{aw.trophy}</div>
               <div style={{ flex: 1, minWidth: 0 }}>
                 <div className="fs-mono" style={{
-                  fontSize: 20, color: aw.color, letterSpacing: '0.15em',
+                  fontSize: 14, color: aw.color, letterSpacing: '0.12em',
                   fontWeight: 700, textTransform: 'uppercase',
                 }}>
                   {aw.label}
                 </div>
-                <div style={{
-                  fontSize: 22, fontWeight: 700, marginTop: 2,
+                <div className="fs-sans" style={{
+                  fontSize: 16, fontWeight: 700, marginTop: 3, lineHeight: 1.2,
                   overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
                 }}>
                   {aw.winner}
                 </div>
               </div>
               <div className="fs-mono" style={{
-                fontSize: 20, color: '#c8c8dc', textAlign: 'right', flexShrink: 0,
+                fontSize: 14, color: '#c8c8dc', textAlign: 'right', flexShrink: 0, lineHeight: 1.4,
               }}>
                 {aw.sub}
               </div>
@@ -6114,31 +6171,31 @@ const SlidePeakDay = React.memo(function SlidePeakDay({ a, t }) {
   const animated = useAnimatedNumber(count, 1400, [date]);
 
   return (
-    <SlideShell bg="#2a1a0a" accent="#fbbf24">
+    <SlideShell bg="#2a1a0a" accent="#ffd972">
       <div style={{
         position: 'relative', height: '100%',
         display: 'flex', flexDirection: 'column', justifyContent: 'center',
         textAlign: 'center', padding: '0 24px',
       }}>
         <div className="fs-mono a-fade-up" style={{
-          fontSize: 20, color: '#fbbf24', letterSpacing: '0.3em',
+          fontSize: 14, color: '#ffd972', letterSpacing: '0.15em',
         }}>
           {t.peakday_eyebrow}
         </div>
         <div className="fs-display a-fade-up" style={{
-          animationDelay: '0.3s', fontSize: 38, lineHeight: 0.95,
-          letterSpacing: '-0.04em', marginTop: 14,
+          animationDelay: '0.3s', fontSize: 32, lineHeight: 1.15,
+          letterSpacing: '-0.03em', marginTop: 20, fontWeight: 700,
         }}>
           <span style={{ fontStyle: 'italic' }}>{dayName},</span><br/>{dateStr}
         </div>
         <div className="fs-display a-spring" style={{
-          animationDelay: '0.7s', fontSize: 110, lineHeight: 1,
-          letterSpacing: '-0.05em', color: '#fbbf24', marginTop: 16,
+          animationDelay: '0.7s', fontSize: 64, lineHeight: 1.1,
+          letterSpacing: '-0.04em', color: '#ffd972', marginTop: 40, fontWeight: 800,
         }}>
           {animated}
         </div>
         <div className="fs-display a-fade-up" style={{
-          animationDelay: '1.2s', fontSize: 24, marginTop: -4, fontStyle: 'italic',
+          animationDelay: '1.2s', fontSize: 20, marginTop: 10, fontStyle: 'italic', fontWeight: 500,
         }}>
           {t.peakday_msgs}
         </div>
@@ -6149,38 +6206,38 @@ const SlidePeakDay = React.memo(function SlidePeakDay({ a, t }) {
 
 const SlideFinale = React.memo(function SlideFinale({ a, t, onExit }) {
   return (
-    <SlideShell bg="#0a0a0f" accent="#a3e635">
+    <SlideShell bg="#0a0a0f" accent="#ffd972">
       <div style={{
         position: 'relative', height: '100%',
         display: 'flex', flexDirection: 'column', justifyContent: 'center',
         textAlign: 'center', padding: '0 24px',
       }}>
         <div className="fs-mono a-fade-up" style={{
-          fontSize: 20, color: '#a3e635', letterSpacing: '0.3em',
+          fontSize: 14, color: '#ffd972', letterSpacing: '0.15em',
         }}>
           {t.finale_eyebrow}
         </div>
-        <div className="a-spring" style={{ animationDelay: '0.3s', marginTop: 32 }}>
+        <div className="a-spring" style={{ animationDelay: '0.3s', marginTop: 48 }}>
           <div className="fs-display" style={{
-            fontSize: 68, lineHeight: 0.88, letterSpacing: '-0.05em',
+            fontSize: 52, lineHeight: 1.1, letterSpacing: '-0.04em', fontWeight: 800,
           }}>
             <span style={{ display: 'block' }}>{t.finale_see}</span>
             <span style={{ display: 'block' }}>{t.finale_in_the}</span>
-            <span style={{ display: 'block', fontStyle: 'italic', color: '#a3e635' }}>{t.finale_chat}</span>
+            <span style={{ display: 'block', fontStyle: 'italic', color: '#ffd972' }}>{t.finale_chat}</span>
           </div>
         </div>
-        <div className="a-fade-up" style={{
-          animationDelay: '1.0s', marginTop: 36, fontSize: 23, color: '#d0d0e0',
+        <div className="fs-sans a-fade-up" style={{
+          animationDelay: '1.0s', marginTop: 40, fontSize: 18, color: '#d0d0e0', lineHeight: 1.45,
         }}>
           {t.finale_now}
         </div>
         <div className="a-fade-up" style={{
           animationDelay: '1.4s', display: 'flex', gap: 8,
-          justifyContent: 'center', marginTop: 28,
+          justifyContent: 'center', marginTop: 32,
         }}>
-          <button onClick={onExit} className="press" style={{
-            padding: '12px 24px', background: '#a3e635', color: '#0a0a0f',
-            border: 'none', borderRadius: 999, fontSize: 23, fontWeight: 700, cursor: 'pointer',
+          <button onClick={onExit} className="press fs-sans" style={{
+            padding: '14px 28px', background: '#ffd972', color: '#0a0a0f',
+            border: 'none', borderRadius: 999, fontSize: 18, fontWeight: 700, cursor: 'pointer',
           }}>
             {t.finale_explore}
           </button>
@@ -6235,7 +6292,7 @@ function PostMenu({ analytics, diagnostics, selectedAuthor, setSelectedAuthor, t
       <div style={{ padding: '16px 20px 32px' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 }}>
           <div style={{ fontWeight: 800, fontSize: 18, letterSpacing: '-0.02em' }}>
-            chat<span style={{ color: '#a3e635' }}>wrapped</span>
+            chat<span style={{ color: '#ffd972' }}>wrapped</span>
           </div>
           <button onClick={onReset} className="press" aria-label={t.a11y_start_over || 'Start over'} style={{
             background: '#15151d', border: '1px solid #2a2a36', color: '#cfcfdc',
@@ -6257,9 +6314,9 @@ function PostMenu({ analytics, diagnostics, selectedAuthor, setSelectedAuthor, t
         <div style={{ display: 'flex', gap: 10 }}>
           <button onClick={onReplay} className="a-scale-in press lift" style={{
             flex: 1, position: 'relative', overflow: 'hidden', textAlign: 'left',
-            background: 'linear-gradient(135deg, #a3e635 0%, #d4f04a 100%)',
+            background: 'linear-gradient(135deg, #ffd972 0%, #ffe896 100%)',
             border: 'none', borderRadius: 18, padding: '18px 16px', cursor: 'pointer',
-            color: '#0a0a0f', boxShadow: '0 14px 30px rgba(163,230,53,0.35)',
+            color: '#0a0a0f', boxShadow: '0 14px 30px rgba(255,217,114,0.35)',
           }}>
             <div className="a-shine" style={{ position: 'absolute', inset: 0 }} />
             <div className="fs-display" style={{
@@ -6281,10 +6338,10 @@ function PostMenu({ analytics, diagnostics, selectedAuthor, setSelectedAuthor, t
 
           <button onClick={onRoastMode} className="a-scale-in press lift a-gradient-shift" style={{
             flex: 1, position: 'relative', overflow: 'hidden', textAlign: 'left',
-            background: 'linear-gradient(135deg, #f472b6 0%, #ef4444 50%, #f472b6 100%)',
+            background: 'linear-gradient(135deg, #f06449 0%, #f06449 50%, #f06449 100%)',
             backgroundSize: '200% 200%',
             border: 'none', borderRadius: 18, padding: '18px 16px', cursor: 'pointer',
-            color: '#fff', boxShadow: '0 14px 30px rgba(244,114,182,0.40)',
+            color: '#fff', boxShadow: '0 14px 30px rgba(240,100,73,0.40)',
             animationDelay: '0.05s',
           }}>
             <div className="a-shine" style={{ position: 'absolute', inset: 0 }} />
@@ -6320,10 +6377,10 @@ function PostMenu({ analytics, diagnostics, selectedAuthor, setSelectedAuthor, t
             </div>
             <div style={{ fontSize: 23, fontWeight: 700, marginTop: 3 }}>{selectedAuthor}</div>
             <div className="fs-mono" style={{
-              fontSize: 20, color: '#a3e635', marginTop: 4, fontStyle: 'italic',
+              fontSize: 20, color: '#ffd972', marginTop: 4, fontStyle: 'italic',
             }}>"{resolveTitle(u, t)}"</div>
           </div>
-          <div className="fs-mono" style={{ fontSize: 20, color: '#a3e635', letterSpacing: '0.1em' }}>
+          <div className="fs-mono" style={{ fontSize: 20, color: '#ffd972', letterSpacing: '0.1em' }}>
             {t.menu_switch}
           </div>
         </button>
@@ -6332,15 +6389,15 @@ function PostMenu({ analytics, diagnostics, selectedAuthor, setSelectedAuthor, t
         <button onClick={onDebug} className="press" style={{
           width: '100%', textAlign: 'left',
           marginTop: 16, padding: '14px 16px',
-          background: diagnostics?.confidence >= 80 ? 'rgba(163,230,53,0.10)' : 'rgba(251,191,36,0.10)',
-          border: `1px solid ${diagnostics?.confidence >= 80 ? 'rgba(163,230,53,0.30)' : 'rgba(251,191,36,0.35)'}`,
+          background: diagnostics?.confidence >= 80 ? 'rgba(255,217,114,0.10)' : 'rgba(255,217,114,0.10)',
+          border: `1px solid ${diagnostics?.confidence >= 80 ? 'rgba(255,217,114,0.30)' : 'rgba(255,217,114,0.35)'}`,
           borderRadius: 12, cursor: 'pointer', color: '#f4f4f8',
           display: 'flex', justifyContent: 'space-between', alignItems: 'center',
           minHeight: 56,
         }}>
           <div>
             <div className="fs-mono" style={{
-              fontSize: 21, color: diagnostics?.confidence >= 80 ? '#bff260' : '#fbbf24',
+              fontSize: 21, color: diagnostics?.confidence >= 80 ? '#ffd972' : '#ffd972',
               letterSpacing: '0.2em', fontWeight: 700,
             }}>
               {interp(t.menu_verified, { n: diagnostics?.confidence ?? 0 })}
@@ -6352,7 +6409,7 @@ function PostMenu({ analytics, diagnostics, selectedAuthor, setSelectedAuthor, t
               })}
             </div>
             {diagnostics?.warnings.length > 0 && (
-              <div style={{ fontSize: 21, color: '#fbbf24', marginTop: 4 }}>
+              <div style={{ fontSize: 21, color: '#ffd972', marginTop: 4 }}>
                 {diagnostics.warnings[0]}
               </div>
             )}
@@ -6366,16 +6423,16 @@ function PostMenu({ analytics, diagnostics, selectedAuthor, setSelectedAuthor, t
         <div style={{
           marginTop: 20, padding: 18,
           background: 'linear-gradient(135deg, #1a1a25 0%, #15151d 100%)',
-          border: '1px solid rgba(163,230,53,0.2)', borderRadius: 16,
+          border: '1px solid rgba(255,217,114,0.2)', borderRadius: 16,
         }}>
           <div className="fs-mono" style={{
-            fontSize: 20, color: '#a3e635', letterSpacing: '0.2em', marginBottom: 8,
+            fontSize: 20, color: '#ffd972', letterSpacing: '0.2em', marginBottom: 8,
           }}>
             {t.menu_this_group_is}
           </div>
           <div className="fs-display" style={{
             fontSize: 26, lineHeight: 1, letterSpacing: '-0.03em',
-            fontStyle: 'italic', color: '#a3e635',
+            fontStyle: 'italic', color: '#ffd972',
           }}>
             {analytics.groupPersonality}
           </div>
@@ -6400,7 +6457,7 @@ function PostMenu({ analytics, diagnostics, selectedAuthor, setSelectedAuthor, t
                   background: '#15151d', border: '1px solid #2a2a36', borderRadius: 12,
                 }}>
                   <div className="fs-mono" style={{
-                    fontSize: 20, color: '#a3e635', fontWeight: 700, width: 24,
+                    fontSize: 20, color: '#ffd972', fontWeight: 700, width: 24,
                   }}>
                     {String(i + 1).padStart(2, '0')}
                   </div>
@@ -6494,7 +6551,7 @@ function PostMenu({ analytics, diagnostics, selectedAuthor, setSelectedAuthor, t
                   <div style={{
                     position: 'absolute', top: 0, bottom: 0, left: 0,
                     width: `${Math.min(pct * 2.5, 100)}%`,
-                    background: isUser ? 'rgba(163,230,53,0.10)' : 'rgba(163,230,53,0.04)',
+                    background: isUser ? 'rgba(255,217,114,0.10)' : 'rgba(255,217,114,0.04)',
                   }} />
                   <div style={{
                     position: 'relative', display: 'flex',
@@ -6511,7 +6568,7 @@ function PostMenu({ analytics, diagnostics, selectedAuthor, setSelectedAuthor, t
                           fontSize: 23, fontWeight: isUser ? 700 : 500,
                           overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
                         }}>
-                          {user.author}{isUser && <span style={{ color: '#a3e635' }}> {t.rank_you}</span>}
+                          {user.author}{isUser && <span style={{ color: '#ffd972' }}> {t.rank_you}</span>}
                         </div>
                         <div className="fs-mono" style={{
                           fontSize: 20, color: '#c8c8dc', marginTop: 1, fontStyle: 'italic',
@@ -6522,7 +6579,7 @@ function PostMenu({ analytics, diagnostics, selectedAuthor, setSelectedAuthor, t
                       </div>
                     </div>
                     <div className="fs-mono" style={{
-                      fontSize: 21, color: isUser ? '#a3e635' : '#d0d0e0',
+                      fontSize: 21, color: isUser ? '#ffd972' : '#d0d0e0',
                       fontWeight: 600, flexShrink: 0,
                     }}>
                       {user.messageCount.toLocaleString()}
@@ -6553,7 +6610,7 @@ function PostMenu({ analytics, diagnostics, selectedAuthor, setSelectedAuthor, t
                   overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
                 }}>{user.author}</div>
                 <div className="fs-mono" style={{
-                  fontSize: 20, color: '#a3e635', marginTop: 2, fontStyle: 'italic',
+                  fontSize: 20, color: '#ffd972', marginTop: 2, fontStyle: 'italic',
                   overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
                 }}>"{resolveTitle(user, t)}"</div>
               </div>
@@ -6576,7 +6633,7 @@ function HighlightCard({ value, label, accent, small }) {
     }}>
       <div className="fs-display" style={{
         fontSize: small ? 18 : 28, letterSpacing: '-0.02em', lineHeight: 1,
-        color: accent ? '#a3e635' : '#f4f4f8',
+        color: accent ? '#ffd972' : '#f4f4f8',
         overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
       }}>{value}</div>
       <div className="fs-mono" style={{
@@ -6641,7 +6698,7 @@ function VerifyView({ diagnostics, analytics, fileName, t, onContinue, onReset }
   const maxWords = Math.max(...perAuthor.map(p => p.words), 1);
 
   const confidence = diagnostics.confidence;
-  const confColor = confidence >= 90 ? '#a3e635' : confidence >= 70 ? '#fbbf24' : '#ef4444';
+  const confColor = confidence >= 90 ? '#ffd972' : confidence >= 70 ? '#ffd972' : '#f06449';
   const confLabel = confidence >= 90 ? 'High' : confidence >= 70 ? 'Medium' : 'Low';
 
   return (
@@ -6657,7 +6714,7 @@ function VerifyView({ diagnostics, analytics, fileName, t, onContinue, onReset }
           <div className="fs-display" style={{
             fontSize: 32, lineHeight: 1, letterSpacing: '-0.03em', flex: 1,
           }}>
-            {t.verify_title} <span style={{ fontStyle: 'italic', color: '#a3e635' }}>{t.verify_right}</span>?
+            {t.verify_title} <span style={{ fontStyle: 'italic', color: '#ffd972' }}>{t.verify_right}</span>?
           </div>
           <button onClick={onReset} className="press" style={{
             background: 'transparent', border: 'none',
@@ -6746,7 +6803,7 @@ function VerifyView({ diagnostics, analytics, fileName, t, onContinue, onReset }
             ))}
           </div>
           {perAuthor.length === 1 && (
-            <div style={{ marginTop: 10, fontSize: 21, color: '#fbbf24', lineHeight: 1.4 }}>
+            <div style={{ marginTop: 10, fontSize: 21, color: '#ffd972', lineHeight: 1.4 }}>
               ⚠ Only one participant detected. If this is a group chat, the parser may have failed.
             </div>
           )}
@@ -6768,7 +6825,7 @@ function VerifyView({ diagnostics, analytics, fileName, t, onContinue, onReset }
                 <div style={{
                   position: 'absolute', top: 0, bottom: 0, left: 0,
                   width: `${(p.messages / maxMsgs) * 100}%`,
-                  background: 'rgba(163,230,53,0.06)',
+                  background: 'rgba(255,217,114,0.06)',
                 }} />
                 <div style={{
                   position: 'relative', display: 'flex',
@@ -6784,7 +6841,7 @@ function VerifyView({ diagnostics, analytics, fileName, t, onContinue, onReset }
                   <div className="fs-mono" style={{ fontSize: 20, color: '#c8c8dc', minWidth: 42, textAlign: 'right' }}>
                     {pct.toFixed(1)}%
                   </div>
-                  <div className="fs-mono" style={{ fontSize: 22, color: '#a3e635', fontWeight: 700, minWidth: 60, textAlign: 'right' }}>
+                  <div className="fs-mono" style={{ fontSize: 22, color: '#ffd972', fontWeight: 700, minWidth: 60, textAlign: 'right' }}>
                     {p.messages.toLocaleString()}
                   </div>
                 </div>
@@ -6821,7 +6878,7 @@ function VerifyView({ diagnostics, analytics, fileName, t, onContinue, onReset }
                 <div style={{
                   position: 'absolute', top: 0, bottom: 0, left: 0,
                   width: `${(p.words / maxWords) * 100}%`,
-                  background: 'rgba(96,165,250,0.06)',
+                  background: 'rgba(156,246,246,0.06)',
                 }} />
                 <div style={{
                   position: 'relative', display: 'flex',
@@ -6837,7 +6894,7 @@ function VerifyView({ diagnostics, analytics, fileName, t, onContinue, onReset }
                   <div className="fs-mono" style={{ fontSize: 20, color: '#c8c8dc', minWidth: 42, textAlign: 'right' }}>
                     {avg.toFixed(1)} avg
                   </div>
-                  <div className="fs-mono" style={{ fontSize: 22, color: '#60a5fa', fontWeight: 700, minWidth: 60, textAlign: 'right' }}>
+                  <div className="fs-mono" style={{ fontSize: 22, color: '#9cf6f6', fontWeight: 700, minWidth: 60, textAlign: 'right' }}>
                     {p.words.toLocaleString()}
                   </div>
                 </div>
@@ -6873,10 +6930,10 @@ function VerifyView({ diagnostics, analytics, fileName, t, onContinue, onReset }
                     fontSize: 23,
                     overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
                   }}>{p.author}</div>
-                  <div className="fs-mono" style={{ fontSize: 22, color: p.media > 0 ? '#fbbf24' : '#6a6a7a', textAlign: 'right', fontWeight: 600 }}>
+                  <div className="fs-mono" style={{ fontSize: 22, color: p.media > 0 ? '#ffd972' : '#6a6a7a', textAlign: 'right', fontWeight: 600 }}>
                     {p.media.toLocaleString()}
                   </div>
-                  <div className="fs-mono" style={{ fontSize: 22, color: p.voice > 0 ? '#a78bfa' : '#6a6a7a', textAlign: 'right', fontWeight: 600, minWidth: 36 }}>
+                  <div className="fs-mono" style={{ fontSize: 22, color: p.voice > 0 ? '#9cf6f6' : '#6a6a7a', textAlign: 'right', fontWeight: 600, minWidth: 36 }}>
                     {p.voice.toLocaleString()}
                   </div>
                 </div>
@@ -6922,8 +6979,8 @@ function VerifyView({ diagnostics, analytics, fileName, t, onContinue, onReset }
                 </div>
                 {s.flags && (
                   <div className="fs-mono" style={{
-                    fontSize: 20, color: '#bff260', letterSpacing: '0.1em',
-                    background: 'rgba(163,230,53,0.14)', padding: '3px 8px', borderRadius: 4,
+                    fontSize: 20, color: '#ffd972', letterSpacing: '0.1em',
+                    background: 'rgba(255,217,114,0.14)', padding: '3px 8px', borderRadius: 4,
                   }}>
                     {s.flags}
                   </div>
@@ -6931,7 +6988,7 @@ function VerifyView({ diagnostics, analytics, fileName, t, onContinue, onReset }
               </div>
               <div style={{ display: 'grid', gridTemplateColumns: '70px 1fr', gap: 6, fontSize: 20 }}>
                 <div className="fs-mono" style={{ color: '#c8c8dc' }}>timestamp</div>
-                <div className="fs-mono" style={{ color: '#a3e635' }}>{s.timestamp}</div>
+                <div className="fs-mono" style={{ color: '#ffd972' }}>{s.timestamp}</div>
                 <div className="fs-mono" style={{ color: '#c8c8dc' }}>sender</div>
                 <div style={{ color: '#fff', fontWeight: 600 }}>{s.author}</div>
                 <div className="fs-mono" style={{ color: '#c8c8dc' }}>content</div>
@@ -6950,10 +7007,10 @@ function VerifyView({ diagnostics, analytics, fileName, t, onContinue, onReset }
         {/* CTA */}
         <button onClick={onContinue} className="press" style={{
           width: '100%', position: 'relative', overflow: 'hidden',
-          padding: 18, background: '#a3e635', color: '#0a0a0f',
+          padding: 18, background: '#ffd972', color: '#0a0a0f',
           border: 'none', borderRadius: 16, fontSize: 16, fontWeight: 800,
           cursor: 'pointer', letterSpacing: '-0.01em',
-          boxShadow: '0 12px 28px rgba(163,230,53,0.35)',
+          boxShadow: '0 12px 28px rgba(255,217,114,0.35)',
         }}>
           <div className="a-shine" style={{ position: 'absolute', inset: 0 }} />
           {t.verify_continue}
@@ -6984,7 +7041,7 @@ function SectionTitle({ label }) {
 }
 
 function VRow({ label, value, accent, warn, hint, last }) {
-  const valueColor = warn ? '#ef4444' : accent ? '#a3e635' : '#fff';
+  const valueColor = warn ? '#f06449' : accent ? '#ffd972' : '#fff';
   return (
     <div style={{
       padding: '10px 14px',
@@ -7035,7 +7092,7 @@ function RoastMode({ analytics, selectedAuthor, setSelectedAuthor, t, onBack }) 
             fontSize: 22, fontWeight: 600, cursor: 'pointer', minHeight: 44,
             display: 'inline-flex', alignItems: 'center', gap: 6,
           }}>{t.rm_back}</button>
-          <div className="fs-mono" style={{ fontSize: 20, color: '#f472b6', letterSpacing: '0.2em', fontWeight: 700 }}>
+          <div className="fs-mono" style={{ fontSize: 20, color: '#f06449', letterSpacing: '0.2em', fontWeight: 700 }}>
             {t.rm_title}
           </div>
         </div>
@@ -7046,7 +7103,7 @@ function RoastMode({ analytics, selectedAuthor, setSelectedAuthor, t, onBack }) 
           marginTop: 4, marginBottom: 8,
         }}>
           {t.rm_pick}<br/>
-          <span style={{ fontStyle: 'italic', color: '#f472b6' }}>{t.rm_victim}</span>
+          <span style={{ fontStyle: 'italic', color: '#f06449' }}>{t.rm_victim}</span>
         </div>
         <div className="a-fade-up" style={{
           animationDelay: '0.1s',
@@ -7059,9 +7116,9 @@ function RoastMode({ analytics, selectedAuthor, setSelectedAuthor, t, onBack }) 
         <button onClick={() => setPickerOpen(true)} className="press lift a-pop-in" style={{
           width: '100%', position: 'relative', overflow: 'hidden',
           padding: '16px 18px', cursor: 'pointer',
-          background: 'linear-gradient(135deg, #f472b6 0%, #ef4444 100%)',
+          background: 'linear-gradient(135deg, #f06449 0%, #f06449 100%)',
           border: 'none', borderRadius: 18, color: '#fff',
-          boxShadow: '0 14px 30px rgba(244,114,182,0.35)',
+          boxShadow: '0 14px 30px rgba(240,100,73,0.35)',
           display: 'flex', justifyContent: 'space-between', alignItems: 'center',
           textAlign: 'left',
         }}>
@@ -7094,21 +7151,21 @@ function RoastMode({ analytics, selectedAuthor, setSelectedAuthor, t, onBack }) 
               position: 'relative', overflow: 'hidden',
               padding: '20px 20px 18px',
               background: i % 2 === 0
-                ? 'linear-gradient(135deg, rgba(244,114,182,0.16) 0%, rgba(244,114,182,0.04) 100%)'
-                : 'linear-gradient(135deg, rgba(239,68,68,0.14) 0%, rgba(239,68,68,0.03) 100%)',
-              border: `1px solid ${i % 2 === 0 ? 'rgba(244,114,182,0.4)' : 'rgba(239,68,68,0.35)'}`,
+                ? 'linear-gradient(135deg, rgba(240,100,73,0.16) 0%, rgba(240,100,73,0.04) 100%)'
+                : 'linear-gradient(135deg, rgba(240,100,73,0.14) 0%, rgba(240,100,73,0.03) 100%)',
+              border: `1px solid ${i % 2 === 0 ? 'rgba(240,100,73,0.4)' : 'rgba(240,100,73,0.35)'}`,
               borderRadius: 20,
               animationDelay: `${0.1 + i * 0.12}s`,
               boxShadow: i % 2 === 0
-                ? '0 10px 28px rgba(244,114,182,0.12)'
-                : '0 10px 28px rgba(239,68,68,0.10)',
+                ? '0 10px 28px rgba(240,100,73,0.12)'
+                : '0 10px 28px rgba(240,100,73,0.10)',
             }}>
               <div style={{
                 position: 'absolute', top: 14, right: 14,
                 fontSize: 22, opacity: 0.5,
               }}>{i === 0 ? '🔥' : i === 1 ? '💀' : i === 2 ? '☠️' : '🫠'}</div>
               <div className="fs-mono" style={{
-                fontSize: 20, color: i % 2 === 0 ? '#f472b6' : '#ef4444',
+                fontSize: 20, color: i % 2 === 0 ? '#f06449' : '#f06449',
                 letterSpacing: '0.22em', opacity: 0.75, marginBottom: 10, fontWeight: 700,
               }}>
                 {t.rm_roast} #{String(i + 1).padStart(2, '0')}
@@ -7121,7 +7178,7 @@ function RoastMode({ analytics, selectedAuthor, setSelectedAuthor, t, onBack }) 
               </div>
               <div className="fs-display" style={{
                 marginTop: 10, fontSize: 18, lineHeight: 1.3, letterSpacing: '-0.005em',
-                color: i % 2 === 0 ? '#f472b6' : '#ef4444', fontStyle: 'italic',
+                color: i % 2 === 0 ? '#f06449' : '#f06449', fontStyle: 'italic',
               }}>
                 {interp(t[roast.kickerKey] || '', roast.vars || {})}
               </div>
@@ -7147,7 +7204,7 @@ function RoastMode({ analytics, selectedAuthor, setSelectedAuthor, t, onBack }) 
             {interp(t.rm_screenshot, { name: selectedAuthor }).split(selectedAuthor).reduce((acc, part, idx, arr) => {
               acc.push(part);
               if (idx < arr.length - 1) {
-                acc.push(<span key={idx} style={{ color: '#f472b6' }}>{selectedAuthor}</span>);
+                acc.push(<span key={idx} style={{ color: '#f06449' }}>{selectedAuthor}</span>);
               }
               return acc;
             }, [])}
@@ -7180,13 +7237,13 @@ function RoastMode({ analytics, selectedAuthor, setSelectedAuthor, t, onBack }) 
                     {other.author}
                   </div>
                   <div className="fs-mono" style={{
-                    fontSize: 20, color: '#f472b6', marginTop: 2, fontStyle: 'italic',
+                    fontSize: 20, color: '#f06449', marginTop: 2, fontStyle: 'italic',
                     overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
                   }}>
                     {interp(other.roasts.length === 1 ? t.rm_ready : t.rm_ready_plural, { n: other.roasts.length })}
                   </div>
                 </div>
-                <div className="fs-mono" style={{ fontSize: 20, color: '#a3e635', letterSpacing: '0.1em' }}>
+                <div className="fs-mono" style={{ fontSize: 20, color: '#ffd972', letterSpacing: '0.1em' }}>
                   {t.rm_btn}
                 </div>
               </button>
@@ -7213,7 +7270,7 @@ function RoastMode({ analytics, selectedAuthor, setSelectedAuthor, t, onBack }) 
                   overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
                 }}>{user.author}</div>
                 <div className="fs-mono" style={{
-                  fontSize: 20, color: '#f472b6', marginTop: 2, fontStyle: 'italic',
+                  fontSize: 20, color: '#f06449', marginTop: 2, fontStyle: 'italic',
                   overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
                 }}>{interp(user.roasts.length === 1 ? t.rm_ready : t.rm_ready_plural, { n: user.roasts.length })}</div>
               </div>
