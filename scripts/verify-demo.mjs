@@ -16,7 +16,10 @@ async function launch() {
 }
 
 const browser = await launch();
-const page = await (await browser.newContext()).newPage();
+const ctx = await browser.newContext();
+// Skip the first-run how-to guide so we land straight on the home screen.
+await ctx.addInitScript(() => { try { localStorage.setItem('cw_seen_guide', '1'); } catch {} });
+const page = await ctx.newPage();
 
 page.on('console', (m) => {
   if (m.type() !== 'error') return;
