@@ -31,7 +31,10 @@
       "Bash(node -e \"const {chromium}=require\\('playwright'\\); chromium.executablePath ? console.log\\('exe:', \\(\\(\\)=>{try{return chromium.executablePath\\(\\)}catch\\(e\\){return 'unknown'}}\\)\\(\\)\\) : 0\")",
       "Bash(node scripts/verify-demo.mjs)",
       "Bash(git checkout *)",
-      "Bash(git add *)"
+      "Bash(git add *)",
+      "Bash(git commit -q -m ' *)",
+      "Bash(git commit *)",
+      "Bash(git merge *)"
     ]
   }
 }
