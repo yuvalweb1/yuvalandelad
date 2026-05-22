@@ -1,0 +1,41 @@
+{
+  "_readme": "Edit values to apply changes. Run: node scripts/apply-theme.js. Undo: git checkout src/App.jsx",
+
+  "fonts": {
+    "Bricolage Grotesque": "Bricolage Grotesque",
+    "DM Sans": "DM Sans",
+    "Inter Tight": "Inter Tight"
+  },
+
+  "colors": {
+    "_accents": "--- Accent colors ---",
+    "#ffbe0b": "#ffbe0b",
+    "#fb5607": "#fb5607",
+    "#ff006e": "#ff006e",
+    "#3a86ff": "#3a86ff",
+    "#8338ec": "#8338ec",
+    "#fb560720": "#fb560720",
+
+    "_backgrounds": "--- Dark backgrounds ---",
+    "#0a0a0f": "#0a0a0f",
+    "#15151d": "#15151d",
+    "#1a1a2e": "#1a1a2e",
+    "#2a0645": "#2a0645",
+    "#2a2a36": "#2a2a36",
+    "#3a3a48": "#3a3a48",
+
+    "_text": "--- Text / neutral scale ---",
+    "#6a6a7a": "#6a6a7a",
+    "#8b8b9d": "#8b8b9d",
+    "#b8b8c8": "#b8b8c8",
+    "#c8c8dc": "#c8c8dc",
+    "#cfcfdc": "#cfcfdc",
+    "#d0d0e0": "#d0d0e0",
+    "#dcdcec": "#dcdcec",
+    "#f4f4f8": "#f4f4f8",
+    "#fff1f5": "#fff1f5",
+    "#fff5f7": "#fff5f7",
+    "#fff": "#fff",
+    "#000": "#000"
+  }
+}

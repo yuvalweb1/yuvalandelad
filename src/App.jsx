@@ -4116,7 +4116,7 @@ function GlobalStyles() {
         unicode-range: U+0590-05FF, U+FB1D-FB4F, U+200F, U+200E;
       }
       .fs-display { font-family: 'Bricolage Grotesque', 'Rubik Black', 'Comix CLM', serif; }
-      .fs-mono { font-family: 'Inter Tight', 'DM Sans', 'Comix CLM', -apple-system, sans-serif; font-feature-settings: 'tnum' on; font-variant-numeric: tabular-nums; }
+      .fs-mono { font-family: 'Inter Tight', 'DM Sans', 'Comix CLM', -apple-system, sans-serif; font-feature-settings: 'tnum' on; font-variant-numeric: tabular-nums; font-weight: 500; }
       .fs-sans { font-family: 'DM Sans', 'Comix CLM', -apple-system, sans-serif; }
       @keyframes fadeUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
       @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
@@ -4976,7 +4976,7 @@ const SlideIntro = React.memo(function SlideIntro({ a, t }) {
         display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center',
         textAlign: 'center', padding: '0 24px',
       }}>
-        <div className="fs-mono a-fade-up" style={{ fontSize: 14, color: '#ffbe0b', letterSpacing: '0.15em' }}>
+        <div className="fs-sans a-fade-up" style={{ fontSize: 12, color: '#ffbe0b', letterSpacing: '0.15em', fontWeight: 500, textTransform: 'uppercase' }}>
           {t.intro_eyebrow} · {year}
         </div>
         <div className="a-spring" style={{ animationDelay: '0.3s', marginTop: 48 }}>
@@ -4986,7 +4986,7 @@ const SlideIntro = React.memo(function SlideIntro({ a, t }) {
           </div>
         </div>
         <div className="fs-sans a-fade-up" style={{
-          animationDelay: '0.8s', marginTop: 32, fontSize: 18, color: 'rgba(42,6,69,0.65)', maxWidth: 280, lineHeight: 1.45,
+          animationDelay: '0.8s', marginTop: 32, fontSize: 18, color: 'rgba(42,6,69,0.85)', maxWidth: 280, lineHeight: 1.45,
         }}>
           {interp(t.intro_summary, {
             msgs: a.totalMessages.toLocaleString(),
@@ -5009,7 +5009,7 @@ const SlideMessageCount = React.memo(function SlideMessageCount({ a, u, t }) {
         display: 'flex', flexDirection: 'column', justifyContent: 'center',
         textAlign: 'center', padding: '0 24px',
       }}>
-        <div className="fs-mono a-fade-up" style={{ fontSize: 14, color: '#ff006e', letterSpacing: '0.15em' }}>
+        <div className="fs-sans a-fade-up" style={{ fontSize: 12, color: '#ff006e', letterSpacing: '0.15em', fontWeight: 500, textTransform: 'uppercase' }}>
           {t.msg_eyebrow}
         </div>
         <div className="fs-display a-spring a-pulse-glow" style={{
@@ -5021,7 +5021,7 @@ const SlideMessageCount = React.memo(function SlideMessageCount({ a, u, t }) {
           {animatedGroup.toLocaleString()}
         </div>
         <div className="fs-display a-fade-up" style={{
-          animationDelay: '0.6s', fontSize: 20, marginTop: 8, fontStyle: 'italic', fontWeight: 500, color: '#2a0645',
+          animationDelay: '0.6s', fontSize: 20, marginTop: 8, fontStyle: 'italic', fontWeight: 700, color: '#2a0645',
         }}>
           {t.msg_word}
         </div>
@@ -5029,8 +5029,8 @@ const SlideMessageCount = React.memo(function SlideMessageCount({ a, u, t }) {
         <div className="a-fade-up" style={{
           animationDelay: '1.5s', marginTop: 48,
         }}>
-          <div className="fs-mono" style={{
-            fontSize: 14, color: 'rgba(42,6,69,0.55)', letterSpacing: '0.15em', marginBottom: 12,
+          <div className="fs-sans" style={{
+            fontSize: 12, color: 'rgba(42,6,69,0.78)', letterSpacing: '0.15em', marginBottom: 12, fontWeight: 500, textTransform: 'uppercase',
           }}>
             {t.msg_your_share}
           </div>
@@ -5042,7 +5042,7 @@ const SlideMessageCount = React.memo(function SlideMessageCount({ a, u, t }) {
             }}>
               {animatedUser.toLocaleString()}
             </div>
-            <div className="fs-mono" style={{ fontSize: 18, color: 'rgba(42,6,69,0.60)' }}>
+            <div className="fs-mono" style={{ fontSize: 18, color: 'rgba(42,6,69,0.82)' }}>
               · {u.sharePct.toFixed(1)}%
             </div>
           </div>
@@ -5083,7 +5083,7 @@ const SlideRank = React.memo(function SlideRank({ a, u, t }) {
         display: 'flex', flexDirection: 'column', justifyContent: 'center',
         padding: '0 24px',
       }}>
-        <div className="fs-mono a-fade-up" style={{ fontSize: 14, color: '#ffbe0b', letterSpacing: '0.15em' }}>
+        <div className="fs-sans a-fade-up" style={{ fontSize: 12, color: '#ffbe0b', letterSpacing: '0.15em', fontWeight: 500, textTransform: 'uppercase' }}>
           {t.rank_eyebrow}
         </div>
         <div className="fs-display a-fade-up" style={{
@@ -5131,7 +5131,7 @@ const SlideRank = React.memo(function SlideRank({ a, u, t }) {
                   </div>
                   <div className="fs-mono" style={{
                     fontSize: 15, fontWeight: 600,
-                    color: isFirst ? '#ffbe0b' : 'rgba(42,6,69,0.55)',
+                    color: isFirst ? '#ffbe0b' : 'rgba(42,6,69,0.78)',
                     flexShrink: 0,
                   }}>
                     {row.messageCount.toLocaleString()}
@@ -5170,7 +5170,7 @@ const SlideVsEveryone = React.memo(function SlideVsEveryone({ a, u, t }) {
         display: 'flex', flexDirection: 'column', justifyContent: 'center',
         textAlign: 'center', padding: '0 24px',
       }}>
-        <div className="fs-mono a-fade-up" style={{ fontSize: 14, color: '#3a86ff', letterSpacing: '0.15em' }}>
+        <div className="fs-sans a-fade-up" style={{ fontSize: 12, color: '#3a86ff', letterSpacing: '0.15em', fontWeight: 500, textTransform: 'uppercase' }}>
           {t.vs_eyebrow}
         </div>
 
@@ -5179,13 +5179,13 @@ const SlideVsEveryone = React.memo(function SlideVsEveryone({ a, u, t }) {
             fontSize: 64, lineHeight: 1.1, letterSpacing: '-0.04em',
             color: '#3a86ff', fontWeight: 800,
           }}>
-            {animatedBeat}<span style={{ fontSize: 36, color: 'rgba(42,6,69,0.38)' }}>/{animatedTotal}</span>
+            {animatedBeat}<span style={{ fontSize: 36, color: 'rgba(42,6,69,0.62)' }}>/{animatedTotal}</span>
           </div>
         </div>
 
         <div className="a-fade-up" style={{ animationDelay: '0.7s', marginTop: 20 }}>
           <div className="fs-display" style={{
-            fontSize: 20, lineHeight: 1.35, fontStyle: 'italic', letterSpacing: '-0.02em',
+            fontSize: 20, lineHeight: 1.35, fontStyle: 'italic', fontWeight: 700, letterSpacing: '-0.02em',
             whiteSpace: 'pre-line',
           }}>
             {isFirst && others > 0 && t.vs_outsent_all}
@@ -5196,23 +5196,23 @@ const SlideVsEveryone = React.memo(function SlideVsEveryone({ a, u, t }) {
         </div>
 
         <div className="fs-mono a-fade-up" style={{
-          animationDelay: '1.0s', marginTop: 20, fontSize: 16, color: 'rgba(42,6,69,0.60)', letterSpacing: '0.08em',
+          animationDelay: '1.0s', marginTop: 20, fontSize: 16, color: 'rgba(42,6,69,0.82)', letterSpacing: '0.08em',
         }}>
           {interp(t.vs_ranked, { msgs: u.messageCount.toLocaleString(), rank, total: totalUsers })}
         </div>
 
         {a.fastestResponder && a.fastestResponder.author !== u.author && a.fastestResponder.avgRespMin != null && (
           <div className="a-fade-up" style={{ animationDelay: '1.3s', marginTop: 24 }}>
-            <div className="fs-mono" style={{ fontSize: 14, color: 'rgba(42,6,69,0.50)', letterSpacing: '0.12em' }}>
+            <div className="fs-sans" style={{ fontSize: 12, color: 'rgba(42,6,69,0.75)', letterSpacing: '0.12em', fontWeight: 500, textTransform: 'uppercase' }}>
               {t.vs_fastest}
             </div>
             <div className="fs-display" style={{
-              fontSize: 20, color: '#3a86ff', fontStyle: 'italic',
+              fontSize: 20, color: '#3a86ff', fontStyle: 'italic', fontWeight: 700,
               marginTop: 6, letterSpacing: '-0.02em',
             }}>
               {a.fastestResponder.author}
             </div>
-            <div className="fs-mono" style={{ fontSize: 16, color: 'rgba(42,6,69,0.50)', marginTop: 2 }}>
+            <div className="fs-mono" style={{ fontSize: 16, color: 'rgba(42,6,69,0.75)', marginTop: 2 }}>
               {fastestAvgText}
             </div>
           </div>
@@ -5232,7 +5232,7 @@ const SlideTitle = React.memo(function SlideTitle({ u, t }) {
         display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center',
         textAlign: 'center', padding: '0 24px',
       }}>
-        <div className="fs-mono a-fade-up" style={{ fontSize: 14, color: '#ffbe0b', letterSpacing: '0.15em' }}>
+        <div className="fs-sans a-fade-up" style={{ fontSize: 12, color: '#ffbe0b', letterSpacing: '0.15em', fontWeight: 500, textTransform: 'uppercase' }}>
           {t.title_eyebrow}
         </div>
         <div className="a-spring a-pulse-glow" style={{ animationDelay: '0.3s', marginTop: 48 }}>
@@ -5245,7 +5245,7 @@ const SlideTitle = React.memo(function SlideTitle({ u, t }) {
           </div>
         </div>
         <div className="a-fade-up" style={{ animationDelay: '1.0s', marginTop: 40 }}>
-          <div className="fs-mono" style={{ fontSize: 14, color: 'rgba(42,6,69,0.50)', letterSpacing: '0.12em' }}>
+          <div className="fs-sans" style={{ fontSize: 12, color: 'rgba(42,6,69,0.75)', letterSpacing: '0.12em', fontWeight: 500, textTransform: 'uppercase' }}>
             {t.title_based_on}
           </div>
           <div className="fs-sans" style={{ fontSize: 18, color: '#2a0645', marginTop: 8, fontWeight: 500, lineHeight: 1.4 }}>
@@ -5265,7 +5265,7 @@ const SlideGroupDescribes = React.memo(function SlideGroupDescribes({ u, t }) {
         display: 'flex', flexDirection: 'column', justifyContent: 'center',
         padding: '0 24px',
       }}>
-        <div className="fs-mono a-fade-up" style={{ fontSize: 14, color: '#8338ec', letterSpacing: '0.15em' }}>
+        <div className="fs-sans a-fade-up" style={{ fontSize: 12, color: '#8338ec', letterSpacing: '0.15em', fontWeight: 500, textTransform: 'uppercase' }}>
           {t.descr_eyebrow}
         </div>
         <div className="a-spring" style={{ animationDelay: '0.3s', marginTop: 48 }}>
@@ -5276,7 +5276,7 @@ const SlideGroupDescribes = React.memo(function SlideGroupDescribes({ u, t }) {
           </div>
         </div>
         <div className="fs-sans a-fade-up" style={{
-          animationDelay: '1.0s', marginTop: 40, fontSize: 18, lineHeight: 1.5, color: 'rgba(131,56,236,0.70)',
+          animationDelay: '1.0s', marginTop: 40, fontSize: 18, lineHeight: 1.5, color: 'rgba(131,56,236,0.88)',
         }}>
           {t.descr_footnote}
         </div>
@@ -5296,7 +5296,7 @@ const SlidePeakHour = React.memo(function SlidePeakHour({ a, u, t }) {
         display: 'flex', flexDirection: 'column', justifyContent: 'center',
         textAlign: 'center', padding: '0 24px',
       }}>
-        <div className="fs-mono a-fade-up" style={{ fontSize: 14, color: '#3a86ff', letterSpacing: '0.15em' }}>
+        <div className="fs-sans a-fade-up" style={{ fontSize: 12, color: '#3a86ff', letterSpacing: '0.15em', fontWeight: 500, textTransform: 'uppercase' }}>
           {t.peak_eyebrow}
         </div>
         <div className="fs-display a-spring" style={{
@@ -5321,7 +5321,7 @@ const SlidePeakHour = React.memo(function SlidePeakHour({ a, u, t }) {
         </div>
         <div className="fs-sans a-fade-up" style={{
           animationDelay: '1.2s', marginTop: 32, fontSize: 18, lineHeight: 1.5,
-          color: 'rgba(42,6,69,0.65)', maxWidth: 280, margin: '32px auto 0',
+          color: 'rgba(42,6,69,0.85)', maxWidth: 280, margin: '32px auto 0',
         }}>
           {hour >= 0 && hour < 5 && t.peak_3am}
           {hour >= 5 && hour < 11 && t.peak_morning}
@@ -5351,7 +5351,7 @@ const SlideNight = React.memo(function SlideNight({ a, u, t }) {
         display: 'flex', flexDirection: 'column', justifyContent: 'center',
         textAlign: 'center', padding: '0 24px',
       }}>
-        <div className="fs-mono a-fade-up" style={{ fontSize: 14, color: '#3a86ff', letterSpacing: '0.15em' }}>
+        <div className="fs-sans a-fade-up" style={{ fontSize: 12, color: '#3a86ff', letterSpacing: '0.15em', fontWeight: 500, textTransform: 'uppercase' }}>
           {t.night_eyebrow}
         </div>
         <div className="fs-display a-spring" style={{
@@ -5361,12 +5361,12 @@ const SlideNight = React.memo(function SlideNight({ a, u, t }) {
           {pct}<span style={{ fontSize: 32 }}>%</span>
         </div>
         <div className="fs-display a-fade-up" style={{
-          animationDelay: '0.6s', fontSize: 20, fontStyle: 'italic', marginTop: 10, fontWeight: 500, color: '#2a0645',
+          animationDelay: '0.6s', fontSize: 20, fontStyle: 'italic', marginTop: 10, fontWeight: 700, color: '#2a0645',
         }}>
           {t.night_of_msgs}
         </div>
         <div className="fs-mono a-fade-up" style={{
-          animationDelay: '0.9s', fontSize: 16, color: 'rgba(42,6,69,0.60)',
+          animationDelay: '0.9s', fontSize: 16, color: 'rgba(42,6,69,0.82)',
           marginTop: 16, letterSpacing: '0.08em',
         }}>
           {interp(t.night_count, {
@@ -5376,7 +5376,7 @@ const SlideNight = React.memo(function SlideNight({ a, u, t }) {
         </div>
         <div className="fs-sans a-fade-up" style={{
           animationDelay: '1.2s', marginTop: 32, fontSize: 18, lineHeight: 1.5,
-          color: 'rgba(42,6,69,0.65)', maxWidth: 280, margin: '32px auto 0',
+          color: 'rgba(42,6,69,0.85)', maxWidth: 280, margin: '32px auto 0',
         }}>
           {u.nightPct > 30 && t.night_diag_strong}
           {u.nightPct > 15 && u.nightPct <= 30 && t.night_diag_med}
@@ -5384,9 +5384,9 @@ const SlideNight = React.memo(function SlideNight({ a, u, t }) {
           {u.nightPct <= 5 && t.night_diag_none}
         </div>
         {a.nightOwl?.author === u.author && (
-          <div className="fs-mono a-fade-up" style={{
-            animationDelay: '1.5s', fontSize: 14, color: '#ffbe0b',
-            marginTop: 20, letterSpacing: '0.15em', fontWeight: 700,
+          <div className="fs-sans a-fade-up" style={{
+            animationDelay: '1.5s', fontSize: 12, color: '#ffbe0b',
+            marginTop: 20, letterSpacing: '0.15em', fontWeight: 500, textTransform: 'uppercase',
           }}>
             {t.night_owl}
           </div>
@@ -5406,7 +5406,7 @@ const SlideStreak = React.memo(function SlideStreak({ u, t }) {
         display: 'flex', flexDirection: 'column', justifyContent: 'center',
         textAlign: 'center', padding: '0 24px',
       }}>
-        <div className="fs-mono a-fade-up" style={{ fontSize: 14, color: '#ffbe0b', letterSpacing: '0.15em' }}>
+        <div className="fs-sans a-fade-up" style={{ fontSize: 12, color: '#ffbe0b', letterSpacing: '0.15em', fontWeight: 500, textTransform: 'uppercase' }}>
           {t.streak_eyebrow}
         </div>
         <div className="a-spring" style={{ animationDelay: '0.2s', marginTop: 48 }}>
@@ -5417,7 +5417,7 @@ const SlideStreak = React.memo(function SlideStreak({ u, t }) {
             {days}
           </div>
           <div className="fs-display" style={{
-            fontSize: 20, fontStyle: 'italic', marginTop: 10, fontWeight: 500, color: '#2a0645',
+            fontSize: 20, fontStyle: 'italic', marginTop: 10, fontWeight: 700, color: '#2a0645',
           }}>
             {u.longestStreak === 1 ? t.streak_day : t.streak_days}
           </div>
@@ -5455,7 +5455,7 @@ const SlideSpeed = React.memo(function SlideSpeed({ a, u, t }) {
         display: 'flex', flexDirection: 'column', justifyContent: 'center',
         textAlign: 'center', padding: '0 24px',
       }}>
-        <div className="fs-mono a-fade-up" style={{ fontSize: 14, color: '#3a86ff', letterSpacing: '0.15em' }}>
+        <div className="fs-sans a-fade-up" style={{ fontSize: 12, color: '#3a86ff', letterSpacing: '0.15em', fontWeight: 500, textTransform: 'uppercase' }}>
           {t.speed_eyebrow}
         </div>
         <div className="fs-display a-spring" style={{
@@ -5472,8 +5472,8 @@ const SlideSpeed = React.memo(function SlideSpeed({ a, u, t }) {
             <span style={{ color: '#3a86ff', fontStyle: 'normal' }}>{pct}%</span> {t.speed_of_group}
           </div>
         </div>
-        <div className="fs-mono a-fade-up" style={{
-          animationDelay: '1.3s', marginTop: 24, fontSize: 14, color: 'rgba(42,6,69,0.50)', letterSpacing: '0.12em',
+        <div className="fs-sans a-fade-up" style={{
+          animationDelay: '1.3s', marginTop: 24, fontSize: 12, color: 'rgba(42,6,69,0.75)', letterSpacing: '0.12em', fontWeight: 500, textTransform: 'uppercase',
         }}>
           {interp(t.speed_based, { n: u.respSampleSize })}
         </div>
@@ -5491,7 +5491,7 @@ const SlideWord = React.memo(function SlideWord({ u, t }) {
         display: 'flex', flexDirection: 'column', justifyContent: 'center',
         textAlign: 'center', padding: '0 24px',
       }}>
-        <div className="fs-mono a-fade-up" style={{ fontSize: 14, color: '#ffbe0b', letterSpacing: '0.15em' }}>
+        <div className="fs-sans a-fade-up" style={{ fontSize: 12, color: '#ffbe0b', letterSpacing: '0.15em', fontWeight: 500, textTransform: 'uppercase' }}>
           {t.word_eyebrow}
         </div>
         <div className="a-spring" style={{ animationDelay: '0.3s', marginTop: 48 }}>
@@ -5504,7 +5504,7 @@ const SlideWord = React.memo(function SlideWord({ u, t }) {
           </div>
         </div>
         <div className="fs-sans a-fade-up" style={{
-          animationDelay: '1.0s', marginTop: 40, fontSize: 18, lineHeight: 1.5, color: 'rgba(42,6,69,0.65)',
+          animationDelay: '1.0s', marginTop: 40, fontSize: 18, lineHeight: 1.5, color: 'rgba(42,6,69,0.85)',
         }}>
           {interp(t.word_used, { n: u.topWordCount })}
         </div>
@@ -5525,8 +5525,8 @@ const SlideTopWords = React.memo(function SlideTopWords({ a, t }) {
         display: 'flex', flexDirection: 'column',
         padding: '32px 24px 24px',
       }}>
-        <div className="fs-mono a-fade-up" style={{
-          textAlign: 'center', fontSize: 14, color: '#8338ec', letterSpacing: '0.15em',
+        <div className="fs-sans a-fade-up" style={{
+          textAlign: 'center', fontSize: 12, color: '#8338ec', letterSpacing: '0.15em', fontWeight: 500, textTransform: 'uppercase',
         }}>
           {t.top_words_eyebrow}
         </div>
@@ -5607,7 +5607,7 @@ const SlideEmoji = React.memo(function SlideEmoji({ a, u, t }) {
         display: 'flex', flexDirection: 'column', justifyContent: 'center',
         textAlign: 'center', padding: '0 24px',
       }}>
-        <div className="fs-mono a-fade-up" style={{ fontSize: 14, color: '#ffbe0b', letterSpacing: '0.15em' }}>
+        <div className="fs-sans a-fade-up" style={{ fontSize: 12, color: '#ffbe0b', letterSpacing: '0.15em', fontWeight: 500, textTransform: 'uppercase' }}>
           {t.emoji_eyebrow}
         </div>
         <div className="a-spring" style={{
@@ -5616,7 +5616,7 @@ const SlideEmoji = React.memo(function SlideEmoji({ a, u, t }) {
           {u.topEmoji}
         </div>
         <div className="fs-sans a-fade-up" style={{
-          animationDelay: '0.8s', marginTop: 40, fontSize: 18, color: 'rgba(42,6,69,0.70)', lineHeight: 1.4,
+          animationDelay: '0.8s', marginTop: 40, fontSize: 18, color: 'rgba(42,6,69,0.88)', lineHeight: 1.4,
         }}>
           {interp(t.emoji_used, { n: u.topEmojiCount })}
         </div>
@@ -5669,7 +5669,7 @@ const SlideDramaRole = React.memo(function SlideDramaRole({ u, t }) {
   const isPercent = labelText.startsWith('%');
   const cleanLabel = isPercent ? labelText.slice(1).trim() : labelText;
   const isLightBg = bg === '#ffbe0b';
-  const bodyColor = isLightBg ? 'rgba(131,56,236,0.70)' : 'rgba(42,6,69,0.65)';
+  const bodyColor = isLightBg ? 'rgba(131,56,236,0.88)' : 'rgba(42,6,69,0.85)';
   const heroColor = isLightBg ? '#1a1a2e' : '#2a0645';
 
   return (
@@ -5679,7 +5679,7 @@ const SlideDramaRole = React.memo(function SlideDramaRole({ u, t }) {
         display: 'flex', flexDirection: 'column', justifyContent: 'center',
         textAlign: 'center', padding: '0 24px',
       }}>
-        <div className="fs-mono a-fade-up" style={{ fontSize: 14, color: accent, letterSpacing: '0.15em' }}>
+        <div className="fs-sans a-fade-up" style={{ fontSize: 12, color: accent, letterSpacing: '0.15em', fontWeight: 500, textTransform: 'uppercase' }}>
           {t.drama_eyebrow}
         </div>
         <div className="a-spring" style={{ animationDelay: '0.3s', marginTop: 32 }}>
@@ -5728,8 +5728,8 @@ const SlideRoast = React.memo(function SlideRoast({ u, profile, t }) {
         display: 'flex', flexDirection: 'column', justifyContent: 'center',
         padding: '0 22px',
       }}>
-        <div className="fs-mono a-fade-up" style={{
-          fontSize: 14, color: '#fb5607', letterSpacing: '0.15em',
+        <div className="fs-sans a-fade-up" style={{
+          fontSize: 12, color: '#fb5607', letterSpacing: '0.15em', fontWeight: 500, textTransform: 'uppercase',
         }}>
           {eyebrow}
         </div>
@@ -5748,9 +5748,9 @@ const SlideRoast = React.memo(function SlideRoast({ u, profile, t }) {
               borderRadius: 20,
               animationDelay: `${0.5 + i * 0.5}s`,
             }}>
-              <div className="fs-mono" style={{
-                fontSize: 14, color: '#fb5607', letterSpacing: '0.15em',
-                opacity: 0.70, marginBottom: 10, fontWeight: 700,
+              <div className="fs-sans" style={{
+                fontSize: 12, color: '#fb5607', letterSpacing: '0.15em',
+                opacity: 0.70, marginBottom: 10, fontWeight: 500, textTransform: 'uppercase',
               }}>
                 #{String(i + 1).padStart(2, '0')}
               </div>
@@ -5761,9 +5761,9 @@ const SlideRoast = React.memo(function SlideRoast({ u, profile, t }) {
                 {interp(t[roast.lineKey] || '', roast.vars || {})}
               </div>
               {tone !== 'mild' && (
-                <div className="fs-sans" style={{
+                <div className="fs-display" style={{
                   marginTop: 10, fontSize: 16, lineHeight: 1.4, letterSpacing: '-0.01em',
-                  color: '#fb5607', fontStyle: 'italic',
+                  color: '#fb5607', fontStyle: 'italic', fontWeight: 700,
                 }}>
                   {interp(t[roast.kickerKey] || '', roast.vars || {})}
                 </div>
@@ -5772,9 +5772,9 @@ const SlideRoast = React.memo(function SlideRoast({ u, profile, t }) {
           ))}
         </div>
         {u.roasts.length > 2 && (
-          <div className="fs-mono a-fade-up" style={{
+          <div className="fs-sans a-fade-up" style={{
             animationDelay: '1.8s', textAlign: 'center', marginTop: 16,
-            fontSize: 14, color: 'rgba(42,6,69,0.50)', letterSpacing: '0.12em',
+            fontSize: 12, color: 'rgba(42,6,69,0.75)', letterSpacing: '0.12em', fontWeight: 500,
           }}>
             {interp(t.roast_more, { n: u.roasts.length - 2 })}
           </div>
@@ -5793,7 +5793,7 @@ const SlideAchievements = React.memo(function SlideAchievements({ achievements, 
         display: 'flex', flexDirection: 'column', justifyContent: 'center',
         padding: '0 24px',
       }}>
-        <div className="fs-mono a-fade-up" style={{ fontSize: 14, color: '#ff006e', letterSpacing: '0.15em' }}>
+        <div className="fs-sans a-fade-up" style={{ fontSize: 12, color: '#ff006e', letterSpacing: '0.15em', fontWeight: 500, textTransform: 'uppercase' }}>
           {t.ach_eyebrow}
         </div>
         <div className="fs-display a-fade-up" style={{
@@ -5821,7 +5821,7 @@ const SlideAchievements = React.memo(function SlideAchievements({ achievements, 
                     {t[ach.labelKey] || ach.labelKey}
                   </div>
                   <div className="fs-sans" style={{
-                    fontSize: 16, color: 'rgba(42,6,69,0.60)', marginTop: 6, lineHeight: 1.4,
+                    fontSize: 16, color: 'rgba(42,6,69,0.82)', marginTop: 6, lineHeight: 1.4,
                   }}>
                     {interp(t[ach.evidenceKey] || '', ach.vars || {})}
                   </div>
@@ -5831,9 +5831,9 @@ const SlideAchievements = React.memo(function SlideAchievements({ achievements, 
           ))}
         </div>
         {achievements.length > 3 && (
-          <div className="fs-mono a-fade-up" style={{
+          <div className="fs-sans a-fade-up" style={{
             animationDelay: '1.5s', textAlign: 'center', marginTop: 16,
-            fontSize: 14, color: 'rgba(42,6,69,0.45)', letterSpacing: '0.12em',
+            fontSize: 12, color: 'rgba(42,6,69,0.72)', letterSpacing: '0.12em', fontWeight: 500,
           }}>
             {interp(t.ach_more, { n: achievements.length - 3 })}
           </div>
@@ -5851,8 +5851,8 @@ const SlideMostLikely = React.memo(function SlideMostLikely({ a, t }) {
         display: 'flex', flexDirection: 'column',
         padding: '32px 24px 24px',
       }}>
-        <div className="fs-mono a-fade-up" style={{
-          textAlign: 'center', fontSize: 14, color: '#3a86ff', letterSpacing: '0.15em',
+        <div className="fs-sans a-fade-up" style={{
+          textAlign: 'center', fontSize: 12, color: '#3a86ff', letterSpacing: '0.15em', fontWeight: 500, textTransform: 'uppercase',
         }}>
           {t.likely_eyebrow}
         </div>
@@ -5877,8 +5877,8 @@ const SlideMostLikely = React.memo(function SlideMostLikely({ a, t }) {
               <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
                 <div style={{ fontSize: 22, lineHeight: 1 }}>{card.icon}</div>
                 <div style={{ flex: 1, minWidth: 0 }}>
-                  <div className="fs-mono" style={{
-                    fontSize: 14, color: '#3a86ff', letterSpacing: '0.12em', fontWeight: 700,
+                  <div className="fs-sans" style={{
+                    fontSize: 12, color: '#3a86ff', letterSpacing: '0.12em', fontWeight: 500, textTransform: 'uppercase',
                   }}>
                     {t.likely_label}
                   </div>
@@ -5888,13 +5888,13 @@ const SlideMostLikely = React.memo(function SlideMostLikely({ a, t }) {
                 </div>
                 <div style={{ textAlign: 'right' }}>
                   <div className="fs-display" style={{
-                    fontSize: 18, color: '#3a86ff', fontStyle: 'italic',
+                    fontSize: 18, color: '#3a86ff', fontStyle: 'italic', fontWeight: 700,
                     letterSpacing: '-0.02em', maxWidth: 100,
                     overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
                   }}>
                     {card.winner}
                   </div>
-                  <div className="fs-mono" style={{ fontSize: 14, color: 'rgba(42,6,69,0.45)', marginTop: 4 }}>
+                  <div className="fs-mono" style={{ fontSize: 14, color: 'rgba(42,6,69,0.72)', marginTop: 4 }}>
                     {card.metric}
                   </div>
                 </div>
@@ -5918,8 +5918,8 @@ const SlideDuo = React.memo(function SlideDuo({ a, u, t }) {
         display: 'flex', flexDirection: 'column', justifyContent: 'center',
         textAlign: 'center', padding: '0 24px',
       }}>
-        <div className="fs-mono a-fade-up" style={{
-          fontSize: 14, color: '#ff006e', letterSpacing: '0.15em',
+        <div className="fs-sans a-fade-up" style={{
+          fontSize: 12, color: '#ff006e', letterSpacing: '0.15em', fontWeight: 500, textTransform: 'uppercase',
         }}>
           {t.duo_eyebrow}
         </div>
@@ -5928,7 +5928,7 @@ const SlideDuo = React.memo(function SlideDuo({ a, u, t }) {
             fontSize: 36, lineHeight: 1.15, letterSpacing: '-0.03em', fontWeight: 700,
           }}>
             <span style={{ fontStyle: 'italic', color: '#ff006e' }}>{n1}</span>
-            <span style={{ display: 'block', margin: '12px 0', fontSize: 16, color: 'rgba(42,6,69,0.50)' }}>&</span>
+            <span style={{ display: 'block', margin: '12px 0', fontSize: 16, color: 'rgba(42,6,69,0.75)' }}>&</span>
             <span style={{ fontStyle: 'italic', color: '#ff006e' }}>{n2}</span>
           </div>
         </div>
@@ -5942,7 +5942,7 @@ const SlideDuo = React.memo(function SlideDuo({ a, u, t }) {
         </div>
         <div className="fs-sans a-fade-up" style={{
           animationDelay: '1.4s', marginTop: 32, fontSize: 18,
-          color: 'rgba(42,6,69,0.65)', maxWidth: 280, margin: '32px auto 0', lineHeight: 1.45,
+          color: 'rgba(42,6,69,0.85)', maxWidth: 280, margin: '32px auto 0', lineHeight: 1.45,
         }}>
           {isInDuo
             ? interp(t.duo_in_with, { partner })
@@ -5962,8 +5962,8 @@ const SlideEras = React.memo(function SlideEras({ a, t }) {
         position: 'relative', height: '100%',
         display: 'flex', flexDirection: 'column', padding: '32px 24px 24px',
       }}>
-        <div className="fs-mono a-fade-up" style={{
-          textAlign: 'center', fontSize: 14, color: '#ffbe0b', letterSpacing: '0.15em',
+        <div className="fs-sans a-fade-up" style={{
+          textAlign: 'center', fontSize: 12, color: '#ffbe0b', letterSpacing: '0.15em', fontWeight: 500, textTransform: 'uppercase',
         }}>
           {t.eras_eyebrow}
         </div>
@@ -5991,8 +5991,8 @@ const SlideEras = React.memo(function SlideEras({ a, t }) {
                 borderRadius: 18,
                 animationDelay: `${0.5 + i * 0.18}s`,
               }}>
-                <div className="fs-mono" style={{
-                  fontSize: 14, color: '#ffbe0b', letterSpacing: '0.15em', fontWeight: 700,
+                <div className="fs-sans" style={{
+                  fontSize: 12, color: '#ffbe0b', letterSpacing: '0.15em', fontWeight: 500, textTransform: 'uppercase',
                 }}>
                   {t.eras_chapter} {String(i + 1).padStart(2, '0')}
                 </div>
@@ -6003,7 +6003,7 @@ const SlideEras = React.memo(function SlideEras({ a, t }) {
                   {era.name}
                 </div>
                 <div className="fs-mono" style={{
-                  fontSize: 14, color: 'rgba(42,6,69,0.50)', marginTop: 6, letterSpacing: '0.03em',
+                  fontSize: 14, color: 'rgba(42,6,69,0.75)', marginTop: 6, letterSpacing: '0.03em',
                 }}>
                   {dateRange} · {era.messageCount.toLocaleString()} {t.eras_msgs} · {interp(t.eras_per_day, { n: era.msgPerDay })}
                 </div>
@@ -6045,8 +6045,8 @@ const SlideChaosMoment = React.memo(function SlideChaosMoment({ a, t }) {
         display: 'flex', flexDirection: 'column', justifyContent: 'center',
         textAlign: 'center', padding: '0 24px',
       }}>
-        <div className="fs-mono a-fade-up" style={{
-          fontSize: 14, color: '#ff006e', letterSpacing: '0.15em',
+        <div className="fs-sans a-fade-up" style={{
+          fontSize: 12, color: '#ff006e', letterSpacing: '0.15em', fontWeight: 500, textTransform: 'uppercase',
         }}>
           {t.chaos_eyebrow}
         </div>
@@ -6067,14 +6067,14 @@ const SlideChaosMoment = React.memo(function SlideChaosMoment({ a, t }) {
             {animated}
           </div>
           <div className="fs-display" style={{
-            fontSize: 20, marginTop: 8, color: '#ff006e', fontStyle: 'italic', fontWeight: 500,
+            fontSize: 20, marginTop: 8, color: '#ff006e', fontStyle: 'italic', fontWeight: 700,
           }}>
             {t.chaos_msgs_minute}
           </div>
         </div>
         <div className="fs-sans a-fade-up" style={{
           animationDelay: '1.6s', marginTop: 32, fontSize: 18, lineHeight: 1.5,
-          color: 'rgba(42,6,69,0.65)', maxWidth: 280, margin: '32px auto 0',
+          color: 'rgba(42,6,69,0.85)', maxWidth: 280, margin: '32px auto 0',
         }}>
           {t.chaos_lost_control}
         </div>
@@ -6091,14 +6091,14 @@ const SlideGroupPersona = React.memo(function SlideGroupPersona({ a, t }) {
         display: 'flex', flexDirection: 'column', justifyContent: 'center',
         padding: '0 24px',
       }}>
-        <div className="fs-mono a-fade-up" style={{
-          fontSize: 14, color: '#8338ec', letterSpacing: '0.15em',
+        <div className="fs-sans a-fade-up" style={{
+          fontSize: 12, color: '#8338ec', letterSpacing: '0.15em', fontWeight: 500, textTransform: 'uppercase',
         }}>
           {t.persona_eyebrow}
         </div>
         <div className="fs-display a-fade-up" style={{
           animationDelay: '0.2s', fontSize: 20, lineHeight: 1.2,
-          letterSpacing: '-0.02em', marginTop: 20, color: 'rgba(131,56,236,0.65)', fontWeight: 500,
+          letterSpacing: '-0.02em', marginTop: 20, color: 'rgba(131,56,236,0.85)', fontWeight: 500,
         }}>
           {t.persona_this_group}
         </div>
@@ -6111,8 +6111,8 @@ const SlideGroupPersona = React.memo(function SlideGroupPersona({ a, t }) {
           </div>
         </div>
         <div className="a-fade-up" style={{ animationDelay: '1.2s', marginTop: 48 }}>
-          <div className="fs-mono" style={{
-            fontSize: 14, color: 'rgba(131,56,236,0.55)', letterSpacing: '0.12em', marginBottom: 10,
+          <div className="fs-sans" style={{
+            fontSize: 12, color: 'rgba(131,56,236,0.78)', letterSpacing: '0.12em', marginBottom: 10, fontWeight: 500, textTransform: 'uppercase',
           }}>
             {t.persona_evidence}
           </div>
@@ -6148,8 +6148,8 @@ const SlideAwards = React.memo(function SlideAwards({ a, t }) {
         position: 'relative', height: '100%',
         display: 'flex', flexDirection: 'column', padding: '32px 24px 24px',
       }}>
-        <div className="fs-mono a-fade-up" style={{
-          textAlign: 'center', fontSize: 14, color: '#ff006e', letterSpacing: '0.15em',
+        <div className="fs-sans a-fade-up" style={{
+          textAlign: 'center', fontSize: 12, color: '#ff006e', letterSpacing: '0.15em', fontWeight: 500, textTransform: 'uppercase',
         }}>
           {t.awards_eyebrow}
         </div>
@@ -6174,9 +6174,9 @@ const SlideAwards = React.memo(function SlideAwards({ a, t }) {
             }}>
               <div style={{ fontSize: 24, lineHeight: 1, flexShrink: 0 }}>{aw.trophy}</div>
               <div style={{ flex: 1, minWidth: 0 }}>
-                <div className="fs-mono" style={{
-                  fontSize: 14, color: aw.color, letterSpacing: '0.12em',
-                  fontWeight: 700, textTransform: 'uppercase',
+                <div className="fs-sans" style={{
+                  fontSize: 12, color: aw.color, letterSpacing: '0.12em',
+                  fontWeight: 500, textTransform: 'uppercase',
                 }}>
                   {aw.label}
                 </div>
@@ -6188,7 +6188,7 @@ const SlideAwards = React.memo(function SlideAwards({ a, t }) {
                 </div>
               </div>
               <div className="fs-mono" style={{
-                fontSize: 14, color: 'rgba(42,6,69,0.45)', textAlign: 'right', flexShrink: 0, lineHeight: 1.4,
+                fontSize: 14, color: 'rgba(42,6,69,0.72)', textAlign: 'right', flexShrink: 0, lineHeight: 1.4,
               }}>
                 {aw.sub}
               </div>
@@ -6216,8 +6216,8 @@ const SlidePeakDay = React.memo(function SlidePeakDay({ a, t }) {
         display: 'flex', flexDirection: 'column', justifyContent: 'center',
         textAlign: 'center', padding: '0 24px',
       }}>
-        <div className="fs-mono a-fade-up" style={{
-          fontSize: 14, color: '#ffbe0b', letterSpacing: '0.15em',
+        <div className="fs-sans a-fade-up" style={{
+          fontSize: 12, color: '#ffbe0b', letterSpacing: '0.15em', fontWeight: 500, textTransform: 'uppercase',
         }}>
           {t.peakday_eyebrow}
         </div>
@@ -6234,7 +6234,7 @@ const SlidePeakDay = React.memo(function SlidePeakDay({ a, t }) {
           {animated}
         </div>
         <div className="fs-display a-fade-up" style={{
-          animationDelay: '1.2s', fontSize: 20, marginTop: 10, fontStyle: 'italic', fontWeight: 500, color: '#2a0645',
+          animationDelay: '1.2s', fontSize: 20, marginTop: 10, fontStyle: 'italic', fontWeight: 700, color: '#2a0645',
         }}>
           {t.peakday_msgs}
         </div>
@@ -6251,8 +6251,8 @@ const SlideFinale = React.memo(function SlideFinale({ a, t, onExit }) {
         display: 'flex', flexDirection: 'column', justifyContent: 'center',
         textAlign: 'center', padding: '0 24px',
       }}>
-        <div className="fs-mono a-fade-up" style={{
-          fontSize: 14, color: '#ff006e', letterSpacing: '0.15em',
+        <div className="fs-sans a-fade-up" style={{
+          fontSize: 12, color: '#ff006e', letterSpacing: '0.15em', fontWeight: 500, textTransform: 'uppercase',
         }}>
           {t.finale_eyebrow}
         </div>
@@ -6266,7 +6266,7 @@ const SlideFinale = React.memo(function SlideFinale({ a, t, onExit }) {
           </div>
         </div>
         <div className="fs-sans a-fade-up" style={{
-          animationDelay: '1.0s', marginTop: 40, fontSize: 18, color: 'rgba(42,6,69,0.65)', lineHeight: 1.45,
+          animationDelay: '1.0s', marginTop: 40, fontSize: 18, color: 'rgba(42,6,69,0.85)', lineHeight: 1.45,
         }}>
           {t.finale_now}
         </div>

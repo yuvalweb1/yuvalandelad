@@ -24,7 +24,9 @@
       "Bash(Remove-Item -Recurse -Force \"node_modules/.vite\" -ErrorAction SilentlyContinue)",
       "Bash(curl -s -o /dev/null -w \"%{http_code}\" http://localhost:5173)",
       "Bash(npx playwright *)",
-      "Read(//c/tmp/**)"
+      "Read(//c/tmp/**)",
+      "Bash(grep -v \"fs-display\\\\|fs-mono\\\\|Bricolage\\\\|//\")",
+      "Bash(node scripts/apply-theme.js)"
     ]
   }
 }
