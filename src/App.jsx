@@ -1240,34 +1240,34 @@ const RTL_LANGS = new Set(['he', 'ar']);
 
 const I18N = {
   en: {
-    landing_eyebrow: 'NEW · WHATSAPP UNWRAPPED',
+    landing_eyebrow: 'CHATWRAPPED · YOUR WHATSAPP YEAR',
     landing_h1_a: 'Your',
     landing_h1_b: 'group chat',
     landing_h1_c: 'year is',
     landing_h1_d: 'about to',
     landing_h1_e: 'drop.',
-    landing_sub: 'Eras. Awards. Drama. A cinematic recap built from your real messages. Nothing leaves your phone.',
+    landing_sub: 'Stats. Roasts. Drama. Built from your actual messages. Nothing leaves your phone.',
     cta_play: 'Play my Wrapped →',
     cta_demo: 'OR PREVIEW WITH DEMO →',
     privacy_note: 'PROCESSED ENTIRELY ON YOUR DEVICE',
     err_format: 'Upload a .txt or .zip from WhatsApp export.',
-    err_no_msgs: 'No messages parsed. Format may not be supported.',
+    err_no_msgs: 'No messages found. Format may not be supported.',
     onboard_skip: 'Skip',
     onboard_continue: 'Continue →',
     onboard_done: 'See my Wrapped →',
     onboard_title: 'Quick questions',
-    onboard_sub: 'A few seconds. Makes your Wrapped 10x more accurate.',
-    q_who_are_you: "What's your name in this chat?",
-    q_who_are_you_hint: 'Pick yourself from the participants',
-    q_relationship: 'What kind of chat is this?',
+    onboard_sub: 'Two seconds. Makes everything way more accurate.',
+    q_who_are_you: "Which one are you in this chat?",
+    q_who_are_you_hint: 'Pick yourself from the list',
+    q_relationship: 'What kind of group is this?',
     q_relationship_friends: 'Friends',
     q_relationship_family: 'Family',
     q_relationship_work: 'Work',
     q_relationship_couple: 'Just us two',
     q_relationship_other: 'Other',
-    q_tone: 'How spicy should the roasts be?',
+    q_tone: 'How savage should the roasts be?',
     q_tone_mild: 'Gentle',
-    q_tone_mild_d: 'Keep it kind',
+    q_tone_mild_d: 'Be kind',
     q_tone_medium: 'Honest',
     q_tone_medium_d: 'Real but fair',
     q_tone_spicy: 'Savage',
@@ -1280,166 +1280,166 @@ const I18N = {
     parsing_label_analyze: 'Analyzing your chaos',
     parsing_label_build: 'Building your story',
     parsing_detail_open: 'Reading bytes from disk',
-    parsing_detail_unzip: 'Decompressing WhatsApp ZIP',
-    parsing_detail_read: 'Parsing timestamps & senders',
+    parsing_detail_unzip: 'Decompressing WhatsApp export',
+    parsing_detail_read: 'Parsing timestamps and senders',
     parsing_detail_analyze: 'Detecting drama, eras, peaks',
     parsing_detail_build: 'Almost there…',
     // Intro
     intro_eyebrow: 'CHATWRAPPED',
-    intro_get: 'Get',
-    intro_ready: 'ready.',
-    intro_summary: '{msgs} messages. {people} people. {days} days. One story.',
+    intro_get: 'Here it',
+    intro_ready: 'comes.',
+    intro_summary: '{msgs} messages. {people} people. {days} days. Good luck.',
     // Message count
-    msg_eyebrow: 'THIS YEAR THE GROUP SENT',
+    msg_eyebrow: 'AS A GROUP, YOU SENT',
     msg_word: 'messages.',
-    msg_your_share: 'YOUR SHARE',
+    msg_your_share: 'YOUR CONTRIBUTION',
     // Rank
     rank_eyebrow: '✦ THE LEADERBOARD',
-    rank_finished: 'You finished',
-    rank_of: 'of {n}.',
-    rank_you: '(you)',
+    rank_finished: 'You came in',
+    rank_of: 'out of {n}.',
+    rank_you: '← you',
     // Vs everyone
     vs_eyebrow: 'YOU VS EVERYONE',
-    vs_outsent_all: 'You out-sent\nevery other person.',
-    vs_least: 'You sent fewer\nthan everyone else.',
-    vs_middle: 'You sent more than\n{beat} of {others} others.',
-    vs_alone: "It's just you here.",
-    vs_ranked: '{msgs} msgs · ranked #{rank} of {total}',
-    vs_fastest: 'FASTEST IN THE CHAT',
+    vs_outsent_all: 'Outsent every\nsingle person here.',
+    vs_least: 'Fewer messages than\nanyone else. A lurker.',
+    vs_middle: 'More talkative than\n{beat} out of {others} people.',
+    vs_alone: 'Solo mission.',
+    vs_ranked: '{msgs} messages · #{rank} of {total}',
+    vs_fastest: 'FASTEST IN THE GROUP',
     vs_avg_s: '{s}s avg',
     vs_avg_m: '{m}m avg',
     vs_avg_h: '{h}h avg',
     // Title
-    title_eyebrow: '✦ THEY CALL YOU',
-    title_based_on: 'BASED ON',
+    title_eyebrow: '✦ YOUR OFFICIAL TITLE',
+    title_based_on: 'EARNED BY',
     // Group describes
-    descr_eyebrow: 'THE GROUP WOULD DESCRIBE YOU AS',
-    descr_footnote: "They didn't say it out loud. But the data did.",
+    descr_eyebrow: 'THE DATA DESCRIBES YOU AS',
+    descr_footnote: "Not our words. The numbers said it.",
     // Peak hour
-    peak_eyebrow: 'YOUR HOUR',
-    peak_3am: 'Genuinely concerning.',
-    peak_morning: 'An actual morning person.',
-    peak_midday: 'Texting during work. Bold.',
-    peak_evening: 'Post-work texting champion.',
-    peak_late: 'Late-night philosopher behavior.',
+    peak_eyebrow: 'YOUR PEAK HOUR',
+    peak_3am: 'Are you okay??',
+    peak_morning: 'A morning person. Actually impressive.',
+    peak_midday: 'During work hours. Very professional.',
+    peak_evening: 'Wind-down mode. We respect it.',
+    peak_late: 'The thoughts hit different at midnight.',
     // Night
-    night_eyebrow: 'BETWEEN MIDNIGHT & 6 AM',
-    night_of_msgs: 'of your messages.',
-    night_diag_strong: 'Diagnosis: certified night creature.',
-    night_diag_med: "You're up later than you think.",
-    night_diag_low: 'Healthy sleep schedule, mostly.',
-    night_diag_none: 'You log off. Respect.',
-    night_owl: '✦ #1 NIGHT OWL IN THIS CHAT',
+    night_eyebrow: 'MESSAGES SENT MIDNIGHT TO 6 AM',
+    night_of_msgs: 'of your messages. Sent in the dark.',
+    night_diag_strong: 'The bed is RIGHT THERE.',
+    night_diag_med: 'Still up. Still texting.',
+    night_diag_low: 'Mostly normal sleep schedule. Good for you.',
+    night_diag_none: 'You actually sleep. Respect.',
+    night_owl: '✦ #1 NIGHT OWL IN THIS GROUP',
     night_count: '{night} of your {total}',
     // Streak
-    streak_eyebrow: 'YOUR LONGEST STREAK',
-    streak_day: 'day',
+    streak_eyebrow: 'YOUR LONGEST RUN',
+    streak_day: 'day in a row.',
     streak_days: 'days straight.',
     // Speed
-    speed_eyebrow: 'AVG REPLY SPEED',
+    speed_eyebrow: 'AVERAGE REPLY TIME',
     speed_faster: 'Faster than',
     speed_of_group: 'of the group.',
-    speed_based: 'BASED ON {n} TRACKED REPLIES',
+    speed_based: 'CLOCKED ACROSS {n} REPLIES',
     // Word
-    word_eyebrow: 'YOUR SIGNATURE WORD',
-    word_used: 'Used {n} times.',
+    word_eyebrow: 'THE WORD YOU CAN\'T LET GO OF',
+    word_used: '{n} times this year. They noticed.',
     // Top words (group)
-    top_words_eyebrow: 'THE GROUP’S VOCABULARY',
-    top_words_title: 'The words',
-    top_words_subtitle: 'you all kept saying',
+    top_words_eyebrow: 'THE GROUP CHAT\'S GREATEST HITS',
+    top_words_title: 'Words this group',
+    top_words_subtitle: 'could not stop saying',
     // Emoji
-    emoji_eyebrow: 'MOST-USED EMOJI',
-    emoji_used: 'Used {n} times.',
+    emoji_eyebrow: 'YOUR SPIRIT EMOJI',
+    emoji_used: '{n} times. That\'s a lot.',
     // Drama role
-    drama_eyebrow: '✦ YOUR ROLE IN THE DRAMA',
+    drama_eyebrow: '✦ YOUR ROLE IN ALL OF THIS',
     drama_defib: 'The Defibrillator',
-    drama_defib_label: 'dead chats revived',
-    drama_defib_copy: 'When this group went silent, you brought it back.',
+    drama_defib_label: 'dead conversations back to life',
+    drama_defib_copy: 'Dead silence. You said something. Hero move.',
     drama_killer: 'The Conversation Killer',
-    drama_killer_label: 'chats ended on you',
-    drama_killer_copy: 'Whenever you spoke, no one had anything to add. Suspicious.',
+    drama_killer_label: 'conversations ended after you posted',
+    drama_killer_copy: "You type. Everyone goes quiet. We're not saying anything, but...",
     drama_replied: 'Everyone Replies To You',
-    drama_replied_label: '% of your msgs got a reply within 30 min',
-    drama_replied_copy: 'When you speak, the group listens.',
+    drama_replied_label: '% of your messages got a reply',
+    drama_replied_copy: "People actually respond to you. That's genuinely rare.",
     drama_ignored: 'Online But Ignored',
-    drama_ignored_label: '% of your msgs got no reply',
+    drama_ignored_label: '% of your messages got no reply',
     drama_ignored_copy: "It's not you. It's them. Probably.",
-    drama_steady: 'Steady in the Mix',
-    drama_steady_label: 'days you sent the final message',
-    drama_steady_copy: 'You closed the chat plenty of times. Just present.',
+    drama_steady: 'The Constant',
+    drama_steady_label: 'days you had the last word',
+    drama_steady_copy: 'No drama, no chaos. Just reliably here.',
     // Roast
-    roast_eyebrow_mild: '✦ GENTLE TAKES',
+    roast_eyebrow_mild: '✦ BEING VERY NICE ABOUT THIS',
     roast_eyebrow_med: '✦ READING YOU FOR FILTH',
     roast_eyebrow_spicy: '🔥 NO MERCY MODE',
-    roast_heading_mild: 'A few gentle notes.',
-    roast_heading_med: 'A few observations.',
+    roast_heading_mild: 'With love. Mostly.',
+    roast_heading_med: 'Okay. We need to talk.',
     roast_heading_spicy: 'No mercy. Brace yourself.',
-    roast_more: '+{n} MORE IN ROAST MODE →',
+    roast_more: '+{n} more waiting in Roast Mode →',
     // Achievements
-    ach_eyebrow: '✦ ACHIEVEMENTS UNLOCKED',
-    ach_earned: 'You earned',
+    ach_eyebrow: '✦ BADGES YOU EARNED',
+    ach_earned: 'You walked away with',
     ach_badges: 'badge',
     ach_badges_plural: 'badges',
-    ach_more: '+{n} MORE',
+    ach_more: '+{n} more',
     // Most likely
-    likely_eyebrow: '✦ MOST LIKELY TO',
+    likely_eyebrow: '✦ THE GROUP\'S SUPERLATIVES',
     likely_title: 'The group',
-    likely_verdicts: 'verdicts.',
+    likely_verdicts: 'has spoken.',
     likely_label: 'MOST LIKELY TO',
     likely_to_text_3am: 'text at 3 AM',
-    likely_to_burst: 'send 10 messages in a row',
-    likely_to_reply_fast: 'reply in under a minute',
-    likely_to_disappear: 'disappear for weeks',
-    likely_to_kill: 'kill the conversation',
-    likely_to_revive: 'bring the chat back to life',
+    likely_to_burst: 'spam the chat',
+    likely_to_reply_fast: 'reply instantly',
+    likely_to_disappear: 'ghost everyone',
+    likely_to_kill: 'kill the vibe',
+    likely_to_revive: 'revive the chat',
     // Duo
-    duo_eyebrow: '✦ THE TOP DUO',
+    duo_eyebrow: '✦ THE POWER COUPLE',
     duo_traded: 'traded',
-    duo_replies_between: 'replies between them.',
-    duo_in_with: 'You and {partner} are basically co-hosts of this chat.',
-    duo_share: '{pct}% of all back-and-forth in this group.',
+    duo_replies_between: 'replies just between them.',
+    duo_in_with: 'You and {partner} basically run this place.',
+    duo_share: '{pct}% of all back-and-forth. Wild.',
     // Eras
-    eras_eyebrow: '✦ YOUR ERAS',
-    eras_title: 'The chapters',
-    eras_subtitle: 'of this chat.',
-    eras_chapter: 'CHAPTER',
-    eras_msgs: 'msgs',
+    eras_eyebrow: '✦ THE TIMELINE',
+    eras_title: 'This chat had',
+    eras_subtitle: 'actual eras.',
+    eras_chapter: 'ERA',
+    eras_msgs: 'messages',
     eras_per_day: '{n}/day',
     // Chaos
-    chaos_eyebrow: '✦ THE MOMENT IT BROKE',
+    chaos_eyebrow: '✦ THE CHAOS PEAK',
     chaos_at: 'at {time}.',
-    chaos_msgs_minute: 'messages in one minute.',
-    chaos_lost_control: 'The group lost control.',
+    chaos_msgs_minute: 'messages in sixty seconds.',
+    chaos_lost_control: 'Everyone lost the plot at the same time.',
     // Group persona
-    persona_eyebrow: '✦ DIAGNOSIS',
-    persona_this_group: 'This group is a…',
-    persona_evidence: 'EVIDENCE',
+    persona_eyebrow: '✦ GROUP DIAGNOSIS',
+    persona_this_group: 'As a group, you are:',
+    persona_evidence: 'THE EVIDENCE',
     // Awards
-    awards_eyebrow: '✦ THE AWARDS CEREMONY',
-    awards_title: 'And the winners',
+    awards_eyebrow: '✦ AND THE AWARD GOES TO...',
+    awards_title: "Tonight's honorees",
     awards_are: 'are…',
     awards_fastest: 'Fastest Fingers',
     awards_fastest_sub: '{m}m avg reply',
     awards_yapper: 'Biggest Yapper',
-    awards_yapper_sub: '{n} messages',
+    awards_yapper_sub: '{n} messages sent',
     awards_nightowl: 'Most Dangerous After Midnight',
-    awards_nightowl_sub: '{pct}% post-midnight',
+    awards_nightowl_sub: '{pct}% after midnight',
     awards_ghost: 'The Return of the Ghost',
-    awards_ghost_sub: '{n}-day absence',
+    awards_ghost_sub: '{n} days gone',
     awards_killer: 'Conversation Killer',
-    awards_killer_sub: '{n} chats ended on them',
+    awards_killer_sub: '{n} conversations, flatlined',
     awards_defib: 'The Defibrillator',
-    awards_defib_sub: 'revived {n} dead chats',
+    awards_defib_sub: '{n} dead chats revived',
     // Peak day
-    peakday_eyebrow: "THE GROUP'S WILDEST DAY",
-    peakday_msgs: 'messages in one day.',
+    peakday_eyebrow: "THE MOST CHAOTIC DAY",
+    peakday_msgs: 'messages in one day. What happened?',
     // Finale
     finale_eyebrow: "✦ THAT'S A WRAP",
     finale_see: 'See you',
     finale_in_the: 'in the',
     finale_chat: 'group chat.',
-    finale_now: 'Now ask your friends what they got.',
-    finale_explore: 'Explore the data →',
+    finale_now: 'Now send this to everyone in the group.',
+    finale_explore: 'See the full stats →',
     // Post menu
     menu_replay: 'REPLAY',
     menu_watch: 'Watch\nagain →',
@@ -1447,9 +1447,9 @@ const I18N = {
     menu_roast_everyone: 'Roast\neveryone →',
     menu_viewing_as: 'VIEWING AS',
     menu_switch: 'SWITCH →',
-    menu_verified: '✓ VERIFIED DATA · {n}%',
-    menu_msgs_senders: '{msgs} msgs · {senders} senders parsed',
-    menu_verify: 'VERIFY →',
+    menu_verified: '✓ CONFIDENCE: {n}%',
+    menu_msgs_senders: '{msgs} messages from {senders} people',
+    menu_verify: 'CHECK →',
     menu_this_group_is: '✦ THIS GROUP IS A',
     menu_eras: 'THE ERAS',
     menu_highlights: 'YOUR HIGHLIGHTS',
@@ -1458,8 +1458,8 @@ const I18N = {
     menu_hl_messages: 'messages',
     menu_hl_of: 'of {n}',
     menu_hl_peak_hour: 'peak hour',
-    menu_hl_at_night: 'at night',
-    menu_hl_streak: 'streak',
+    menu_hl_at_night: 'after midnight',
+    menu_hl_streak: 'day streak',
     menu_hl_top_emoji: 'top emoji',
     menu_hl_top_word: 'top word',
     menu_hl_avg_reply: 'avg reply',
@@ -1468,11 +1468,11 @@ const I18N = {
     rm_title: '🔥 ROAST MODE',
     rm_pick: 'Pick a',
     rm_victim: 'victim.',
-    rm_sub: 'Every roast is based on real numbers from this chat. No mercy. Tap a name to switch.',
+    rm_sub: 'Every roast is based on real data from this chat. No mercy. Tap a name to switch.',
     rm_now: 'NOW ROASTING',
     rm_roast: 'ROAST',
     rm_hot_take: 'HOT TAKE',
-    rm_screenshot: 'Now go screenshot this and\nsend it to {name}.',
+    rm_screenshot: 'Screenshot this and send it to {name}. You know you want to.',
     rm_others: 'OTHER VICTIMS',
     rm_ready: '{n} roast ready',
     rm_ready_plural: '{n} roasts ready',
@@ -1483,7 +1483,7 @@ const I18N = {
     verify_back: '← Back',
     verify_title: 'Does this look',
     verify_right: 'right',
-    verify_sub: 'Numbers are computed straight from the parsed file. Skim them — if anything looks off, hit Reset. If it matches your expectations, continue to Wrapped.',
+    verify_sub: "Numbers come straight from the parsed file. If something looks off, hit Reset. If it matches your gut, keep going.",
     verify_continue: 'Looks right · Continue to Wrapped →',
     verify_wrong: 'NUMBERS LOOK WRONG · UPLOAD AGAIN',
     verify_reset: 'RESET',
@@ -1508,33 +1508,33 @@ const I18N = {
     st_title_morning: 'Morning Glory',
     st_title_anchor: 'The Anchor',
     // Social Layer — Title evidence
-    st_ev_voice_boss: '{n} voice notes ({pct}% of msgs)',
+    st_ev_voice_boss: '{n} voice notes ({pct}% of messages)',
     st_ev_last_seen: '{n}-day absence',
     st_ev_spammer: '{n}-message burst',
-    st_ev_2am: '{pct}% post-midnight',
+    st_ev_2am: '{pct}% after midnight',
     st_ev_main_char: '{pct}% of all messages',
-    st_ev_available: '{m}m avg reply (n={n})',
-    st_ev_questions: '{pct}% questions',
-    st_ev_media: '{pct}% media',
-    st_ev_defib: 'revived {n} dead chats',
-    st_ev_killer: '{n} chats ended on them',
-    st_ev_ignored: '{pct}% messages got no reply',
+    st_ev_available: '{m}m avg reply (based on {n})',
+    st_ev_questions: '{pct}% of messages are questions',
+    st_ev_media: '{pct}% of messages are media',
+    st_ev_defib: 'revived {n} dead conversations',
+    st_ev_killer: '{n} conversations ended after them',
+    st_ev_ignored: '{pct}% of messages got no reply',
     st_ev_emoji: '{n} emojis sent',
-    st_ev_share_low: 'only {pct}% share',
+    st_ev_share_low: 'only {pct}% of messages',
     st_ev_streak: '{n}-day streak',
-    st_ev_essay: '{n} words/msg avg',
-    st_ev_peak: 'peaks at {h}:00',
-    st_ev_anchor: 'steady, consistent participation',
+    st_ev_essay: '{n} words per message on average',
+    st_ev_peak: 'most active at {h}:00',
+    st_ev_anchor: 'steady, consistent presence',
     // Social Layer — Group descriptions
     st_desc_online: 'always online',
     st_desc_watching: 'never answers but always watching',
     st_desc_disappears: 'starts plans, disappears immediately',
-    st_desc_keeps_alive: 'the one who keeps this group alive',
+    st_desc_keeps_alive: 'the one keeping this group alive',
     st_desc_midnight: 'only exists after midnight',
-    st_desc_lot_to_say: 'has a lot to say. always.',
+    st_desc_lot_to_say: 'always has something to say',
     st_desc_asks: 'asks more than they answer',
-    st_desc_when_feels: 'shows up exactly when they feel like it',
-    st_desc_voice: 'a voice note person, somehow',
+    st_desc_when_feels: 'shows up when they feel like it',
+    st_desc_voice: 'a voice note person, for some reason',
     st_desc_emoji: 'speaks fluent emoji',
     st_desc_always_there: 'just kind of always there',
     // Social Layer — Achievements
@@ -1549,15 +1549,15 @@ const I18N = {
     st_ach_submin: 'Sub-Minute Responder',
     st_ach_solo: 'The Solo Show',
     st_ach_lastword: 'The Last Word',
-    st_ach_ev_night: '{pct}% of msgs post-midnight',
-    st_ach_ev_sprint: 'unbroken streak of {n} msgs in a row',
+    st_ach_ev_night: '{pct}% of messages after midnight',
+    st_ach_ev_sprint: '{n} messages in a row, unbroken',
     st_ach_ev_voice: '{n} voice notes sent',
     st_ach_ev_ghost: '{n}-day absence then came back',
     st_ach_ev_iron: '{n} consecutive days',
-    st_ach_ev_defib: 'revived {n} chats after >12h silence',
-    st_ach_ev_assassin: '{n} chats ended right after them',
+    st_ach_ev_defib: 'revived {n} conversations after 12+ hours of silence',
+    st_ach_ev_assassin: '{n} conversations ended right after them',
     st_ach_ev_emoji_hof: '{n} emojis sent',
-    st_ach_ev_submin: '{s}s avg reply (n={n})',
+    st_ach_ev_submin: '{s}s average reply (based on {n})',
     st_ach_ev_solo: '{pct}% of all messages',
     st_ach_ev_lastword: 'closed {n} days',
     // Social Layer — Roasts (line + kicker per scenario)
@@ -1570,8 +1570,8 @@ const I18N = {
     st_r_vol_pod_l: '{pct}% of every message sent here was you.',
     st_r_vol_pod_k: "This isn't a group chat. It's your podcast.",
     st_r_vol_dom_l: 'You said {pct}% of everything.',
-    st_r_vol_dom_k: 'The others were trying to talk.',
-    st_r_vol_tiny_l: '{pct}% share. {n} messages all year.',
+    st_r_vol_dom_k: 'The others were trying to get a word in.',
+    st_r_vol_tiny_l: '{pct}% of messages. {n} total, all year.',
     st_r_vol_tiny_k: 'Are you... okay? Should we check on you?',
     st_r_vol_watch_l: '{pct}% of the chat is yours.',
     st_r_vol_watch_k: "You're watching. Plotting. Saving everything for court.",
@@ -1579,7 +1579,7 @@ const I18N = {
     st_r_burst_hostage_k: "That's not texting. That's a hostage situation.",
     st_r_burst_uninterr_l: '{n} messages in a row. Uninterrupted.',
     st_r_burst_uninterr_k: 'Nobody asked. Nobody could stop you either.',
-    st_r_burst_record_l: 'Your record streak: {n} messages, no one replied.',
+    st_r_burst_record_l: 'Personal best: {n} messages with no reply.',
     st_r_burst_record_k: 'You just kept going. Beautiful, in a way.',
     st_r_night_tab_l: '{pct}% of your messages happen between midnight and 6 AM.',
     st_r_night_tab_k: "You don't have a sleep schedule. You have an open tab.",
@@ -1592,39 +1592,39 @@ const I18N = {
     st_r_ghost_vanish_l: '{n}-day silence at one point.',
     st_r_ghost_vanish_k: 'No "hey." No explanation. Just vanished.',
     st_r_voice_beg_l: '{n} voice notes sent.',
-    st_r_voice_beg_k: "We're begging you to type. Just type. Please.",
-    st_r_voice_mono_l: '{n} voice notes. Average human: 3.',
-    st_r_voice_mono_k: 'Nobody has time to listen to your 47-second monologue.',
+    st_r_voice_beg_k: "We're begging you to type. Please. Just type.",
+    st_r_voice_mono_l: '{n} voice notes. Average person: 3.',
+    st_r_voice_mono_k: "Nobody has time for your 47-second monologue.",
     st_r_q_google_l: '{pct}% of your messages are questions.',
-    st_r_q_google_k: "You don't have a personality. You have a Google search bar.",
-    st_r_q_tired_l: '1 in every 4 messages from you is a question.',
-    st_r_q_tired_k: 'The group is tired. So tired.',
-    st_r_media_fwd_l: '{pct}% of what you send is media.',
+    st_r_q_google_k: "You don't have a personality. You have a search bar.",
+    st_r_q_tired_l: '1 in 4 messages from you is a question.',
+    st_r_q_tired_k: 'The group is exhausted. Deeply, thoroughly exhausted.',
+    st_r_media_fwd_l: '{pct}% of what you send is pictures or videos.',
     st_r_media_fwd_k: "You don't talk. You forward.",
-    st_r_media_redist_l: '{pct}% memes. {rest}% actual content.',
-    st_r_media_redist_k: "Your contribution: redistributing other people's jokes.",
-    st_r_ign_thumb_l: '{pct}% of your messages got zero reply in 30 minutes.',
+    st_r_media_redist_l: '{pct}% memes. {rest}% actual words.',
+    st_r_media_redist_k: "Your role: redistributing other people's jokes.",
+    st_r_ign_thumb_l: '{pct}% of your messages got no reply within 30 minutes.',
     st_r_ign_thumb_k: 'Not even a thumbs up. Tough crowd.',
     st_r_ign_said_l: '{pct}% of what you say goes ignored.',
     st_r_ign_said_k: "It's not what you said. It's that you said it.",
     st_r_kill_arg_l: '{n} conversations ended within minutes of you speaking.',
     st_r_kill_arg_k: "You're not a participant. You're a closing argument.",
-    st_r_kill_susp_l: '{n} chats died right after you posted.',
-    st_r_kill_susp_k: 'Suspicious. Investigation pending.',
-    st_r_emoji_help_l: '{n} emojis sent. Approximately {per} per message.',
+    st_r_kill_susp_l: '{n} conversations went quiet right after you posted.',
+    st_r_kill_susp_k: "Suspicious. We're looking into it.",
+    st_r_emoji_help_l: '{n} emojis sent. That\'s {per} per message.',
     st_r_emoji_help_k: 'Your keyboard is 80% pictures. Get help.',
     st_r_emoji_words_l: '{n} emojis in one year.',
     st_r_emoji_words_k: "Words exist. They're free. Try them.",
     st_r_emoji_zero_l: '{n} messages. Zero emojis.',
     st_r_emoji_zero_k: 'What happened to you. Who hurt you.',
     st_r_len_ted_l: '{n} words per message on average.',
-    st_r_len_ted_k: 'This is a chat. Not a TED talk.',
+    st_r_len_ted_k: 'This is a group chat. Not a TED talk.',
     st_r_len_tldr_l: 'Average message: {n} words.',
     st_r_len_tldr_k: "TL;DR. We're begging you.",
-    st_r_len_poem_l: 'Your average message: {n} words.',
+    st_r_len_poem_l: 'Average message length: {n} words.',
     st_r_len_poem_k: '"ok" "k" "lol" — a poetry collection.',
     st_r_rev_bless_l: '{n} times you broke a 12+ hour silence.',
-    st_r_rev_bless_k: 'Bless you. The chat would be dead without you.',
+    st_r_rev_bless_k: 'Bless you. The group would be dead without you.',
     st_r_streak_grass_l: '{n} consecutive days of messages.',
     st_r_streak_grass_k: 'Touch grass. Pet a dog. See the sun.',
     st_r_streak_love_l: '{n}-day messaging streak.',
@@ -3914,7 +3914,7 @@ function ChatWrappedApp() {
       }}>
         <BlobBackground />
         <StatusBar />
-        <div style={{ flex: 1, position: 'relative', overflow: 'hidden' }} dir={isRTL ? 'rtl' : 'ltr'}>
+        <div style={{ flex: 1, position: 'relative', overflow: 'hidden' }} dir={isRTL ? 'rtl' : 'auto'}>
           {stage === 'landing' && (
             <Landing
               onFile={handleFile}
@@ -4070,7 +4070,7 @@ function GlobalStyles() {
         unicode-range: U+0590-05FF, U+FB1D-FB4F, U+200F, U+200E;
       }
       .fs-display { font-family: 'Bricolage Grotesque', 'Rubik Black', 'Comix CLM', serif; }
-      .fs-mono { font-family: 'JetBrains Mono', 'Comix CLM', monospace; font-feature-settings: 'tnum' on; font-variant-numeric: tabular-nums; }
+      .fs-mono { font-family: 'Inter Tight', 'DM Sans', 'Comix CLM', -apple-system, sans-serif; font-feature-settings: 'tnum' on; font-variant-numeric: tabular-nums; }
       .fs-sans { font-family: 'DM Sans', 'Comix CLM', -apple-system, sans-serif; }
       @keyframes fadeUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
       @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
@@ -4181,6 +4181,11 @@ function GlobalStyles() {
         background-size: 200% 100%;
         animation: shineMove 2.2s linear infinite;
       }
+      @keyframes slideEnterRight { from { transform: translateX(100%); } to { transform: translateX(0); } }
+      @keyframes slideEnterLeft  { from { transform: translateX(-100%); } to { transform: translateX(0); } }
+      .slide-in-right { animation: slideEnterRight 350ms cubic-bezier(0.4, 0, 0.2, 1) both; }
+      .slide-in-left  { animation: slideEnterLeft  350ms cubic-bezier(0.4, 0, 0.2, 1) both; }
+      .slide-content  { animation: fadeIn 0.4s ease 0.12s both; }
       .no-sb::-webkit-scrollbar { display: none; }
       .no-sb { scrollbar-width: none; }
       .press { transition: transform 0.1s; }
@@ -4211,7 +4216,8 @@ function GlobalStyles() {
         }
         .a-fade-up, .a-fade-in, .a-scale-in, .a-spring,
         .a-slide-right, .a-slide-up-far, .a-bar,
-        .a-pop-in, .a-roast-card {
+        .a-pop-in, .a-roast-card,
+        .slide-in-right, .slide-in-left, .slide-content {
           animation-duration: 0.001ms !important;
           animation-delay: 0ms !important;
         }
@@ -4619,7 +4625,7 @@ function Onboarding({ analytics, t, profile, setProfile, onComplete, onSkip }) {
   return (
     <div className="no-sb" style={{
       position: 'relative', height: '100%', overflow: 'auto',
-      background: 'radial-gradient(ellipse at top, #1a1a2e 0%, #050507 70%)',
+      background: 'radial-gradient(ellipse at top, #573280 0%, #050507 70%)',
     }}>
       <div style={{ position: 'absolute', top: 60, right: -80, width: 220, height: 220,
         borderRadius: '50%', background: '#ffd972', opacity: 0.15, filter: 'blur(80px)',
@@ -4673,9 +4679,9 @@ function Onboarding({ analytics, t, profile, setProfile, onComplete, onSkip }) {
               {analytics.users.map((u, i) => {
                 const selected = draft.self === u.author;
                 return (
-                  <button key={u.author} onClick={() => setDraft({ ...draft, self: u.author })}
+                  <button key={u.author} dir="auto" onClick={() => setDraft({ ...draft, self: u.author })}
                     className="press lift" style={{
-                      width: '100%', textAlign: 'left',
+                      width: '100%', textAlign: 'start',
                       padding: '14px 16px', cursor: 'pointer',
                       background: selected
                         ? 'linear-gradient(135deg, rgba(255,217,114,0.18), rgba(255,217,114,0.04))'
@@ -4686,16 +4692,11 @@ function Onboarding({ analytics, t, profile, setProfile, onComplete, onSkip }) {
                       animation: `fadeUp 0.4s cubic-bezier(0.16,1,0.3,1) ${i * 0.04}s both`,
                     }}>
                     <div style={{ minWidth: 0, flex: 1 }}>
-                      <div style={{
+                      <div dir="auto" style={{
                         fontSize: 23, fontWeight: selected ? 800 : 600,
                         overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
                       }}>
                         {u.author}
-                      </div>
-                      <div className="fs-mono" style={{
-                        fontSize: 21, color: '#d8d8e8', marginTop: 3,
-                      }}>
-                        {u.messageCount.toLocaleString()} msgs · {u.sharePct.toFixed(0)}%
                       </div>
                     </div>
                     {selected && (
@@ -4721,9 +4722,9 @@ function Onboarding({ analytics, t, profile, setProfile, onComplete, onSkip }) {
               {currentStep.options.map((opt, i) => {
                 const selected = draft[currentStep.key] === opt.value;
                 return (
-                  <button key={opt.value} onClick={() => setDraft({ ...draft, [currentStep.key]: opt.value })}
+                  <button key={opt.value} dir="auto" onClick={() => setDraft({ ...draft, [currentStep.key]: opt.value })}
                     className="press lift" style={{
-                      width: '100%', textAlign: 'left',
+                      width: '100%', textAlign: 'start',
                       padding: '16px 18px', cursor: 'pointer',
                       background: selected
                         ? 'linear-gradient(135deg, rgba(255,217,114,0.18), rgba(255,217,114,0.04))'
@@ -4759,9 +4760,9 @@ function Onboarding({ analytics, t, profile, setProfile, onComplete, onSkip }) {
               {currentStep.options.map((opt, i) => {
                 const selected = draft.tone === opt.value;
                 return (
-                  <button key={opt.value} onClick={() => setDraft({ ...draft, tone: opt.value })}
+                  <button key={opt.value} dir="auto" onClick={() => setDraft({ ...draft, tone: opt.value })}
                     className="press lift" style={{
-                      width: '100%', textAlign: 'left',
+                      width: '100%', textAlign: 'start',
                       padding: '18px 20px', cursor: 'pointer',
                       background: selected
                         ? `linear-gradient(135deg, ${opt.color}28, ${opt.color}08)`
@@ -4842,45 +4843,31 @@ function Wrapped({ analytics, diagnostics, selectedAuthor, setSelectedAuthor, sl
   const current = slides[slide];
   const SlideComp = SLIDE_COMPONENTS[current];
 
+  const dirRef = useRef(1);
+
   useEffect(() => {
     if (slide >= total - 1) return;
     const id = setTimeout(() => {
+      dirRef.current = 1;
       setSlide(s => Math.min(s + 1, total - 1));
     }, 6500);
     return () => clearTimeout(id);
   }, [slide, total, setSlide]);
 
-  const next = () => setSlide(Math.min(slide + 1, total - 1));
-  const prev = () => setSlide(Math.max(slide - 1, 0));
+  const next = () => { dirRef.current = 1;  setSlide(Math.min(slide + 1, total - 1)); };
+  const prev = () => { dirRef.current = -1; setSlide(Math.max(slide - 1, 0)); };
 
   return (
     <div style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column' }}>
-      {/* Progress bars */}
-      <div style={{ display: 'flex', gap: 4, padding: '12px 12px 0', zIndex: 20 }}>
-        {slides.map((_, i) => (
-          <div key={i} style={{
-            flex: 1, height: 2.5, borderRadius: 999,
-            background: 'rgba(255,255,255,0.18)', overflow: 'hidden',
-          }}>
-            <div style={{
-              height: '100%',
-              width: i < slide ? '100%' : i === slide ? '100%' : '0%',
-              background: '#fff',
-              transition: i === slide ? 'width 6.5s linear' : 'none',
-            }} />
-          </div>
-        ))}
-      </div>
-
       {/* Close */}
       <button onClick={onExit} className="press" aria-label={t.a11y_close || 'Close'} style={{
-        position: 'absolute', top: 16, right: 8, zIndex: 5,
-        background: 'rgba(255,255,255,0.18)', backdropFilter: 'blur(10px)',
-        color: '#fff', border: 'none', width: 44, height: 44,
+        position: 'absolute', top: 16, right: 16, zIndex: 5,
+        background: 'rgba(0,0,0,0.25)', backdropFilter: 'blur(12px)',
+        color: '#fff', border: 'none', width: 40, height: 40,
         borderRadius: '50%', cursor: 'pointer',
         display: 'flex', alignItems: 'center', justifyContent: 'center',
       }}>
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
           strokeWidth="2.4" strokeLinecap="round" aria-hidden="true">
           <line x1="18" y1="6" x2="6" y2="18"/>
           <line x1="6" y1="6" x2="18" y2="18"/>
@@ -4888,11 +4875,13 @@ function Wrapped({ analytics, diagnostics, selectedAuthor, setSelectedAuthor, sl
       </button>
 
       {/* Tap zones — pure touch convenience, hidden from assistive tech */}
-      <div onClick={prev} aria-hidden="true" style={{ position: 'absolute', left: 0, top: 50, bottom: 50, width: '30%', zIndex: 4 }} />
-      <div onClick={next} aria-hidden="true" style={{ position: 'absolute', right: 0, top: 50, bottom: 50, width: '70%', zIndex: 4 }} />
+      <div onClick={prev} aria-hidden="true" style={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: '30%', zIndex: 4 }} />
+      <div onClick={next} aria-hidden="true" style={{ position: 'absolute', right: 0, top: 0, bottom: 0, width: '70%', zIndex: 4 }} />
 
-      {/* Slide */}
-      <div key={`${current}-${selectedAuthor}`} style={{ flex: 1, position: 'relative', overflow: 'hidden' }}>
+      {/* Slide with directional transition */}
+      <div key={`${current}-${selectedAuthor}`}
+        className={dirRef.current >= 0 ? 'slide-in-right' : 'slide-in-left'}
+        style={{ flex: 1, position: 'relative', overflow: 'hidden' }}>
         {SlideComp && <SlideComp a={analytics} u={user} t={t} profile={profile} achievements={userAchievements} onExit={onExit} />}
       </div>
     </div>
@@ -4909,16 +4898,18 @@ const SlideShell = React.memo(function SlideShell({ children, bg, accent = '#ffd
       position: 'absolute', inset: 0, overflow: 'hidden', background: bg,
     }}>
       <div style={{
-        position: 'absolute', top: -80, right: -80, width: 280, height: 280,
-        borderRadius: '50%', background: accent, opacity: 0.20,
-        filter: 'blur(80px)', pointerEvents: 'none',
+        position: 'absolute', top: -80, right: -80, width: 300, height: 300,
+        borderRadius: '50%', background: accent, opacity: 0.22,
+        filter: 'blur(90px)', pointerEvents: 'none',
       }} />
       <div style={{
-        position: 'absolute', bottom: -100, left: -80, width: 240, height: 240,
-        borderRadius: '50%', background: accent, opacity: 0.10,
-        filter: 'blur(80px)', pointerEvents: 'none',
+        position: 'absolute', bottom: -100, left: -80, width: 260, height: 260,
+        borderRadius: '50%', background: accent, opacity: 0.12,
+        filter: 'blur(90px)', pointerEvents: 'none',
       }} />
-      {children}
+      <div className="slide-content" style={{ height: '100%' }}>
+        {children}
+      </div>
     </div>
   );
 })
@@ -4930,7 +4921,7 @@ const SlideShell = React.memo(function SlideShell({ children, bg, accent = '#ffd
 const SlideIntro = React.memo(function SlideIntro({ a, t }) {
   const year = new Date().getFullYear();
   return (
-    <SlideShell bg="#0a0a0f" accent="#ffd972">
+    <SlideShell bg="#573280" accent="#ffd972">
       <div style={{
         position: 'relative', height: '100%',
         display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center',
@@ -4940,13 +4931,13 @@ const SlideIntro = React.memo(function SlideIntro({ a, t }) {
           {t.intro_eyebrow} · {year}
         </div>
         <div className="a-spring" style={{ animationDelay: '0.3s', marginTop: 48 }}>
-          <div className="fs-display" style={{ fontSize: 56, lineHeight: 1.1, letterSpacing: '-0.04em', fontWeight: 800 }}>
+          <div className="fs-display" style={{ fontSize: 56, lineHeight: 1.1, letterSpacing: '-0.04em', fontWeight: 800, color: '#f1e4f3' }}>
             {t.intro_get && <span style={{ display: 'block' }}>{t.intro_get}</span>}
             {t.intro_ready && <span style={{ display: 'block', fontStyle: 'italic', color: '#ffd972' }}>{t.intro_ready}</span>}
           </div>
         </div>
         <div className="fs-sans a-fade-up" style={{
-          animationDelay: '0.8s', marginTop: 32, fontSize: 18, color: '#d0d0e0', maxWidth: 280, lineHeight: 1.45,
+          animationDelay: '0.8s', marginTop: 32, fontSize: 18, color: 'rgba(241,228,243,0.75)', maxWidth: 280, lineHeight: 1.45,
         }}>
           {interp(t.intro_summary, {
             msgs: a.totalMessages.toLocaleString(),
@@ -4963,7 +4954,7 @@ const SlideMessageCount = React.memo(function SlideMessageCount({ a, u, t }) {
   const animatedGroup = useAnimatedNumber(a.totalMessages, 1800, [a.totalMessages]);
   const animatedUser = useAnimatedNumber(u.messageCount, 1600, [u.author]);
   return (
-    <SlideShell bg="#0a0a1f" accent="#ffd972">
+    <SlideShell bg="#f06449" accent="#ffd972">
       <div style={{
         position: 'relative', height: '100%',
         display: 'flex', flexDirection: 'column', justifyContent: 'center',
@@ -4981,17 +4972,16 @@ const SlideMessageCount = React.memo(function SlideMessageCount({ a, u, t }) {
           {animatedGroup.toLocaleString()}
         </div>
         <div className="fs-display a-fade-up" style={{
-          animationDelay: '0.6s', fontSize: 20, marginTop: 8, fontStyle: 'italic', fontWeight: 500,
+          animationDelay: '0.6s', fontSize: 20, marginTop: 8, fontStyle: 'italic', fontWeight: 500, color: '#fff',
         }}>
           {t.msg_word}
         </div>
 
         <div className="a-fade-up" style={{
-          animationDelay: '1.5s', marginTop: 40,
-          paddingTop: 24, borderTop: '1px solid rgba(255,255,255,0.08)',
+          animationDelay: '1.5s', marginTop: 48,
         }}>
           <div className="fs-mono" style={{
-            fontSize: 14, color: '#c8c8dc', letterSpacing: '0.15em', marginBottom: 12,
+            fontSize: 14, color: 'rgba(255,255,255,0.65)', letterSpacing: '0.15em', marginBottom: 12,
           }}>
             {t.msg_your_share}
           </div>
@@ -5003,7 +4993,7 @@ const SlideMessageCount = React.memo(function SlideMessageCount({ a, u, t }) {
             }}>
               {animatedUser.toLocaleString()}
             </div>
-            <div className="fs-mono" style={{ fontSize: 18, color: '#d0d0e0' }}>
+            <div className="fs-mono" style={{ fontSize: 18, color: 'rgba(255,255,255,0.75)' }}>
               · {u.sharePct.toFixed(1)}%
             </div>
           </div>
@@ -5011,7 +5001,7 @@ const SlideMessageCount = React.memo(function SlideMessageCount({ a, u, t }) {
           <div style={{
             marginTop: 14, marginInline: 'auto', maxWidth: 240,
             height: 8, borderRadius: 999,
-            background: 'rgba(255,255,255,0.10)', overflow: 'hidden',
+            background: 'rgba(255,255,255,0.20)', overflow: 'hidden',
           }}>
             <div style={{
               height: '100%', width: `${u.sharePct}%`,
@@ -5036,59 +5026,62 @@ const SlideRank = React.memo(function SlideRank({ a, u, t }) {
   const maxMsgs = top5[0].messageCount;
 
   return (
-    <SlideShell bg="#1f0a2a" accent="#f06449">
+    <SlideShell bg="#573280" accent="#ffd972">
       <div style={{
         position: 'relative', height: '100%',
         display: 'flex', flexDirection: 'column', justifyContent: 'center',
         padding: '0 24px',
       }}>
-        <div className="fs-mono a-fade-up" style={{ fontSize: 14, color: '#f06449', letterSpacing: '0.15em' }}>
+        <div className="fs-mono a-fade-up" style={{ fontSize: 14, color: '#ffd972', letterSpacing: '0.15em' }}>
           {t.rank_eyebrow}
         </div>
         <div className="fs-display a-fade-up" style={{
-          animationDelay: '0.2s', fontSize: 32, lineHeight: 1.15, letterSpacing: '-0.03em', marginTop: 20, fontWeight: 700,
+          animationDelay: '0.2s', fontSize: 28, lineHeight: 1.15, letterSpacing: '-0.03em', marginTop: 16, fontWeight: 700, color: '#f1e4f3',
         }}>
           {t.rank_finished}<br/>
-          <span style={{ color: '#f06449', fontStyle: 'italic' }}>{ordinal(rank)}</span> {interp(t.rank_of, { n: a.users.length })}
+          <span style={{ color: '#ffd972', fontStyle: 'italic' }}>{ordinal(rank)}</span> {interp(t.rank_of, { n: a.users.length })}
         </div>
-        <div style={{ marginTop: 32, display: 'flex', flexDirection: 'column', gap: 10 }}>
+        <div style={{ marginTop: 28, display: 'flex', flexDirection: 'column', gap: 10 }}>
           {top5.map((row, i) => {
             const isUser = row.author === u.author;
+            const isFirst = i === 0;
             return (
-              <div key={row.author} className="a-slide-right" style={{
-                position: 'relative', padding: '12px 16px',
-                background: isUser ? 'rgba(240,100,73,0.15)' : 'rgba(255,255,255,0.04)',
-                border: isUser ? '1px solid rgba(240,100,73,0.5)' : '1px solid rgba(255,255,255,0.06)',
-                borderRadius: 12, overflow: 'hidden',
-                animationDelay: `${0.5 + i * 0.1}s`,
+              <div key={row.author} dir="auto" className="a-slide-right" style={{
+                position: 'relative',
+                padding: '14px 20px',
+                background: isFirst ? 'rgba(255,217,114,0.22)' : isUser ? 'rgba(241,228,243,0.14)' : 'rgba(255,255,255,0.06)',
+                borderRadius: 18, overflow: 'hidden',
+                animationDelay: `${0.45 + i * 0.1}s`,
               }}>
                 <div className="a-bar" style={{
-                  position: 'absolute', top: 0, bottom: 0, left: 0,
+                  position: 'absolute', top: 0, bottom: 0, insetInlineStart: 0,
                   width: `${(row.messageCount / maxMsgs) * 100}%`,
-                  background: isUser ? 'rgba(240,100,73,0.18)' : 'rgba(255,255,255,0.03)',
-                  animationDelay: `${0.7 + i * 0.1}s`,
+                  background: isFirst ? 'rgba(255,217,114,0.12)' : 'rgba(255,255,255,0.04)',
+                  animationDelay: `${0.65 + i * 0.1}s`,
                 }} />
                 <div style={{
                   position: 'relative', display: 'flex',
-                  justifyContent: 'space-between', alignItems: 'center',
+                  alignItems: 'center', gap: 14,
                 }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 10, minWidth: 0 }}>
-                    <div className="fs-mono" style={{
-                      fontSize: 14, color: isUser ? '#f06449' : '#c8c8dc',
-                      width: 18, fontWeight: 700,
-                    }}>
-                      {String(i + 1).padStart(2, '0')}
-                    </div>
-                    <div style={{
-                      fontSize: 16, fontWeight: isUser ? 700 : 500,
-                      overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
-                    }}>
-                      {row.author} {isUser && <span style={{ color: '#f06449' }}>{t.rank_you}</span>}
-                    </div>
+                  <div className="fs-display" style={{
+                    fontSize: 28, fontWeight: 800, lineHeight: 1,
+                    color: isFirst ? '#ffd972' : 'rgba(241,228,243,0.30)',
+                    width: 36, flexShrink: 0,
+                  }}>
+                    {i + 1}
+                  </div>
+                  <div style={{
+                    flex: 1, minWidth: 0,
+                    fontSize: 16, fontWeight: isUser || isFirst ? 700 : 500,
+                    color: isFirst ? '#ffd972' : '#f1e4f3',
+                    overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+                  }}>
+                    {row.author} {isUser && <span style={{ color: '#ffd972', fontSize: 13, fontWeight: 600 }}>{t.rank_you}</span>}
                   </div>
                   <div className="fs-mono" style={{
-                    fontSize: 16, fontWeight: 600,
-                    color: isUser ? '#f06449' : '#d0d0e0',
+                    fontSize: 15, fontWeight: 600,
+                    color: isFirst ? '#ffd972' : 'rgba(241,228,243,0.60)',
+                    flexShrink: 0,
                   }}>
                     {row.messageCount.toLocaleString()}
                   </div>
@@ -5120,7 +5113,7 @@ const SlideVsEveryone = React.memo(function SlideVsEveryone({ a, u, t }) {
     : interp(t.vs_avg_h, { h: (fastestAvg / 60).toFixed(1) });
 
   return (
-    <SlideShell bg="#0a1a2a" accent="#9cf6f6">
+    <SlideShell bg="#573280" accent="#9cf6f6">
       <div style={{
         position: 'relative', height: '100%',
         display: 'flex', flexDirection: 'column', justifyContent: 'center',
@@ -5135,7 +5128,7 @@ const SlideVsEveryone = React.memo(function SlideVsEveryone({ a, u, t }) {
             fontSize: 64, lineHeight: 1.1, letterSpacing: '-0.04em',
             color: '#9cf6f6', fontWeight: 800,
           }}>
-            {animatedBeat}<span style={{ fontSize: 36, color: '#d0d0e0' }}>/{animatedTotal}</span>
+            {animatedBeat}<span style={{ fontSize: 36, color: 'rgba(241,228,243,0.45)' }}>/{animatedTotal}</span>
           </div>
         </div>
 
@@ -5152,14 +5145,14 @@ const SlideVsEveryone = React.memo(function SlideVsEveryone({ a, u, t }) {
         </div>
 
         <div className="fs-mono a-fade-up" style={{
-          animationDelay: '1.0s', marginTop: 20, fontSize: 16, color: '#d0d0e0', letterSpacing: '0.08em',
+          animationDelay: '1.0s', marginTop: 20, fontSize: 16, color: 'rgba(241,228,243,0.70)', letterSpacing: '0.08em',
         }}>
           {interp(t.vs_ranked, { msgs: u.messageCount.toLocaleString(), rank, total: totalUsers })}
         </div>
 
         {a.fastestResponder && a.fastestResponder.author !== u.author && a.fastestResponder.avgRespMin != null && (
           <div className="a-fade-up" style={{ animationDelay: '1.3s', marginTop: 24 }}>
-            <div className="fs-mono" style={{ fontSize: 14, color: '#c8c8dc', letterSpacing: '0.12em' }}>
+            <div className="fs-mono" style={{ fontSize: 14, color: 'rgba(241,228,243,0.55)', letterSpacing: '0.12em' }}>
               {t.vs_fastest}
             </div>
             <div className="fs-display" style={{
@@ -5168,7 +5161,7 @@ const SlideVsEveryone = React.memo(function SlideVsEveryone({ a, u, t }) {
             }}>
               {a.fastestResponder.author}
             </div>
-            <div className="fs-mono" style={{ fontSize: 16, color: '#c8c8dc', marginTop: 2 }}>
+            <div className="fs-mono" style={{ fontSize: 16, color: 'rgba(241,228,243,0.55)', marginTop: 2 }}>
               {fastestAvgText}
             </div>
           </div>
@@ -5182,7 +5175,7 @@ const SlideTitle = React.memo(function SlideTitle({ u, t }) {
   const title = resolveTitle(u, t);
   const evidence = resolveTitleEvidence(u, t);
   return (
-    <SlideShell bg="#0a0a0f" accent="#ffd972">
+    <SlideShell bg="#573280" accent="#ffd972">
       <div style={{
         position: 'relative', height: '100%',
         display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center',
@@ -5201,10 +5194,10 @@ const SlideTitle = React.memo(function SlideTitle({ u, t }) {
           </div>
         </div>
         <div className="a-fade-up" style={{ animationDelay: '1.0s', marginTop: 40 }}>
-          <div className="fs-mono" style={{ fontSize: 14, color: '#d0d0e0', letterSpacing: '0.12em' }}>
+          <div className="fs-mono" style={{ fontSize: 14, color: 'rgba(241,228,243,0.55)', letterSpacing: '0.12em' }}>
             {t.title_based_on}
           </div>
-          <div className="fs-sans" style={{ fontSize: 18, color: '#fff', marginTop: 8, fontWeight: 500, lineHeight: 1.4 }}>
+          <div className="fs-sans" style={{ fontSize: 18, color: '#f1e4f3', marginTop: 8, fontWeight: 500, lineHeight: 1.4 }}>
             {evidence}
           </div>
         </div>
@@ -5215,7 +5208,7 @@ const SlideTitle = React.memo(function SlideTitle({ u, t }) {
 
 const SlideGroupDescribes = React.memo(function SlideGroupDescribes({ u, t }) {
   return (
-    <SlideShell bg="#1a0a18" accent="#f06449">
+    <SlideShell bg="#f1e4f3" accent="#f06449">
       <div style={{
         position: 'relative', height: '100%',
         display: 'flex', flexDirection: 'column', justifyContent: 'center',
@@ -5226,13 +5219,13 @@ const SlideGroupDescribes = React.memo(function SlideGroupDescribes({ u, t }) {
         </div>
         <div className="a-spring" style={{ animationDelay: '0.3s', marginTop: 48 }}>
           <div className="fs-display" style={{
-            fontSize: 36, lineHeight: 1.2, letterSpacing: '-0.03em', fontStyle: 'italic', fontWeight: 700,
+            fontSize: 36, lineHeight: 1.2, letterSpacing: '-0.03em', fontStyle: 'italic', fontWeight: 700, color: '#1a1a2e',
           }}>
             "{t[u.groupDescriptionKey] || u.groupDescriptionKey}"
           </div>
         </div>
         <div className="fs-sans a-fade-up" style={{
-          animationDelay: '1.0s', marginTop: 40, fontSize: 18, lineHeight: 1.5, color: '#d0d0e0',
+          animationDelay: '1.0s', marginTop: 40, fontSize: 18, lineHeight: 1.5, color: 'rgba(87,50,128,0.70)',
         }}>
           {t.descr_footnote}
         </div>
@@ -5246,7 +5239,7 @@ const SlidePeakHour = React.memo(function SlidePeakHour({ a, u, t }) {
   const hourStr = String(hour).padStart(2, '0');
   const max = Math.max(...a.groupHourly);
   return (
-    <SlideShell bg="#1a0a2f" accent="#9cf6f6">
+    <SlideShell bg="#573280" accent="#9cf6f6">
       <div style={{
         position: 'relative', height: '100%',
         display: 'flex', flexDirection: 'column', justifyContent: 'center',
@@ -5257,7 +5250,7 @@ const SlidePeakHour = React.memo(function SlidePeakHour({ a, u, t }) {
         </div>
         <div className="fs-display a-spring" style={{
           animationDelay: '0.2s', fontSize: 64, lineHeight: 1.1,
-          letterSpacing: '-0.04em', marginTop: 48, fontWeight: 800,
+          letterSpacing: '-0.04em', marginTop: 48, fontWeight: 800, color: '#f1e4f3',
         }}>
           {hourStr}<span style={{ color: '#9cf6f6' }}>:00</span>
         </div>
@@ -5269,7 +5262,7 @@ const SlidePeakHour = React.memo(function SlidePeakHour({ a, u, t }) {
           {a.groupHourly.map((c, h) => (
             <div key={h} className="a-bar" style={{
               width: 7, height: `${(c / max) * 56}px`,
-              background: h === hour ? '#9cf6f6' : 'rgba(255,255,255,0.2)',
+              background: h === hour ? '#9cf6f6' : 'rgba(241,228,243,0.18)',
               borderRadius: 1,
               animationDelay: `${0.9 + h * 0.02}s`,
             }} />
@@ -5277,7 +5270,7 @@ const SlidePeakHour = React.memo(function SlidePeakHour({ a, u, t }) {
         </div>
         <div className="fs-sans a-fade-up" style={{
           animationDelay: '1.2s', marginTop: 32, fontSize: 18, lineHeight: 1.5,
-          color: '#d0d0e0', maxWidth: 280, margin: '32px auto 0',
+          color: 'rgba(241,228,243,0.75)', maxWidth: 280, margin: '32px auto 0',
         }}>
           {hour >= 0 && hour < 5 && t.peak_3am}
           {hour >= 5 && hour < 11 && t.peak_morning}
@@ -5293,7 +5286,7 @@ const SlidePeakHour = React.memo(function SlidePeakHour({ a, u, t }) {
 const SlideNight = React.memo(function SlideNight({ a, u, t }) {
   const pct = useAnimatedNumber(Math.round(u.nightPct), 1400, [u.author]);
   return (
-    <SlideShell bg="#0a0418" accent="#9cf6f6">
+    <SlideShell bg="#573280" accent="#9cf6f6">
       <div style={{ position: 'absolute', inset: 0, pointerEvents: 'none' }}>
         {[20, 50, 80].map((left, i) => (
           <div key={i} className="a-float" style={{
@@ -5307,22 +5300,22 @@ const SlideNight = React.memo(function SlideNight({ a, u, t }) {
         display: 'flex', flexDirection: 'column', justifyContent: 'center',
         textAlign: 'center', padding: '0 24px',
       }}>
-        <div className="fs-mono a-fade-up" style={{ fontSize: 14, color: '#ffd972', letterSpacing: '0.15em' }}>
+        <div className="fs-mono a-fade-up" style={{ fontSize: 14, color: '#9cf6f6', letterSpacing: '0.15em' }}>
           {t.night_eyebrow}
         </div>
         <div className="fs-display a-spring" style={{
           animationDelay: '0.2s', fontSize: 64, lineHeight: 1.1,
-          letterSpacing: '-0.04em', color: '#ffd972', marginTop: 48, fontWeight: 800,
+          letterSpacing: '-0.04em', color: '#9cf6f6', marginTop: 48, fontWeight: 800,
         }}>
           {pct}<span style={{ fontSize: 32 }}>%</span>
         </div>
         <div className="fs-display a-fade-up" style={{
-          animationDelay: '0.6s', fontSize: 20, fontStyle: 'italic', marginTop: 10, fontWeight: 500,
+          animationDelay: '0.6s', fontSize: 20, fontStyle: 'italic', marginTop: 10, fontWeight: 500, color: '#f1e4f3',
         }}>
           {t.night_of_msgs}
         </div>
         <div className="fs-mono a-fade-up" style={{
-          animationDelay: '0.9s', fontSize: 16, color: '#d0d0e0',
+          animationDelay: '0.9s', fontSize: 16, color: 'rgba(241,228,243,0.70)',
           marginTop: 16, letterSpacing: '0.08em',
         }}>
           {interp(t.night_count, {
@@ -5332,7 +5325,7 @@ const SlideNight = React.memo(function SlideNight({ a, u, t }) {
         </div>
         <div className="fs-sans a-fade-up" style={{
           animationDelay: '1.2s', marginTop: 32, fontSize: 18, lineHeight: 1.5,
-          color: '#d0d0e0', maxWidth: 280, margin: '32px auto 0',
+          color: 'rgba(241,228,243,0.75)', maxWidth: 280, margin: '32px auto 0',
         }}>
           {u.nightPct > 30 && t.night_diag_strong}
           {u.nightPct > 15 && u.nightPct <= 30 && t.night_diag_med}
@@ -5356,7 +5349,7 @@ const SlideStreak = React.memo(function SlideStreak({ u, t }) {
   const days = useAnimatedNumber(u.longestStreak, 1200, [u.author]);
   const dotCount = Math.min(u.longestStreak, 30);
   return (
-    <SlideShell bg="#1a1a08" accent="#ffd972">
+    <SlideShell bg="#f06449" accent="#ffd972">
       <div style={{
         position: 'relative', height: '100%',
         display: 'flex', flexDirection: 'column', justifyContent: 'center',
@@ -5373,7 +5366,7 @@ const SlideStreak = React.memo(function SlideStreak({ u, t }) {
             {days}
           </div>
           <div className="fs-display" style={{
-            fontSize: 20, fontStyle: 'italic', marginTop: 10, fontWeight: 500,
+            fontSize: 20, fontStyle: 'italic', marginTop: 10, fontWeight: 500, color: '#fff',
           }}>
             {u.longestStreak === 1 ? t.streak_day : t.streak_days}
           </div>
@@ -5386,8 +5379,8 @@ const SlideStreak = React.memo(function SlideStreak({ u, t }) {
           {Array.from({ length: dotCount }).map((_, i) => (
             <div key={i} style={{
               width: 8, height: 8, borderRadius: 2,
-              background: '#ffd972',
-              opacity: 0.4 + (i / dotCount) * 0.6,
+              background: '#fff',
+              opacity: 0.3 + (i / dotCount) * 0.7,
               animation: `scaleIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) ${1 + i * 0.03}s both`,
             }} />
           ))}
@@ -5405,7 +5398,7 @@ const SlideSpeed = React.memo(function SlideSpeed({ a, u, t }) {
     : `${(respTime / 60).toFixed(1)}h`;
   const pct = u.speedPercentile ?? 50;
   return (
-    <SlideShell bg="#0a1f2a" accent="#9cf6f6">
+    <SlideShell bg="#573280" accent="#9cf6f6">
       <div style={{
         position: 'relative', height: '100%',
         display: 'flex', flexDirection: 'column', justifyContent: 'center',
@@ -5422,14 +5415,14 @@ const SlideSpeed = React.memo(function SlideSpeed({ a, u, t }) {
         </div>
         <div className="a-fade-up" style={{ animationDelay: '0.8s', marginTop: 40 }}>
           <div className="fs-display" style={{
-            fontSize: 28, lineHeight: 1.2, letterSpacing: '-0.02em', fontStyle: 'italic', fontWeight: 700,
+            fontSize: 28, lineHeight: 1.2, letterSpacing: '-0.02em', fontStyle: 'italic', fontWeight: 700, color: '#f1e4f3',
           }}>
             {t.speed_faster}<br/>
             <span style={{ color: '#9cf6f6', fontStyle: 'normal' }}>{pct}%</span> {t.speed_of_group}
           </div>
         </div>
         <div className="fs-mono a-fade-up" style={{
-          animationDelay: '1.3s', marginTop: 24, fontSize: 14, color: '#c8c8dc', letterSpacing: '0.12em',
+          animationDelay: '1.3s', marginTop: 24, fontSize: 14, color: 'rgba(241,228,243,0.55)', letterSpacing: '0.12em',
         }}>
           {interp(t.speed_based, { n: u.respSampleSize })}
         </div>
@@ -5441,26 +5434,26 @@ const SlideSpeed = React.memo(function SlideSpeed({ a, u, t }) {
 const SlideWord = React.memo(function SlideWord({ u, t }) {
   const word = u.topWord;
   return (
-    <SlideShell bg="#2a0a1a" accent="#f06449">
+    <SlideShell bg="#573280" accent="#ffd972">
       <div style={{
         position: 'relative', height: '100%',
         display: 'flex', flexDirection: 'column', justifyContent: 'center',
         textAlign: 'center', padding: '0 24px',
       }}>
-        <div className="fs-mono a-fade-up" style={{ fontSize: 14, color: '#f06449', letterSpacing: '0.15em' }}>
+        <div className="fs-mono a-fade-up" style={{ fontSize: 14, color: '#ffd972', letterSpacing: '0.15em' }}>
           {t.word_eyebrow}
         </div>
         <div className="a-spring" style={{ animationDelay: '0.3s', marginTop: 48 }}>
           <div className="fs-display" style={{
             fontSize: word.length > 10 ? 40 : word.length > 6 ? 56 : 64,
-            lineHeight: 1.1, letterSpacing: '-0.03em', color: '#f06449',
+            lineHeight: 1.1, letterSpacing: '-0.03em', color: '#ffd972',
             fontStyle: 'italic', wordBreak: 'break-word', fontWeight: 800,
           }}>
             "{word}"
           </div>
         </div>
         <div className="fs-sans a-fade-up" style={{
-          animationDelay: '1.0s', marginTop: 40, fontSize: 18, lineHeight: 1.5, color: '#d0d0e0',
+          animationDelay: '1.0s', marginTop: 40, fontSize: 18, lineHeight: 1.5, color: 'rgba(241,228,243,0.75)',
         }}>
           {interp(t.word_used, { n: u.topWordCount })}
         </div>
@@ -5475,23 +5468,23 @@ const SlideTopWords = React.memo(function SlideTopWords({ a, t }) {
   const maxCount = words[0].count;
 
   return (
-    <SlideShell bg="#0a1a1f" accent="#9cf6f6">
+    <SlideShell bg="#f1e4f3" accent="#573280">
       <div style={{
         position: 'relative', height: '100%',
         display: 'flex', flexDirection: 'column',
         padding: '32px 24px 24px',
       }}>
         <div className="fs-mono a-fade-up" style={{
-          textAlign: 'center', fontSize: 14, color: '#9cf6f6', letterSpacing: '0.15em',
+          textAlign: 'center', fontSize: 14, color: '#573280', letterSpacing: '0.15em',
         }}>
           {t.top_words_eyebrow}
         </div>
         <div className="fs-display a-fade-up" style={{
           textAlign: 'center', animationDelay: '0.2s',
-          fontSize: 32, lineHeight: 1.15, letterSpacing: '-0.03em', fontWeight: 700,
+          fontSize: 32, lineHeight: 1.15, letterSpacing: '-0.03em', fontWeight: 700, color: '#1a1a2e',
           marginTop: 12, marginBottom: 20,
         }}>
-          {t.top_words_title}<br/><span style={{ fontStyle: 'italic', color: '#9cf6f6' }}>{t.top_words_subtitle}</span>
+          {t.top_words_title}<br/><span style={{ fontStyle: 'italic', color: '#573280' }}>{t.top_words_subtitle}</span>
         </div>
         <div className="no-sb" style={{
           flex: 1, overflowY: 'auto',
@@ -5500,26 +5493,25 @@ const SlideTopWords = React.memo(function SlideTopWords({ a, t }) {
           {words.map((w, i) => {
             const pct = Math.max(8, Math.round((w.count / maxCount) * 100));
             return (
-              <div key={w.word} className="a-slide-up-far" style={{
+              <div key={w.word} dir="auto" className="a-slide-up-far" style={{
                 position: 'relative',
-                padding: '14px 16px',
-                background: 'rgba(156,246,246,0.08)',
-                border: '1px solid rgba(156,246,246,0.22)',
-                borderRadius: 14,
+                padding: '16px 20px',
+                background: 'rgba(87,50,128,0.08)',
+                borderRadius: 18,
                 overflow: 'hidden',
                 animationDelay: `${0.5 + i * 0.13}s`,
               }}>
                 <div className="a-slide-right" style={{
-                  position: 'absolute', inset: 0,
-                  background: 'linear-gradient(90deg, rgba(156,246,246,0.18) 0%, rgba(156,246,246,0.04) 100%)',
+                  position: 'absolute', top: 0, bottom: 0, insetInlineStart: 0,
+                  background: 'linear-gradient(90deg, rgba(87,50,128,0.14) 0%, rgba(87,50,128,0.02) 100%)',
                   width: `${pct}%`,
                   animationDelay: `${0.7 + i * 0.13}s`,
                   pointerEvents: 'none',
                 }} />
                 <div style={{ position: 'relative', display: 'flex', alignItems: 'center', gap: 14 }}>
-                  <div className="fs-mono" style={{
-                    fontSize: 14, color: '#9cf6f6', fontWeight: 700,
-                    width: 20, textAlign: 'center', opacity: 0.85,
+                  <div className="fs-display" style={{
+                    fontSize: 24, fontWeight: 800, color: i === 0 ? '#573280' : 'rgba(87,50,128,0.35)',
+                    width: 28, flexShrink: 0, lineHeight: 1,
                   }}>
                     {i + 1}
                   </div>
@@ -5527,13 +5519,13 @@ const SlideTopWords = React.memo(function SlideTopWords({ a, t }) {
                     flex: 1, minWidth: 0,
                     fontSize: w.word.length > 12 ? 18 : w.word.length > 8 ? 22 : 28,
                     lineHeight: 1.1, letterSpacing: '-0.02em',
-                    fontStyle: 'italic', color: '#fff', fontWeight: 700,
+                    fontStyle: 'italic', color: '#1a1a2e', fontWeight: 700,
                     overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
                   }}>
                     "{w.word}"
                   </div>
                   <div className="fs-mono" style={{
-                    fontSize: 16, color: '#9cf6f6', fontWeight: 700,
+                    fontSize: 16, color: '#573280', fontWeight: 700,
                     letterSpacing: '0.05em', flexShrink: 0,
                   }}>
                     {w.count.toLocaleString()}×
@@ -5550,7 +5542,7 @@ const SlideTopWords = React.memo(function SlideTopWords({ a, t }) {
 
 const SlideEmoji = React.memo(function SlideEmoji({ a, u, t }) {
   return (
-    <SlideShell bg="#1a0a2a" accent="#ffd972">
+    <SlideShell bg="#f06449" accent="#ffd972">
       <div style={{ position: 'absolute', inset: 0, pointerEvents: 'none' }}>
         {[15, 40, 65, 85].map((left, i) => (
           <div key={i} className="a-float" style={{
@@ -5573,7 +5565,7 @@ const SlideEmoji = React.memo(function SlideEmoji({ a, u, t }) {
           {u.topEmoji}
         </div>
         <div className="fs-sans a-fade-up" style={{
-          animationDelay: '0.8s', marginTop: 40, fontSize: 18, color: '#d0d0e0', lineHeight: 1.4,
+          animationDelay: '0.8s', marginTop: 40, fontSize: 18, color: 'rgba(255,255,255,0.85)', lineHeight: 1.4,
         }}>
           {interp(t.emoji_used, { n: u.topEmojiCount })}
         </div>
@@ -5591,40 +5583,43 @@ const SlideDramaRole = React.memo(function SlideDramaRole({ u, t }) {
     labelText = t.drama_defib_label;
     copyText = t.drama_defib_copy;
     accent = '#9cf6f6';
-    bg = '#0a1a14';
+    bg = '#573280';
   } else if (u.conversationsKilled > u.conversationsRevived && u.conversationsKilled >= 5) {
     titleText = t.drama_killer;
     count = u.conversationsKilled;
     labelText = t.drama_killer_label;
     copyText = t.drama_killer_copy;
     accent = '#f06449';
-    bg = '#1a0a0a';
+    bg = '#573280';
   } else if (u.replyReceivedRate > 0.5 && u.messageCount >= 20) {
     titleText = t.drama_replied;
     count = Math.round(u.replyReceivedRate * 100);
     labelText = t.drama_replied_label;
     copyText = t.drama_replied_copy;
     accent = '#ffd972';
-    bg = '#1a1a08';
+    bg = '#f06449';
   } else if (u.ignoredRate > 0.25 && u.messageCount >= 20) {
     titleText = t.drama_ignored;
     count = Math.round(u.ignoredRate * 100);
     labelText = t.drama_ignored_label;
     copyText = t.drama_ignored_copy;
-    accent = '#f1e4f3';
-    bg = '#0a0a14';
+    accent = '#573280';
+    bg = '#f1e4f3';
   } else {
     titleText = t.drama_steady;
     count = u.finalMessagesOfDay;
     labelText = t.drama_steady_label;
     copyText = t.drama_steady_copy;
     accent = '#9cf6f6';
-    bg = '#0a141f';
+    bg = '#573280';
   }
 
   const animated = useAnimatedNumber(count, 1400, [u.author]);
   const isPercent = labelText.startsWith('%');
   const cleanLabel = isPercent ? labelText.slice(1).trim() : labelText;
+  const isLightBg = bg === '#f1e4f3';
+  const bodyColor = isLightBg ? 'rgba(87,50,128,0.70)' : 'rgba(241,228,243,0.75)';
+  const heroColor = isLightBg ? '#1a1a2e' : '#fff';
 
   return (
     <SlideShell bg={bg} accent={accent}>
@@ -5646,18 +5641,18 @@ const SlideDramaRole = React.memo(function SlideDramaRole({ u, t }) {
         </div>
         <div className="a-spring" style={{ animationDelay: '0.7s', marginTop: 40 }}>
           <div className="fs-display" style={{
-            fontSize: 56, lineHeight: 1.1, letterSpacing: '-0.04em', color: '#fff', fontWeight: 800,
+            fontSize: 56, lineHeight: 1.1, letterSpacing: '-0.04em', color: heroColor, fontWeight: 800,
           }}>
             {animated}{isPercent ? '%' : ''}
           </div>
           <div className="fs-mono" style={{
-            fontSize: 16, color: '#d0d0e0', letterSpacing: '0.08em', marginTop: 8,
+            fontSize: 16, color: bodyColor, letterSpacing: '0.08em', marginTop: 8,
           }}>
             {cleanLabel}
           </div>
         </div>
         <div className="fs-sans a-fade-up" style={{
-          animationDelay: '1.3s', marginTop: 32, fontSize: 18, lineHeight: 1.5, color: '#d0d0e0',
+          animationDelay: '1.3s', marginTop: 32, fontSize: 18, lineHeight: 1.5, color: bodyColor,
         }}>
           {copyText}
         </div>
@@ -5676,7 +5671,7 @@ const SlideRoast = React.memo(function SlideRoast({ u, profile, t }) {
     : tone === 'mild' ? t.roast_eyebrow_mild
     : t.roast_eyebrow_med;
   return (
-    <SlideShell bg="#1a0a14" accent="#f06449">
+    <SlideShell bg="#573280" accent="#f06449">
       <div style={{
         position: 'relative', height: '100%',
         display: 'flex', flexDirection: 'column', justifyContent: 'center',
@@ -5689,7 +5684,7 @@ const SlideRoast = React.memo(function SlideRoast({ u, profile, t }) {
         </div>
         <div className="fs-display a-fade-up" style={{
           animationDelay: '0.15s', fontSize: 32, lineHeight: 1.15,
-          letterSpacing: '-0.03em', marginTop: 16, fontStyle: 'italic', fontWeight: 700,
+          letterSpacing: '-0.03em', marginTop: 16, fontStyle: 'italic', fontWeight: 700, color: '#f1e4f3',
         }}>
           {heading}
         </div>
@@ -5697,22 +5692,20 @@ const SlideRoast = React.memo(function SlideRoast({ u, profile, t }) {
           {roasts.map((roast, i) => (
             <div key={i} className="a-roast-card" style={{
               position: 'relative', overflow: 'hidden',
-              padding: '20px 20px 18px',
-              background: 'linear-gradient(135deg, rgba(240,100,73,0.14) 0%, rgba(240,100,73,0.04) 100%)',
-              border: '1px solid rgba(240,100,73,0.35)',
-              borderRadius: 18,
+              padding: '20px 22px 18px',
+              background: 'rgba(241,228,243,0.10)',
+              borderRadius: 20,
               animationDelay: `${0.5 + i * 0.5}s`,
-              boxShadow: '0 8px 24px rgba(240,100,73,0.10)',
             }}>
               <div className="fs-mono" style={{
                 fontSize: 14, color: '#f06449', letterSpacing: '0.15em',
-                opacity: 0.55, marginBottom: 10, fontWeight: 700,
+                opacity: 0.70, marginBottom: 10, fontWeight: 700,
               }}>
                 #{String(i + 1).padStart(2, '0')}
               </div>
               <div className="fs-sans" style={{
                 fontSize: 18, lineHeight: 1.45, letterSpacing: '-0.01em',
-                color: '#fff', fontWeight: 400,
+                color: '#f1e4f3', fontWeight: 400,
               }}>
                 {interp(t[roast.lineKey] || '', roast.vars || {})}
               </div>
@@ -5730,7 +5723,7 @@ const SlideRoast = React.memo(function SlideRoast({ u, profile, t }) {
         {u.roasts.length > 2 && (
           <div className="fs-mono a-fade-up" style={{
             animationDelay: '1.8s', textAlign: 'center', marginTop: 16,
-            fontSize: 14, color: '#c8c8dc', letterSpacing: '0.12em',
+            fontSize: 14, color: 'rgba(241,228,243,0.55)', letterSpacing: '0.12em',
           }}>
             {interp(t.roast_more, { n: u.roasts.length - 2 })}
           </div>
@@ -5743,7 +5736,7 @@ const SlideRoast = React.memo(function SlideRoast({ u, profile, t }) {
 const SlideAchievements = React.memo(function SlideAchievements({ achievements, t }) {
   const top = achievements.slice(0, 3);
   return (
-    <SlideShell bg="#0a0a14" accent="#ffd972">
+    <SlideShell bg="#573280" accent="#ffd972">
       <div style={{
         position: 'relative', height: '100%',
         display: 'flex', flexDirection: 'column', justifyContent: 'center',
@@ -5754,7 +5747,7 @@ const SlideAchievements = React.memo(function SlideAchievements({ achievements, 
         </div>
         <div className="fs-display a-fade-up" style={{
           animationDelay: '0.2s', fontSize: 32, lineHeight: 1.15,
-          letterSpacing: '-0.03em', marginTop: 20, fontWeight: 700,
+          letterSpacing: '-0.03em', marginTop: 20, fontWeight: 700, color: '#f1e4f3',
         }}>
           {t.ach_earned}<br/>
           <span style={{ fontStyle: 'italic', color: '#ffd972' }}>{achievements.length}</span>{' '}
@@ -5763,10 +5756,9 @@ const SlideAchievements = React.memo(function SlideAchievements({ achievements, 
         <div style={{ marginTop: 32, display: 'flex', flexDirection: 'column', gap: 16 }}>
           {top.map((ach, i) => (
             <div key={i} className="a-spring" style={{
-              position: 'relative', overflow: 'hidden', padding: '18px',
-              background: `linear-gradient(135deg, ${ach.color}22 0%, ${ach.color}08 100%)`,
-              border: `1px solid ${ach.color}40`,
-              borderRadius: 16,
+              position: 'relative', overflow: 'hidden', padding: '20px 22px',
+              background: `linear-gradient(135deg, ${ach.color}25 0%, ${ach.color}08 100%)`,
+              borderRadius: 20,
               animationDelay: `${0.5 + i * 0.2}s`,
             }}>
               <div style={{ display: 'flex', alignItems: 'flex-start', gap: 12 }}>
@@ -5778,7 +5770,7 @@ const SlideAchievements = React.memo(function SlideAchievements({ achievements, 
                     {t[ach.labelKey] || ach.labelKey}
                   </div>
                   <div className="fs-sans" style={{
-                    fontSize: 16, color: '#d0d0e0', marginTop: 6, lineHeight: 1.4,
+                    fontSize: 16, color: 'rgba(241,228,243,0.70)', marginTop: 6, lineHeight: 1.4,
                   }}>
                     {interp(t[ach.evidenceKey] || '', ach.vars || {})}
                   </div>
@@ -5790,7 +5782,7 @@ const SlideAchievements = React.memo(function SlideAchievements({ achievements, 
         {achievements.length > 3 && (
           <div className="fs-mono a-fade-up" style={{
             animationDelay: '1.5s', textAlign: 'center', marginTop: 16,
-            fontSize: 14, color: '#c8c8dc', letterSpacing: '0.12em',
+            fontSize: 14, color: 'rgba(241,228,243,0.50)', letterSpacing: '0.12em',
           }}>
             {interp(t.ach_more, { n: achievements.length - 3 })}
           </div>
@@ -5802,7 +5794,7 @@ const SlideAchievements = React.memo(function SlideAchievements({ achievements, 
 
 const SlideMostLikely = React.memo(function SlideMostLikely({ a, t }) {
   return (
-    <SlideShell bg="#0a1a2a" accent="#9cf6f6">
+    <SlideShell bg="#573280" accent="#9cf6f6">
       <div style={{
         position: 'relative', height: '100%',
         display: 'flex', flexDirection: 'column',
@@ -5815,7 +5807,7 @@ const SlideMostLikely = React.memo(function SlideMostLikely({ a, t }) {
         </div>
         <div className="fs-display a-fade-up" style={{
           textAlign: 'center', animationDelay: '0.2s',
-          fontSize: 32, lineHeight: 1.15, letterSpacing: '-0.03em', fontWeight: 700,
+          fontSize: 32, lineHeight: 1.15, letterSpacing: '-0.03em', fontWeight: 700, color: '#f1e4f3',
           marginTop: 12, marginBottom: 20,
         }}>
           {t.likely_title}<br/><span style={{ fontStyle: 'italic', color: '#9cf6f6' }}>{t.likely_verdicts}</span>
@@ -5826,10 +5818,9 @@ const SlideMostLikely = React.memo(function SlideMostLikely({ a, t }) {
         }}>
           {a.mostLikely.map((card, i) => (
             <div key={i} className="a-slide-right" style={{
-              padding: '14px 16px',
-              background: 'rgba(156,246,246,0.10)',
-              border: '1px solid rgba(156,246,246,0.25)',
-              borderRadius: 14,
+              padding: '16px 20px',
+              background: 'rgba(156,246,246,0.08)',
+              borderRadius: 18,
               animationDelay: `${0.5 + i * 0.11}s`,
             }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
@@ -5840,7 +5831,7 @@ const SlideMostLikely = React.memo(function SlideMostLikely({ a, t }) {
                   }}>
                     {t.likely_label}
                   </div>
-                  <div className="fs-sans" style={{ fontSize: 16, color: '#fff', marginTop: 4, fontWeight: 500, lineHeight: 1.3 }}>
+                  <div className="fs-sans" style={{ fontSize: 16, color: '#f1e4f3', marginTop: 4, fontWeight: 500, lineHeight: 1.3 }}>
                     {t[card.labelKey] || card.labelKey}
                   </div>
                 </div>
@@ -5852,7 +5843,7 @@ const SlideMostLikely = React.memo(function SlideMostLikely({ a, t }) {
                   }}>
                     {card.winner}
                   </div>
-                  <div className="fs-mono" style={{ fontSize: 14, color: '#c8c8dc', marginTop: 4 }}>
+                  <div className="fs-mono" style={{ fontSize: 14, color: 'rgba(241,228,243,0.50)', marginTop: 4 }}>
                     {card.metric}
                   </div>
                 </div>
@@ -5870,14 +5861,14 @@ const SlideDuo = React.memo(function SlideDuo({ a, u, t }) {
   const isInDuo = n1 === u.author || n2 === u.author;
   const partner = n1 === u.author ? n2 : n1;
   return (
-    <SlideShell bg="#1f0a1a" accent="#f06449">
+    <SlideShell bg="#f06449" accent="#ffd972">
       <div style={{
         position: 'relative', height: '100%',
         display: 'flex', flexDirection: 'column', justifyContent: 'center',
         textAlign: 'center', padding: '0 24px',
       }}>
         <div className="fs-mono a-fade-up" style={{
-          fontSize: 14, color: '#f06449', letterSpacing: '0.15em',
+          fontSize: 14, color: '#ffd972', letterSpacing: '0.15em',
         }}>
           {t.duo_eyebrow}
         </div>
@@ -5885,22 +5876,22 @@ const SlideDuo = React.memo(function SlideDuo({ a, u, t }) {
           <div className="fs-display" style={{
             fontSize: 36, lineHeight: 1.15, letterSpacing: '-0.03em', fontWeight: 700,
           }}>
-            <span style={{ fontStyle: 'italic', color: '#f06449' }}>{n1}</span>
-            <span style={{ display: 'block', margin: '12px 0', fontSize: 16, color: '#c8c8dc' }}>&</span>
-            <span style={{ fontStyle: 'italic', color: '#f06449' }}>{n2}</span>
+            <span style={{ fontStyle: 'italic', color: '#ffd972' }}>{n1}</span>
+            <span style={{ display: 'block', margin: '12px 0', fontSize: 16, color: 'rgba(255,255,255,0.60)' }}>&</span>
+            <span style={{ fontStyle: 'italic', color: '#ffd972' }}>{n2}</span>
           </div>
         </div>
         <div className="a-fade-up" style={{ animationDelay: '0.9s', marginTop: 48 }}>
           <div className="fs-display" style={{
-            fontSize: 24, lineHeight: 1.3, letterSpacing: '-0.02em', fontWeight: 700,
+            fontSize: 24, lineHeight: 1.3, letterSpacing: '-0.02em', fontWeight: 700, color: '#fff',
           }}>
-            {t.duo_traded} <span style={{ color: '#f06449' }}>{a.topDuo.count.toLocaleString()}</span><br/>
+            {t.duo_traded} <span style={{ color: '#ffd972' }}>{a.topDuo.count.toLocaleString()}</span><br/>
             {t.duo_replies_between}
           </div>
         </div>
         <div className="fs-sans a-fade-up" style={{
           animationDelay: '1.4s', marginTop: 32, fontSize: 18,
-          color: '#d0d0e0', maxWidth: 280, margin: '32px auto 0', lineHeight: 1.45,
+          color: 'rgba(255,255,255,0.80)', maxWidth: 280, margin: '32px auto 0', lineHeight: 1.45,
         }}>
           {isInDuo
             ? interp(t.duo_in_with, { partner })
@@ -5915,7 +5906,7 @@ const MONTH_NAMES = ['January','February','March','April','May','June','July','A
 
 const SlideEras = React.memo(function SlideEras({ a, t }) {
   return (
-    <SlideShell bg="#0a0418" accent="#ffd972">
+    <SlideShell bg="#573280" accent="#ffd972">
       <div style={{
         position: 'relative', height: '100%',
         display: 'flex', flexDirection: 'column', padding: '32px 24px 24px',
@@ -5927,7 +5918,7 @@ const SlideEras = React.memo(function SlideEras({ a, t }) {
         </div>
         <div className="fs-display a-fade-up" style={{
           textAlign: 'center', animationDelay: '0.2s',
-          fontSize: 32, lineHeight: 1.15, letterSpacing: '-0.03em', fontWeight: 700,
+          fontSize: 32, lineHeight: 1.15, letterSpacing: '-0.03em', fontWeight: 700, color: '#f1e4f3',
           marginTop: 12, marginBottom: 20,
         }}>
           {t.eras_title}<br/><span style={{ fontStyle: 'italic', color: '#ffd972' }}>{t.eras_subtitle}</span>
@@ -5944,10 +5935,9 @@ const SlideEras = React.memo(function SlideEras({ a, t }) {
               : `${startMonth} ${era.startDate.getDate()} – ${endMonth} ${era.endDate.getDate()}`;
             return (
               <div key={i} className="a-fade-up" style={{
-                padding: '14px 16px',
+                padding: '16px 20px',
                 background: 'rgba(255,217,114,0.08)',
-                border: '1px solid rgba(255,217,114,0.20)',
-                borderRadius: 14,
+                borderRadius: 18,
                 animationDelay: `${0.5 + i * 0.18}s`,
               }}>
                 <div className="fs-mono" style={{
@@ -5957,12 +5947,12 @@ const SlideEras = React.memo(function SlideEras({ a, t }) {
                 </div>
                 <div className="fs-display" style={{
                   fontSize: 20, lineHeight: 1.2, letterSpacing: '-0.02em',
-                  marginTop: 4, fontStyle: 'italic', fontWeight: 700,
+                  marginTop: 4, fontStyle: 'italic', fontWeight: 700, color: '#f1e4f3',
                 }}>
                   {era.name}
                 </div>
                 <div className="fs-mono" style={{
-                  fontSize: 14, color: '#d0d0e0', marginTop: 6, letterSpacing: '0.03em',
+                  fontSize: 14, color: 'rgba(241,228,243,0.55)', marginTop: 6, letterSpacing: '0.03em',
                 }}>
                   {dateRange} · {era.messageCount.toLocaleString()} {t.eras_msgs} · {interp(t.eras_per_day, { n: era.msgPerDay })}
                 </div>
@@ -5988,14 +5978,13 @@ const SlideChaosMoment = React.memo(function SlideChaosMoment({ a, t }) {
   }));
 
   return (
-    <SlideShell bg="#1a0a14" accent="#f06449" shake={true}>
+    <SlideShell bg="#f06449" accent="#ffd972" shake={true}>
       <div style={{ position: 'absolute', inset: 0, pointerEvents: 'none', overflow: 'hidden' }}>
         {bubbles.map((b, i) => (
           <div key={i} style={{
             position: 'absolute', left: `${b.left}%`, top: -30,
             width: 60, height: 26, borderRadius: 8,
-            background: 'rgba(240,100,73,0.20)',
-            border: '1px solid rgba(240,100,73,0.35)',
+            background: 'rgba(255,255,255,0.18)',
             animation: `notifRain 3s linear ${b.delay}s infinite`,
           }} />
         ))}
@@ -6006,35 +5995,35 @@ const SlideChaosMoment = React.memo(function SlideChaosMoment({ a, t }) {
         textAlign: 'center', padding: '0 24px',
       }}>
         <div className="fs-mono a-fade-up" style={{
-          fontSize: 14, color: '#f06449', letterSpacing: '0.15em',
+          fontSize: 14, color: '#ffd972', letterSpacing: '0.15em',
         }}>
           {t.chaos_eyebrow}
         </div>
         <div className="a-fade-up" style={{ animationDelay: '0.3s', marginTop: 24 }}>
           <div className="fs-display" style={{
-            fontSize: 32, lineHeight: 1.15, letterSpacing: '-0.03em', fontWeight: 700,
+            fontSize: 32, lineHeight: 1.15, letterSpacing: '-0.03em', fontWeight: 700, color: '#fff',
           }}>
             <span style={{ fontStyle: 'italic' }}>{dateStr}</span>
-            <span style={{ display: 'block', color: '#f06449', marginTop: 6 }}>
+            <span style={{ display: 'block', color: '#ffd972', marginTop: 6 }}>
               {interp(t.chaos_at, { time: timeStr })}
             </span>
           </div>
         </div>
         <div className="a-spring" style={{ animationDelay: '0.8s', marginTop: 48 }}>
           <div className="fs-display" style={{
-            fontSize: 56, lineHeight: 1.1, letterSpacing: '-0.04em', color: '#f06449', fontWeight: 800,
+            fontSize: 56, lineHeight: 1.1, letterSpacing: '-0.04em', color: '#fff', fontWeight: 800,
           }}>
             {animated}
           </div>
           <div className="fs-display" style={{
-            fontSize: 20, marginTop: 8, color: '#fff', fontStyle: 'italic', fontWeight: 500,
+            fontSize: 20, marginTop: 8, color: '#ffd972', fontStyle: 'italic', fontWeight: 500,
           }}>
             {t.chaos_msgs_minute}
           </div>
         </div>
         <div className="fs-sans a-fade-up" style={{
           animationDelay: '1.6s', marginTop: 32, fontSize: 18, lineHeight: 1.5,
-          color: '#d0d0e0', maxWidth: 280, margin: '32px auto 0',
+          color: 'rgba(255,255,255,0.80)', maxWidth: 280, margin: '32px auto 0',
         }}>
           {t.chaos_lost_control}
         </div>
@@ -6045,38 +6034,38 @@ const SlideChaosMoment = React.memo(function SlideChaosMoment({ a, t }) {
 
 const SlideGroupPersona = React.memo(function SlideGroupPersona({ a, t }) {
   return (
-    <SlideShell bg="#0a0a18" accent="#ffd972">
+    <SlideShell bg="#f1e4f3" accent="#573280">
       <div style={{
         position: 'relative', height: '100%',
         display: 'flex', flexDirection: 'column', justifyContent: 'center',
         padding: '0 24px',
       }}>
         <div className="fs-mono a-fade-up" style={{
-          fontSize: 14, color: '#ffd972', letterSpacing: '0.15em',
+          fontSize: 14, color: '#573280', letterSpacing: '0.15em',
         }}>
           {t.persona_eyebrow}
         </div>
         <div className="fs-display a-fade-up" style={{
           animationDelay: '0.2s', fontSize: 20, lineHeight: 1.2,
-          letterSpacing: '-0.02em', marginTop: 20, color: '#d0d0e0', fontWeight: 500,
+          letterSpacing: '-0.02em', marginTop: 20, color: 'rgba(87,50,128,0.65)', fontWeight: 500,
         }}>
           {t.persona_this_group}
         </div>
         <div className="a-spring a-pulse-glow" style={{ animationDelay: '0.5s', marginTop: 24 }}>
           <div className="fs-display" style={{
             fontSize: 48, lineHeight: 1.1, letterSpacing: '-0.03em',
-            color: '#ffd972', fontStyle: 'italic', fontWeight: 800,
+            color: '#573280', fontStyle: 'italic', fontWeight: 800,
           }}>
             {a.groupPersonality}
           </div>
         </div>
         <div className="a-fade-up" style={{ animationDelay: '1.2s', marginTop: 48 }}>
           <div className="fs-mono" style={{
-            fontSize: 14, color: '#c8c8dc', letterSpacing: '0.12em', marginBottom: 10,
+            fontSize: 14, color: 'rgba(87,50,128,0.55)', letterSpacing: '0.12em', marginBottom: 10,
           }}>
             {t.persona_evidence}
           </div>
-          <div className="fs-sans" style={{ fontSize: 18, color: '#fff', lineHeight: 1.5, fontWeight: 400 }}>
+          <div className="fs-sans" style={{ fontSize: 18, color: '#1a1a2e', lineHeight: 1.5, fontWeight: 400 }}>
             {a.groupPersonalityReason}
           </div>
         </div>
@@ -6103,7 +6092,7 @@ const SlideAwards = React.memo(function SlideAwards({ a, t }) {
   ].filter(Boolean).slice(0, 6);
 
   return (
-    <SlideShell bg="#0a0a14" accent="#ffd972">
+    <SlideShell bg="#573280" accent="#ffd972">
       <div style={{
         position: 'relative', height: '100%',
         display: 'flex', flexDirection: 'column', padding: '32px 24px 24px',
@@ -6115,7 +6104,7 @@ const SlideAwards = React.memo(function SlideAwards({ a, t }) {
         </div>
         <div className="fs-display a-fade-up" style={{
           textAlign: 'center', animationDelay: '0.2s',
-          fontSize: 32, lineHeight: 1.15, letterSpacing: '-0.03em', fontWeight: 700,
+          fontSize: 32, lineHeight: 1.15, letterSpacing: '-0.03em', fontWeight: 700, color: '#f1e4f3',
           marginTop: 10, marginBottom: 18,
         }}>
           {t.awards_title}<br/><span style={{ fontStyle: 'italic', color: '#ffd972' }}>{t.awards_are}</span>
@@ -6127,10 +6116,9 @@ const SlideAwards = React.memo(function SlideAwards({ a, t }) {
           {awards.map((aw, i) => (
             <div key={aw.label} className="a-slide-up-far" style={{
               display: 'flex', alignItems: 'center', gap: 14,
-              padding: '14px 16px',
-              background: 'rgba(255,255,255,0.04)',
-              border: '1px solid rgba(255,255,255,0.06)',
-              borderRadius: 12,
+              padding: '14px 20px',
+              background: 'rgba(241,228,243,0.10)',
+              borderRadius: 18,
               animationDelay: `${0.5 + i * 0.15}s`,
             }}>
               <div style={{ fontSize: 24, lineHeight: 1, flexShrink: 0 }}>{aw.trophy}</div>
@@ -6142,14 +6130,14 @@ const SlideAwards = React.memo(function SlideAwards({ a, t }) {
                   {aw.label}
                 </div>
                 <div className="fs-sans" style={{
-                  fontSize: 16, fontWeight: 700, marginTop: 3, lineHeight: 1.2,
+                  fontSize: 16, fontWeight: 700, marginTop: 3, lineHeight: 1.2, color: '#f1e4f3',
                   overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
                 }}>
                   {aw.winner}
                 </div>
               </div>
               <div className="fs-mono" style={{
-                fontSize: 14, color: '#c8c8dc', textAlign: 'right', flexShrink: 0, lineHeight: 1.4,
+                fontSize: 14, color: 'rgba(241,228,243,0.50)', textAlign: 'right', flexShrink: 0, lineHeight: 1.4,
               }}>
                 {aw.sub}
               </div>
@@ -6171,7 +6159,7 @@ const SlidePeakDay = React.memo(function SlidePeakDay({ a, t }) {
   const animated = useAnimatedNumber(count, 1400, [date]);
 
   return (
-    <SlideShell bg="#2a1a0a" accent="#ffd972">
+    <SlideShell bg="#f06449" accent="#ffd972">
       <div style={{
         position: 'relative', height: '100%',
         display: 'flex', flexDirection: 'column', justifyContent: 'center',
@@ -6184,7 +6172,7 @@ const SlidePeakDay = React.memo(function SlidePeakDay({ a, t }) {
         </div>
         <div className="fs-display a-fade-up" style={{
           animationDelay: '0.3s', fontSize: 32, lineHeight: 1.15,
-          letterSpacing: '-0.03em', marginTop: 20, fontWeight: 700,
+          letterSpacing: '-0.03em', marginTop: 20, fontWeight: 700, color: '#fff',
         }}>
           <span style={{ fontStyle: 'italic' }}>{dayName},</span><br/>{dateStr}
         </div>
@@ -6195,7 +6183,7 @@ const SlidePeakDay = React.memo(function SlidePeakDay({ a, t }) {
           {animated}
         </div>
         <div className="fs-display a-fade-up" style={{
-          animationDelay: '1.2s', fontSize: 20, marginTop: 10, fontStyle: 'italic', fontWeight: 500,
+          animationDelay: '1.2s', fontSize: 20, marginTop: 10, fontStyle: 'italic', fontWeight: 500, color: '#fff',
         }}>
           {t.peakday_msgs}
         </div>
@@ -6206,7 +6194,7 @@ const SlidePeakDay = React.memo(function SlidePeakDay({ a, t }) {
 
 const SlideFinale = React.memo(function SlideFinale({ a, t, onExit }) {
   return (
-    <SlideShell bg="#0a0a0f" accent="#ffd972">
+    <SlideShell bg="#573280" accent="#ffd972">
       <div style={{
         position: 'relative', height: '100%',
         display: 'flex', flexDirection: 'column', justifyContent: 'center',
@@ -6219,7 +6207,7 @@ const SlideFinale = React.memo(function SlideFinale({ a, t, onExit }) {
         </div>
         <div className="a-spring" style={{ animationDelay: '0.3s', marginTop: 48 }}>
           <div className="fs-display" style={{
-            fontSize: 52, lineHeight: 1.1, letterSpacing: '-0.04em', fontWeight: 800,
+            fontSize: 52, lineHeight: 1.1, letterSpacing: '-0.04em', fontWeight: 800, color: '#f1e4f3',
           }}>
             <span style={{ display: 'block' }}>{t.finale_see}</span>
             <span style={{ display: 'block' }}>{t.finale_in_the}</span>
@@ -6227,7 +6215,7 @@ const SlideFinale = React.memo(function SlideFinale({ a, t, onExit }) {
           </div>
         </div>
         <div className="fs-sans a-fade-up" style={{
-          animationDelay: '1.0s', marginTop: 40, fontSize: 18, color: '#d0d0e0', lineHeight: 1.45,
+          animationDelay: '1.0s', marginTop: 40, fontSize: 18, color: 'rgba(241,228,243,0.75)', lineHeight: 1.45,
         }}>
           {t.finale_now}
         </div>
@@ -6544,12 +6532,12 @@ function PostMenu({ analytics, diagnostics, selectedAuthor, setSelectedAuthor, t
               const pct = (user.messageCount / analytics.totalMessages) * 100;
               const isUser = user.author === selectedAuthor;
               return (
-                <div key={user.author} style={{
+                <div key={user.author} dir="auto" style={{
                   position: 'relative', padding: '11px 12px',
                   borderBottom: i < analytics.users.length - 1 ? '1px solid #2a2a36' : 'none',
                 }}>
                   <div style={{
-                    position: 'absolute', top: 0, bottom: 0, left: 0,
+                    position: 'absolute', top: 0, bottom: 0, insetInlineStart: 0,
                     width: `${Math.min(pct * 2.5, 100)}%`,
                     background: isUser ? 'rgba(255,217,114,0.10)' : 'rgba(255,217,114,0.04)',
                   }} />
