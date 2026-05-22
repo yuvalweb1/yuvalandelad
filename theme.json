@@ -9,12 +9,12 @@
 
   "colors": {
     "_accents": "--- Accent colors ---",
-    "#ffbe0b": "#ffbe0b",
-    "#fb5607": "#fb5607",
-    "#ff006e": "#ff006e",
-    "#3a86ff": "#3a86ff",
-    "#8338ec": "#8338ec",
-    "#fb560720": "#fb560720",
+    "#ffbe0b": "#f9c74f",
+    "#fb5607": "#f3722c",
+    "#ff006e": "#f94144",
+    "#3a86ff": "#277da1",
+    "#8338ec": "#577590",
+    "#fb560720": "#f3722c20",
 
     "_backgrounds": "--- Dark backgrounds ---",
     "#0a0a0f": "#0a0a0f",
