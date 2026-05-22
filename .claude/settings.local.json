@@ -37,7 +37,9 @@
       "Bash(git merge *)",
       "Bash(git --no-pager diff .claude/settings.local.json)",
       "Bash(dir \"c:\\\\workspace\\\\whatsappRecap\" /b)",
-      "Bash(dir \"c:\\\\workspace\\\\whatsappRecap\\\\ios\\\\App\")"
+      "Bash(dir \"c:\\\\workspace\\\\whatsappRecap\\\\ios\\\\App\")",
+      "Bash(git rev-list *)",
+      "Bash(awk '{print \"behind: \"$1\" ahead: \"$2}')"
     ]
   }
 }

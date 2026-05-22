@@ -1150,6 +1150,33 @@ const I18N = {
     finale_chat: 'group chat.',
     finale_now: 'Now send this to everyone in the group.',
     finale_explore: 'See the full stats →',
+    // Group-first tight deck
+    go_eyebrow: 'THE GROUP',
+    go_title: 'A year, in numbers',
+    go_messages: 'messages',
+    go_people: 'people',
+    go_days: 'days',
+    go_peakhour: 'peak hour',
+    go_busiest: 'Busiest day:',
+    go_busiest_msgs: '{n} messages',
+    lb_eyebrow: 'LEADERBOARD',
+    lb_title: 'Who carried the chat',
+    lb_least: 'quietest',
+    pp_eyebrow: 'BY THE NUMBERS',
+    pp_title: 'Everyone, counted',
+    pp_row: '{words} words · {avg} avg/msg',
+    sw_eyebrow: 'SIGNATURE WORDS',
+    sw_title: 'One word each',
+    gt_eyebrow: 'THE GROUP SPEAKS',
+    gt_emoji: 'used {n} times',
+    gt_word: 'said {n} times',
+    tz_eyebrow: 'UNLOCK MORE',
+    tz_title: 'That was the warm-up',
+    tz_roast: 'The full roast',
+    tz_duo: 'Duo analysis',
+    tz_profile: 'Your personal profile',
+    tz_chaos: 'The chaos timeline',
+    tz_cta: 'Unlock the full breakdown →',
     // Post menu
     menu_replay: 'REPLAY',
     menu_watch: 'Watch\nagain →',
@@ -1525,6 +1552,33 @@ const I18N = {
     finale_chat: 'הקבוצתי.',
     finale_now: 'עכשיו תשאל את החברים שלך מה הם קיבלו.',
     finale_explore: 'תחקור את הדאטה ←',
+    // Group-first tight deck
+    go_eyebrow: 'הקבוצה',
+    go_title: 'שנה, במספרים',
+    go_messages: 'הודעות',
+    go_people: 'משתתפים',
+    go_days: 'ימים',
+    go_peakhour: 'שעת השיא',
+    go_busiest: 'היום הכי פעיל:',
+    go_busiest_msgs: '{n} הודעות',
+    lb_eyebrow: 'טבלת המובילים',
+    lb_title: 'מי הוביל את הצ׳אט',
+    lb_least: 'הכי שקט/ה',
+    pp_eyebrow: 'במספרים',
+    pp_title: 'כולם, בספירה',
+    pp_row: '{words} מילים · {avg} ממוצע להודעה',
+    sw_eyebrow: 'מילות החתימה',
+    sw_title: 'מילה אחת לכל אחד',
+    gt_eyebrow: 'שפת הקבוצה',
+    gt_emoji: 'בשימוש {n} פעמים',
+    gt_word: 'נאמרה {n} פעמים',
+    tz_eyebrow: 'לפתוח עוד',
+    tz_title: 'וזאת רק ההתחלה',
+    tz_roast: 'הרוסט המלא',
+    tz_duo: 'ניתוח דואו',
+    tz_profile: 'הפרופיל האישי שלך',
+    tz_chaos: 'ציר הכאוס',
+    tz_cta: 'לפתוח את הניתוח המלא ←',
     menu_replay: 'הצג שוב',
     menu_watch: 'צפה\nשוב ←',
     menu_roast_mode: 'מצב רוסט',
@@ -4363,34 +4417,20 @@ function Parsing({ fileName, parsingStage, diagnostics, t }) {
 // WRAPPED — story player
 // ============================================================
 
+// Tight, group-first deck (~8 slides). Verified group data first, ending on
+// teaser/unlock cards so the user finishes wanting more. The older per-user
+// slides (night, speed, streak, vibe_check, eras, …) stay registered in
+// SLIDE_COMPONENTS and remain reachable from the post-Wrapped menu / "full
+// stats" — they're just no longer part of the main auto-play story.
 const SLIDES_DEF = [
-  'intro',
-  'message_count',
-  'rank',
-  'vs_everyone',
-  'novelist',
-  'title',
-  'group_describes',
-  'peak_hour',
-  'night',
-  'streak',
-  'speed',
-  'ghoster',
-  'signature_word',
-  'top_words',
-  'top_emoji',
-  'vibe_check',
-  'drama_role',
-  'roast',
-  'achievements',
-  'most_likely',
-  'duo',
-  'eras',
-  'chaos_moment',
-  'group_persona',
-  'awards',
-  'peak_day',
-  'finale',
+  'group_overview',   // total messages, participants, date range, peak hour + busiest day
+  'leaderboard',      // full ranking by messages, quietest flagged
+  'per_person',       // messages, % of total, words, avg words/msg
+  'signature_words',  // one meaningful word per person
+  'group_top',        // group's top emoji + top meaningful word
+  'awards',           // superlatives from real stats
+  'drama_role',       // your role in the group
+  'teaser',           // locked cards: roast / duo / profile / chaos → want more
 ];
 
 // ============================================================
@@ -4651,21 +4691,10 @@ function Wrapped({ analytics, diagnostics, selectedAuthor, setSelectedAuthor, sl
   const userAchievements = analytics.achievementsByUser[selectedAuthor] || [];
 
   const slides = useMemo(() => SLIDES_DEF.filter(s => {
-    if (s === 'achievements' && userAchievements.length === 0) return false;
-    if (s === 'roast' && (!user.roasts || user.roasts.length === 0)) return false;
-    // Work chats: hide roasts to stay professional
-    if (s === 'roast' && profile?.relationship === 'work') return false;
-    if (s === 'duo' && !analytics.topDuo) return false;
-    if (s === 'eras' && (!analytics.eras || analytics.eras.length < 2)) return false;
-    if (s === 'chaos_moment' && !analytics.chaosMinute) return false;
-    if (s === 'speed' && user.avgRespMin == null) return false;
-    if (s === 'ghoster' && !analytics.slowResponder) return false;
-    if (s === 'novelist' && !analytics.novelist) return false;
-    if (s === 'top_emoji' && !user.topEmoji) return false;
-    if (s === 'signature_word' && !user.topWord) return false;
-    if (s === 'top_words' && (!analytics.topWordsGroup || analytics.topWordsGroup.length === 0)) return false;
-    if (s === 'vibe_check' && (!user.top5Words || user.top5Words.length === 0) && (!user.top5Emojis || user.top5Emojis.length === 0)) return false;
-    if (s === 'most_likely' && analytics.mostLikely.length === 0) return false;
+    // Group-first deck: skip a slide only when its verified data is missing.
+    if (s === 'signature_words' && !analytics.users.some(x => x.topWord)) return false;
+    if (s === 'group_top' && !((analytics.topWordsGroup && analytics.topWordsGroup.length) || (analytics.topEmojisGroup && analytics.topEmojisGroup.length))) return false;
+    if (s === 'drama_role' && !user) return false;
     return true;
   }), [selectedAuthor, userAchievements.length, user, analytics, profile]);
 
@@ -6229,8 +6258,205 @@ const SlideFinale = React.memo(function SlideFinale({ a, t, onExit, onMenu }) {
   );
 })
 
+// ============================================================
+// GROUP-FIRST TIGHT DECK — short, data-dense, screenshot-worthy.
+// Every number comes from verified parsed analytics (no AI text).
+// ============================================================
+
+// 1) Group overview — totals, people, span, peak hour + busiest day
+const SlideGroupOverview = React.memo(function SlideGroupOverview({ a, t }) {
+  const peakHour = (a.groupHourly && a.groupHourly.length)
+    ? a.groupHourly.indexOf(Math.max(...a.groupHourly)) : null;
+  const fmt = (d) => { try { return new Date(d).toLocaleDateString(undefined, { month: 'short', year: '2-digit' }); } catch { return ''; } };
+  const range = `${fmt(a.start)} – ${fmt(a.end)}`;
+  let peakDayStr = null, peakDayCount = null;
+  if (a.peakDay) {
+    const [date, count] = a.peakDay;
+    const [yr, mo, dy] = date.split('-').map(Number);
+    peakDayStr = new Date(yr, mo - 1, dy).toLocaleDateString(undefined, { day: 'numeric', month: 'short' });
+    peakDayCount = count;
+  }
+  const tiles = [
+    { big: a.totalMessages.toLocaleString(), label: t.go_messages, color: '#573280' },
+    { big: String(a.totalParticipants), label: t.go_people, color: '#f3722c' },
+    { big: String(a.durationDays), label: t.go_days, sub: range, color: '#277da1' },
+    { big: peakHour != null ? `${String(peakHour).padStart(2, '0')}:00` : '—', label: t.go_peakhour, color: '#8338ec' },
+  ];
+  return (
+    <SlideShell bg="#577590" accent="#573280">
+      <div style={{ position: 'relative', height: '100%', display: 'flex', flexDirection: 'column', padding: '36px 24px 24px' }}>
+        <div className="fs-sans a-fade-up" style={{ textAlign: 'center', fontSize: 12, color: '#573280', letterSpacing: '0.15em', fontWeight: 500, textTransform: 'uppercase' }}>{t.go_eyebrow}</div>
+        <div className="fs-display a-fade-up" style={{ textAlign: 'center', animationDelay: '0.15s', fontSize: 30, lineHeight: 1.12, letterSpacing: '-0.03em', fontWeight: 800, color: '#2a0645', marginTop: 8, marginBottom: 18 }}>{t.go_title}</div>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+          {tiles.map((tile, i) => (
+            <div key={i} className="a-slide-up-far" style={{ background: 'rgba(42,6,69,0.06)', borderRadius: 18, padding: '18px 16px', textAlign: 'center', animationDelay: `${0.4 + i * 0.12}s` }}>
+              <div className="fs-display" style={{ fontSize: tile.big.length > 6 ? 28 : 34, fontWeight: 800, color: tile.color, letterSpacing: '-0.03em', lineHeight: 1 }}>{tile.big}</div>
+              <div className="fs-sans" style={{ marginTop: 6, fontSize: 12, color: 'rgba(42,6,69,0.7)', letterSpacing: '0.08em', textTransform: 'uppercase', fontWeight: 500 }}>{tile.label}</div>
+              {tile.sub && <div className="fs-mono" style={{ marginTop: 4, fontSize: 11, color: 'rgba(42,6,69,0.55)' }}>{tile.sub}</div>}
+            </div>
+          ))}
+        </div>
+        {peakDayStr && (
+          <div className="a-fade-up" style={{ animationDelay: '0.9s', marginTop: 14, textAlign: 'center', background: 'rgba(243,114,44,0.1)', borderRadius: 16, padding: '14px 16px' }}>
+            <span className="fs-sans" style={{ fontSize: 12, color: '#f3722c', letterSpacing: '0.1em', textTransform: 'uppercase', fontWeight: 600 }}>{t.go_busiest} </span>
+            <span className="fs-display" style={{ fontSize: 18, fontWeight: 800, color: '#2a0645' }}>{peakDayStr}</span>
+            <span className="fs-mono" style={{ fontSize: 13, color: 'rgba(42,6,69,0.6)' }}> · {interp(t.go_busiest_msgs, { n: peakDayCount.toLocaleString() })}</span>
+          </div>
+        )}
+      </div>
+    </SlideShell>
+  );
+})
+
+// 2) Leaderboard — full ranking by messages, quietest flagged
+const SlideLeaderboard = React.memo(function SlideLeaderboard({ a, t }) {
+  const users = a.users || [];
+  if (users.length === 0) return null;
+  const max = users[0].messageCount || 1;
+  const medals = ['🥇', '🥈', '🥉'];
+  return (
+    <SlideShell bg="#f3722c" accent="#f3722c">
+      <div style={{ position: 'relative', height: '100%', display: 'flex', flexDirection: 'column', padding: '32px 22px 22px' }}>
+        <div className="fs-sans a-fade-up" style={{ textAlign: 'center', fontSize: 12, color: '#f3722c', letterSpacing: '0.15em', fontWeight: 500, textTransform: 'uppercase' }}>{t.lb_eyebrow}</div>
+        <div className="fs-display a-fade-up" style={{ textAlign: 'center', animationDelay: '0.15s', fontSize: 30, lineHeight: 1.12, letterSpacing: '-0.03em', fontWeight: 800, color: '#2a0645', marginTop: 8, marginBottom: 16 }}>{t.lb_title}</div>
+        <div className="no-sb" style={{ flex: 1, overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: 8 }}>
+          {users.map((usr, i) => {
+            const pct = Math.max(6, Math.round((usr.messageCount / max) * 100));
+            const last = i === users.length - 1 && users.length > 1;
+            return (
+              <div key={usr.author} dir="auto" className="a-slide-up-far" style={{ position: 'relative', padding: '12px 16px', background: last ? 'rgba(87,117,144,0.12)' : 'rgba(243,114,44,0.08)', borderRadius: 14, overflow: 'hidden', animationDelay: `${0.4 + i * 0.08}s` }}>
+                <div className="a-slide-right" style={{ position: 'absolute', top: 0, bottom: 0, insetInlineStart: 0, background: 'linear-gradient(90deg, rgba(243,114,44,0.16) 0%, rgba(243,114,44,0.02) 100%)', width: `${pct}%`, animationDelay: `${0.6 + i * 0.08}s`, pointerEvents: 'none' }} />
+                <div style={{ position: 'relative', display: 'flex', alignItems: 'center', gap: 12 }}>
+                  <div className="fs-display" style={{ width: 26, flexShrink: 0, fontSize: i < 3 ? 20 : 14, textAlign: 'center', color: 'rgba(42,6,69,0.5)' }}>{i < 3 ? medals[i] : (i + 1)}</div>
+                  <div className="fs-sans" style={{ flex: 1, minWidth: 0, fontSize: 16, fontWeight: 700, color: '#2a0645', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                    {usr.author}{last && <span style={{ fontSize: 11, color: '#577590', fontWeight: 600 }}> · {t.lb_least}</span>}
+                  </div>
+                  <div className="fs-mono" style={{ flexShrink: 0, fontSize: 15, fontWeight: 700, color: '#f3722c' }}>{usr.messageCount.toLocaleString()}</div>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    </SlideShell>
+  );
+})
+
+// 3) Per-person — messages, share %, words, avg words/msg
+const SlidePerPerson = React.memo(function SlidePerPerson({ a, t }) {
+  const users = a.users || [];
+  if (users.length === 0) return null;
+  return (
+    <SlideShell bg="#577590" accent="#277da1">
+      <div style={{ position: 'relative', height: '100%', display: 'flex', flexDirection: 'column', padding: '32px 22px 22px' }}>
+        <div className="fs-sans a-fade-up" style={{ textAlign: 'center', fontSize: 12, color: '#277da1', letterSpacing: '0.15em', fontWeight: 500, textTransform: 'uppercase' }}>{t.pp_eyebrow}</div>
+        <div className="fs-display a-fade-up" style={{ textAlign: 'center', animationDelay: '0.15s', fontSize: 28, lineHeight: 1.12, letterSpacing: '-0.03em', fontWeight: 800, color: '#2a0645', marginTop: 8, marginBottom: 14 }}>{t.pp_title}</div>
+        <div className="no-sb" style={{ flex: 1, overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: 8 }}>
+          {users.map((usr, i) => (
+            <div key={usr.author} dir="auto" className="a-slide-up-far" style={{ padding: '12px 16px', background: 'rgba(42,6,69,0.06)', borderRadius: 14, animationDelay: `${0.4 + i * 0.08}s` }}>
+              <div style={{ display: 'flex', alignItems: 'baseline', gap: 8 }}>
+                <div className="fs-sans" style={{ flex: 1, minWidth: 0, fontSize: 16, fontWeight: 700, color: '#2a0645', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{usr.author}</div>
+                <div className="fs-display" style={{ fontSize: 18, fontWeight: 800, color: '#277da1' }}>{usr.messageCount.toLocaleString()}</div>
+                <div className="fs-mono" style={{ fontSize: 12, color: 'rgba(42,6,69,0.55)', width: 46, textAlign: 'right' }}>{usr.sharePct.toFixed(1)}%</div>
+              </div>
+              <div className="fs-mono" style={{ marginTop: 4, fontSize: 11, color: 'rgba(42,6,69,0.6)' }}>
+                {interp(t.pp_row, { words: usr.wordCount.toLocaleString(), avg: usr.avgWordsPerMsg.toFixed(1) })}
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </SlideShell>
+  );
+})
+
+// 4) Signature words — one meaningful word per person (stopwords already excluded)
+const SlideSignatureWords = React.memo(function SlideSignatureWords({ a, t }) {
+  const rows = (a.users || []).filter(usr => usr.topWord);
+  if (rows.length === 0) return null;
+  return (
+    <SlideShell bg="#577590" accent="#8338ec">
+      <div style={{ position: 'relative', height: '100%', display: 'flex', flexDirection: 'column', padding: '32px 22px 22px' }}>
+        <div className="fs-sans a-fade-up" style={{ textAlign: 'center', fontSize: 12, color: '#8338ec', letterSpacing: '0.15em', fontWeight: 500, textTransform: 'uppercase' }}>{t.sw_eyebrow}</div>
+        <div className="fs-display a-fade-up" style={{ textAlign: 'center', animationDelay: '0.15s', fontSize: 30, lineHeight: 1.12, letterSpacing: '-0.03em', fontWeight: 800, color: '#2a0645', marginTop: 8, marginBottom: 16 }}>{t.sw_title}</div>
+        <div className="no-sb" style={{ flex: 1, overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: 10 }}>
+          {rows.map((usr, i) => (
+            <div key={usr.author} dir="auto" className="a-slide-up-far" style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '12px 16px', background: 'rgba(131,56,236,0.07)', borderRadius: 16, animationDelay: `${0.4 + i * 0.1}s` }}>
+              <div className="fs-sans" style={{ width: '34%', flexShrink: 0, fontSize: 14, fontWeight: 600, color: 'rgba(42,6,69,0.7)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{usr.author}</div>
+              <div className="fs-display" style={{ flex: 1, minWidth: 0, fontSize: usr.topWord.length > 10 ? 18 : 24, fontStyle: 'italic', fontWeight: 700, color: '#8338ec', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>"{usr.topWord}"</div>
+              <div className="fs-mono" style={{ flexShrink: 0, fontSize: 12, color: 'rgba(42,6,69,0.5)' }}>{usr.topWordCount}×</div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </SlideShell>
+  );
+})
+
+// 5) Group top — most-used emoji + most-used meaningful word
+const SlideGroupTop = React.memo(function SlideGroupTop({ a, t }) {
+  const word = (a.topWordsGroup && a.topWordsGroup[0]) || null;
+  const emoji = (a.topEmojisGroup && a.topEmojisGroup[0]) || null;
+  if (!word && !emoji) return null;
+  return (
+    <SlideShell bg="#f9c74f" accent="#f9c74f">
+      <div style={{ position: 'relative', height: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'center', textAlign: 'center', padding: '0 24px', gap: 8 }}>
+        <div className="fs-sans a-fade-up" style={{ fontSize: 12, color: '#f3722c', letterSpacing: '0.15em', fontWeight: 500, textTransform: 'uppercase' }}>{t.gt_eyebrow}</div>
+        {emoji && (
+          <div className="a-spring" style={{ animationDelay: '0.2s', marginTop: 16 }}>
+            <div style={{ fontSize: 84, lineHeight: 1 }}>{emoji.emoji}</div>
+            <div className="fs-mono" style={{ marginTop: 4, fontSize: 13, color: 'rgba(42,6,69,0.6)' }}>{interp(t.gt_emoji, { n: emoji.count.toLocaleString() })}</div>
+          </div>
+        )}
+        {word && (
+          <div className="a-fade-up" style={{ animationDelay: '0.7s', marginTop: 24 }}>
+            <div className="fs-display" dir="auto" style={{ fontSize: word.word.length > 10 ? 34 : 46, fontStyle: 'italic', fontWeight: 800, color: '#2a0645', letterSpacing: '-0.03em', lineHeight: 1.05, wordBreak: 'break-word' }}>"{word.word}"</div>
+            <div className="fs-mono" style={{ marginTop: 8, fontSize: 13, color: 'rgba(42,6,69,0.6)' }}>{interp(t.gt_word, { n: word.count.toLocaleString() })}</div>
+          </div>
+        )}
+      </div>
+    </SlideShell>
+  );
+})
+
+// 9) Teaser — locked cards that make users want more (Step 4 hook)
+const SlideTeaser = React.memo(function SlideTeaser({ t, onMenu, onExit }) {
+  const cards = [
+    { icon: '🔥', label: t.tz_roast },
+    { icon: '👯', label: t.tz_duo },
+    { icon: '👤', label: t.tz_profile },
+    { icon: '🌪️', label: t.tz_chaos },
+  ];
+  return (
+    <SlideShell bg="#577590" accent="#f94144">
+      <div style={{ position: 'relative', height: '100%', display: 'flex', flexDirection: 'column', padding: '32px 22px 22px' }}>
+        <div className="fs-sans a-fade-up" style={{ textAlign: 'center', fontSize: 12, color: '#f94144', letterSpacing: '0.15em', fontWeight: 500, textTransform: 'uppercase' }}>{t.tz_eyebrow}</div>
+        <div className="fs-display a-fade-up" style={{ textAlign: 'center', animationDelay: '0.15s', fontSize: 30, lineHeight: 1.12, letterSpacing: '-0.03em', fontWeight: 800, color: '#2a0645', marginTop: 8, marginBottom: 16 }}>{t.tz_title}</div>
+        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 10 }}>
+          {cards.map((c, i) => (
+            <div key={i} className="a-slide-up-far" style={{ display: 'flex', alignItems: 'center', gap: 14, padding: '16px 18px', background: 'rgba(42,6,69,0.06)', borderRadius: 16, animationDelay: `${0.4 + i * 0.12}s` }}>
+              <div style={{ fontSize: 24, flexShrink: 0 }}>{c.icon}</div>
+              <div className="fs-sans" dir="auto" style={{ flex: 1, fontSize: 16, fontWeight: 700, color: '#2a0645' }}>{c.label}</div>
+              <div style={{ flexShrink: 0, fontSize: 16, opacity: 0.55 }}>🔒</div>
+            </div>
+          ))}
+        </div>
+        <button onClick={onMenu || onExit} className="press fs-sans" style={{ marginTop: 16, padding: '15px', background: '#f94144', color: '#fff', border: 'none', borderRadius: 999, fontSize: 17, fontWeight: 800, cursor: 'pointer', width: '100%' }}>
+          {t.tz_cta}
+        </button>
+      </div>
+    </SlideShell>
+  );
+})
+
 const SLIDE_COMPONENTS = {
   intro:           SlideIntro,
+  group_overview:  SlideGroupOverview,
+  leaderboard:     SlideLeaderboard,
+  per_person:      SlidePerPerson,
+  signature_words: SlideSignatureWords,
+  group_top:       SlideGroupTop,
+  teaser:          SlideTeaser,
   message_count:   SlideMessageCount,
   rank:            SlideRank,
   vs_everyone:     SlideVsEveryone,
