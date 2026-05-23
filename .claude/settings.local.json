@@ -58,7 +58,9 @@
       "Bash(node -e \"import\\('./src/lib/analytics.js'\\).then\\(m => console.log\\('analytics exports:', Object.keys\\(m\\).sort\\(\\)\\)\\).then\\(\\(\\) => import\\('./src/lib/sample.js'\\)\\).then\\(m => console.log\\('sample exports:', Object.keys\\(m\\)\\)\\)\")",
       "Bash(node scripts/strip-analytics.mjs)",
       "Bash(node scripts/extract-ui.mjs)",
-      "Bash(node scripts/strip-ui.mjs)"
+      "Bash(node scripts/strip-ui.mjs)",
+      "Bash(node scripts/audit-views.mjs)",
+      "Bash(node scripts/strip-views.mjs)"
     ]
   }
 }

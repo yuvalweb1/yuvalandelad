@@ -1,0 +1,256 @@
+import { useRef, useState } from 'react';
+import BottomSheet from '../components/BottomSheet.jsx';
+
+const LANGUAGES = [
+  { code: 'en', name: 'English', flag: '🇺🇸' },
+  { code: 'he', name: 'עברית', flag: '🇮🇱' },
+  { code: 'es', name: 'Español', flag: '🇪🇸' },
+  { code: 'fr', name: 'Français', flag: '🇫🇷' },
+  { code: 'de', name: 'Deutsch', flag: '🇩🇪' },
+  { code: 'pt', name: 'Português', flag: '🇧🇷' },
+  { code: 'it', name: 'Italiano', flag: '🇮🇹' },
+  { code: 'ru', name: 'Русский', flag: '🇷🇺' },
+  { code: 'ar', name: 'العربية', flag: '🇸🇦' },
+  { code: 'tr', name: 'Türkçe', flag: '🇹🇷' },
+];
+
+export default function Landing({ onFile, onDemo, parseError, t, lang, setLang, onHowTo }) {
+  const fileInputRef = useRef(null);
+  const [langOpen, setLangOpen] = useState(false);
+  const currentLang = LANGUAGES.find(l => l.code === lang) || LANGUAGES[0];
+
+  const featureCards = [
+    { icon: '📊', label: t.feat_stats_t || 'STATS', q: t.feat_stats_q || 'Who talked the most?', bg: '#DAF3FF', accent: '#00BFFF', deep: '#0089C4' },
+    { icon: '🔥', label: t.feat_roasts_t || 'ROASTS', q: t.feat_roasts_q || 'AI roasts everyone', bg: '#FFE1EE', accent: '#FF69B4', deep: '#D63384' },
+    { icon: '🎭', label: t.feat_drama_t || 'DRAMA', q: t.feat_drama_q || 'Who started the chaos?', bg: '#FFEFC2', accent: '#FF8C00', deep: '#D17000' },
+  ];
+
+  return (
+    <div style={{
+      position: 'relative', display: 'flex', flexDirection: 'column',
+      padding: '18px 20px 22px', height: '100%',
+      background: 'linear-gradient(180deg, #FFF6D6 0%, #FFF0E2 46%, #FDE6F1 100%)',
+      overflow: 'hidden',
+    }}>
+      {/* ===== Decorative energy layer (gradient blobs + chat bubbles + emoji stickers) ===== */}
+      <div aria-hidden="true" style={{ position: 'absolute', inset: 0, overflow: 'hidden', pointerEvents: 'none' }}>
+        {/* gradient blobs */}
+        <div style={{ position: 'absolute', top: -70, right: -70, width: 240, height: 240, borderRadius: '50%', background: '#FFD700', opacity: 0.55, filter: 'blur(72px)' }} />
+        <div style={{ position: 'absolute', top: 90, left: -90, width: 210, height: 210, borderRadius: '50%', background: '#FF69B4', opacity: 0.35, filter: 'blur(74px)' }} />
+        <div style={{ position: 'absolute', bottom: 70, right: -60, width: 210, height: 210, borderRadius: '50%', background: '#00BFFF', opacity: 0.40, filter: 'blur(70px)' }} />
+        <div style={{ position: 'absolute', bottom: -50, left: -50, width: 190, height: 190, borderRadius: '50%', background: '#FF8C00', opacity: 0.34, filter: 'blur(64px)' }} />
+
+        {/* floating chat bubbles */}
+        <div className="a-float" style={{ position: 'absolute', top: 150, left: 16, width: 58, height: 38, background: '#fff', borderRadius: '18px 18px 18px 4px', boxShadow: '0 8px 20px rgba(74,14,78,0.14)', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 4, animationDelay: '0.2s' }}>
+          {[0, 1, 2].map(d => <span key={d} style={{ width: 6, height: 6, borderRadius: 999, background: '#FF69B4' }} />)}
+        </div>
+        <div className="a-float" style={{ position: 'absolute', top: 232, right: 14, width: 46, height: 32, background: '#4A0E4E', borderRadius: '16px 16px 4px 16px', boxShadow: '0 8px 18px rgba(74,14,78,0.22)', animationDelay: '1.1s' }} />
+
+        {/* emoji stickers */}
+        {[
+          { e: '😂', top: 116, right: 26, rot: -14, size: 30, delay: '0s' },
+          { e: '🔥', top: 300, left: 22, rot: 12, size: 26, delay: '0.7s' },
+          { e: '👀', top: 360, right: 30, rot: -8, size: 24, delay: '1.4s' },
+          { e: '💀', bottom: 168, left: 30, rot: 10, size: 24, delay: '0.4s' },
+          { e: '✨', top: 88, left: 96, rot: 0, size: 20, delay: '1.8s' },
+        ].map((s, i) => (
+          <span key={i} className="a-float" style={{
+            position: 'absolute', top: s.top, bottom: s.bottom, left: s.left, right: s.right,
+            fontSize: s.size, transform: `rotate(${s.rot}deg)`,
+            filter: 'drop-shadow(0 4px 6px rgba(74,14,78,0.28))', animationDelay: s.delay, opacity: 0.92,
+          }}>{s.e}</span>
+        ))}
+      </div>
+
+      {/* Top row: eyebrow + language picker */}
+      <div style={{
+        position: 'relative', zIndex: 10,
+        display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+      }}>
+        <div className="fs-mono a-fade-up" style={{
+          fontSize: 11, color: '#f06449', letterSpacing: '0.22em',
+          fontWeight: 700, textTransform: 'uppercase',
+        }}>
+          ✦ {t.landing_eyebrow}
+        </div>
+        <button onClick={() => setLangOpen(true)} className="press" aria-label={t.a11y_change_language || `Change language. Current: ${currentLang.name}`} style={{
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          width: 38, height: 38, borderRadius: 999,
+          background: 'rgba(87,50,128,0.08)', border: '1px solid rgba(87,50,128,0.18)',
+          color: '#573280', fontSize: 18, cursor: 'pointer',
+        }}>
+          {currentLang.flag}
+        </button>
+      </div>
+
+      {/* Scrollable middle — hero + cards. Keeps the CTA pinned & always visible. */}
+      <div className="no-sb" style={{ position: 'relative', zIndex: 10, flex: 1, minHeight: 0, overflowY: 'auto', display: 'flex', flexDirection: 'column' }}>
+      {/* Hero — emotional promise + subtitle */}
+      <div className="a-fade-up" style={{
+        position: 'relative', zIndex: 10,
+        marginTop: 26,
+        animationDelay: '0.12s',
+      }}>
+        <h1 className="fs-display" style={{
+          fontSize: 54, lineHeight: 0.98, letterSpacing: '-0.045em',
+          fontWeight: 800, margin: 0, color: '#4A0E4E',
+          textShadow: '0 2px 0 rgba(255,255,255,0.6)',
+        }}>
+          {t.landing_h1_a}{' '}
+          <span style={{ fontStyle: 'italic', color: '#FF8C00' }}>{t.landing_h1_b}</span>{' '}
+          {t.landing_h1_c}<br/>
+          <span style={{ fontStyle: 'italic', color: '#FF69B4' }}>{t.landing_h1_d}</span>
+          {t.landing_h1_e ? <> {t.landing_h1_e}</> : null}
+        </h1>
+        <p className="fs-sans" style={{
+          margin: '14px 0 0', maxWidth: 300,
+          fontSize: 16, lineHeight: 1.45, fontWeight: 500,
+          color: 'rgba(74,14,78,0.66)',
+        }}>
+          {t.landing_promise_sub}
+        </p>
+      </div>
+
+      {/* Feature cards — big, colorful, sticker-like */}
+      <div className="a-fade-up" style={{
+        position: 'relative', zIndex: 10,
+        marginTop: 22, display: 'flex', flexDirection: 'column', gap: 12,
+        animationDelay: '0.25s',
+      }}>
+        {featureCards.map((card, i) => (
+          <button key={i} type="button"
+            onClick={() => fileInputRef.current?.click()}
+            aria-label={`${card.label} — ${card.q}`}
+            className="a-slide-right press lift" style={{
+            width: '100%', textAlign: 'start', font: 'inherit', appearance: 'none',
+            display: 'flex', alignItems: 'center', gap: 14,
+            padding: '16px 18px',
+            background: card.bg,
+            borderRadius: 24,
+            border: '2px solid rgba(255,255,255,0.7)',
+            boxShadow: `0 7px 0 ${card.deep}33, 0 16px 30px -8px ${card.deep}55`,
+            animationDelay: `${0.35 + i * 0.1}s`,
+            cursor: 'pointer',
+          }}>
+            {/* icon sticker badge */}
+            <div style={{
+              flexShrink: 0, width: 52, height: 52, borderRadius: 16,
+              background: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center',
+              fontSize: 28, boxShadow: `0 4px 0 ${card.deep}22`, transform: 'rotate(-4deg)',
+            }}>{card.icon}</div>
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <div className="fs-mono" style={{
+                fontSize: 11, fontWeight: 700, color: card.deep,
+                letterSpacing: '0.14em', textTransform: 'uppercase',
+              }}>{card.label}</div>
+              <div className="fs-display" style={{
+                fontSize: 20, fontWeight: 800, color: '#4A0E4E',
+                letterSpacing: '-0.02em', lineHeight: 1.12, marginTop: 2,
+              }}>{card.q}</div>
+            </div>
+            <div style={{
+              flexShrink: 0, width: 30, height: 30, borderRadius: 999,
+              background: card.accent, color: '#fff',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              fontSize: 17, fontWeight: 800, boxShadow: `0 3px 0 ${card.deep}55`,
+            }}>←</div>
+          </button>
+        ))}
+      </div>
+
+      {parseError && (
+        <div role="alert" className="a-scale-in" style={{
+          position: 'relative', zIndex: 10,
+          display: 'flex', gap: 10, marginTop: 12,
+          background: 'rgba(240,100,73,0.10)', border: '1px solid rgba(240,100,73,0.35)',
+          borderRadius: 14, padding: 14,
+        }}>
+          <div style={{ flexShrink: 0, marginTop: 2, color: '#f06449' }}>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2"
+              strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+              <circle cx="12" cy="12" r="10"/>
+              <line x1="12" y1="8" x2="12" y2="12"/>
+              <line x1="12" y1="16" x2="12.01" y2="16"/>
+            </svg>
+          </div>
+          <div style={{ fontSize: 14, lineHeight: 1.5, color: '#2a0645' }}>{parseError}</div>
+        </div>
+      )}
+      </div>
+
+      <div className="a-fade-up" style={{ position: 'relative', zIndex: 10, flexShrink: 0, paddingTop: 16, animationDelay: '0.45s' }}>
+        <input ref={fileInputRef} type="file" accept=".txt,.zip,application/zip,text/plain"
+          style={{ display: 'none' }}
+          onChange={e => { const f = e.target.files?.[0]; if (f) onFile(f); e.target.value = ''; }} />
+        {/* Main CTA — big, exciting, the obvious next action */}
+        <button onClick={() => fileInputRef.current?.click()} className="press a-gradient-shift" style={{
+          width: '100%', position: 'relative', overflow: 'hidden',
+          padding: '20px 18px', color: '#4A0E4E',
+          background: 'linear-gradient(135deg, #FFE45C 0%, #FFD700 50%, #FFB800 100%)',
+          backgroundSize: '200% 200%',
+          border: '2px solid rgba(255,255,255,0.7)', borderRadius: 22,
+          fontSize: 20, fontWeight: 800, cursor: 'pointer', letterSpacing: '-0.01em',
+          boxShadow: '0 8px 0 #E0A800, 0 18px 34px -6px rgba(224,168,0,0.6)',
+        }}>
+          <div className="a-shine" style={{ position: 'absolute', inset: 0 }} />
+          <span className="fs-display" style={{ position: 'relative' }}>{t.landing_cta}</span>
+        </button>
+        {/* Secondary actions — demo + how-to guide */}
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 14, marginTop: 12 }}>
+          <button onClick={onDemo} className="press fs-sans" style={{
+            padding: '8px 4px', background: 'transparent', border: 'none',
+            color: 'rgba(74,14,78,0.55)', fontSize: 14, fontWeight: 600,
+            cursor: 'pointer', textDecoration: 'underline', textUnderlineOffset: 3,
+          }}>
+            {t.landing_demo_soft}
+          </button>
+          {onHowTo && (
+            <button onClick={onHowTo} className="press fs-sans" style={{
+              padding: '8px 4px', background: 'transparent', border: 'none',
+              color: 'rgba(74,14,78,0.55)', fontSize: 14, fontWeight: 600,
+              cursor: 'pointer', textDecoration: 'underline', textUnderlineOffset: 3,
+            }}>
+              {t.howto_link}
+            </button>
+          )}
+        </div>
+
+        {/* Trust footer */}
+        <div className="fs-sans" style={{
+          display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
+          textAlign: 'center', marginTop: 12,
+          fontSize: 11.5, color: 'rgba(74,14,78,0.45)', lineHeight: 1.4,
+        }}>
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" style={{ flexShrink: 0 }}>
+            <rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+          </svg>
+          {t.landing_trust}
+        </div>
+      </div>
+
+      {langOpen && (
+        <BottomSheet onClose={() => setLangOpen(false)} title="Language">
+          {LANGUAGES.map(l => (
+            <button key={l.code} className="press" onClick={() => {
+              setLang(l.code);
+              setLangOpen(false);
+            }} style={{
+              width: '100%', padding: '16px 8px', minHeight: 56, background: 'transparent',
+              border: 'none', borderBottom: '1px solid #2a2a36', color: '#f4f4f8',
+              fontSize: 23, fontWeight: 500, textAlign: 'left', cursor: 'pointer',
+              display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 12,
+            }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                <span style={{ fontSize: 22 }}>{l.flag}</span>
+                <span style={{ fontSize: 23, fontWeight: 600 }}>{l.name}</span>
+              </div>
+              {l.code === lang && (
+                <span style={{ color: '#f9c74f', fontSize: 18 }}>✓</span>
+              )}
+            </button>
+          ))}
+        </BottomSheet>
+      )}
+    </div>
+  );
+}
