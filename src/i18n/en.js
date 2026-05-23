@@ -19,6 +19,8 @@ export default {
   landing_cta: 'Reveal the group →',
   landing_demo_soft: 'Just want a peek? Try the demo',
   landing_trust: 'Everything is processed locally. Your chat never leaves your device.',
+  landing_step1: 'Open WhatsApp → your chat → Export Chat',
+  landing_step2: 'Upload the .zip or .txt you just exported',
   // How-to export guide
   howto_eyebrow: 'BEFORE WE START',
   howto_title: 'How to export your chat',

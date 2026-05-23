@@ -131,18 +131,14 @@ function ChatWrappedApp() {
   return (
     <div style={{
       minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center',
-      padding: 12,
       backgroundImage: 'radial-gradient(ellipse at top, #1a1228 0%, #050505 70%)',
     }}>
       <GlobalStyles />
       <div className="cw-frame" style={{
         position: 'relative', overflow: 'hidden', display: 'flex', flexDirection: 'column',
-        width: '100%', maxWidth: 380,
-        height: 'min(820px, calc(100vh - 24px))',
+        width: '100vw',
+        height: '100vh',
         background: '#0a0a0f',
-        borderRadius: 40,
-        border: '1px solid #1a1a24',
-        boxShadow: '0 30px 80px rgba(0,0,0,0.5), 0 0 0 6px #0a0a10',
         color: '#f4f4f8',
         fontFamily: '"DM Sans", "Comix CLM", -apple-system, sans-serif',
         isolation: 'isolate',

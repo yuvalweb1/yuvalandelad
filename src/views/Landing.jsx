@@ -28,11 +28,11 @@ export default function Landing({ onFile, onDemo, parseError, t, lang, setLang, 
     }}>
       {/* ===== Decorative energy layer (gradient blobs + chat bubbles + emoji stickers) ===== */}
       <div aria-hidden="true" style={{ position: 'absolute', inset: 0, overflow: 'hidden', pointerEvents: 'none' }}>
-        {/* gradient blobs */}
+        {/* gradient blobs — contained above the CTA zone */}
         <div style={{ position: 'absolute', top: -70, right: -70, width: 240, height: 240, borderRadius: '50%', background: '#FFD700', opacity: 0.55, filter: 'blur(72px)' }} />
         <div style={{ position: 'absolute', top: 90, left: -90, width: 210, height: 210, borderRadius: '50%', background: '#FF69B4', opacity: 0.35, filter: 'blur(74px)' }} />
-        <div style={{ position: 'absolute', bottom: 70, right: -60, width: 210, height: 210, borderRadius: '50%', background: '#00BFFF', opacity: 0.40, filter: 'blur(70px)' }} />
-        <div style={{ position: 'absolute', bottom: -50, left: -50, width: 190, height: 190, borderRadius: '50%', background: '#FF8C00', opacity: 0.34, filter: 'blur(64px)' }} />
+        <div style={{ position: 'absolute', top: 260, right: -60, width: 210, height: 210, borderRadius: '50%', background: '#00BFFF', opacity: 0.28, filter: 'blur(70px)' }} />
+        <div style={{ position: 'absolute', top: 300, left: -50, width: 190, height: 190, borderRadius: '50%', background: '#FF8C00', opacity: 0.24, filter: 'blur(64px)' }} />
 
         {/* floating chat bubbles */}
         <div className="a-float" style={{ position: 'absolute', top: 150, left: 16, width: 58, height: 38, background: '#fff', borderRadius: '18px 18px 18px 4px', boxShadow: '0 8px 20px rgba(74,14,78,0.14)', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 4, animationDelay: '0.2s' }}>
@@ -40,12 +40,12 @@ export default function Landing({ onFile, onDemo, parseError, t, lang, setLang, 
         </div>
         <div className="a-float" style={{ position: 'absolute', top: 232, right: 14, width: 46, height: 32, background: '#4A0E4E', borderRadius: '16px 16px 4px 16px', boxShadow: '0 8px 18px rgba(74,14,78,0.22)', animationDelay: '1.1s' }} />
 
-        {/* emoji stickers */}
+        {/* emoji stickers — all above midpoint, clear of CTA zone */}
         {[
           { e: '😂', top: 116, right: 26, rot: -14, size: 30, delay: '0s' },
-          { e: '🔥', top: 300, left: 22, rot: 12, size: 26, delay: '0.7s' },
-          { e: '👀', top: 360, right: 30, rot: -8, size: 24, delay: '1.4s' },
-          { e: '💀', bottom: 168, left: 30, rot: 10, size: 24, delay: '0.4s' },
+          { e: '🔥', top: 198, left: 22, rot: 12, size: 26, delay: '0.7s' },
+          { e: '👀', top: 258, right: 30, rot: -8, size: 24, delay: '1.4s' },
+          { e: '💀', top: 306, left: 30, rot: 10, size: 24, delay: '0.4s' },
           { e: '✨', top: 88, left: 96, rot: 0, size: 20, delay: '1.8s' },
         ].map((s, i) => (
           <span key={i} className="a-float" style={{
@@ -93,7 +93,7 @@ export default function Landing({ onFile, onDemo, parseError, t, lang, setLang, 
           {t.landing_h1_a}{' '}
           <span style={{ fontStyle: 'italic', color: '#FF8C00' }}>{t.landing_h1_b}</span>{' '}
           {t.landing_h1_c}<br/>
-          <span style={{ fontStyle: 'italic', color: '#FF69B4' }}>{t.landing_h1_d}</span>
+          <span>{t.landing_h1_d}</span>
           {t.landing_h1_e ? <> {t.landing_h1_e}</> : null}
         </h1>
       </div>
@@ -122,6 +122,51 @@ export default function Landing({ onFile, onDemo, parseError, t, lang, setLang, 
         <input ref={fileInputRef} type="file" accept=".txt,.zip,application/zip,text/plain"
           style={{ display: 'none' }}
           onChange={e => { const f = e.target.files?.[0]; if (f) onFile(f); e.target.value = ''; }} />
+
+        {/* Prereq card — shows the 2-step flow so the upload CTA has context */}
+        {onHowTo && (
+          <div style={{
+            marginBottom: 10,
+            background: 'rgba(255,255,255,0.62)',
+            border: '1.5px solid rgba(255,255,255,0.88)',
+            borderRadius: 18,
+            padding: '11px 12px',
+            boxShadow: '0 4px 18px -4px rgba(74,14,78,0.13)',
+          }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 9 }}>
+              <div style={{
+                flexShrink: 0, width: 22, height: 22, borderRadius: 999,
+                background: '#4A0E4E', color: '#FFD700',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                fontSize: 12, fontWeight: 800,
+              }}>1</div>
+              <div className="fs-sans" dir="auto" style={{ flex: 1, fontSize: 13, fontWeight: 600, color: '#2a0645', lineHeight: 1.25 }}>
+                {t.landing_step1}
+              </div>
+              <button onClick={onHowTo} className="press fs-sans" style={{
+                flexShrink: 0, padding: '5px 10px',
+                background: '#4A0E4E', border: 'none', borderRadius: 9,
+                color: '#FFD700', fontSize: 11.5, fontWeight: 700,
+                cursor: 'pointer', whiteSpace: 'nowrap', letterSpacing: '-0.01em',
+              }}>
+                {t.howto_link}
+              </button>
+            </div>
+            <div style={{ height: 1, background: 'rgba(74,14,78,0.09)', margin: '9px 0' }} />
+            <div style={{ display: 'flex', alignItems: 'center', gap: 9 }}>
+              <div style={{
+                flexShrink: 0, width: 22, height: 22, borderRadius: 999,
+                background: 'rgba(74,14,78,0.1)', color: 'rgba(74,14,78,0.4)',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                fontSize: 12, fontWeight: 800,
+              }}>2</div>
+              <div className="fs-sans" dir="auto" style={{ fontSize: 13, fontWeight: 600, color: 'rgba(74,14,78,0.5)', lineHeight: 1.25 }}>
+                {t.landing_step2}
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* Main CTA — big, exciting, the obvious next action */}
         <button onClick={() => fileInputRef.current?.click()} className="press a-gradient-shift" style={{
           width: '100%', position: 'relative', overflow: 'hidden',
@@ -135,8 +180,8 @@ export default function Landing({ onFile, onDemo, parseError, t, lang, setLang, 
           <div className="a-shine" style={{ position: 'absolute', inset: 0 }} />
           <span className="fs-display" style={{ position: 'relative' }}>{t.landing_cta}</span>
         </button>
-        {/* Secondary actions — demo + how-to guide */}
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 14, marginTop: 12 }}>
+        {/* Secondary: demo only — how-to is now surfaced in the prereq card above */}
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', marginTop: 12 }}>
           <button onClick={onDemo} className="press fs-sans" style={{
             padding: '8px 4px', background: 'transparent', border: 'none',
             color: 'rgba(74,14,78,0.55)', fontSize: 14, fontWeight: 600,
@@ -144,15 +189,6 @@ export default function Landing({ onFile, onDemo, parseError, t, lang, setLang, 
           }}>
             {t.landing_demo_soft}
           </button>
-          {onHowTo && (
-            <button onClick={onHowTo} className="press fs-sans" style={{
-              padding: '8px 4px', background: 'transparent', border: 'none',
-              color: 'rgba(74,14,78,0.55)', fontSize: 14, fontWeight: 600,
-              cursor: 'pointer', textDecoration: 'underline', textUnderlineOffset: 3,
-            }}>
-              {t.howto_link}
-            </button>
-          )}
         </div>
 
         {/* Trust footer */}

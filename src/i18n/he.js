@@ -19,6 +19,8 @@ export default {
   landing_cta: 'חשוף את הקבוצה ←',
   landing_demo_soft: 'רק רוצים לראות? נסו את הדמו',
   landing_trust: 'הכל מעובד מקומית. הצ׳אט שלך לא עוזב את המכשיר.',
+  landing_step1: 'פתח WhatsApp ← הצ׳אט שלך ← ייצוא צ׳אט',
+  landing_step2: 'העלה את קובץ ה-.zip או .txt שייצאת',
   // מדריך ייצוא הצ׳אט
   howto_eyebrow: 'לפני שמתחילים',
   howto_title: 'איך מורידים את הצ׳אט',
