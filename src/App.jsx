@@ -1,4 +1,4 @@
-﻿import { useState, useMemo, useCallback } from 'react';
+﻿import { useState, useMemo, useCallback, useEffect } from 'react';
 import { parseChat } from './parser/client.js';
 import { computeAll } from './lib/analytics.js';
 import { generateSampleText } from './lib/sample.js';
@@ -92,6 +92,25 @@ function ChatWrappedApp() {
     }
   }, [t]);
 
+  // Web Share Target: when the OS share sheet opens the app, the SW redirects to
+  // /?shared=1 and holds the File in memory. We request it via postMessage here.
+  useEffect(() => {
+    if (!('serviceWorker' in navigator)) return;
+    const onMessage = (event) => {
+      if (event.data?.type === 'SHARED_FILE' && event.data.file) {
+        handleFile(event.data.file);
+      }
+    };
+    navigator.serviceWorker.addEventListener('message', onMessage);
+    if (new URLSearchParams(window.location.search).has('shared')) {
+      window.history.replaceState({}, '', window.location.pathname);
+      navigator.serviceWorker.ready.then(reg => {
+        reg.active?.postMessage({ type: 'GET_SHARED_FILE' });
+      });
+    }
+    return () => navigator.serviceWorker.removeEventListener('message', onMessage);
+  }, [handleFile]);
+
   const loadDemo = useCallback(async () => {
     setFileName('demo-chat.txt');
     setParseError(null);
@@ -144,6 +163,11 @@ function ChatWrappedApp() {
         isolation: 'isolate',
       }}>
         <BlobBackground />
+        <div aria-hidden="true" style={{
+          position: 'absolute', top: 0, left: 0, right: 0, height: 28,
+          background: 'linear-gradient(to bottom, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.55) 30%, rgba(0,0,0,0.18) 65%, transparent 100%)',
+          zIndex: 1, pointerEvents: 'none',
+        }} />
         <div style={{ flex: 1, position: 'relative', overflow: 'hidden' }} dir={isRTL ? 'rtl' : 'auto'}>
           {stage === 'howto' && (
             <HowToGuide

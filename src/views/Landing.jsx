@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react';
+import { useRef, useState, useCallback } from 'react';
 import BottomSheet from '../components/BottomSheet.jsx';
 
 const LANGUAGES = [
@@ -17,12 +17,40 @@ const LANGUAGES = [
 export default function Landing({ onFile, onDemo, parseError, t, lang, setLang, onHowTo }) {
   const fileInputRef = useRef(null);
   const [langOpen, setLangOpen] = useState(false);
+  const [shaking, setShaking] = useState(false);
+  const [howToPulse, setHowToPulse] = useState(false);
   const currentLang = LANGUAGES.find(l => l.code === lang) || LANGUAGES[0];
 
+  const handleCtaClick = useCallback(() => {
+    setShaking(true);
+    setHowToPulse(true);
+    fileInputRef.current?.click();
+    setTimeout(() => { setShaking(false); setHowToPulse(false); }, 520);
+  }, []);
+
   return (
+    <>
+    <style>{`
+      @keyframes shake-no {
+        0%,100% { transform: translateX(0); }
+        15%      { transform: translateX(-7px); }
+        30%      { transform: translateX(7px); }
+        45%      { transform: translateX(-5px); }
+        60%      { transform: translateX(5px); }
+        75%      { transform: translateX(-3px); }
+        90%      { transform: translateX(3px); }
+      }
+      @keyframes pulse-guide {
+        0%,100% { box-shadow: 0 4px 18px -4px rgba(74,14,78,0.13); outline: 2px solid transparent; }
+        25%     { box-shadow: 0 6px 28px -4px rgba(74,14,78,0.3), 0 0 0 3px rgba(255,215,0,0.6); outline: 2px solid rgba(255,215,0,0.6); }
+        55%     { box-shadow: 0 5px 22px -4px rgba(74,14,78,0.2), 0 0 0 2px rgba(255,215,0,0.35); outline: 2px solid rgba(255,215,0,0.35); }
+      }
+      .cta-shake { animation: shake-no 0.48s ease-in-out; }
+      .guide-pulse { animation: pulse-guide 0.5s ease-in-out; }
+    `}</style>
     <div style={{
       position: 'relative', display: 'flex', flexDirection: 'column',
-      padding: '18px 20px 22px', height: '100%',
+      padding: '44px 20px 22px', height: '100%',
       background: 'linear-gradient(180deg, #FFF6D6 0%, #FFF0E2 46%, #FDE6F1 100%)',
       overflow: 'hidden',
     }}>
@@ -62,18 +90,22 @@ export default function Landing({ onFile, onDemo, parseError, t, lang, setLang, 
         display: 'flex', justifyContent: 'space-between', alignItems: 'center',
       }}>
         <div className="fs-mono a-fade-up" style={{
-          fontSize: 11, color: '#f06449', letterSpacing: '0.22em',
-          fontWeight: 700, textTransform: 'uppercase',
+          fontSize: 13, color: '#f06449', letterSpacing: '0.16em',
+          fontWeight: 800, textTransform: 'uppercase',
         }}>
           ✦ {t.landing_eyebrow}
         </div>
         <button onClick={() => setLangOpen(true)} className="press" aria-label={t.a11y_change_language || `Change language. Current: ${currentLang.name}`} style={{
-          display: 'flex', alignItems: 'center', justifyContent: 'center',
-          width: 38, height: 38, borderRadius: 999,
+          display: 'flex', alignItems: 'center', gap: 5,
+          padding: '0 10px', height: 34, borderRadius: 999,
           background: 'rgba(87,50,128,0.08)', border: '1px solid rgba(87,50,128,0.18)',
-          color: '#573280', fontSize: 18, cursor: 'pointer',
+          color: '#573280', cursor: 'pointer',
         }}>
-          {currentLang.flag}
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+            <circle cx="12" cy="12" r="10"/>
+            <path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
+          </svg>
+          <span style={{ fontSize: 12, fontWeight: 700, letterSpacing: '0.01em' }}>{currentLang.name}</span>
         </button>
       </div>
 
@@ -86,7 +118,7 @@ export default function Landing({ onFile, onDemo, parseError, t, lang, setLang, 
         animationDelay: '0.12s',
       }}>
         <h1 className="fs-display" style={{
-          fontSize: 54, lineHeight: 0.98, letterSpacing: '-0.045em',
+          fontSize: 'clamp(38px, 11vw, 54px)', lineHeight: 0.98, letterSpacing: '-0.045em',
           fontWeight: 800, margin: 0, color: '#4A0E4E',
           textShadow: '0 2px 0 rgba(255,255,255,0.6)',
         }}>
@@ -125,7 +157,7 @@ export default function Landing({ onFile, onDemo, parseError, t, lang, setLang, 
 
         {/* Prereq card — shows the 2-step flow so the upload CTA has context */}
         {onHowTo && (
-          <div style={{
+          <div className={howToPulse ? 'guide-pulse' : ''} style={{
             marginBottom: 10,
             background: 'rgba(255,255,255,0.62)',
             border: '1.5px solid rgba(255,255,255,0.88)',
@@ -168,7 +200,7 @@ export default function Landing({ onFile, onDemo, parseError, t, lang, setLang, 
         )}
 
         {/* Main CTA — big, exciting, the obvious next action */}
-        <button onClick={() => fileInputRef.current?.click()} className="press a-gradient-shift" style={{
+        <button onClick={handleCtaClick} className={`press a-gradient-shift${shaking ? ' cta-shake' : ''}`} style={{
           width: '100%', position: 'relative', overflow: 'hidden',
           padding: '20px 18px', color: '#4A0E4E',
           background: 'linear-gradient(135deg, #FFE45C 0%, #FFD700 50%, #FFB800 100%)',
@@ -204,7 +236,7 @@ export default function Landing({ onFile, onDemo, parseError, t, lang, setLang, 
         </div>
       </div>
 
-      {langOpen && (
+    {langOpen && (
         <BottomSheet onClose={() => setLangOpen(false)} title="Language">
           {LANGUAGES.map(l => (
             <button key={l.code} className="press" onClick={() => {
@@ -228,5 +260,6 @@ export default function Landing({ onFile, onDemo, parseError, t, lang, setLang, 
         </BottomSheet>
       )}
     </div>
+    </>
   );
 }

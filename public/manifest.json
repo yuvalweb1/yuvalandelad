@@ -1,0 +1,30 @@
+{
+  "name": "ChatWrapped",
+  "short_name": "ChatWrapped",
+  "description": "A cinematic recap of your WhatsApp group chat. 100% on-device.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0a0a0f",
+  "theme_color": "#0a0a0f",
+  "icons": [
+    {
+      "src": "/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ],
+  "share_target": {
+    "action": "/share-target",
+    "method": "POST",
+    "enctype": "multipart/form-data",
+    "params": {
+      "files": [
+        {
+          "name": "chat",
+          "accept": ["application/zip", "text/plain", ".zip", ".txt"]
+        }
+      ]
+    }
+  }
+}
