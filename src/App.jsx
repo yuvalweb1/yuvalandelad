@@ -6,7 +6,6 @@ import { RTL_LANGS, detectLang, buildT } from './i18n';
 import ErrorBoundary from './components/ErrorBoundary.jsx';
 import GlobalStyles from './components/GlobalStyles.jsx';
 import BlobBackground from './components/BlobBackground.jsx';
-import StatusBar from './components/StatusBar.jsx';
 import HomeIndicator from './components/HomeIndicator.jsx';
 import HowToGuide from './views/HowToGuide.jsx';
 import Landing from './views/Landing.jsx';
@@ -149,7 +148,6 @@ function ChatWrappedApp() {
         isolation: 'isolate',
       }}>
         <BlobBackground />
-        <StatusBar />
         <div style={{ flex: 1, position: 'relative', overflow: 'hidden' }} dir={isRTL ? 'rtl' : 'auto'}>
           {stage === 'howto' && (
             <HowToGuide

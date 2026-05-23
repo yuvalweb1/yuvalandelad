@@ -19,12 +19,6 @@ export default function Landing({ onFile, onDemo, parseError, t, lang, setLang, 
   const [langOpen, setLangOpen] = useState(false);
   const currentLang = LANGUAGES.find(l => l.code === lang) || LANGUAGES[0];
 
-  const featureCards = [
-    { icon: '📊', label: t.feat_stats_t || 'STATS', q: t.feat_stats_q || 'Who talked the most?', bg: '#DAF3FF', accent: '#00BFFF', deep: '#0089C4' },
-    { icon: '🔥', label: t.feat_roasts_t || 'ROASTS', q: t.feat_roasts_q || 'AI roasts everyone', bg: '#FFE1EE', accent: '#FF69B4', deep: '#D63384' },
-    { icon: '🎭', label: t.feat_drama_t || 'DRAMA', q: t.feat_drama_q || 'Who started the chaos?', bg: '#FFEFC2', accent: '#FF8C00', deep: '#D17000' },
-  ];
-
   return (
     <div style={{
       position: 'relative', display: 'flex', flexDirection: 'column',
@@ -83,8 +77,8 @@ export default function Landing({ onFile, onDemo, parseError, t, lang, setLang, 
         </button>
       </div>
 
-      {/* Scrollable middle — hero + cards. Keeps the CTA pinned & always visible. */}
-      <div className="no-sb" style={{ position: 'relative', zIndex: 10, flex: 1, minHeight: 0, overflowY: 'auto', display: 'flex', flexDirection: 'column' }}>
+      {/* Middle — hero. Keeps the CTA pinned & always visible. */}
+      <div style={{ position: 'relative', zIndex: 10, flex: 1, minHeight: 0, overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
       {/* Hero — emotional promise + subtitle */}
       <div className="a-fade-up" style={{
         position: 'relative', zIndex: 10,
@@ -102,60 +96,6 @@ export default function Landing({ onFile, onDemo, parseError, t, lang, setLang, 
           <span style={{ fontStyle: 'italic', color: '#FF69B4' }}>{t.landing_h1_d}</span>
           {t.landing_h1_e ? <> {t.landing_h1_e}</> : null}
         </h1>
-        <p className="fs-sans" style={{
-          margin: '14px 0 0', maxWidth: 300,
-          fontSize: 16, lineHeight: 1.45, fontWeight: 500,
-          color: 'rgba(74,14,78,0.66)',
-        }}>
-          {t.landing_promise_sub}
-        </p>
-      </div>
-
-      {/* Feature cards — big, colorful, sticker-like */}
-      <div className="a-fade-up" style={{
-        position: 'relative', zIndex: 10,
-        marginTop: 22, display: 'flex', flexDirection: 'column', gap: 12,
-        animationDelay: '0.25s',
-      }}>
-        {featureCards.map((card, i) => (
-          <button key={i} type="button"
-            onClick={() => fileInputRef.current?.click()}
-            aria-label={`${card.label} — ${card.q}`}
-            className="a-slide-right press lift" style={{
-            width: '100%', textAlign: 'start', font: 'inherit', appearance: 'none',
-            display: 'flex', alignItems: 'center', gap: 14,
-            padding: '16px 18px',
-            background: card.bg,
-            borderRadius: 24,
-            border: '2px solid rgba(255,255,255,0.7)',
-            boxShadow: `0 7px 0 ${card.deep}33, 0 16px 30px -8px ${card.deep}55`,
-            animationDelay: `${0.35 + i * 0.1}s`,
-            cursor: 'pointer',
-          }}>
-            {/* icon sticker badge */}
-            <div style={{
-              flexShrink: 0, width: 52, height: 52, borderRadius: 16,
-              background: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center',
-              fontSize: 28, boxShadow: `0 4px 0 ${card.deep}22`, transform: 'rotate(-4deg)',
-            }}>{card.icon}</div>
-            <div style={{ flex: 1, minWidth: 0 }}>
-              <div className="fs-mono" style={{
-                fontSize: 11, fontWeight: 700, color: card.deep,
-                letterSpacing: '0.14em', textTransform: 'uppercase',
-              }}>{card.label}</div>
-              <div className="fs-display" style={{
-                fontSize: 20, fontWeight: 800, color: '#4A0E4E',
-                letterSpacing: '-0.02em', lineHeight: 1.12, marginTop: 2,
-              }}>{card.q}</div>
-            </div>
-            <div style={{
-              flexShrink: 0, width: 30, height: 30, borderRadius: 999,
-              background: card.accent, color: '#fff',
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-              fontSize: 17, fontWeight: 800, boxShadow: `0 3px 0 ${card.deep}55`,
-            }}>←</div>
-          </button>
-        ))}
       </div>
 
       {parseError && (
