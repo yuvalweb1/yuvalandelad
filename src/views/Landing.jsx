@@ -24,7 +24,6 @@ export default function Landing({ onFile, onDemo, parseError, t, lang, setLang, 
   const handleCtaClick = useCallback(() => {
     setShaking(true);
     setHowToPulse(true);
-    fileInputRef.current?.click();
     setTimeout(() => { setShaking(false); setHowToPulse(false); }, 520);
   }, []);
 
@@ -185,17 +184,29 @@ export default function Landing({ onFile, onDemo, parseError, t, lang, setLang, 
               </button>
             </div>
             <div style={{ height: 1, background: 'rgba(74,14,78,0.09)', margin: '9px 0' }} />
-            <div style={{ display: 'flex', alignItems: 'center', gap: 9 }}>
+            <button onClick={() => fileInputRef.current?.click()} className="press fs-sans" style={{
+              display: 'flex', alignItems: 'center', gap: 9,
+              width: '100%', background: 'transparent', border: 'none',
+              padding: 0, cursor: 'pointer', textAlign: 'left',
+            }}>
               <div style={{
                 flexShrink: 0, width: 22, height: 22, borderRadius: 999,
-                background: 'rgba(74,14,78,0.1)', color: 'rgba(74,14,78,0.4)',
+                background: '#4A0E4E', color: '#FFD700',
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
                 fontSize: 12, fontWeight: 800,
               }}>2</div>
-              <div className="fs-sans" dir="auto" style={{ fontSize: 13, fontWeight: 600, color: 'rgba(74,14,78,0.5)', lineHeight: 1.25 }}>
+              <div dir="auto" style={{ flex: 1, fontSize: 13, fontWeight: 600, color: '#2a0645', lineHeight: 1.25 }}>
                 {t.landing_step2}
               </div>
-            </div>
+              <div style={{
+                flexShrink: 0, padding: '5px 10px',
+                background: 'rgba(74,14,78,0.08)', border: '1.5px solid rgba(74,14,78,0.18)',
+                borderRadius: 9, color: '#4A0E4E', fontSize: 11.5, fontWeight: 700,
+                whiteSpace: 'nowrap', letterSpacing: '-0.01em',
+              }}>
+                Upload ↑
+              </div>
+            </button>
           </div>
         )}
 
