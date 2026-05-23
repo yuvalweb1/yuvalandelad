@@ -6,6 +6,7 @@ import SlidePerPerson from './SlidePerPerson.jsx';
 import SlideSignatureWords from './SlideSignatureWords.jsx';
 import SlideGroupTop from './SlideGroupTop.jsx';
 import SlidePhotos from './SlidePhotos.jsx';
+import SlideAd from './SlideAd.jsx';
 import SlideTeaser from './SlideTeaser.jsx';
 
 // Auto-play order. Wrapped filters this further based on which slides have
@@ -20,6 +21,7 @@ export const SLIDES_DEF = [
   'photos',
   'awards',
   'drama_role',
+  'ad',          // interstitial ad — shown only when ADS.slots.interstitial is on
   'teaser',
 ];
 
@@ -33,5 +35,6 @@ export const SLIDE_COMPONENTS = {
   photos:          SlidePhotos,
   awards:          SlideAwards,
   drama_role:      SlideDramaRole,
+  ad:              SlideAd,
   teaser:          SlideTeaser,
 };

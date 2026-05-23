@@ -1,5 +1,6 @@
 import { useMemo, useRef, useEffect } from 'react';
 import SlidesBlobBackground from '../components/SlidesBlobBackground.jsx';
+import { adEnabled } from '../lib/ads.js';
 
 export default function Wrapped({ analytics, diagnostics, selectedAuthor, setSelectedAuthor, slide, setSlide, profile, t, onExit, onMenu, slidesDef, slideComponents }) {
   const user = analytics.userMap[selectedAuthor];
@@ -12,6 +13,7 @@ export default function Wrapped({ analytics, diagnostics, selectedAuthor, setSel
     if (s === 'group_top' && !((analytics.topWordsGroup && analytics.topWordsGroup.length) || (analytics.topEmojisGroup && analytics.topEmojisGroup.length))) return false;
     if (s === 'photos' && (!analytics.photos || analytics.photos.length === 0)) return false;
     if (s === 'drama_role' && !user) return false;
+    if (s === 'ad' && !adEnabled('interstitial')) return false;
     return true;
   }), [selectedAuthor, userAchievements.length, user, analytics, profile]);
 

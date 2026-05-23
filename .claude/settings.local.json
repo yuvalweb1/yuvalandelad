@@ -65,7 +65,10 @@
       "Bash(node scripts/audit-imports.mjs)",
       "Bash(node scripts/audit-slides.mjs)",
       "Bash(node scripts/extract-slides.mjs)",
-      "Bash(node scripts/strip-slides.mjs)"
+      "Bash(node scripts/strip-slides.mjs)",
+      "Bash(cd \"c:/work space/whatsappRecap/yuvalandelad\")",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\" http://localhost:5173/)",
+      "Bash(echo 'dev server: __TRACKED_VAR__')"
     ]
   }
 }

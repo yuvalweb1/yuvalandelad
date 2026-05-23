@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { interp, resolveTitle } from '../i18n';
 import BottomSheet from '../components/BottomSheet.jsx';
+import AdSlot from '../components/AdSlot.jsx';
 
 export default function PostMenu({ analytics, diagnostics, selectedAuthor, setSelectedAuthor, t, onReplay, onReset, onDebug, onRoastMode }) {
   const [pickerOpen, setPickerOpen] = useState(false);
@@ -103,6 +104,9 @@ export default function PostMenu({ analytics, diagnostics, selectedAuthor, setSe
             </div>
           </button>
         </div>
+
+        {/* Ad banner slot (placeholder until filled — see src/lib/ads.js) */}
+        <AdSlot slot="menu" format="banner" t={t} style={{ marginTop: 10 }} />
 
         {/* Person picker */}
         <button onClick={() => setPickerOpen(true)} className="press" style={{

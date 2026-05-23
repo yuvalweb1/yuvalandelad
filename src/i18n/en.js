@@ -49,6 +49,8 @@ export default {
   photos_eyebrow: 'CAUGHT ON CAMERA',
   photos_title: '{n} photos this year',
   photos_sub: 'Straight from your chat · on your device only',
+  ad_label: 'Advertisement',
+  ad_placeholder: 'Your ad here',
   err_format: 'Upload a .txt or .zip from WhatsApp export.',
   err_no_msgs: 'No messages found. Format may not be supported.',
   onboard_skip: 'Skip',

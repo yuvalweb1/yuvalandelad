@@ -49,6 +49,8 @@ export default {
   photos_eyebrow: 'נתפס במצלמה',
   photos_title: '{n} תמונות השנה',
   photos_sub: 'ישר מהצ׳אט · רק במכשיר שלך',
+  ad_label: 'פרסומת',
+  ad_placeholder: 'המקום שלך לפרסומת',
   err_format: 'העלה קובץ .txt או .zip מהיצוא של ווצאפ.',
   err_no_msgs: 'לא נמצאו הודעות. ייתכן שהפורמט אינו נתמך.',
   onboard_skip: 'דלג',

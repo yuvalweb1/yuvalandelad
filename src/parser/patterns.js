@@ -19,7 +19,6 @@ export const SYSTEM_PATTERNS = [
   /שינה\/תה? את שם הקבוצה/, /שינה\/תה? את התיאור/, /שינה\/תה? את התמונה/,
   /נוצרה הקבוצה/, /יצרת קבוצה/, /יצר\/ה? את הקבוצה/,
   /^ההודעות והשיחות מוצפנות/, /הצפנה מקצה לקצה/,
-  /ההודעה הזו נמחקה/, /מחקת את ההודעה הזו/,
   // English
   /^.+ joined using this group/i, /^.+ was added/i, /^.+ added .+/i,
   /^.+ left$/i, /^.+ was removed/i, /^.+ removed .+/i,
@@ -27,7 +26,6 @@ export const SYSTEM_PATTERNS = [
   /^.+ changed the group description/i, /changed the group's icon/i,
   /^.+ created group/i, /^.+ created this group/i,
   /^Messages and calls are end-to-end encrypted/i,
-  /^This message was deleted$/i, /^You deleted this message$/i,
   /^Missed (voice|video) call$/i,
 ];
 
@@ -52,9 +50,16 @@ export const VOICE_PATTERNS = [
   /PTT-.*\.opus/, /\.opus/,
 ];
 
+// Deleted-message notices — many phrasings, so kept broad (unanchored,
+// tolerant of trailing punctuation). These messages are excluded from all
+// analytics (counted only as `deletedMessages` in diagnostics).
 export const DELETED_PATTERNS = [
-  /^ההודעה הזו נמחקה$/, /^מחקת את ההודעה הזו$/,
-  /^This message was deleted$/, /^You deleted this message$/,
+  // Hebrew: ה/הודעה · זו/זאת/הזו/הזאת · "נמחקה" (incl. "ההודעה נמחקה")
+  /הודעה\s*(?:הזו|הזאת|זו|זאת)?\s*נמחקה/,
+  /מחקת\s*(?:את\s*)?(?:ה)?הודעה/,
+  // English (tolerant of a trailing period/space/marker)
+  /this message was deleted/i,
+  /you deleted this message/i,
 ];
 
 // Group-IDENTITY notices: the end-to-end-encryption notice is attributed by
