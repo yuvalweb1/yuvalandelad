@@ -53,7 +53,10 @@
       "Bash(node scripts/strip-i18n.mjs)",
       "Read(//c/workspace/whatsappRecap/**)",
       "Bash(stat -c '%y %s' android/app/src/main/assets/public/index.html dist/index.html 2>&1)",
-      "Bash(npx cap *)"
+      "Bash(npx cap *)",
+      "Bash(node scripts/extract-analytics.mjs)",
+      "Bash(node -e \"import\\('./src/lib/analytics.js'\\).then\\(m => console.log\\('analytics exports:', Object.keys\\(m\\).sort\\(\\)\\)\\).then\\(\\(\\) => import\\('./src/lib/sample.js'\\)\\).then\\(m => console.log\\('sample exports:', Object.keys\\(m\\)\\)\\)\")",
+      "Bash(node scripts/strip-analytics.mjs)"
     ]
   }
 }
