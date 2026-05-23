@@ -60,7 +60,12 @@
       "Bash(node scripts/extract-ui.mjs)",
       "Bash(node scripts/strip-ui.mjs)",
       "Bash(node scripts/audit-views.mjs)",
-      "Bash(node scripts/strip-views.mjs)"
+      "Bash(node scripts/strip-views.mjs)",
+      "Bash(node scripts/delete-dead-slides.mjs)",
+      "Bash(node scripts/audit-imports.mjs)",
+      "Bash(node scripts/audit-slides.mjs)",
+      "Bash(node scripts/extract-slides.mjs)",
+      "Bash(node scripts/strip-slides.mjs)"
     ]
   }
 }
