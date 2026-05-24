@@ -7,7 +7,6 @@ export default {
   landing_h1_e: 'sortir.',
   landing_sub: 'Eres. Récompenses. Drame. Un résumé cinématographique de tes vrais messages. Rien ne quitte ton téléphone.',
   cta_play: 'Voir mon Wrapped →',
-  cta_demo: 'OU VOIR LA DÉMO →',
   privacy_note: 'TRAITÉ ENTIÈREMENT SUR TON APPAREIL',
   err_format: 'Téléverse un .txt ou .zip exporté de WhatsApp.',
   err_no_msgs: 'Aucun message trouvé. Format non supporté.',

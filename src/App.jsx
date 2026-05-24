@@ -1,7 +1,6 @@
 ﻿import { useState, useMemo, useCallback, useEffect } from 'react';
 import { parseChat } from './parser/client.js';
 import { computeAll } from './lib/analytics.js';
-import { generateSampleText } from './lib/sample.js';
 import { RTL_LANGS, detectLang, buildT } from './i18n';
 import ErrorBoundary from './components/ErrorBoundary.jsx';
 import GlobalStyles from './components/GlobalStyles.jsx';
@@ -111,30 +110,6 @@ function ChatWrappedApp() {
     return () => navigator.serviceWorker.removeEventListener('message', onMessage);
   }, [handleFile]);
 
-  const loadDemo = useCallback(async () => {
-    setFileName('demo-chat.txt');
-    setParseError(null);
-    setStage('parsing');
-    setParsingStage(0);
-    await new Promise(r => setTimeout(r, 400));
-    const text = generateSampleText();
-    const { messages: parsed, diagnostics: diag } = await parseChat({
-      text,
-      onProgress: () => setParsingStage(2),
-    });
-    setDiagnostics(diag);
-    await new Promise(r => setTimeout(r, 600));
-    setParsingStage(3);
-    const a = computeAll(parsed);
-    await new Promise(r => setTimeout(r, 500));
-    setParsingStage(4);
-    await new Promise(r => setTimeout(r, 400));
-    setAnalytics(a);
-    setSelectedAuthor(a.users[0].author);
-    setSlide(0);
-    setStage('onboard');
-  }, []);
-
   const reset = () => {
     // Free any object URLs created for chat photos before dropping analytics.
     if (analytics && analytics.photos) {
@@ -181,7 +156,6 @@ function ChatWrappedApp() {
           {stage === 'landing' && (
             <Landing
               onFile={handleFile}
-              onDemo={loadDemo}
               parseError={parseError}
               t={t}
               lang={lang}

@@ -7,7 +7,6 @@ export default {
   landing_h1_e: 'salir.',
   landing_sub: 'Eras. Premios. Drama. Un resumen cinematográfico de tus mensajes reales. Nada sale de tu teléfono.',
   cta_play: 'Ver mi Wrapped →',
-  cta_demo: 'O VER CON DEMO →',
   privacy_note: 'PROCESADO ENTERAMENTE EN TU DISPOSITIVO',
   err_format: 'Sube un archivo .txt o .zip exportado de WhatsApp.',
   err_no_msgs: 'No se encontraron mensajes. Formato no soportado.',

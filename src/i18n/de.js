@@ -7,7 +7,6 @@ export default {
   landing_h1_e: 'enthüllt.',
   landing_sub: 'Eren. Awards. Drama. Eine kinoreife Zusammenfassung deiner echten Nachrichten. Nichts verlässt dein Telefon.',
   cta_play: 'Mein Wrapped abspielen →',
-  cta_demo: 'ODER DEMO ANZEIGEN →',
   privacy_note: 'KOMPLETT AUF DEINEM GERÄT VERARBEITET',
   err_format: 'Lade eine .txt oder .zip aus WhatsApp-Export hoch.',
   err_no_msgs: 'Keine Nachrichten gefunden. Format nicht unterstützt.',

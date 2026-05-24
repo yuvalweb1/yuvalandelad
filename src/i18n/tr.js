@@ -7,7 +7,6 @@ export default {
   landing_h1_e: 'üzere.',
   landing_sub: 'Çağlar. Ödüller. Drama. Gerçek mesajlarından sinematik bir özet. Hiçbir şey telefonundan çıkmıyor.',
   cta_play: 'Wrapped\'imi aç →',
-  cta_demo: 'YA DA DEMOYU İZLE →',
   privacy_note: 'TAMAMEN CİHAZINDA İŞLENİR',
   err_format: 'WhatsApp dışa aktarımından .txt veya .zip yükle.',
   err_no_msgs: 'Mesaj bulunamadı. Format desteklenmiyor.',

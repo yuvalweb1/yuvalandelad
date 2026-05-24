@@ -1,4 +1,4 @@
-import { useRef, useState, useCallback } from 'react';
+import { useRef, useState, useCallback, useMemo } from 'react';
 import BottomSheet from '../components/BottomSheet.jsx';
 
 const LANGUAGES = [
@@ -14,11 +14,15 @@ const LANGUAGES = [
   { code: 'tr', name: 'Türkçe', flag: '🇹🇷' },
 ];
 
-export default function Landing({ onFile, onDemo, parseError, t, lang, setLang, onHowTo }) {
+export default function Landing({ onFile, parseError, t, lang, setLang, onHowTo }) {
   const fileInputRef = useRef(null);
   const [langOpen, setLangOpen] = useState(false);
   const [shaking, setShaking] = useState(false);
   const [howToPulse, setHowToPulse] = useState(false);
+  const emojiRots = useMemo(() => [10, -13, 16, -9, 12].map(base => {
+    const jitter = ((Math.random() * 12) | 0) - 6;
+    return base + jitter;
+  }), []);
   const currentLang = LANGUAGES.find(l => l.code === lang) || LANGUAGES[0];
 
   const handleCtaClick = useCallback(() => {
@@ -69,23 +73,27 @@ export default function Landing({ onFile, onDemo, parseError, t, lang, setLang, 
 
         {/* paper sticker cards — emoji on a small white note */}
         {[
-          { e: '😂', top: 108, right: 22, rot: -12, size: 28, delay: '0s' },
-          { e: '🔥', top: 196, left: 18, rot: 11, size: 26, delay: '0.7s' },
-          { e: '👀', top: 262, right: 26, rot: -9, size: 24, delay: '1.4s' },
-          { e: '💀', top: 310, left: 26, rot: 9, size: 24, delay: '0.4s' },
-          { e: '✨', top: 82, left: 90, rot: 5, size: 22, delay: '1.8s' },
+          { e: '😂', top: 108, right: 22, size: 28, delay: '0s' },
+          { e: '🔥', top: 196, left: 18, size: 26, delay: '0.7s' },
+          { e: '👀', top: 262, right: 26, size: 24, delay: '1.4s' },
+          { e: '💀', top: 310, left: 26, size: 24, delay: '0.4s' },
+          { e: '✨', top: 82, left: 90, size: 22, delay: '1.8s' },
         ].map((s, i) => (
-          <div key={i} className="a-float" style={{
+          <div key={i} style={{
             position: 'absolute', top: s.top, left: s.left, right: s.right,
-            transform: `rotate(${s.rot}deg)`,
-            animationDelay: s.delay,
+            transform: `rotate(${emojiRots[i]}deg)`,
             width: s.size + 22, height: s.size + 22,
-            background: 'rgba(255,255,255,0.92)',
-            borderRadius: 10,
-            boxShadow: '0 4px 14px rgba(74,14,78,0.18), 0 1px 3px rgba(74,14,78,0.10)',
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
           }}>
-            <span style={{ fontSize: s.size, lineHeight: 1 }}>{s.e}</span>
+            <div className="a-float" style={{
+              width: '100%', height: '100%',
+              animationDelay: s.delay,
+              background: 'rgba(255,255,255,0.92)',
+              borderRadius: 10,
+              boxShadow: '0 4px 14px rgba(74,14,78,0.18), 0 1px 3px rgba(74,14,78,0.10)',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+            }}>
+              <span style={{ fontSize: s.size, lineHeight: 1 }}>{s.e}</span>
+            </div>
           </div>
         ))}
       </div>
@@ -120,6 +128,7 @@ export default function Landing({ onFile, onDemo, parseError, t, lang, setLang, 
         position: 'relative', zIndex: 10,
         marginTop: 26,
         animationDelay: '0.12s',
+        textAlign: 'center',
       }}>
         <h1 className="fs-display" style={{
           fontSize: 'clamp(38px, 11vw, 54px)', lineHeight: 0.98, letterSpacing: '-0.045em',
@@ -228,21 +237,10 @@ export default function Landing({ onFile, onDemo, parseError, t, lang, setLang, 
           <div className="a-shine" style={{ position: 'absolute', inset: 0 }} />
           <span className="fs-display" style={{ position: 'relative' }}>{t.landing_cta}</span>
         </button>
-        {/* Secondary: demo only — how-to is now surfaced in the prereq card above */}
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', marginTop: 12 }}>
-          <button onClick={onDemo} className="press fs-sans" style={{
-            padding: '8px 4px', background: 'transparent', border: 'none',
-            color: 'rgba(74,14,78,0.55)', fontSize: 14, fontWeight: 600,
-            cursor: 'pointer', textDecoration: 'underline', textUnderlineOffset: 3,
-          }}>
-            {t.landing_demo_soft}
-          </button>
-        </div>
-
         {/* Trust footer */}
         <div className="fs-sans" style={{
           display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
-          textAlign: 'center', marginTop: 12,
+          textAlign: 'center', marginTop: 6,
           fontSize: 11.5, color: 'rgba(74,14,78,0.45)', lineHeight: 1.4,
         }}>
           <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" style={{ flexShrink: 0 }}>
