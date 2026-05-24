@@ -54,8 +54,8 @@ export default function Wrapped({ analytics, diagnostics, selectedAuthor, setSel
       </button>
 
       {/* Tap zones — pure touch convenience, hidden from assistive tech */}
-      <div onClick={prev} aria-hidden="true" style={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: '30%', zIndex: 4 }} />
-      {slide < total - 1 && <div onClick={next} aria-hidden="true" style={{ position: 'absolute', right: 0, top: 0, bottom: 0, width: '70%', zIndex: 4 }} />}
+      <div onClick={prev} aria-hidden="true" style={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: '30%', zIndex: 4, touchAction: 'pan-y' }} />
+      {slide < total - 1 && <div onClick={next} aria-hidden="true" style={{ position: 'absolute', right: 0, top: 0, bottom: 0, width: '70%', zIndex: 4, touchAction: 'pan-y' }} />}
 
       {/* Slide with directional transition */}
       <div key={`${current}-${selectedAuthor}`}
