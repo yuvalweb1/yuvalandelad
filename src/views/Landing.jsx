@@ -95,12 +95,10 @@ export default function Landing({ onFile, onDemo, parseError, t, lang, setLang, 
         position: 'relative', zIndex: 10,
         display: 'flex', justifyContent: 'space-between', alignItems: 'center',
       }}>
-        <img
-          src="/recapped_logo_clean.png"
-          alt="recapped"
-          className="a-fade-up"
-          style={{ height: 40, width: 'auto', objectFit: 'contain' }}
-        />
+        <div className="a-fade-up" style={{ display: 'flex', alignItems: 'baseline', gap: 0 }}>
+          <span style={{ fontFamily: 'Georgia, serif', fontSize: 24, fontWeight: 700, letterSpacing: '-0.03em', color: '#4A0E4E' }}>re</span>
+          <span style={{ fontFamily: 'Georgia, serif', fontSize: 24, fontWeight: 700, letterSpacing: '-0.03em', color: '#f06449' }}>capped</span>
+        </div>
         <button onClick={() => setLangOpen(true)} className="press" aria-label={t.a11y_change_language || `Change language. Current: ${currentLang.name}`} style={{
           display: 'flex', alignItems: 'center', gap: 5,
           padding: '0 10px', height: 34, borderRadius: 999,
