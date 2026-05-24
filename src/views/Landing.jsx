@@ -104,8 +104,8 @@ export default function Landing({ onFile, parseError, t, lang, setLang, onHowTo 
         display: 'flex', justifyContent: 'space-between', alignItems: 'center',
       }}>
         <div className="a-fade-up" style={{ display: 'flex', alignItems: 'baseline', gap: 0 }}>
-          <span style={{ fontFamily: 'Georgia, serif', fontSize: 24, fontWeight: 700, letterSpacing: '-0.03em', color: '#4A0E4E' }}>re</span>
-          <span style={{ fontFamily: 'Georgia, serif', fontSize: 24, fontWeight: 700, letterSpacing: '-0.03em', color: '#f06449' }}>capped</span>
+          <span style={{ fontFamily: 'Georgia, serif', fontSize: 19, fontWeight: 700, letterSpacing: '-0.03em', color: '#4A0E4E' }}>re</span>
+          <span style={{ fontFamily: 'Georgia, serif', fontSize: 19, fontWeight: 700, letterSpacing: '-0.03em', color: '#f06449' }}>capped</span>
         </div>
         <button onClick={() => setLangOpen(true)} className="press" aria-label={t.a11y_change_language || `Change language. Current: ${currentLang.name}`} style={{
           display: 'flex', alignItems: 'center', gap: 5,
@@ -126,7 +126,7 @@ export default function Landing({ onFile, parseError, t, lang, setLang, onHowTo 
       {/* Hero — emotional promise + subtitle */}
       <div className="a-fade-up" style={{
         position: 'relative', zIndex: 10,
-        marginTop: 26,
+        marginTop: 96,
         animationDelay: '0.12s',
         textAlign: 'center',
       }}>
