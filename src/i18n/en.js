@@ -15,7 +15,7 @@ export default {
   feat_roasts_q: 'AI roasts everyone',
   feat_drama_t: 'DRAMA',
   feat_drama_q: 'Who started the chaos?',
-  landing_cta: 'Expose the chat →',
+  landing_cta: 'Expose them →',
   landing_trust: 'Everything is processed locally. Your chat never leaves your device.',
   landing_step1: 'Export your chat',
   landing_step2: 'Upload an exported file',
