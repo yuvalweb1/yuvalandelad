@@ -67,19 +67,26 @@ export default function Landing({ onFile, onDemo, parseError, t, lang, setLang, 
         </div>
         <div className="a-float" style={{ position: 'absolute', top: 232, right: 14, width: 46, height: 32, background: '#4A0E4E', borderRadius: '16px 16px 4px 16px', boxShadow: '0 8px 18px rgba(74,14,78,0.22)', animationDelay: '1.1s' }} />
 
-        {/* emoji stickers — all above midpoint, clear of CTA zone */}
+        {/* paper sticker cards — emoji on a small white note */}
         {[
-          { e: '😂', top: 116, right: 26, rot: -14, size: 30, delay: '0s' },
-          { e: '🔥', top: 198, left: 22, rot: 12, size: 26, delay: '0.7s' },
-          { e: '👀', top: 258, right: 30, rot: -8, size: 24, delay: '1.4s' },
-          { e: '💀', top: 306, left: 30, rot: 10, size: 24, delay: '0.4s' },
-          { e: '✨', top: 88, left: 96, rot: 0, size: 20, delay: '1.8s' },
+          { e: '😂', top: 108, right: 22, rot: -12, size: 28, delay: '0s' },
+          { e: '🔥', top: 196, left: 18, rot: 11, size: 26, delay: '0.7s' },
+          { e: '👀', top: 262, right: 26, rot: -9, size: 24, delay: '1.4s' },
+          { e: '💀', top: 310, left: 26, rot: 9, size: 24, delay: '0.4s' },
+          { e: '✨', top: 82, left: 90, rot: 5, size: 22, delay: '1.8s' },
         ].map((s, i) => (
-          <span key={i} className="a-float" style={{
-            position: 'absolute', top: s.top, bottom: s.bottom, left: s.left, right: s.right,
-            fontSize: s.size, transform: `rotate(${s.rot}deg)`,
-            filter: 'drop-shadow(0 4px 6px rgba(74,14,78,0.28))', animationDelay: s.delay, opacity: 0.92,
-          }}>{s.e}</span>
+          <div key={i} className="a-float" style={{
+            position: 'absolute', top: s.top, left: s.left, right: s.right,
+            transform: `rotate(${s.rot}deg)`,
+            animationDelay: s.delay,
+            width: s.size + 22, height: s.size + 22,
+            background: 'rgba(255,255,255,0.92)',
+            borderRadius: 10,
+            boxShadow: '0 4px 14px rgba(74,14,78,0.18), 0 1px 3px rgba(74,14,78,0.10)',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+          }}>
+            <span style={{ fontSize: s.size, lineHeight: 1 }}>{s.e}</span>
+          </div>
         ))}
       </div>
 
@@ -88,12 +95,12 @@ export default function Landing({ onFile, onDemo, parseError, t, lang, setLang, 
         position: 'relative', zIndex: 10,
         display: 'flex', justifyContent: 'space-between', alignItems: 'center',
       }}>
-        <div className="fs-mono a-fade-up" style={{
-          fontSize: 13, color: '#f06449', letterSpacing: '0.16em',
-          fontWeight: 800, textTransform: 'uppercase',
-        }}>
-          ✦ {t.landing_eyebrow}
-        </div>
+        <img
+          src="/recapped_logo_clean.png"
+          alt="recapped"
+          className="a-fade-up"
+          style={{ height: 40, width: 'auto', objectFit: 'contain' }}
+        />
         <button onClick={() => setLangOpen(true)} className="press" aria-label={t.a11y_change_language || `Change language. Current: ${currentLang.name}`} style={{
           display: 'flex', alignItems: 'center', gap: 5,
           padding: '0 10px', height: 34, borderRadius: 999,
