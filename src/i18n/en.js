@@ -2,7 +2,7 @@ export default {
   landing_eyebrow: 'CHATWRAPPED · YOUR WHATSAPP YEAR',
   landing_h1_a: 'ready to',
   landing_h1_b: 'expose',
-  landing_h1_c: 'the chat?',
+  landing_h1_c: '',
   landing_h1_d: '',
   landing_h1_e: '',
   landing_sub: 'Stats. Roasts. Drama. Built from your actual messages. Nothing leaves your phone.',

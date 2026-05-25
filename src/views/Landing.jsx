@@ -131,12 +131,21 @@ export default function Landing({ onFile, parseError, t, lang, setLang, onHowTo 
         textAlign: 'center',
       }}>
         <h1 className="fs-display" style={{
-          fontSize: 'clamp(38px, 11vw, 54px)', lineHeight: 0.98, letterSpacing: '-0.045em',
+          fontSize: 'clamp(38px, 11vw, 54px)', lineHeight: 0.92, letterSpacing: '-0.045em',
           fontWeight: 800, margin: 0, color: '#4A0E4E',
           textShadow: '0 2px 0 rgba(255,255,255,0.6)',
         }}>
           {t.landing_h1_a}{' '}
-          <span style={{ fontStyle: 'italic', color: '#FF8C00' }}>{t.landing_h1_b}</span>{' '}
+          <span style={{
+            display: 'inline-block',
+            background: '#FF1867',
+            color: '#fff',
+            padding: '2px 12px 5px',
+            borderRadius: 999,
+            transform: 'rotate(-2.5deg)',
+            verticalAlign: 'middle',
+            boxShadow: '0 3px 0 rgba(180,0,60,0.4)',
+          }}>{t.landing_h1_b}</span>{' '}
           {t.landing_h1_c}<br/>
           <span>{t.landing_h1_d}</span>
           {t.landing_h1_e ? <> {t.landing_h1_e}</> : null}
