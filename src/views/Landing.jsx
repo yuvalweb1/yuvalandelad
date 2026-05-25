@@ -48,9 +48,9 @@ export default function Landing({
         90%      { transform: translateX(3px); }
       }
       @keyframes pulse-guide {
-        0%,100% { box-shadow: 0 4px 18px -4px rgba(74,14,78,0.13); outline: 2px solid transparent; }
-        25%     { box-shadow: 0 6px 28px -4px rgba(74,14,78,0.3), 0 0 0 3px rgba(255,215,0,0.6); outline: 2px solid rgba(255,215,0,0.6); }
-        55%     { box-shadow: 0 5px 22px -4px rgba(74,14,78,0.2), 0 0 0 2px rgba(255,215,0,0.35); outline: 2px solid rgba(255,215,0,0.35); }
+        0%,100% { box-shadow: 0 6px 0 rgba(74,14,78,0.14), 0 16px 28px -8px rgba(74,14,78,0.22); outline: 2px solid transparent; }
+        25%     { box-shadow: 0 6px 0 rgba(74,14,78,0.14), 0 16px 28px -8px rgba(74,14,78,0.30), 0 0 0 3px rgba(255,215,0,0.6); outline: 2px solid rgba(255,215,0,0.6); }
+        55%     { box-shadow: 0 6px 0 rgba(74,14,78,0.14), 0 16px 28px -8px rgba(74,14,78,0.26), 0 0 0 2px rgba(255,215,0,0.35); outline: 2px solid rgba(255,215,0,0.35); }
       }
       .cta-shake { animation: shake-no 0.48s ease-in-out; }
       .guide-pulse { animation: pulse-guide 0.5s ease-in-out; }
@@ -118,8 +118,9 @@ export default function Landing({
         <button onClick={() => setLangOpen(true)} className="press" aria-label={t.a11y_change_language || `Change language. Current: ${currentLang.name}`} style={{
           display: 'flex', alignItems: 'center', gap: 5,
           padding: '0 10px', height: 34, borderRadius: 999,
-          background: 'rgba(87,50,128,0.08)', border: '1px solid rgba(87,50,128,0.18)',
+          background: '#FFF6E8', border: '1.5px solid rgba(255,255,255,0.85)',
           color: '#573280', cursor: 'pointer',
+          boxShadow: '0 4px 0 rgba(87,50,128,0.28), 0 10px 18px -6px rgba(87,50,128,0.35)',
         }}>
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
             <circle cx="12" cy="12" r="10"/>
@@ -141,7 +142,7 @@ export default function Landing({
         <h1 className="fs-display" style={{
           fontSize: 'clamp(38px, 11vw, 54px)', lineHeight: 0.92, letterSpacing: '-0.045em',
           fontWeight: 800, margin: 0, color: '#4A0E4E',
-          textShadow: '0 2px 0 rgba(255,255,255,0.6)',
+          textShadow: '0 1px 0 rgba(255,255,255,0.8), 0 3px 0 rgba(74,14,78,0.18), 0 6px 0 rgba(74,14,78,0.10), 0 12px 18px rgba(74,14,78,0.20)',
         }}>
           {t.landing_h1_a}{' '}
           <span style={{
@@ -152,7 +153,8 @@ export default function Landing({
             borderRadius: 999,
             transform: 'rotate(-2.5deg)',
             verticalAlign: 'middle',
-            boxShadow: '0 3px 0 rgba(180,0,60,0.4)',
+            boxShadow: '0 6px 0 #B3003F, 0 14px 24px -6px rgba(180,0,60,0.55)',
+            textShadow: '0 1px 0 rgba(0,0,0,0.18)',
           }}>{t.landing_h1_b}</span>{' '}
           {t.landing_h1_c}<br/>
           <span>{t.landing_h1_d}</span>
@@ -183,11 +185,11 @@ export default function Landing({
       <div className="a-fade-up" style={{
         position: 'relative', zIndex: 10, flexShrink: 0,
         marginTop: 12,
-        background: 'rgba(255,255,255,0.62)',
-        border: '1.5px solid rgba(255,255,255,0.88)',
+        background: 'rgba(255,255,255,0.82)',
+        border: '1.5px solid rgba(255,255,255,0.95)',
         borderRadius: 18,
         padding: '11px 12px',
-        boxShadow: '0 4px 18px -4px rgba(74,14,78,0.13)',
+        boxShadow: '0 6px 0 rgba(74,14,78,0.14), 0 16px 28px -8px rgba(74,14,78,0.22)',
         animationDelay: '0.30s',
       }}>
         <div style={{
@@ -215,8 +217,10 @@ export default function Landing({
             <div aria-hidden="true" style={{
               width: 36, height: 36, borderRadius: 999,
               display: 'flex', alignItems: 'center', justifyContent: 'center',
-              background: 'rgba(74,14,78,0.06)',
+              background: '#fff',
+              border: '1.5px solid rgba(255,255,255,0.9)',
               fontSize: 18, lineHeight: 1,
+              boxShadow: '0 4px 0 rgba(74,14,78,0.18), 0 10px 18px -4px rgba(74,14,78,0.22)',
             }}>👀</div>
             <div className="fs-sans" style={{
               fontSize: 13, fontWeight: 600, color: 'rgba(74,14,78,0.5)',
@@ -291,11 +295,11 @@ export default function Landing({
         {onHowTo && (
           <div className={howToPulse ? 'guide-pulse' : ''} style={{
             marginBottom: 10,
-            background: 'rgba(255,255,255,0.62)',
-            border: '1.5px solid rgba(255,255,255,0.88)',
+            background: 'rgba(255,255,255,0.82)',
+            border: '1.5px solid rgba(255,255,255,0.95)',
             borderRadius: 18,
             padding: '11px 12px',
-            boxShadow: '0 4px 18px -4px rgba(74,14,78,0.13)',
+            boxShadow: '0 6px 0 rgba(74,14,78,0.14), 0 16px 28px -8px rgba(74,14,78,0.22)',
           }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 9 }}>
               <div style={{
@@ -333,7 +337,7 @@ export default function Landing({
               </div>
               <div style={{
                 flexShrink: 0, padding: '5px 10px',
-                background: 'rgba(74,14,78,0.08)', border: '1.5px solid rgba(74,14,78,0.18)',
+                background: '#FFF6E8', border: '1px solid rgba(74,14,78,0.10)',
                 borderRadius: 9, color: '#4A0E4E', fontSize: 11.5, fontWeight: 700,
                 whiteSpace: 'nowrap', letterSpacing: '-0.01em',
               }}>
@@ -351,7 +355,7 @@ export default function Landing({
           backgroundSize: '200% 200%',
           border: '2px solid rgba(255,255,255,0.7)', borderRadius: 22,
           fontSize: 20, fontWeight: 800, cursor: 'pointer', letterSpacing: '-0.01em',
-          boxShadow: '0 8px 0 #E0A800, 0 18px 34px -6px rgba(224,168,0,0.6)',
+          boxShadow: '0 5px 0 #E0A800, 0 12px 22px -8px rgba(224,168,0,0.45)',
         }}>
           <div className="a-shine" style={{ position: 'absolute', inset: 0 }} />
           <span className="fs-display" style={{ position: 'relative' }}>{t.landing_cta}</span>
