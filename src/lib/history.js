@@ -20,14 +20,44 @@ function persist(list) {
   try { localStorage.setItem(KEY, JSON.stringify(list)); } catch {}
 }
 
-// Strip name back to a friendly title — drop .txt/.zip, drop the
-// "WhatsApp Chat with " prefix that exports use.
+// WhatsApp's exported filenames are localized to the device language.
+// Strip the "WhatsApp Chat with " preamble across the languages this app supports.
+const FILENAME_PREFIX_PATTERNS = [
+  /^WhatsApp\s+Chat\s+(?:with|-)\s*/i,             // en  (iOS + Android)
+  /^WhatsApp\s+צ['׳']?אט\s+עם\s*/i,                // he
+  /^Chat\s+de\s+WhatsApp\s+con\s*/i,               // es
+  /^Discussion\s+WhatsApp\s+avec\s*/i,             // fr
+  /^WhatsApp[-\s]Chat\s+mit\s*/i,                  // de
+  /^Conversa\s+do\s+WhatsApp\s+com\s*/i,           // pt
+  /^Chat\s+WhatsApp\s+con\s*/i,                    // it
+  /^Чат\s+WhatsApp\s+с\s*/i,                       // ru
+  /^محادثة\s+WhatsApp\s+مع\s*/i,                    // ar
+  /^WhatsApp\s+Sohbeti[-:\s]+/i,                   // tr
+];
+
+// Friendly chat name from an export filename — last-resort fallback when the
+// parser couldn't detect the group's own subject from the chat content.
 export function chatNameFromFile(name) {
   if (!name) return '';
-  let n = name.replace(/\.(txt|zip)$/i, '');
-  n = n.replace(/^WhatsApp Chat with\s*/i, '');
-  n = n.replace(/^_chat$/i, 'Chat');
+  let n = name.replace(/\.(txt|zip)$/i, '').trim();
+  if (/^_chat$/i.test(n)) return 'Chat';
+  for (const re of FILENAME_PREFIX_PATTERNS) {
+    if (re.test(n)) { n = n.replace(re, ''); break; }
+  }
   return n.trim() || 'Chat';
+}
+
+// Prefer the in-chat group subject (the actual chat name) when the parser
+// detected it; otherwise derive a clean name from the filename.
+export function deriveChatName({ diagnostics, fileName }) {
+  const detected = diagnostics?.detectedGroupName;
+  if (detected) {
+    // detectedGroupName may join multiple subjects with ", " if the title
+    // changed during the chat's lifetime — keep the most recent one.
+    const parts = detected.split(',').map(s => s.trim()).filter(Boolean);
+    if (parts.length) return parts[parts.length - 1];
+  }
+  return chatNameFromFile(fileName);
 }
 
 export function saveRecap({ chatName, stats }) {

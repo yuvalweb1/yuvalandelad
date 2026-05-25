@@ -1,7 +1,7 @@
 ﻿import { useState, useMemo, useCallback, useEffect, useRef } from 'react';
 import { parseChat } from './parser/client.js';
 import { computeAll } from './lib/analytics.js';
-import { loadHistory, saveRecap, removeRecap, clearHistory, chatNameFromFile } from './lib/history.js';
+import { loadHistory, saveRecap, removeRecap, clearHistory, deriveChatName } from './lib/history.js';
 import { RTL_LANGS, detectLang, buildT } from './i18n';
 import ErrorBoundary from './components/ErrorBoundary.jsx';
 import GlobalStyles from './components/GlobalStyles.jsx';
@@ -82,7 +82,7 @@ function ChatWrappedApp() {
       a.photos = media || [];   // real images from a "with media" .zip (blob URLs)
       // Persist a snapshot (without blob URLs — those die on reload).
       const { photos: _photos, ...stats } = a;
-      saveRecap({ chatName: chatNameFromFile(file.name), stats });
+      saveRecap({ chatName: deriveChatName({ diagnostics: diag, fileName: file.name }), stats });
       setHistory(loadHistory());
       setParsingStage(4);
       await new Promise(r => setTimeout(r, 400));
