@@ -1,6 +1,7 @@
-﻿import { useState, useMemo, useCallback, useEffect } from 'react';
+﻿import { useState, useMemo, useCallback, useEffect, useRef } from 'react';
 import { parseChat } from './parser/client.js';
 import { computeAll } from './lib/analytics.js';
+import { loadHistory, saveRecap, removeRecap, clearHistory, chatNameFromFile } from './lib/history.js';
 import { RTL_LANGS, detectLang, buildT } from './i18n';
 import ErrorBoundary from './components/ErrorBoundary.jsx';
 import GlobalStyles from './components/GlobalStyles.jsx';
@@ -47,6 +48,7 @@ function ChatWrappedApp() {
     tone: null,
     self: null,
   });
+  const [history, setHistory] = useState(() => loadHistory());
   const t = useMemo(() => buildT(lang), [lang]);
   const isRTL = RTL_LANGS.has(lang);
 
@@ -78,6 +80,10 @@ function ChatWrappedApp() {
       await new Promise(r => setTimeout(r, 400));
       const a = computeAll(parsed);
       a.photos = media || [];   // real images from a "with media" .zip (blob URLs)
+      // Persist a snapshot (without blob URLs — those die on reload).
+      const { photos: _photos, ...stats } = a;
+      saveRecap({ chatName: chatNameFromFile(file.name), stats });
+      setHistory(loadHistory());
       setParsingStage(4);
       await new Promise(r => setTimeout(r, 400));
       setAnalytics(a);
@@ -110,6 +116,19 @@ function ChatWrappedApp() {
     return () => navigator.serviceWorker.removeEventListener('message', onMessage);
   }, [handleFile]);
 
+  // Capacitor Android: MainActivity reads the shared file and calls this global
+  // with base64 content once the WebView is ready.
+  const handleFileRef = useRef(handleFile);
+  useEffect(() => { handleFileRef.current = handleFile; }, [handleFile]);
+  useEffect(() => {
+    window.__capacitorSharedFile = (base64, name, type) => {
+      const bytes = Uint8Array.from(atob(base64), c => c.charCodeAt(0));
+      const file = new File([bytes], name, { type });
+      handleFileRef.current(file);
+    };
+    return () => { delete window.__capacitorSharedFile; };
+  }, []);
+
   const reset = () => {
     // Free any object URLs created for chat photos before dropping analytics.
     if (analytics && analytics.photos) {
@@ -121,6 +140,29 @@ function ChatWrappedApp() {
     setParseError(null);
     setSlide(0);
   };
+
+  const handleLoadRecap = useCallback((id) => {
+    const entry = loadHistory().find(r => r.id === id);
+    if (!entry) return;
+    // Reconstruct analytics shape: stored stats + empty photos
+    // (blob URLs from the original session are long gone).
+    const a = { ...entry.stats, photos: [] };
+    setDiagnostics(null);
+    setAnalytics(a);
+    setSelectedAuthor(a.users?.[0]?.author || '');
+    setProfile({ relationship: null, tone: null, self: null });
+    setSlide(0);
+    setStage('wrapped');
+  }, []);
+
+  const handleDeleteRecap = useCallback((id) => {
+    setHistory(removeRecap(id));
+  }, []);
+
+  const handleClearHistory = useCallback(() => {
+    clearHistory();
+    setHistory([]);
+  }, []);
 
   return (
     <div style={{
@@ -161,6 +203,10 @@ function ChatWrappedApp() {
               lang={lang}
               setLang={setLang}
               onHowTo={() => setStage('howto')}
+              history={history}
+              onLoadRecap={handleLoadRecap}
+              onDeleteRecap={handleDeleteRecap}
+              onClearHistory={handleClearHistory}
             />
           )}
           {stage === 'parsing' && (

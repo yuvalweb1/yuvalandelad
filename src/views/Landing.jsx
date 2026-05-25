@@ -1,5 +1,6 @@
 import { useRef, useState, useCallback, useMemo } from 'react';
 import BottomSheet from '../components/BottomSheet.jsx';
+import { relativeTime } from '../lib/history.js';
 
 const LANGUAGES = [
   { code: 'en', name: 'English', flag: '🇺🇸' },
@@ -14,7 +15,10 @@ const LANGUAGES = [
   { code: 'tr', name: 'Türkçe', flag: '🇹🇷' },
 ];
 
-export default function Landing({ onFile, parseError, t, lang, setLang, onHowTo }) {
+export default function Landing({
+  onFile, parseError, t, lang, setLang, onHowTo,
+  history = [], onLoadRecap, onDeleteRecap, onClearHistory,
+}) {
   const fileInputRef = useRef(null);
   const [langOpen, setLangOpen] = useState(false);
   const [shaking, setShaking] = useState(false);
@@ -50,10 +54,14 @@ export default function Landing({ onFile, parseError, t, lang, setLang, onHowTo 
       }
       .cta-shake { animation: shake-no 0.48s ease-in-out; }
       .guide-pulse { animation: pulse-guide 0.5s ease-in-out; }
+      .recap-row { transition: background-color 0.18s ease-out; }
+      .recap-row:hover { background: rgba(74,14,78,0.06); }
+      .recap-row:active { background: rgba(74,14,78,0.12); }
+      .recap-row:focus-visible { outline: 2px solid rgba(74,14,78,0.4); outline-offset: -2px; }
     `}</style>
     <div style={{
       position: 'relative', display: 'flex', flexDirection: 'column',
-      padding: '44px 20px 22px', height: '100%',
+      padding: '44px 20px 80px', height: '100%',
       background: 'linear-gradient(180deg, #FFF6D6 0%, #FFF0E2 46%, #FDE6F1 100%)',
       overflow: 'hidden',
     }}>
@@ -126,7 +134,7 @@ export default function Landing({ onFile, parseError, t, lang, setLang, onHowTo 
       {/* Hero — emotional promise + subtitle */}
       <div className="a-fade-up" style={{
         position: 'relative', zIndex: 10,
-        marginTop: 96,
+        marginTop: 48,
         animationDelay: '0.12s',
         textAlign: 'center',
       }}>
@@ -170,6 +178,108 @@ export default function Landing({ onFile, parseError, t, lang, setLang, onHowTo 
           <div style={{ fontSize: 14, lineHeight: 1.5, color: '#2a0645' }}>{parseError}</div>
         </div>
       )}
+      </div>
+
+      <div className="a-fade-up" style={{
+        position: 'relative', zIndex: 10, flexShrink: 0,
+        marginTop: 12,
+        background: 'rgba(255,255,255,0.62)',
+        border: '1.5px solid rgba(255,255,255,0.88)',
+        borderRadius: 18,
+        padding: '11px 12px',
+        boxShadow: '0 4px 18px -4px rgba(74,14,78,0.13)',
+        animationDelay: '0.30s',
+      }}>
+        <div style={{
+          display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+          minHeight: 18, padding: '0 4px 6px',
+        }}>
+          <span className="fs-sans" style={{
+            fontSize: 11.5, fontWeight: 700, letterSpacing: '0.04em',
+            textTransform: 'uppercase', color: 'rgba(74,14,78,0.55)',
+          }}>{t.past_recaps}</span>
+          {history.length > 0 && (
+            <button onClick={onClearHistory} className="press fs-sans" style={{
+              background: 'transparent', border: 'none', cursor: 'pointer',
+              padding: '2px 4px', fontSize: 11.5, fontWeight: 700,
+              color: '#d04848', letterSpacing: '-0.01em',
+            }}>{t.past_recaps_clear}</button>
+          )}
+        </div>
+
+        {history.length === 0 ? (
+          <div style={{
+            display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
+            gap: 6, padding: '18px 8px 14px', textAlign: 'center',
+          }}>
+            <div aria-hidden="true" style={{
+              width: 36, height: 36, borderRadius: 999,
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              background: 'rgba(74,14,78,0.06)',
+              fontSize: 18, lineHeight: 1,
+            }}>👀</div>
+            <div className="fs-sans" style={{
+              fontSize: 13, fontWeight: 600, color: 'rgba(74,14,78,0.5)',
+              letterSpacing: '-0.005em',
+            }}>{t.past_recaps_empty}</div>
+          </div>
+        ) : (
+          <div role="list">
+            {history.map((r, i) => {
+              const isLast = i === history.length - 1;
+              return (
+                <div
+                  key={r.id}
+                  role="button"
+                  tabIndex={0}
+                  className="recap-row"
+                  onClick={() => onLoadRecap(r.id)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                      e.preventDefault();
+                      onLoadRecap(r.id);
+                    }
+                  }}
+                  style={{
+                    display: 'flex', alignItems: 'center', gap: 8,
+                    padding: '10px 6px',
+                    borderBottom: isLast ? 'none' : '1px solid rgba(74,14,78,0.09)',
+                    cursor: 'pointer',
+                    borderRadius: 6,
+                  }}
+                >
+                  <span dir="auto" style={{
+                    flex: 1, minWidth: 0,
+                    fontSize: 14, fontWeight: 600, color: '#2a0645',
+                    lineHeight: 1.25,
+                    whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
+                  }}>{r.chatName}</span>
+                  <span className="fs-sans" style={{
+                    flexShrink: 0, fontSize: 11.5, fontWeight: 500,
+                    color: 'rgba(74,14,78,0.5)', letterSpacing: '-0.005em',
+                  }}>{relativeTime(r.date, lang)}</span>
+                  <button
+                    onClick={(e) => { e.stopPropagation(); onDeleteRecap(r.id); }}
+                    onKeyDown={(e) => e.stopPropagation()}
+                    aria-label={t.past_recaps_remove}
+                    className="press"
+                    style={{
+                      flexShrink: 0, width: 22, height: 22,
+                      display: 'flex', alignItems: 'center', justifyContent: 'center',
+                      background: 'transparent', border: 'none', cursor: 'pointer',
+                      color: 'rgba(74,14,78,0.4)', fontSize: 14, lineHeight: 1,
+                      borderRadius: 999, padding: 0,
+                    }}
+                  >✕</button>
+                  <span aria-hidden="true" style={{
+                    flexShrink: 0, fontSize: 16, color: 'rgba(74,14,78,0.55)',
+                    fontWeight: 700, lineHeight: 1,
+                  }}>→</span>
+                </div>
+              );
+            })}
+          </div>
+        )}
       </div>
 
       <div className="a-fade-up" style={{ position: 'relative', zIndex: 10, flexShrink: 0, paddingTop: 16, animationDelay: '0.45s' }}>
@@ -246,17 +356,20 @@ export default function Landing({ onFile, parseError, t, lang, setLang, onHowTo 
           <div className="a-shine" style={{ position: 'absolute', inset: 0 }} />
           <span className="fs-display" style={{ position: 'relative' }}>{t.landing_cta}</span>
         </button>
-        {/* Trust footer */}
-        <div className="fs-sans" style={{
-          display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
-          textAlign: 'center', marginTop: 6,
-          fontSize: 11.5, color: 'rgba(74,14,78,0.45)', lineHeight: 1.4,
-        }}>
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" style={{ flexShrink: 0 }}>
-            <rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>
-          </svg>
-          {t.landing_trust}
-        </div>
+      </div>
+
+      {/* Trust footer — pinned to bottom of container */}
+      <div className="fs-sans" style={{
+        position: 'absolute', bottom: 20, left: 0, right: 0,
+        display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
+        textAlign: 'center',
+        fontSize: 11.5, color: 'rgba(74,14,78,0.45)', lineHeight: 1.4,
+        pointerEvents: 'none',
+      }}>
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" style={{ flexShrink: 0 }}>
+          <rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+        </svg>
+        {t.landing_trust}
       </div>
 
     {langOpen && (
