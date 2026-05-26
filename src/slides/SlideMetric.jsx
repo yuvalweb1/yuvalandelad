@@ -14,7 +14,6 @@ const METRIC_DEFS = {
     rows: (a) => (a.users || [])
       .filter(u => u.nightPct > 0 && u.nightMessages >= 3)
       .sort((x, y) => y.nightPct - x.nightPct)
-      .slice(0, 5)
       .map(u => ({ author: u.author, value: u.nightPct, displayValue: `${u.nightPct.toFixed(0)}%`, sub: `${u.nightMessages.toLocaleString()} msgs 0–6am` })),
   },
   early_birds: {
@@ -24,7 +23,6 @@ const METRIC_DEFS = {
     rows: (a) => (a.users || [])
       .filter(u => u.morningMessages >= 3)
       .sort((x, y) => y.morningMessages - x.morningMessages)
-      .slice(0, 5)
       .map(u => ({ author: u.author, value: u.morningMessages, displayValue: u.morningMessages.toLocaleString(), sub: `peak ${String(u.peakHour).padStart(2,'0')}:00` })),
   },
   voice_notes_leader: {
@@ -34,7 +32,6 @@ const METRIC_DEFS = {
     rows: (a) => (a.users || [])
       .filter(u => u.voiceCount > 0)
       .sort((x, y) => y.voiceCount - x.voiceCount)
-      .slice(0, 5)
       .map(u => ({ author: u.author, value: u.voiceCount, displayValue: u.voiceCount.toLocaleString(), sub: `${(u.voiceRate * 100).toFixed(0)}% of their msgs` })),
   },
   overtime: {
@@ -52,8 +49,7 @@ const METRIC_DEFS = {
         })
         .filter(x => x.off >= 5)
         .sort((x, y) => y.pct - x.pct)
-        .slice(0, 5)
-        .map(x => ({ author: x.u.author, value: x.pct, displayValue: `${x.pct.toFixed(0)}%`, sub: `${x.off.toLocaleString()} off-hours msgs` }));
+          .map(x => ({ author: x.u.author, value: x.pct, displayValue: `${x.pct.toFixed(0)}%`, sub: `${x.off.toLocaleString()} off-hours msgs` }));
     },
   },
   response_times: {
@@ -63,7 +59,7 @@ const METRIC_DEFS = {
     rows: (a) => {
       const eligible = (a.users || []).filter(u => u.respSampleSize >= 5 && u.avgRespMin != null);
       if (eligible.length === 0) return [];
-      const sorted = [...eligible].sort((x, y) => x.avgRespMin - y.avgRespMin).slice(0, 5);
+      const sorted = [...eligible].sort((x, y) => x.avgRespMin - y.avgRespMin);
       const slowest = sorted[sorted.length - 1].avgRespMin;
       return sorted.map(u => ({
         author: u.author,
@@ -80,7 +76,6 @@ const METRIC_DEFS = {
     rows: (a) => (a.users || [])
       .filter(u => u.messageCount >= 20)
       .sort((x, y) => y.avgCharsPerMsg - x.avgCharsPerMsg)
-      .slice(0, 5)
       .map(u => ({ author: u.author, value: u.avgCharsPerMsg, displayValue: `${Math.round(u.avgCharsPerMsg)}c`, sub: `${u.avgWordsPerMsg.toFixed(1)} words/msg` })),
   },
   link_sharers: {
@@ -90,7 +85,6 @@ const METRIC_DEFS = {
     rows: (a) => (a.users || [])
       .filter(u => u.linkCount > 0)
       .sort((x, y) => y.linkCount - x.linkCount)
-      .slice(0, 5)
       .map(u => ({ author: u.author, value: u.linkCount, displayValue: u.linkCount.toLocaleString(), sub: 'links shared' })),
   },
   double_texts: {
@@ -100,7 +94,6 @@ const METRIC_DEFS = {
     rows: (a) => (a.users || [])
       .filter(u => u.maxBurst >= 2)
       .sort((x, y) => y.maxBurst - x.maxBurst)
-      .slice(0, 5)
       .map(u => ({ author: u.author, value: u.maxBurst, displayValue: `${u.maxBurst}×`, sub: 'in a row' })),
   },
   ignored_award: {
@@ -110,7 +103,6 @@ const METRIC_DEFS = {
     rows: (a) => (a.users || [])
       .filter(u => u.longestAbsenceDays >= 1)
       .sort((x, y) => y.longestAbsenceDays - x.longestAbsenceDays)
-      .slice(0, 5)
       .map(u => ({ author: u.author, value: u.longestAbsenceDays, displayValue: `${u.longestAbsenceDays}d`, sub: 'silent stretch' })),
   },
   night_messages: {
@@ -120,7 +112,6 @@ const METRIC_DEFS = {
     rows: (a) => (a.users || [])
       .filter(u => u.nightPct > 0 && u.nightMessages >= 1)
       .sort((x, y) => y.nightPct - x.nightPct)
-      .slice(0, 5)
       .map(u => ({ author: u.author, value: u.nightPct, displayValue: `${u.nightPct.toFixed(0)}%`, sub: `${u.nightMessages.toLocaleString()} late msgs` })),
   },
 };
@@ -171,7 +162,7 @@ const SlideMetric = React.memo(function SlideMetric({ a, t, profile, metricKey }
             {sub}
           </div>
         )}
-        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 8, minHeight: 0 }}>
+        <div className="no-sb" style={{ flex: 1, overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: 8, minHeight: 0, paddingBottom: 12 }}>
           {rows.map((r, i) => {
             const pct = Math.max(8, Math.round((r.value / maxVal) * 100));
             return (

@@ -78,7 +78,8 @@
       "Bash(curl -s -o /dev/null -w \"dev server: %{http_code}\\\\n\" http://localhost:5173/)",
       "Bash(node scripts/test-systemauthor.mjs)",
       "Bash(rm -f scripts/test-systemauthor.mjs)",
-      "Bash(curl -s -o /dev/null -w \"dev: %{http_code}\\\\n\" http://localhost:5173/)"
+      "Bash(curl -s -o /dev/null -w \"dev: %{http_code}\\\\n\" http://localhost:5173/)",
+      "Bash(git fetch *)"
     ]
   }
 }
