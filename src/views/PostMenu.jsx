@@ -11,25 +11,74 @@ const EGGPLANT = '#4A0E4E';
 const SKY      = '#00BFFF';
 const PINK     = '#FF69B4';
 const ROSE     = '#F94144';
+const MINT     = '#43AA8B';
+const PURPLE   = '#8338EC';
 const DEEP_PINK = '#D63384';
 const CREAM    = '#fff5f7';
 
+// Reusable shadow pattern (chunky "pop" drop + soft glow), parameterized by
+// the section accent so every card reads as part of the same family.
 const popShadow = (hex) =>
   `0 6px 0 ${hex}22, 0 14px 24px -8px ${hex}55`;
 
-// Minimal hub: actions only. Group/eras/highlights/leaderboard/achievements
-// are already shown as full slides, so we don't repeat them here.
+// Floating emoji stickers — fixed positioned so they stay put while the page
+// scrolls. Same vibe as ListSlideDecor (used on the data slides) so PostMenu
+// reads as a member of the same family.
+const STICKER_POSITIONS = [
+  { top: 70,  insetInlineStart: 14, rot: -14, size: 34, delay: '0s'   },
+  { top: 110, insetInlineEnd:   18, rot:  12, size: 28, delay: '0.6s' },
+  { top: 168, insetInlineStart: '24%', rot: -6, size: 22, delay: '1.0s' },
+  { bottom: 80, insetInlineStart: 22, rot:  8,  size: 30, delay: '1.4s' },
+  { bottom: 140, insetInlineEnd: 28, rot: -10, size: 28, delay: '0.3s' },
+  { bottom: 220, insetInlineStart: '38%', rot: 6, size: 24, delay: '0.9s' },
+];
+const STICKER_EMOJIS = ['✨', '🎬', '🎉', '💫', '⭐', '🎯'];
+
 export default function PostMenu({ analytics, diagnostics, selectedAuthor, setSelectedAuthor, t, onReplay, onReset, onDebug, onRoastMode }) {
   const [pickerOpen, setPickerOpen] = useState(false);
   const u = analytics.userMap[selectedAuthor];
   if (!u) return null;
+
+  // Highlights grid — only render cards whose value actually exists. The
+  // current user's "wrapped at a glance" — same numbers the slides celebrate.
+  const rank = analytics.users.findIndex(x => x.author === selectedAuthor) + 1;
+  const fmtReply = u.avgRespMin != null
+    ? (u.avgRespMin < 60 ? `${u.avgRespMin.toFixed(1)}m` : `${(u.avgRespMin / 60).toFixed(1)}h`)
+    : null;
+  const highlights = [
+    { value: u.messageCount.toLocaleString(), label: t.menu_hl_messages, accent: MANGO },
+    rank > 0 && { value: `#${rank}`, label: interp(t.menu_hl_of, { n: analytics.users.length }), accent: PINK },
+    u.peakHour != null && { value: `${u.peakHour}:00`, label: t.menu_hl_peak_hour, accent: SKY },
+    u.nightPct != null && { value: `${Math.round(u.nightPct)}%`, label: t.menu_hl_at_night, accent: PURPLE },
+    u.longestStreak > 0 && { value: `${u.longestStreak}d`, label: t.menu_hl_streak, accent: MINT },
+    u.topEmoji && { value: u.topEmoji, label: t.menu_hl_top_emoji, accent: BANANA },
+    fmtReply && { value: fmtReply, label: t.menu_hl_avg_reply, accent: ROSE },
+  ].filter(Boolean).slice(0, 6);
+
+  const persona = resolveTitle(u, t);
 
   return (
     <div className="no-sb" style={{
       height: '100%', overflowY: 'auto', position: 'relative',
       background: CREAM,
     }}>
-      {/* Ultra-Pop gradient blobs — fixed so they stay behind everything. */}
+      {/* Idle breath + icon drift animations — purely decorative, looped. */}
+      <style>{`
+        @keyframes breathe-soft {
+          0%, 100% { transform: translateY(0) scale(1); }
+          50%      { transform: translateY(-3px) scale(1.012); }
+        }
+        @keyframes icon-drift {
+          0%, 100% { transform: translate(0, 0) rotate(-4deg); }
+          50%      { transform: translate(-6px, 4px) rotate(2deg); }
+        }
+        .cta-breathe   { animation: breathe-soft 4.2s ease-in-out 0.6s infinite; }
+        .cta-breathe-2 { animation: breathe-soft 4.2s ease-in-out -1.5s infinite; }
+        .cta-icon-drift { animation: icon-drift 5.5s ease-in-out infinite; }
+      `}</style>
+
+      {/* ===== Decoration layer ===== */}
+      {/* Gradient blobs — fixed so they stay behind everything during scroll. */}
       <div aria-hidden="true" style={{
         position: 'fixed', top: -70, insetInlineStart: -80, width: 240, height: 240,
         borderRadius: '50%', background: BANANA, opacity: 0.5, filter: 'blur(72px)',
@@ -50,23 +99,35 @@ export default function PostMenu({ analytics, diagnostics, selectedAuthor, setSe
         borderRadius: '50%', background: MANGO, opacity: 0.34, filter: 'blur(62px)',
         pointerEvents: 'none', zIndex: 0,
       }} />
+      {/* Floating emoji stickers — same vibe as ListSlideDecor on data slides. */}
+      <div aria-hidden="true" style={{
+        position: 'fixed', inset: 0, pointerEvents: 'none', zIndex: 0, overflow: 'hidden',
+      }}>
+        {STICKER_POSITIONS.map((p, i) => (
+          <span key={i} className="a-float" style={{
+            position: 'absolute',
+            top: p.top, bottom: p.bottom,
+            insetInlineStart: p.insetInlineStart, insetInlineEnd: p.insetInlineEnd,
+            fontSize: p.size, transform: `rotate(${p.rot}deg)`,
+            filter: 'drop-shadow(0 4px 6px rgba(74,14,78,0.32))',
+            animationDelay: p.delay,
+          }}>{STICKER_EMOJIS[i % STICKER_EMOJIS.length]}</span>
+        ))}
+      </div>
 
       <div style={{
-        padding: '22px 22px 32px', position: 'relative', zIndex: 1,
+        padding: '24px 20px 28px', position: 'relative', zIndex: 1,
         minHeight: '100%', display: 'flex', flexDirection: 'column',
       }}>
-        {/* Header — chatwrapped is brand English text, lock LTR even in RTL UI. */}
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
-          <div dir="ltr" className="fs-display" style={{ fontWeight: 800, fontSize: 22, letterSpacing: '-0.03em', color: EGGPLANT }}>
-            chat<span style={{ color: MANGO, fontStyle: 'italic' }}>wrapped</span>
-          </div>
+        {/* Top-right reset — minimal chrome so the slide-style header owns the top */}
+        <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 8 }}>
           <button onClick={onReset} className="press" aria-label={t.a11y_start_over || 'Start over'} style={{
             background: '#fff', border: `2px solid ${MANGO}33`, color: EGGPLANT,
-            width: 40, height: 40, borderRadius: 999, cursor: 'pointer',
+            width: 38, height: 38, borderRadius: 999, cursor: 'pointer',
             display: 'flex', alignItems: 'center', justifyContent: 'center',
             boxShadow: popShadow(MANGO),
           }}>
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
               strokeWidth="2.2" strokeLinecap="round" aria-hidden="true">
               <polyline points="23 4 23 10 17 10"/>
               <polyline points="1 20 1 14 7 14"/>
@@ -75,119 +136,181 @@ export default function PostMenu({ analytics, diagnostics, selectedAuthor, setSe
           </button>
         </div>
 
-        {/* Hero CTAs — vertical stack, bigger so they own the screen. */}
-        <button onClick={onReplay} className="a-scale-in press lift" style={{
+        {/* Slide-style header: eyebrow + display title + persona subtitle.
+            Mirrors SlideAwards / SlideLeaderboard / SlidePerPerson typography
+            so the post-menu reads as a slide, not a separate page. */}
+        <div className="fs-sans a-fade-up" style={{
+          textAlign: 'center', fontSize: 13, color: MANGO,
+          letterSpacing: '0.18em', fontWeight: 800, textTransform: 'uppercase',
+        }}>
+          ✨ {t.menu_highlights}
+        </div>
+        <div dir="auto" className="fs-display a-fade-up" style={{
+          textAlign: 'center', animationDelay: '0.15s',
+          fontSize: selectedAuthor.length > 12 ? 36 : 44,
+          lineHeight: 1.04, letterSpacing: '-0.04em',
+          fontWeight: 800, color: EGGPLANT,
+          marginTop: 8, marginBottom: persona ? 2 : 18,
+          textShadow: '0 2px 0 rgba(255,255,255,0.65), 0 1px 3px rgba(74,14,78,0.12)',
+          overflowWrap: 'break-word', wordBreak: 'break-word', padding: '0 8px',
+        }}>
+          <span style={{ fontStyle: 'italic', color: MANGO }}>{selectedAuthor}</span>
+        </div>
+        {persona && (
+          <div dir="auto" className="fs-mono a-fade-up" style={{
+            textAlign: 'center', animationDelay: '0.22s',
+            fontSize: 13, color: 'rgba(74,14,78,0.6)',
+            marginBottom: 22, fontWeight: 600, fontStyle: 'italic',
+            overflowWrap: 'break-word', wordBreak: 'break-word', padding: '0 12px',
+          }}>
+            "{persona}"
+          </div>
+        )}
+
+        {/* Hero CTAs — primary actions, breathing gently. */}
+        <button onClick={onReplay} className="a-fade-up press lift cta-breathe" style={{
           position: 'relative', overflow: 'hidden', textAlign: 'start',
           background: `linear-gradient(135deg, ${BANANA} 0%, ${MANGO} 100%)`,
-          border: `2px solid rgba(255,255,255,0.85)`,
-          borderRadius: 26, padding: '22px 22px', cursor: 'pointer',
+          border: `3px solid rgba(255,255,255,0.9)`,
+          borderRadius: 26, padding: '24px 22px', cursor: 'pointer',
           color: EGGPLANT, boxShadow: `0 10px 0 ${MANGO}33, 0 22px 36px -8px ${MANGO}66`,
+          animationDelay: '0.3s',
         }}>
           <div className="a-shine" style={{ position: 'absolute', inset: 0 }} />
-          <div className="fs-display" style={{
-            position: 'absolute', insetInlineEnd: -10, top: -16, fontSize: 110,
-            opacity: 0.18, lineHeight: 1, fontStyle: 'italic',
+          <div aria-hidden="true" className="fs-display cta-icon-drift" style={{
+            position: 'absolute', insetInlineEnd: -10, top: -18, fontSize: 120,
+            opacity: 0.2, lineHeight: 1, fontStyle: 'italic',
+            pointerEvents: 'none',
           }}>✦</div>
           <div className="fs-sans" style={{
-            fontSize: 11, letterSpacing: '0.22em', opacity: 0.75, fontWeight: 800,
+            fontSize: 11, letterSpacing: '0.24em', opacity: 0.78, fontWeight: 800,
             textTransform: 'uppercase',
           }}>
             {t.menu_replay}
           </div>
           <div dir="auto" className="fs-display" style={{
-            fontSize: 30, lineHeight: 1.0, letterSpacing: '-0.03em', marginTop: 8,
+            fontSize: 30, lineHeight: 1.0, letterSpacing: '-0.035em', marginTop: 8,
             whiteSpace: 'pre-line', fontWeight: 800,
             overflowWrap: 'break-word', wordBreak: 'break-word',
+            textShadow: '0 2px 0 rgba(255,255,255,0.35)',
           }}>
             {t.menu_watch}
           </div>
         </button>
 
-        <button onClick={onRoastMode} className="a-scale-in press lift" style={{
+        <button onClick={onRoastMode} className="a-fade-up press lift cta-breathe-2" style={{
           marginTop: 12,
           position: 'relative', overflow: 'hidden', textAlign: 'start',
           background: `linear-gradient(135deg, ${PINK} 0%, ${ROSE} 100%)`,
-          border: `2px solid rgba(255,255,255,0.85)`,
-          borderRadius: 26, padding: '22px 22px', cursor: 'pointer',
+          border: `3px solid rgba(255,255,255,0.9)`,
+          borderRadius: 26, padding: '24px 22px', cursor: 'pointer',
           color: '#fff', boxShadow: `0 10px 0 ${DEEP_PINK}33, 0 22px 36px -8px ${ROSE}66`,
-          animationDelay: '0.06s',
+          animationDelay: '0.38s',
         }}>
           <div className="a-shine" style={{ position: 'absolute', inset: 0 }} />
-          <div style={{
-            position: 'absolute', insetInlineEnd: -6, top: -10, fontSize: 80,
-            opacity: 0.22, lineHeight: 1,
+          <div aria-hidden="true" className="cta-icon-drift" style={{
+            position: 'absolute', insetInlineEnd: -8, top: -14, fontSize: 86,
+            opacity: 0.28, lineHeight: 1, pointerEvents: 'none',
           }}>🔥</div>
           <div className="fs-sans" style={{
-            fontSize: 11, letterSpacing: '0.22em', opacity: 0.95, fontWeight: 800,
+            fontSize: 11, letterSpacing: '0.24em', opacity: 0.95, fontWeight: 800,
             textTransform: 'uppercase',
           }}>
             {t.menu_roast_mode}
           </div>
           <div dir="auto" className="fs-display" style={{
-            fontSize: 30, lineHeight: 1.0, letterSpacing: '-0.03em', marginTop: 8,
+            fontSize: 30, lineHeight: 1.0, letterSpacing: '-0.035em', marginTop: 8,
             whiteSpace: 'pre-line', fontWeight: 800,
             overflowWrap: 'break-word', wordBreak: 'break-word',
+            textShadow: '0 2px 0 rgba(0,0,0,0.15)',
           }}>
             {t.menu_roast_everyone}
           </div>
         </button>
 
-        {/* Ad banner slot (placeholder until filled — see src/lib/ads.js) */}
-        <AdSlot slot="menu" format="banner" t={t} style={{ marginTop: 16 }} />
-
-        {/* Person picker — primary secondary action: change whose wrapped this is. */}
-        <button onClick={() => setPickerOpen(true)} className="a-fade-up press" style={{
-          marginTop: 16,
-          width: '100%', padding: '16px 18px',
-          background: '#fff', border: `2px solid rgba(255,255,255,0.85)`,
-          borderRadius: 22, cursor: 'pointer',
-          display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-          boxShadow: popShadow(SKY),
-          animationDelay: '0.15s',
-        }}>
-          <div style={{ textAlign: 'start', minWidth: 0, flex: 1 }}>
-            <div className="fs-sans" style={{ fontSize: 11, color: SKY, letterSpacing: '0.18em', fontWeight: 800, textTransform: 'uppercase' }}>
-              👀 {t.menu_viewing_as}
+        {/* Highlights grid — each card on a white "sticker" with a colored
+            pop shadow, exactly like the data cards on every other slide. */}
+        {highlights.length > 0 && (
+          <div style={{ marginTop: 22 }}>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 9 }}>
+              {highlights.map((h, i) => (
+                <div key={i} className="a-fade-up" style={{
+                  background: '#fff', border: `2px solid rgba(255,255,255,0.85)`,
+                  borderRadius: 16, padding: '12px 14px', minHeight: 76,
+                  boxShadow: popShadow(h.accent),
+                  animationDelay: `${0.5 + i * 0.05}s`,
+                }}>
+                  <div dir="auto" className="fs-display" style={{
+                    fontSize: 22, letterSpacing: '-0.03em', lineHeight: 1,
+                    color: h.accent, fontWeight: 800,
+                    overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+                    textShadow: '0 1px 0 rgba(255,255,255,0.65)',
+                  }}>{h.value}</div>
+                  <div className="fs-mono" style={{
+                    fontSize: 9.5, color: 'rgba(74,14,78,0.55)', letterSpacing: '0.14em',
+                    marginTop: 6, textTransform: 'uppercase', fontWeight: 700,
+                    overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+                  }}>{h.label}</div>
+                </div>
+              ))}
             </div>
-            <div dir="auto" className="fs-display" style={{
-              fontSize: 22, fontWeight: 800, marginTop: 4, color: EGGPLANT, letterSpacing: '-0.02em',
-              overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+          </div>
+        )}
+
+        {/* Ad slot — bottom of content so highlights/CTAs lead. */}
+        <AdSlot slot="menu" format="banner" t={t} style={{ marginTop: 18 }} />
+
+        {/* Push the tertiary actions to the bottom — single thin row. */}
+        <div style={{ flex: 1, minHeight: 14 }} />
+
+        <div className="a-fade-up" style={{
+          marginTop: 14, display: 'flex', alignItems: 'stretch', gap: 8,
+          animationDelay: '0.7s',
+        }}>
+          <button onClick={() => setPickerOpen(true)} className="press" style={{
+            flex: 1, minWidth: 0,
+            display: 'flex', alignItems: 'center', gap: 8,
+            padding: '10px 14px',
+            background: '#fff', border: `2px solid rgba(255,255,255,0.85)`,
+            borderRadius: 14, cursor: 'pointer', textAlign: 'start',
+            boxShadow: popShadow(SKY),
+          }}>
+            <span style={{ fontSize: 16, flexShrink: 0 }}>👀</span>
+            <div style={{ minWidth: 0, flex: 1 }}>
+              <div className="fs-mono" style={{
+                fontSize: 9, color: 'rgba(74,14,78,0.55)', letterSpacing: '0.16em',
+                fontWeight: 800, textTransform: 'uppercase', lineHeight: 1,
+              }}>
+                {t.menu_switch}
+              </div>
+              <div dir="auto" className="fs-sans" style={{
+                fontSize: 13, fontWeight: 800, color: EGGPLANT, marginTop: 2,
+                letterSpacing: '-0.01em',
+                overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+              }}>
+                {selectedAuthor}
+              </div>
+            </div>
+            <span className="fs-mono" style={{
+              fontSize: 11, color: SKY, fontWeight: 800, flexShrink: 0,
+            }}>→</span>
+          </button>
+
+          <button onClick={onDebug} className="press" aria-label={t.menu_verify} style={{
+            display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
+            padding: '10px 14px',
+            background: '#FFF8E0', border: `2px solid ${BANANA}88`,
+            borderRadius: 14, cursor: 'pointer', flexShrink: 0,
+            boxShadow: popShadow(BANANA),
+          }}>
+            <span className="fs-mono" style={{
+              fontSize: 12, fontWeight: 800, color: '#B8860B',
+              letterSpacing: '0.05em',
             }}>
-              {selectedAuthor}
-            </div>
-          </div>
-          <div className="fs-mono" style={{
-            fontSize: 13, color: SKY, letterSpacing: '0.1em', fontWeight: 800, flexShrink: 0, marginInlineStart: 12,
-          }}>
-            {t.menu_switch} →
-          </div>
-        </button>
-
-        {/* Push the verify link to the bottom — keep it visible but de-emphasised. */}
-        <div style={{ flex: 1, minHeight: 24 }} />
-
-        <button onClick={onDebug} className="press" style={{
-          marginTop: 16,
-          width: '100%', textAlign: 'center',
-          padding: '12px 14px',
-          background: 'transparent',
-          border: 'none', cursor: 'pointer',
-          display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 6,
-        }}>
-          <span className="fs-mono" style={{
-            fontSize: 11, color: 'rgba(74,14,78,0.55)', letterSpacing: '0.18em',
-            fontWeight: 700, textTransform: 'uppercase',
-          }}>
-            ✓ {interp(t.menu_verified, { n: diagnostics?.confidence ?? 0 })}
-          </span>
-          <span className="fs-mono" style={{ fontSize: 11, color: 'rgba(74,14,78,0.4)', fontWeight: 700 }}>·</span>
-          <span className="fs-mono" style={{
-            fontSize: 11, color: MANGO, letterSpacing: '0.12em',
-            fontWeight: 800, textTransform: 'uppercase',
-          }}>
-            {t.menu_verify} →
-          </span>
-        </button>
+              ✓ {diagnostics?.confidence ?? 0}%
+            </span>
+          </button>
+        </div>
       </div>
 
       {pickerOpen && (
