@@ -62,6 +62,14 @@ export const DELETED_PATTERNS = [
   /you deleted this message/i,
 ];
 
+// Pseudo-authors WhatsApp puts on the exporter's OWN system actions
+// (never real contact names): the gender-neutral Hebrew pronoun "את/ה"
+// and the English "You". Excluded so they don't appear as a participant.
+export const SYSTEM_AUTHOR_NAMES = new Set([
+  'את/ה', 'את\\ה',
+  'You', '~You',
+]);
+
 // Group-IDENTITY notices: the end-to-end-encryption notice is attributed by
 // iOS exports to the group's own subject as the "sender" (e.g.
 // `[date] My Group: Messages and calls are end-to-end encrypted…`). A real

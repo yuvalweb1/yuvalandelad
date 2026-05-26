@@ -2,7 +2,7 @@ import { useMemo, useRef, useEffect } from 'react';
 import SlidesBlobBackground from '../components/SlidesBlobBackground.jsx';
 import { adEnabled } from '../lib/ads.js';
 
-export default function Wrapped({ analytics, diagnostics, selectedAuthor, setSelectedAuthor, slide, setSlide, profile, t, onExit, onMenu, slidesDef, slideComponents }) {
+export default function Wrapped({ analytics, diagnostics, selectedAuthor, setSelectedAuthor, slide, setSlide, profile, t, onExit, onMenu, onRoastMode, slidesDef, slideComponents }) {
   const user = analytics.userMap[selectedAuthor];
   if (!user) return null;
   const userAchievements = analytics.achievementsByUser[selectedAuthor] || [];
@@ -61,7 +61,7 @@ export default function Wrapped({ analytics, diagnostics, selectedAuthor, setSel
       <div key={`${current}-${selectedAuthor}`}
         className={dirRef.current >= 0 ? 'slide-in-right' : 'slide-in-left'}
         style={{ flex: 1, position: 'relative', overflow: 'hidden', zIndex: 1 }}>
-        {SlideComp && <SlideComp a={analytics} u={user} t={t} profile={profile} achievements={userAchievements} onExit={onExit} onMenu={onMenu} />}
+        {SlideComp && <SlideComp a={analytics} u={user} t={t} profile={profile} achievements={userAchievements} onExit={onExit} onMenu={onMenu} onRoastMode={onRoastMode} />}
       </div>
     </div>
   );

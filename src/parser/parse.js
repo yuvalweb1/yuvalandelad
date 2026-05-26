@@ -17,6 +17,7 @@ import {
   VOICE_PATTERNS,
   DELETED_PATTERNS,
   GROUP_IDENTITY_PATTERNS,
+  SYSTEM_AUTHOR_NAMES,
   HEADER_PATTERNS,
   SYSTEM_HEADER_PATTERNS,
   LINK_RE,
@@ -160,7 +161,8 @@ export function parseWhatsApp(rawText) {
 
       // Check if this header is actually a system-event header (sender contains a system pattern)
       const cleanAuthor = author.trim();
-      const isSystemEvent = SYSTEM_PATTERNS.some(p => p.test(cleanAuthor)) ||
+      const isSystemEvent = SYSTEM_AUTHOR_NAMES.has(cleanAuthor) ||
+                            SYSTEM_PATTERNS.some(p => p.test(cleanAuthor)) ||
                             SYSTEM_PATTERNS.some(p => p.test(content));
 
       if (current) {

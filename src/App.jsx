@@ -232,6 +232,7 @@ function ChatWrappedApp() {
               t={t}
               onExit={() => setStage('landing')}
               onMenu={() => setStage('menu')}
+              onRoastMode={() => setStage('roastmode')}
             />
           )}
           {stage === 'menu' && analytics && (
