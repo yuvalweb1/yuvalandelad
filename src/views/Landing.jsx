@@ -14,7 +14,7 @@ const LANGUAGES = [
   { code: 'tr', name: 'Türkçe', flag: '🇹🇷' },
 ];
 
-export default function Landing({ onFile, onDemo, parseError, t, lang, setLang, onHowTo }) {
+export default function Landing({ onFile, onDemo, parseError, t, lang, setLang, onHowTo, includeMedia = true, setIncludeMedia }) {
   const fileInputRef = useRef(null);
   const [langOpen, setLangOpen] = useState(false);
   const [shaking, setShaking] = useState(false);
@@ -223,6 +223,45 @@ export default function Landing({ onFile, onDemo, parseError, t, lang, setLang, 
           <div className="a-shine" style={{ position: 'absolute', inset: 0 }} />
           <span className="fs-display" style={{ position: 'relative' }}>{t.landing_cta}</span>
         </button>
+
+        {/* Media toggle — turns on/off photos, voice, sticker, video analysis */}
+        {setIncludeMedia && (
+          <button
+            type="button"
+            onClick={() => setIncludeMedia(!includeMedia)}
+            aria-pressed={includeMedia}
+            className="press"
+            style={{
+              display: 'flex', alignItems: 'center', gap: 10,
+              width: '100%', marginTop: 10, padding: '11px 14px',
+              background: includeMedia ? 'rgba(0,191,255,0.14)' : 'rgba(74,14,78,0.05)',
+              border: `2px solid ${includeMedia ? 'rgba(0,191,255,0.45)' : 'rgba(74,14,78,0.12)'}`,
+              borderRadius: 16, cursor: 'pointer', font: 'inherit', textAlign: 'start',
+            }}>
+            <div style={{ fontSize: 22, flexShrink: 0 }}>{includeMedia ? '📸' : '📝'}</div>
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <div className="fs-sans" style={{ fontSize: 14, fontWeight: 800, color: '#4A0E4E', lineHeight: 1.15 }}>
+                {t.landing_media_title}
+              </div>
+              <div className="fs-mono" style={{ fontSize: 11, color: 'rgba(74,14,78,0.6)', marginTop: 2 }}>
+                {includeMedia ? t.landing_media_on : t.landing_media_off}
+              </div>
+            </div>
+            {/* iOS-style switch */}
+            <div style={{
+              flexShrink: 0, width: 40, height: 24, borderRadius: 999,
+              background: includeMedia ? '#00BFFF' : 'rgba(74,14,78,0.18)',
+              position: 'relative', transition: 'background 0.18s',
+            }}>
+              <div style={{
+                position: 'absolute', top: 2, insetInlineStart: includeMedia ? 18 : 2,
+                width: 20, height: 20, borderRadius: '50%', background: '#fff',
+                boxShadow: '0 1px 3px rgba(0,0,0,0.18)', transition: 'inset-inline-start 0.18s',
+              }} />
+            </div>
+          </button>
+        )}
+
         {/* Secondary: demo only — how-to is now surfaced in the prereq card above */}
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', marginTop: 12 }}>
           <button onClick={onDemo} className="press fs-sans" style={{

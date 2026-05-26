@@ -52,6 +52,24 @@ export default {
   photos_eyebrow: 'CAUGHT ON CAMERA',
   photos_title: '{n} photos this year',
   photos_sub: 'Straight from your chat · on your device only',
+  // Media analysis toggle (Landing)
+  landing_media_title: 'Include media in the analysis',
+  landing_media_on: 'Photos, voice, stickers, videos · slower',
+  landing_media_off: 'Text only · fast & light',
+  // Stickers slide
+  stk_eyebrow: 'STICKER OBSESSIONS',
+  stk_title: '{n} stickers sent',
+  stk_sub: 'Most-used stickers · ranked',
+  // Voice slide
+  voice_eyebrow: 'LONGEST VOICE NOTES',
+  voice_title_a: 'The',
+  voice_title_b: 'monologues',
+  voice_sub: 'Tap play. Lengths estimated from file size.',
+  // Videos slide
+  vid_eyebrow: 'TOP VIDEOS',
+  vid_title_a: 'The',
+  vid_title_b: 'highlight reel',
+  vid_sub: 'Tap play · processed on-device',
   ad_label: 'Advertisement',
   ad_placeholder: 'Your ad here',
   err_format: 'Upload a .txt or .zip from WhatsApp export.',

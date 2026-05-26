@@ -1,7 +1,7 @@
 ﻿import { useState, useMemo, useCallback, useEffect } from 'react';
 import { parseChat } from './parser/client.js';
 import { computeAll } from './lib/analytics.js';
-import { generateSampleText } from './lib/sample.js';
+import { generateSampleText, generateSampleMedia } from './lib/sample.js';
 import { RTL_LANGS, detectLang, buildT } from './i18n';
 import ErrorBoundary from './components/ErrorBoundary.jsx';
 import GlobalStyles from './components/GlobalStyles.jsx';
@@ -43,6 +43,15 @@ function ChatWrappedApp() {
   const [slide, setSlide] = useState(0);
   const [parsingStage, setParsingStage] = useState(0);
   const [lang, setLang] = useState(() => detectLang());
+  // Include media (photos / voice / stickers / videos) in the analysis.
+  // Off = faster, text-only. Persisted so users don't re-toggle each visit.
+  const [includeMedia, setIncludeMedia] = useState(() => {
+    try { const v = localStorage.getItem('cw_include_media'); return v === null ? true : v === '1'; } catch { return true; }
+  });
+  const updateIncludeMedia = (v) => {
+    setIncludeMedia(v);
+    try { localStorage.setItem('cw_include_media', v ? '1' : '0'); } catch {}
+  };
   const [profile, setProfile] = useState({
     relationship: null,
     tone: null,
@@ -67,6 +76,7 @@ function ChatWrappedApp() {
       // freezes the UI. Progress phases drive the cinematic stage meter.
       const { messages: parsed, diagnostics: diag, media } = await parseChat({
         file,
+        includeMedia,
         onProgress: (phase) => setParsingStage(phase === 'unzip' ? 1 : 2),
       });
       setDiagnostics(diag);
@@ -78,7 +88,12 @@ function ChatWrappedApp() {
       setParsingStage(3);
       await new Promise(r => setTimeout(r, 400));
       const a = computeAll(parsed);
-      a.photos = media || [];   // real images from a "with media" .zip (blob URLs)
+      // Real media (blob URLs) extracted on-device — empty when toggle is off
+      // or when uploading a .txt. Each category is independent.
+      a.photos   = media?.photos   || [];
+      a.voice    = media?.voice    || [];
+      a.videos   = media?.videos   || [];
+      a.stickers = media?.stickers || [];
       setParsingStage(4);
       await new Promise(r => setTimeout(r, 400));
       setAnalytics(a);
@@ -126,6 +141,15 @@ function ChatWrappedApp() {
     await new Promise(r => setTimeout(r, 600));
     setParsingStage(3);
     const a = computeAll(parsed);
+    // Synthetic media so the demo previews the photos/voice/stickers slides
+    // (videos skipped — minimal playable MP4 is hard to generate). Respects
+    // the same toggle as a real upload: off → demo stays text-only too.
+    if (includeMedia) {
+      const dm = generateSampleMedia(a.users);
+      a.photos = dm.photos; a.voice = dm.voice; a.videos = dm.videos; a.stickers = dm.stickers;
+    } else {
+      a.photos = []; a.voice = []; a.videos = []; a.stickers = [];
+    }
     await new Promise(r => setTimeout(r, 500));
     setParsingStage(4);
     await new Promise(r => setTimeout(r, 400));
@@ -133,12 +157,18 @@ function ChatWrappedApp() {
     setSelectedAuthor(a.users[0].author);
     setSlide(0);
     setStage('onboard');
-  }, []);
+  }, [includeMedia]);
 
   const reset = () => {
-    // Free any object URLs created for chat photos before dropping analytics.
-    if (analytics && analytics.photos) {
-      for (const p of analytics.photos) { try { URL.revokeObjectURL(p.url); } catch {} }
+    // Free any object URLs created for chat media before dropping analytics.
+    if (analytics) {
+      const all = [
+        ...(analytics.photos   || []),
+        ...(analytics.voice    || []),
+        ...(analytics.videos   || []),
+        ...(analytics.stickers || []),
+      ];
+      for (const m of all) { try { URL.revokeObjectURL(m.url); } catch {} }
     }
     setAnalytics(null);
     setDiagnostics(null);
@@ -187,6 +217,8 @@ function ChatWrappedApp() {
               lang={lang}
               setLang={setLang}
               onHowTo={() => setStage('howto')}
+              includeMedia={includeMedia}
+              setIncludeMedia={updateIncludeMedia}
             />
           )}
           {stage === 'parsing' && (

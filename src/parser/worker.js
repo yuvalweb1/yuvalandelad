@@ -1,27 +1,26 @@
 // ============================================================
 // whatsapp-wrapped-parser — Web Worker entry
 // ------------------------------------------------------------
-// Runs the heavy work (ZIP inflate + line-by-line parse) off the
-// main thread so the UI never freezes on large exports. A module
-// worker; spawn it with:
-//
+// Runs the heavy work (ZIP inflate + parse) off the main thread.
+// Spawn:
 //   new Worker(new URL('./worker.js', import.meta.url), { type: 'module' })
 //
-// Protocol (see client.js for the friendly Promise wrapper):
-//   in : { id, type: 'parseFile', file }   // File (.zip or .txt)
-//        { id, type: 'parseText', text }    // raw transcript text
-//   out: { id, type: 'progress', phase }    // 'unzip' | 'parse'
-//        { id, type: 'result', messages, diagnostics, media }
-//        { id, type: 'error',  error }
+// Protocol (see client.js for the friendly wrapper):
+//   in : { id, type:'parseFile', file, includeMedia? }   // File (.zip|.txt)
+//        { id, type:'parseText', text }                  // raw transcript
+//   out: { id, type:'progress', phase }                  // 'unzip' | 'parse'
+//        { id, type:'result', messages, diagnostics, media }
+//        { id, type:'error',  error }
 //
-// `media` (only for .zip "with media" exports) is an array of
-// { name, mime, author, ts, bytes:Uint8Array } — bytes are transferred
-// zero-copy; the main thread turns them into blob URLs. Date objects in
-// `messages` survive structured clone.
+// `media` is { photos, voice, videos, stickers } — each [{name, bytes, mime,
+// author, ts, ...}]. Bytes transferred zero-copy; main thread turns them into
+// blob URLs. Date objects survive structured clone.
 // ============================================================
 
 import { parseWhatsApp } from './parse.js';
-import { readZipBundle } from './zip.js';
+import { readZipBundle, readZipText } from './zip.js';
+
+const EMPTY_MEDIA = { photos: [], voice: [], videos: [], stickers: [] };
 
 self.onmessage = async (e) => {
   const { id, type } = e.data || {};
@@ -29,17 +28,23 @@ self.onmessage = async (e) => {
 
   try {
     let text;
-    let media = [];
+    let media = EMPTY_MEDIA;
 
     if (type === 'parseFile') {
       const file = e.data.file;
+      const includeMedia = e.data.includeMedia !== false; // default on
       const name = (file.name || '').toLowerCase();
       const isZip = name.endsWith('.zip') || (!name.endsWith('.txt') && (await looksLikeZip(file)));
       if (isZip) {
         post({ type: 'progress', phase: 'unzip' });
-        const bundle = await readZipBundle(file);
-        text = bundle.text;
-        media = bundle.media;
+        if (includeMedia) {
+          const bundle = await readZipBundle(file);
+          text = bundle.text;
+          media = { photos: bundle.photos, voice: bundle.voice, videos: bundle.videos, stickers: bundle.stickers };
+        } else {
+          // Text-only path — lighter, no media extraction.
+          text = await readZipText(file);
+        }
       } else if (name.endsWith('.txt') || name === '') {
         text = await file.text();
       } else {
@@ -54,27 +59,29 @@ self.onmessage = async (e) => {
     post({ type: 'progress', phase: 'parse' });
     const { messages, diagnostics } = parseWhatsApp(text);
 
-    // Tie each extracted image to who sent it (and when) via the filename the
-    // chat references. Drop images that don't decode to a known sender only if
-    // we can't place them at all — we still keep them for the group collage.
-    if (media.length > 0) {
-      const byName = {};
-      for (const m of messages) if (m.mediaFile) byName[m.mediaFile] = m;
-      for (const item of media) {
-        const ref = byName[item.name];
-        item.author = ref ? ref.author : null;
-        item.ts = ref ? ref.timestamp : null;
-      }
-    }
+    // Tie each extracted media item to its sender via the filename the chat
+    // references. Photos/voice/videos use filename match; stickers share a
+    // representative file so association is less reliable — left as null.
+    const byName = {};
+    for (const m of messages) if (m.mediaFile) byName[m.mediaFile] = m;
+    const tag = (item) => { const ref = byName[item.name]; item.author = ref ? ref.author : null; item.ts = ref ? ref.timestamp : null; };
+    media.photos.forEach(tag);
+    media.voice.forEach(tag);
+    media.videos.forEach(tag);
+    media.stickers.forEach(tag);
 
-    const transfer = media.map(m => m.bytes.buffer);
+    const transfer = [
+      ...media.photos.map(m => m.bytes.buffer),
+      ...media.voice.map(m => m.bytes.buffer),
+      ...media.videos.map(m => m.bytes.buffer),
+      ...media.stickers.map(m => m.bytes.buffer),
+    ];
     post({ type: 'result', messages, diagnostics, media }, transfer);
   } catch (err) {
     post({ type: 'error', error: err && err.message ? err.message : String(err) });
   }
 };
 
-// Sniff the PK\x03\x04 local-file signature so a mis-named .zip still works.
 async function looksLikeZip(file) {
   try {
     const head = new Uint8Array(await file.slice(0, 4).arrayBuffer());

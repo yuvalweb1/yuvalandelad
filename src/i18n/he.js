@@ -52,6 +52,24 @@ export default {
   photos_eyebrow: 'נתפס במצלמה',
   photos_title: '{n} תמונות השנה',
   photos_sub: 'ישר מהצ׳אט · רק במכשיר שלך',
+  // טוגל ניתוח מדיה (Landing)
+  landing_media_title: 'כלול מדיה בניתוח',
+  landing_media_on: 'תמונות, קוליות, סטיקרים וסרטונים · איטי יותר',
+  landing_media_off: 'טקסט בלבד · מהיר וקליל',
+  // שקופית סטיקרים
+  stk_eyebrow: 'שיגעון הסטיקרים',
+  stk_title: '{n} סטיקרים נשלחו',
+  stk_sub: 'הסטיקרים הכי מנוצלים · בדירוג',
+  // שקופית הקלטות קוליות
+  voice_eyebrow: 'ההודעות הקוליות הכי ארוכות',
+  voice_title_a: 'המונולוגים',
+  voice_title_b: 'שלכם',
+  voice_sub: 'הקש/י play. אורך מוערך לפי גודל הקובץ.',
+  // שקופית סרטונים
+  vid_eyebrow: 'הסרטונים שלכם',
+  vid_title_a: 'גלגלי',
+  vid_title_b: 'הזיכרון',
+  vid_sub: 'הקש/י play · עיבוד במכשיר',
   ad_label: 'פרסומת',
   ad_placeholder: 'המקום שלך לפרסומת',
   err_format: 'העלה קובץ .txt או .zip מהיצוא של ווצאפ.',

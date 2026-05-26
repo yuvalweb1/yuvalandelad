@@ -6,6 +6,9 @@ import SlidePerPerson from './SlidePerPerson.jsx';
 import SlideSignatureWords from './SlideSignatureWords.jsx';
 import SlideGroupTop from './SlideGroupTop.jsx';
 import SlidePhotos from './SlidePhotos.jsx';
+import SlideVoice from './SlideVoice.jsx';
+import SlideVideos from './SlideVideos.jsx';
+import SlideStickers from './SlideStickers.jsx';
 import SlideAd from './SlideAd.jsx';
 import SlideTeaser from './SlideTeaser.jsx';
 
@@ -19,6 +22,9 @@ export const SLIDES_DEF = [
   'signature_words',
   'group_top',
   'photos',
+  'stickers',     // most-used stickers (with-media export only)
+  'voice',        // longest voice notes (with-media export only)
+  'videos',       // top videos (with-media export only)
   'awards',
   'drama_role',
   'ad',          // interstitial ad — shown only when ADS.slots.interstitial is on
@@ -33,6 +39,9 @@ export const SLIDE_COMPONENTS = {
   signature_words: SlideSignatureWords,
   group_top:       SlideGroupTop,
   photos:          SlidePhotos,
+  stickers:        SlideStickers,
+  voice:           SlideVoice,
+  videos:          SlideVideos,
   awards:          SlideAwards,
   drama_role:      SlideDramaRole,
   ad:              SlideAd,

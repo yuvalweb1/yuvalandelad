@@ -1,45 +1,54 @@
 // ============================================================
 // whatsapp-wrapped-parser — main-thread client
 // ------------------------------------------------------------
-// Friendly Promise wrapper around worker.js. Spawns a one-shot
-// module worker, relays progress, resolves with the parse result,
-// then terminates the worker. If Workers (or module workers) are
-// unavailable, it transparently falls back to parsing on the main
-// thread so the app still works everywhere.
+// Friendly Promise wrapper around worker.js. Falls back to main-thread
+// parsing where Workers are unavailable.
 //
 //   const { messages, diagnostics, media } = await parseChat({
 //     file,                       // File (.zip or .txt)   — OR —
 //     text,                       // raw transcript string
+//     includeMedia: true,         // extract photos/voice/videos/stickers
 //     onProgress: (phase) => {},  // 'unzip' | 'parse'
 //   });
 //
-// `media` is an array of { name, mime, author, ts, url } where `url` is an
-// object URL ready for an <img>. Call URL.revokeObjectURL(url) when done.
+// `media` is { photos, voice, videos, stickers } — each item has `url`
+// (object URL) ready for an <img>/<audio>/<video>. Call URL.revokeObjectURL
+// on every url when done.
 // ============================================================
 
 let _idSeq = 0;
 
-// Turn the transferred image bytes into <img>-ready object URLs (main thread).
-function materializeMedia(media) {
-  if (!media || !media.length) return [];
-  return media.map(m => ({
+// Materialize transferred bytes into <img>/<audio>/<video>-ready blob URLs.
+function materializeList(items) {
+  if (!items || !items.length) return [];
+  return items.map(m => ({
     name: m.name, mime: m.mime, author: m.author, ts: m.ts,
+    size: m.size ?? (m.bytes && m.bytes.length) ?? 0,
+    count: m.count, // stickers carry an occurrence count
     url: URL.createObjectURL(new Blob([m.bytes], { type: m.mime })),
   }));
+}
+function materializeMedia(media) {
+  if (!media) return { photos: [], voice: [], videos: [], stickers: [] };
+  return {
+    photos:   materializeList(media.photos),
+    voice:    materializeList(media.voice),
+    videos:   materializeList(media.videos),
+    stickers: materializeList(media.stickers),
+  };
 }
 
 /**
  * Parse a WhatsApp export off the main thread.
- * @param {{ file?: File, text?: string, onProgress?: (phase: string) => void }} opts
- * @returns {Promise<{ messages: Array, diagnostics: object, media: Array }>}
+ * @param {{ file?: File, text?: string, includeMedia?: boolean, onProgress?: (phase: string) => void }} opts
  */
-export function parseChat({ file, text, onProgress } = {}) {
+export function parseChat({ file, text, includeMedia = true, onProgress } = {}) {
   if (!file && text == null) {
     return Promise.reject(new Error('parseChat requires { file } or { text }'));
   }
 
   if (typeof Worker === 'undefined') {
-    return parseOnMainThread({ file, text, onProgress });
+    return parseOnMainThread({ file, text, includeMedia, onProgress });
   }
 
   return new Promise((resolve, reject) => {
@@ -47,8 +56,7 @@ export function parseChat({ file, text, onProgress } = {}) {
     try {
       worker = new Worker(new URL('./worker.js', import.meta.url), { type: 'module' });
     } catch {
-      // Some environments block module workers — degrade gracefully.
-      parseOnMainThread({ file, text, onProgress }).then(resolve, reject);
+      parseOnMainThread({ file, text, includeMedia, onProgress }).then(resolve, reject);
       return;
     }
 
@@ -75,7 +83,7 @@ export function parseChat({ file, text, onProgress } = {}) {
     };
 
     if (file) {
-      worker.postMessage({ id, type: 'parseFile', file });
+      worker.postMessage({ id, type: 'parseFile', file, includeMedia });
     } else {
       worker.postMessage({ id, type: 'parseText', text });
     }
@@ -83,32 +91,37 @@ export function parseChat({ file, text, onProgress } = {}) {
 }
 
 // Fallback path: identical result shape, just on the main thread.
-async function parseOnMainThread({ file, text, onProgress }) {
+async function parseOnMainThread({ file, text, includeMedia, onProgress }) {
   const { parseWhatsApp } = await import('./parse.js');
   let raw = text;
-  let mediaRaw = [];
+  let mediaRaw = null;
   if (file) {
     const name = (file.name || '').toLowerCase();
     if (name.endsWith('.zip')) {
       onProgress && onProgress('unzip');
-      const { readZipBundle } = await import('./zip.js');
-      const bundle = await readZipBundle(file);
-      raw = bundle.text;
-      mediaRaw = bundle.media;
+      if (includeMedia) {
+        const { readZipBundle } = await import('./zip.js');
+        const bundle = await readZipBundle(file);
+        raw = bundle.text;
+        mediaRaw = { photos: bundle.photos, voice: bundle.voice, videos: bundle.videos, stickers: bundle.stickers };
+      } else {
+        const { readZipText } = await import('./zip.js');
+        raw = await readZipText(file);
+      }
     } else {
       raw = await file.text();
     }
   }
   onProgress && onProgress('parse');
   const { messages, diagnostics } = parseWhatsApp(raw);
-  if (mediaRaw.length) {
+  if (mediaRaw) {
     const byName = {};
     for (const m of messages) if (m.mediaFile) byName[m.mediaFile] = m;
-    for (const item of mediaRaw) {
-      const ref = byName[item.name];
-      item.author = ref ? ref.author : null;
-      item.ts = ref ? ref.timestamp : null;
-    }
+    const tag = (item) => { const ref = byName[item.name]; item.author = ref ? ref.author : null; item.ts = ref ? ref.timestamp : null; };
+    mediaRaw.photos.forEach(tag);
+    mediaRaw.voice.forEach(tag);
+    mediaRaw.videos.forEach(tag);
+    mediaRaw.stickers.forEach(tag);
   }
   return { messages, diagnostics, media: materializeMedia(mediaRaw) };
 }
