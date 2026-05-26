@@ -1,15 +1,16 @@
 import React from 'react';
 import SlideShell from './SlideShell.jsx';
-import { interp } from '../i18n';
+import { interp, typedCopy } from '../i18n';
 
-const SlidePerPerson = React.memo(function SlidePerPerson({ a, t }) {
+const SlidePerPerson = React.memo(function SlidePerPerson({ a, t, profile }) {
+  const type = profile?.relationship || 'other';
   const users = a.users || [];
   if (users.length === 0) return null;
   return (
     <SlideShell bg="#577590" accent="#277da1">
       <div style={{ position: 'relative', height: '100%', display: 'flex', flexDirection: 'column', padding: '32px 22px 22px' }}>
-        <div className="fs-sans a-fade-up" style={{ textAlign: 'center', fontSize: 12, color: '#277da1', letterSpacing: '0.15em', fontWeight: 500, textTransform: 'uppercase' }}>{t.pp_eyebrow}</div>
-        <div className="fs-display a-fade-up" style={{ textAlign: 'center', animationDelay: '0.15s', fontSize: 28, lineHeight: 1.12, letterSpacing: '-0.03em', fontWeight: 800, color: '#2a0645', marginTop: 8, marginBottom: 14 }}>{t.pp_title}</div>
+        <div className="fs-sans a-fade-up" style={{ textAlign: 'center', fontSize: 12, color: '#277da1', letterSpacing: '0.15em', fontWeight: 500, textTransform: 'uppercase' }}>{typedCopy(t, 'pp_eyebrow', type)}</div>
+        <div className="fs-display a-fade-up" style={{ textAlign: 'center', animationDelay: '0.15s', fontSize: 28, lineHeight: 1.12, letterSpacing: '-0.03em', fontWeight: 800, color: '#2a0645', marginTop: 8, marginBottom: 14 }}>{typedCopy(t, 'pp_title', type)}</div>
         <div className="no-sb" style={{ flex: 1, overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: 8 }}>
           {users.map((usr, i) => (
             <div key={usr.author} dir="auto" className="a-slide-up-far" style={{ padding: '12px 16px', background: 'rgba(42,6,69,0.06)', borderRadius: 14, animationDelay: `${0.4 + i * 0.08}s` }}>

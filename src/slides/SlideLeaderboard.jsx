@@ -1,9 +1,11 @@
 import React from 'react';
 import SlideShell from './SlideShell.jsx';
+import { typedCopy } from '../i18n';
 
 const MAX_ROWS = 9;
 
-const SlideLeaderboard = React.memo(function SlideLeaderboard({ a, t }) {
+const SlideLeaderboard = React.memo(function SlideLeaderboard({ a, t, profile }) {
+  const type = profile?.relationship || 'other';
   const users = a.users || [];
   if (users.length === 0) return null;
   const max = users[0].messageCount || 1;
@@ -36,8 +38,8 @@ const SlideLeaderboard = React.memo(function SlideLeaderboard({ a, t }) {
   return (
     <SlideShell bg="#f3722c" accent="#f3722c">
       <div style={{ position: 'relative', height: '100%', display: 'flex', flexDirection: 'column', padding: '32px 22px 22px' }}>
-        <div className="fs-sans a-fade-up" style={{ textAlign: 'center', fontSize: 12, color: '#f3722c', letterSpacing: '0.15em', fontWeight: 500, textTransform: 'uppercase' }}>{t.lb_eyebrow}</div>
-        <div className="fs-display a-fade-up" style={{ textAlign: 'center', animationDelay: '0.15s', fontSize: 30, lineHeight: 1.12, letterSpacing: '-0.03em', fontWeight: 800, color: '#2a0645', marginTop: 8, marginBottom: 16 }}>{t.lb_title}</div>
+        <div className="fs-sans a-fade-up" style={{ textAlign: 'center', fontSize: 12, color: '#f3722c', letterSpacing: '0.15em', fontWeight: 500, textTransform: 'uppercase' }}>{typedCopy(t, 'lb_eyebrow', type)}</div>
+        <div className="fs-display a-fade-up" style={{ textAlign: 'center', animationDelay: '0.15s', fontSize: 30, lineHeight: 1.12, letterSpacing: '-0.03em', fontWeight: 800, color: '#2a0645', marginTop: 8, marginBottom: 16 }}>{typedCopy(t, 'lb_title', type)}</div>
         <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 6, minHeight: 0 }}>
           {topUsers.map((usr, i) => renderRow(usr, i + 1, { isLast: !showOverflow && i === users.length - 1 && users.length > 1 }))}
           {showOverflow && (

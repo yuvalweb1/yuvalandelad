@@ -15,7 +15,7 @@ import Wrapped from './views/Wrapped.jsx';
 import PostMenu from './views/PostMenu.jsx';
 import VerifyView from './views/VerifyView.jsx';
 import RoastMode from './views/RoastMode.jsx';
-import { SLIDES_DEF, SLIDE_COMPONENTS } from './slides';
+import { SLIDES_BY_TYPE, SLIDE_COMPONENTS } from './slides';
 
 // ============================================================
 // MAIN
@@ -240,7 +240,7 @@ function ChatWrappedApp() {
           )}
           {stage === 'wrapped' && analytics && (
             <Wrapped
-              slidesDef={SLIDES_DEF}
+              slidesDef={SLIDES_BY_TYPE[profile.relationship] || SLIDES_BY_TYPE.other}
               slideComponents={SLIDE_COMPONENTS}
               analytics={analytics}
               diagnostics={diagnostics}

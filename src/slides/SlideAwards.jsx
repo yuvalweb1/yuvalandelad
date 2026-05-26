@@ -1,8 +1,9 @@
 import React from 'react';
 import SlideShell from './SlideShell.jsx';
-import { interp } from '../i18n';
+import { interp, typedCopy } from '../i18n';
 
-const SlideAwards = React.memo(function SlideAwards({ a, t }) {
+const SlideAwards = React.memo(function SlideAwards({ a, t, profile }) {
+  const type = profile?.relationship || 'other';
   // Only include awards with valid winners
   const awards = [
     a.fastestResponder && { trophy: '🏆', label: t.awards_fastest, winner: a.fastestResponder.author,
@@ -28,14 +29,14 @@ const SlideAwards = React.memo(function SlideAwards({ a, t }) {
         <div className="fs-sans a-fade-up" style={{
           textAlign: 'center', fontSize: 12, color: '#f94144', letterSpacing: '0.15em', fontWeight: 500, textTransform: 'uppercase',
         }}>
-          {t.awards_eyebrow}
+          {typedCopy(t, 'awards_eyebrow', type)}
         </div>
         <div className="fs-display a-fade-up" style={{
           textAlign: 'center', animationDelay: '0.2s',
           fontSize: 32, lineHeight: 1.15, letterSpacing: '-0.03em', fontWeight: 700, color: '#2a0645',
           marginTop: 10, marginBottom: 18,
         }}>
-          {t.awards_title}<br/><span style={{ fontStyle: 'italic', color: '#f94144' }}>{t.awards_are}</span>
+          {typedCopy(t, 'awards_title', type)}<br/><span style={{ fontStyle: 'italic', color: '#f94144' }}>{typedCopy(t, 'awards_are', type)}</span>
         </div>
         <div className="no-sb" style={{
           flex: 1, overflowY: 'auto',

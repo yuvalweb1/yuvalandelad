@@ -1,15 +1,16 @@
 import React from 'react';
 import SlideShell from './SlideShell.jsx';
-import { interp } from '../i18n';
+import { interp, typedCopy } from '../i18n';
 
-const SlideGroupTop = React.memo(function SlideGroupTop({ a, t }) {
+const SlideGroupTop = React.memo(function SlideGroupTop({ a, t, profile }) {
+  const type = profile?.relationship || 'other';
   const word = (a.topWordsGroup && a.topWordsGroup[0]) || null;
   const emoji = (a.topEmojisGroup && a.topEmojisGroup[0]) || null;
   if (!word && !emoji) return null;
   return (
     <SlideShell bg="#f9c74f" accent="#f9c74f">
       <div style={{ position: 'relative', height: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'center', textAlign: 'center', padding: '0 24px', gap: 8 }}>
-        <div className="fs-sans a-fade-up" style={{ fontSize: 12, color: '#f3722c', letterSpacing: '0.15em', fontWeight: 500, textTransform: 'uppercase' }}>{t.gt_eyebrow}</div>
+        <div className="fs-sans a-fade-up" style={{ fontSize: 12, color: '#f3722c', letterSpacing: '0.15em', fontWeight: 500, textTransform: 'uppercase' }}>{typedCopy(t, 'gt_eyebrow', type)}</div>
         {emoji && (
           <div className="a-spring" style={{ animationDelay: '0.2s', marginTop: 16 }}>
             <div style={{ fontSize: 84, lineHeight: 1 }}>{emoji.emoji}</div>

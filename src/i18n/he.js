@@ -547,4 +547,159 @@ export default {
   st_r_fallback_k6: 'לא חם, לא קר. פושר/ת. beige flag מהלך/ת.',
   st_r_fallback_k7: 'הופעת אורח בקבוצה של עצמך. סיגמה? לא, סתם שקט/ה.',
   st_r_fallback_k8: 'אין עליך מה לכתוב, וזה הרוסט. cooked בלי בכלל לבשל.',
+
+  // ===== Chat-type aware copy =====
+  // night_owls
+  m_night_owls_eyebrow: 'ינשופי לילה',
+  m_night_owls_title: 'הכי מאוחר בשעון',
+  m_night_owls_sub: 'הודעות בין חצות ל-6 בבוקר',
+  m_night_owls_eyebrow_friends: 'מי לא ישן',
+  m_night_owls_title_friends: 'עוד מקלידים ב-3 לפנות בוקר',
+  // early_birds
+  m_early_birds_eyebrow: 'ציפורי בוקר',
+  m_early_birds_title: 'הראשונים לבוקר טוב',
+  m_early_birds_sub: 'שעות הבוקר (5–11)',
+  m_early_birds_eyebrow_family: 'ציפורי הבוקר',
+  m_early_birds_title_family: 'מי תמיד ראשון לבוקר טוב',
+  // voice_notes_leader
+  m_voice_notes_leader_eyebrow: 'הקלטות קוליות',
+  m_voice_notes_leader_title: 'אוהבי ההקלטות הקוליות',
+  m_voice_notes_leader_sub: '',
+  m_voice_notes_leader_eyebrow_family: 'הקלטות קוליות',
+  m_voice_notes_leader_title_family: 'מישהו ממש אוהב הודעות קוליות',
+  // overtime
+  m_overtime_eyebrow: 'שעות נוספות',
+  m_overtime_title: 'הודעות מחוץ לשעות העבודה',
+  m_overtime_sub: 'הודעות שנשלחו מחוץ ל-9–18',
+  m_overtime_eyebrow_work: 'שעות נוספות',
+  m_overtime_title_work: 'מישהו לא יודע מה זה "אחרי שעות העבודה"',
+  // response_times
+  m_response_times_eyebrow: 'זמני תגובה',
+  m_response_times_title: 'הכי מהירים להגיב',
+  m_response_times_sub: '',
+  m_response_times_eyebrow_work: 'זמני תגובה',
+  m_response_times_title_work: 'התגובות המהירות בצוות',
+  m_response_times_eyebrow_couple: 'מהירות תגובה',
+  m_response_times_title_couple: 'מי עונה מהר יותר?',
+  // essay_writers
+  m_essay_writers_eyebrow: 'הסופרים',
+  m_essay_writers_title: 'ההודעות הכי ארוכות',
+  m_essay_writers_sub: '',
+  m_essay_writers_eyebrow_work: 'הסופרים',
+  m_essay_writers_title_work: 'מי כותב/ת חיבורים בקבוצה',
+  // link_sharers
+  m_link_sharers_eyebrow: 'מפיצי לינקים',
+  m_link_sharers_title: 'הכי הרבה לינקים',
+  m_link_sharers_sub: '',
+  m_link_sharers_eyebrow_work: 'מפיצי לינקים',
+  m_link_sharers_title_work: 'שימושיים — או רק מסיחים את הדעת?',
+  // double_texts
+  m_double_texts_eyebrow: 'רצפי הודעות',
+  m_double_texts_title: 'רצף ההודעות הכי ארוך',
+  m_double_texts_sub: '',
+  m_double_texts_eyebrow_couple: 'רצפי הודעות',
+  m_double_texts_title_couple: 'מי הדביק/ה כאן?',
+  // ignored_award
+  m_ignored_award_eyebrow: 'נעלמו',
+  m_ignored_award_title: 'תקופות השתיקה הארוכות',
+  m_ignored_award_sub: 'ימים בין הודעה להודעה',
+  m_ignored_award_eyebrow_friends: 'מי מתעלמים מ',
+  m_ignored_award_title_friends: 'השתיקה הארוכה ביותר אחרי הודעה',
+  // night_messages
+  m_night_messages_eyebrow: 'אחרי חצות',
+  m_night_messages_title: 'מי נשאר ער יותר',
+  m_night_messages_sub: '',
+  m_night_messages_eyebrow_couple: 'הודעות לילה',
+  m_night_messages_title_couple: 'מי עדיין ער/ה וחושב/ת עלינו?',
+
+  // Longest streak
+  ls_eyebrow: 'הרצף',
+  ls_title: 'הרצף הכי ארוך של ימים רצופים',
+  ls_unit: 'ימים ברצף',
+  ls_sub: '{name} שמר/ה על הרצף',
+  ls_eyebrow_couple: 'הרצף שלנו',
+  ls_title_couple: 'ימים רצופים של התכתבות',
+  ls_sub_couple: 'אף יום לא חלף בלי הודעה',
+
+  // Busiest weekday
+  bw_eyebrow: 'השבוע',
+  bw_title: 'מתי הצ׳אט הכי רועש',
+  bw_peak_label: 'יום השיא',
+  bw_eyebrow_work: 'שבוע העבודה',
+  bw_title_work: 'היום העמוס בשבוע',
+  day_sun: 'ראשון', day_mon: 'שני', day_tue: 'שלישי', day_wed: 'רביעי',
+  day_thu: 'חמישי', day_fri: 'שישי', day_sat: 'שבת',
+  day_sun_short: 'א׳', day_mon_short: 'ב׳', day_tue_short: 'ג׳', day_wed_short: 'ד׳',
+  day_thu_short: 'ה׳', day_fri_short: 'ו׳', day_sat_short: 'ש׳',
+
+  // Signature emoji
+  se_eyebrow: 'האימוג׳י של כל אחד',
+  se_title: 'אימוג׳י אחד לכל אחד',
+  se_eyebrow_friends: 'סימני זיהוי',
+  se_title_friends: 'האימוג׳י הכי מזוהה עם כל אחד',
+  se_eyebrow_couple: 'האימוג׳ים שלנו',
+  se_title_couple: 'האימוג׳י שכל אחד מאיתנו אוהב',
+
+  // group_overview typed
+  go_eyebrow_friends: 'הקבוצה',
+  go_title_friends: 'שנה של שטויות',
+  go_eyebrow_family: 'המשפחה',
+  go_title_family: 'השנה, ביחד',
+  go_eyebrow_work: 'הצוות',
+  go_title_work: 'השנה, במספרים',
+  go_eyebrow_couple: 'אנחנו',
+  go_title_couple: 'השנה שלנו, במספרים',
+
+  // leaderboard typed
+  lb_eyebrow_friends: 'טבלת המובילים',
+  lb_title_friends: 'מי לא הצליחה לשתוק?',
+  lb_eyebrow_family: 'שומרים על קשר',
+  lb_title_family: 'מי הכי כתב/ה השנה',
+  lb_eyebrow_work: 'הכי פעילים',
+  lb_title_work: 'הקולות החזקים של הצוות',
+
+  // per_person typed
+  pp_eyebrow_family: 'התרומה של כולם',
+  pp_title_family: 'תרומה משפחתית',
+  pp_eyebrow_couple: 'בינינו',
+  pp_title_couple: 'מי כותב/ת יותר?',
+
+  // signature_words typed
+  sw_eyebrow_friends: 'סימני זיהוי',
+  sw_title_friends: 'המילה של כל אחד',
+  sw_eyebrow_family: 'מילים אהובות',
+  sw_title_family: 'מילה לכל אחד',
+  sw_eyebrow_work: 'המילים הכי נכתבות',
+  sw_title_work: 'לפי אדם',
+  sw_eyebrow_couple: 'המילים שלך',
+  sw_title_couple: 'מה אתם אומרים אחד לשנייה',
+
+  // group_top typed
+  gt_eyebrow_friends: 'בדיחה פנימית',
+  gt_eyebrow_family: 'המשפט המשפחתי',
+  gt_eyebrow_couple: 'המילה שלנו',
+
+  // photos typed
+  photos_eyebrow_friends: 'הוכחות',
+  photos_sub_friends: 'גלול אחורה אם אתה מעז',
+  photos_eyebrow_family: 'זכרונות',
+  photos_title_family: '{n} תמונות השנה',
+  photos_sub_family: 'כל הרגעים',
+  photos_eyebrow_couple: 'הזכרונות שלנו',
+  photos_title_couple: '{n} תמונות שלנו',
+  photos_sub_couple: 'חלקים מהשנה',
+
+  // awards typed
+  awards_eyebrow_friends: '✦ והפרסים מוענקים ל',
+  awards_title_friends: 'הזוכים של הערב',
+  awards_are_friends: 'הם…',
+  awards_eyebrow_family: '✦ הפרסים המשפחתיים',
+  awards_title_family: 'הבולטים השנה',
+  awards_are_family: 'הם…',
+  awards_eyebrow_work: '✦ פרסי המשרד',
+  awards_title_work: 'סקירת הביצועים',
+  awards_are_work: 'היא…',
+  awards_eyebrow_couple: '✦ פרסי הזוג',
+  awards_title_couple: 'והזוכים',
+  awards_are_couple: 'הם…',
 };

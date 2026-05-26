@@ -574,4 +574,164 @@ export default {
   st_r_fallback_k6: 'Not hot, not cold. Lukewarm. A walking beige flag.',
   st_r_fallback_k7: 'A guest star in your own group chat. Sigma? No, just quiet.',
   st_r_fallback_k8: 'Nothing to roast, and that\'s the roast. cooked without cooking.',
+
+  // ===== Chat-type aware copy =====
+  // Pattern: <key>_<type> overrides the base <key> for friends/family/work/couple.
+  // Missing typed key falls back to base via typedCopy() in i18n/index.js.
+
+  // ----- Generic metric slides (SlideMetric) -----
+  // night_owls
+  m_night_owls_eyebrow: 'NIGHT OWLS',
+  m_night_owls_title: 'Latest texters',
+  m_night_owls_sub: 'Messages between midnight and 6am',
+  m_night_owls_eyebrow_friends: 'WHO DOESN\'T SLEEP',
+  m_night_owls_title_friends: 'Still typing at 3am',
+  // early_birds
+  m_early_birds_eyebrow: 'EARLY BIRDS',
+  m_early_birds_title: 'First to say good morning',
+  m_early_birds_sub: 'Morning hours (5–11am)',
+  m_early_birds_eyebrow_family: 'THE EARLY BIRDS',
+  m_early_birds_title_family: 'The family\'s morning crew',
+  // voice_notes_leader
+  m_voice_notes_leader_eyebrow: 'VOICE NOTES',
+  m_voice_notes_leader_title: 'The voice memo enthusiasts',
+  m_voice_notes_leader_sub: '',
+  m_voice_notes_leader_eyebrow_family: 'VOICE NOTES',
+  m_voice_notes_leader_title_family: 'Someone really loves voice messages',
+  // overtime
+  m_overtime_eyebrow: 'OFF THE CLOCK',
+  m_overtime_title: 'After-hours messengers',
+  m_overtime_sub: 'Messages sent outside 9–6',
+  m_overtime_eyebrow_work: 'OFF THE CLOCK',
+  m_overtime_title_work: 'Someone doesn\'t know what "after hours" means',
+  // response_times
+  m_response_times_eyebrow: 'RESPONSE TIMES',
+  m_response_times_title: 'Fastest to reply',
+  m_response_times_sub: '',
+  m_response_times_eyebrow_work: 'RESPONSE TIMES',
+  m_response_times_title_work: 'Fastest replies on the team',
+  m_response_times_eyebrow_couple: 'REPLY SPEED',
+  m_response_times_title_couple: 'Who answers faster?',
+  // essay_writers
+  m_essay_writers_eyebrow: 'THE ESSAYISTS',
+  m_essay_writers_title: 'Longest messages',
+  m_essay_writers_sub: '',
+  m_essay_writers_eyebrow_work: 'THE ESSAYISTS',
+  m_essay_writers_title_work: 'The essay writer of the group',
+  // link_sharers
+  m_link_sharers_eyebrow: 'LINK DROPPERS',
+  m_link_sharers_title: 'Most links shared',
+  m_link_sharers_sub: '',
+  m_link_sharers_eyebrow_work: 'LINK DROPPERS',
+  m_link_sharers_title_work: 'Useful — or just distracting?',
+  // double_texts
+  m_double_texts_eyebrow: 'DOUBLE-TEXTERS',
+  m_double_texts_title: 'Biggest message streaks in a row',
+  m_double_texts_sub: '',
+  m_double_texts_eyebrow_couple: 'DOUBLE-TEXTERS',
+  m_double_texts_title_couple: 'Who\'s the clingy one?',
+  // ignored_award
+  m_ignored_award_eyebrow: 'GHOSTED',
+  m_ignored_award_title: 'Longest silent stretches',
+  m_ignored_award_sub: 'Days between messages',
+  m_ignored_award_eyebrow_friends: 'WHO GETS IGNORED',
+  m_ignored_award_title_friends: 'Longest silence after a message',
+  // night_messages
+  m_night_messages_eyebrow: 'AFTER HOURS',
+  m_night_messages_title: 'Who stays up later',
+  m_night_messages_sub: '',
+  m_night_messages_eyebrow_couple: 'NIGHT MESSAGES',
+  m_night_messages_title_couple: 'Who\'s still up thinking about us?',
+
+  // ----- Longest streak slide -----
+  ls_eyebrow: 'THE STREAK',
+  ls_title: 'Longest run of consecutive days',
+  ls_unit: 'days in a row',
+  ls_sub: '{name} kept the streak alive',
+  ls_eyebrow_couple: 'OUR STREAK',
+  ls_title_couple: 'Consecutive days chatting',
+  ls_sub_couple: 'Not a single day went by silent',
+
+  // ----- Busiest weekday slide -----
+  bw_eyebrow: 'THE WEEK',
+  bw_title: 'When the chat is loudest',
+  bw_peak_label: 'PEAK DAY',
+  bw_eyebrow_work: 'THE WORK WEEK',
+  bw_title_work: 'Busiest day of the week',
+  day_sun: 'Sunday', day_mon: 'Monday', day_tue: 'Tuesday', day_wed: 'Wednesday',
+  day_thu: 'Thursday', day_fri: 'Friday', day_sat: 'Saturday',
+  day_sun_short: 'Sun', day_mon_short: 'Mon', day_tue_short: 'Tue', day_wed_short: 'Wed',
+  day_thu_short: 'Thu', day_fri_short: 'Fri', day_sat_short: 'Sat',
+
+  // ----- Signature emoji slide -----
+  se_eyebrow: 'SIGNATURE EMOJI',
+  se_title: 'One emoji each',
+  se_eyebrow_friends: 'DEAD GIVEAWAYS',
+  se_title_friends: 'Everyone\'s most-used emoji',
+  se_eyebrow_couple: 'OUR EMOJIS',
+  se_title_couple: 'The emoji each of you reaches for',
+
+  // ----- Typed overrides for existing slides -----
+  // group_overview
+  go_eyebrow_friends: 'THE GROUP CHAT',
+  go_title_friends: 'A year of nonsense',
+  go_eyebrow_family: 'THE FAMILY',
+  go_title_family: 'This year, together',
+  go_eyebrow_work: 'THE TEAM',
+  go_title_work: 'This year, in numbers',
+  go_eyebrow_couple: 'US',
+  go_title_couple: 'Our year, in numbers',
+
+  // leaderboard
+  lb_eyebrow_friends: 'LEADERBOARD',
+  lb_title_friends: 'Guess who wouldn\'t shut up?',
+  lb_eyebrow_family: 'STAYING IN TOUCH',
+  lb_title_family: 'Who reached out most',
+  lb_eyebrow_work: 'MOST ACTIVE',
+  lb_title_work: 'The team\'s loudest voices',
+
+  // per_person
+  pp_eyebrow_family: 'EVERYONE\'S PART',
+  pp_title_family: 'Family contributions',
+  pp_eyebrow_couple: 'BETWEEN US',
+  pp_title_couple: 'Who texts more?',
+
+  // signature_words
+  sw_eyebrow_friends: 'DEAD GIVEAWAYS',
+  sw_title_friends: 'Each person\'s tell',
+  sw_eyebrow_family: 'FAVORITE WORDS',
+  sw_title_family: 'Everyone\'s word',
+  sw_eyebrow_work: 'MOST-TYPED WORDS',
+  sw_title_work: 'By person',
+  sw_eyebrow_couple: 'YOUR WORDS',
+  sw_title_couple: 'What you say to each other',
+
+  // group_top
+  gt_eyebrow_friends: 'THE INSIDE JOKE',
+  gt_eyebrow_family: 'THE FAMILY PHRASE',
+  gt_eyebrow_couple: 'OUR WORD',
+
+  // photos
+  photos_eyebrow_friends: 'EVIDENCE',
+  photos_sub_friends: 'Scroll back if you dare',
+  photos_eyebrow_family: 'MEMORIES',
+  photos_title_family: '{n} photos shared',
+  photos_sub_family: 'All the moments',
+  photos_eyebrow_couple: 'OUR MEMORIES',
+  photos_title_couple: '{n} photos of us',
+  photos_sub_couple: 'Pieces of the year',
+
+  // awards
+  awards_eyebrow_friends: '✦ AND THE AWARDS GO TO',
+  awards_title_friends: 'Tonight\'s honorees',
+  awards_are_friends: 'are…',
+  awards_eyebrow_family: '✦ THE FAMILY AWARDS',
+  awards_title_family: 'This year\'s standouts',
+  awards_are_family: 'are…',
+  awards_eyebrow_work: '✦ THE OFFICE AWARDS',
+  awards_title_work: 'Performance review',
+  awards_are_work: 'is in…',
+  awards_eyebrow_couple: '✦ THE COUPLE AWARDS',
+  awards_title_couple: 'And the winners',
+  awards_are_couple: 'are…',
 };
