@@ -16,6 +16,7 @@ import Wrapped from './views/Wrapped.jsx';
 import PostMenu from './views/PostMenu.jsx';
 import VerifyView from './views/VerifyView.jsx';
 import RoastMode from './views/RoastMode.jsx';
+import Settings from './views/Settings.jsx';
 import VideoAdSlot from './components/VideoAdSlot.jsx';
 import { adEnabled } from './lib/ads.js';
 import { SLIDES_BY_TYPE, SLIDE_COMPONENTS } from './slides';
@@ -61,6 +62,12 @@ function ChatWrappedApp() {
     self: null,
   });
   const [history, setHistory] = useState(() => loadHistory());
+  // Where Settings should return to. Set just before entering the settings stage.
+  const [settingsReturn, setSettingsReturn] = useState('landing');
+  const openSettings = useCallback((from) => {
+    setSettingsReturn(from);
+    setStage('settings');
+  }, []);
   const t = useMemo(() => buildT(lang), [lang]);
   const isRTL = RTL_LANGS.has(lang);
 
@@ -261,6 +268,7 @@ function ChatWrappedApp() {
               setLang={setLang}
               onHowTo={() => setStage('howto')}
               onDemo={loadDemo}
+              onOpenSettings={() => openSettings('landing')}
               includeMedia={includeMedia}
               setIncludeMedia={updateIncludeMedia}
               history={history}
@@ -346,7 +354,20 @@ function ChatWrappedApp() {
               onReplay={() => { setSlide(0); setStage('wrapped'); }}
               onReset={reset}
               onDebug={() => setStage('verify')}
+              onOpenSettings={() => openSettings('menu')}
               onRoastMode={() => setStage(adEnabled('pre_roast') ? 'ad_pre_roast' : 'roastmode')}
+            />
+          )}
+          {stage === 'settings' && (
+            <Settings
+              t={t}
+              lang={lang}
+              setLang={setLang}
+              includeMedia={includeMedia}
+              setIncludeMedia={updateIncludeMedia}
+              history={history}
+              onClearHistory={handleClearHistory}
+              onBack={() => setStage(settingsReturn)}
             />
           )}
           {stage === 'ad_pre_roast' && (

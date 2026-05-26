@@ -16,7 +16,7 @@ const LANGUAGES = [
 ];
 
 export default function Landing({
-  onFile, onDemo, parseError, t, lang, setLang, onHowTo,
+  onFile, onDemo, parseError, t, lang, setLang, onHowTo, onOpenSettings,
   includeMedia = true, setIncludeMedia,
   history = [], onLoadRecap, onDeleteRecap, onClearHistory,
 }) {
@@ -116,19 +116,35 @@ export default function Landing({
           <span style={{ fontFamily: 'Georgia, serif', fontSize: 19, fontWeight: 700, letterSpacing: '-0.03em', color: '#4A0E4E' }}>re</span>
           <span style={{ fontFamily: 'Georgia, serif', fontSize: 19, fontWeight: 700, letterSpacing: '-0.03em', color: '#f06449' }}>capped</span>
         </div>
-        <button onClick={() => setLangOpen(true)} className="press" aria-label={t.a11y_change_language || `Change language. Current: ${currentLang.name}`} style={{
-          display: 'flex', alignItems: 'center', gap: 5,
-          padding: '0 10px', height: 34, borderRadius: 999,
-          background: '#FFF6E8', border: '1.5px solid rgba(255,255,255,0.85)',
-          color: '#573280', cursor: 'pointer',
-          boxShadow: '0 4px 0 rgba(87,50,128,0.28), 0 10px 18px -6px rgba(87,50,128,0.35)',
-        }}>
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-            <circle cx="12" cy="12" r="10"/>
-            <path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
-          </svg>
-          <span style={{ fontSize: 12, fontWeight: 700, letterSpacing: '0.01em' }}>{currentLang.name}</span>
-        </button>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+          <button onClick={() => setLangOpen(true)} className="press" aria-label={t.a11y_change_language || `Change language. Current: ${currentLang.name}`} style={{
+            display: 'flex', alignItems: 'center', gap: 5,
+            padding: '0 10px', height: 34, borderRadius: 999,
+            background: '#FFF6E8', border: '1.5px solid rgba(255,255,255,0.85)',
+            color: '#573280', cursor: 'pointer',
+            boxShadow: '0 4px 0 rgba(87,50,128,0.28), 0 10px 18px -6px rgba(87,50,128,0.35)',
+          }}>
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+              <circle cx="12" cy="12" r="10"/>
+              <path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
+            </svg>
+            <span style={{ fontSize: 12, fontWeight: 700, letterSpacing: '0.01em' }}>{currentLang.name}</span>
+          </button>
+          {onOpenSettings && (
+            <button onClick={onOpenSettings} className="press" aria-label={t.settings_title || 'Settings'} style={{
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              width: 34, height: 34, borderRadius: 999,
+              background: '#FFF6E8', border: '1.5px solid rgba(255,255,255,0.85)',
+              color: '#573280', cursor: 'pointer',
+              boxShadow: '0 4px 0 rgba(87,50,128,0.28), 0 10px 18px -6px rgba(87,50,128,0.35)',
+            }}>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                <circle cx="12" cy="12" r="3" />
+                <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" />
+              </svg>
+            </button>
+          )}
+        </div>
       </div>
 
       {/* Middle — hero. Keeps the CTA pinned & always visible. */}

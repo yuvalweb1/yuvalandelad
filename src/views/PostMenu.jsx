@@ -34,7 +34,7 @@ const STICKER_POSITIONS = [
 ];
 const STICKER_EMOJIS = ['✨', '🎬', '🎉', '💫', '⭐', '🎯'];
 
-export default function PostMenu({ analytics, diagnostics, selectedAuthor, setSelectedAuthor, t, onReplay, onReset, onDebug, onRoastMode }) {
+export default function PostMenu({ analytics, diagnostics, selectedAuthor, setSelectedAuthor, t, onReplay, onReset, onDebug, onRoastMode, onOpenSettings }) {
   const [pickerOpen, setPickerOpen] = useState(false);
   const u = analytics.userMap[selectedAuthor];
   if (!u) return null;
@@ -119,8 +119,23 @@ export default function PostMenu({ analytics, diagnostics, selectedAuthor, setSe
         padding: '24px 20px 28px', position: 'relative', zIndex: 1,
         minHeight: '100%', display: 'flex', flexDirection: 'column',
       }}>
-        {/* Top-right reset — minimal chrome so the slide-style header owns the top */}
-        <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 8 }}>
+        {/* Top-right chrome — settings + reset. Settings first (start), reset last
+            so the destructive action sits in the most discoverable corner. */}
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
+          {onOpenSettings ? (
+            <button onClick={onOpenSettings} className="press" aria-label={t.settings_title || 'Settings'} style={{
+              background: '#fff', border: `2px solid ${SKY}33`, color: EGGPLANT,
+              width: 38, height: 38, borderRadius: 999, cursor: 'pointer',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              boxShadow: popShadow(SKY),
+            }}>
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                <circle cx="12" cy="12" r="3" />
+                <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" />
+              </svg>
+            </button>
+          ) : <div />}
           <button onClick={onReset} className="press" aria-label={t.a11y_start_over || 'Start over'} style={{
             background: '#fff', border: `2px solid ${MANGO}33`, color: EGGPLANT,
             width: 38, height: 38, borderRadius: 999, cursor: 'pointer',
