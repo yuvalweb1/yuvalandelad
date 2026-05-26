@@ -55,9 +55,9 @@ export default function PostMenu({ analytics, diagnostics, selectedAuthor, setSe
         padding: '22px 22px 32px', position: 'relative', zIndex: 1,
         minHeight: '100%', display: 'flex', flexDirection: 'column',
       }}>
-        {/* Header */}
+        {/* Header — chatwrapped is brand English text, lock LTR even in RTL UI. */}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
-          <div className="fs-display" style={{ fontWeight: 800, fontSize: 22, letterSpacing: '-0.03em', color: EGGPLANT }}>
+          <div dir="ltr" className="fs-display" style={{ fontWeight: 800, fontSize: 22, letterSpacing: '-0.03em', color: EGGPLANT }}>
             chat<span style={{ color: MANGO, fontStyle: 'italic' }}>wrapped</span>
           </div>
           <button onClick={onReset} className="press" aria-label={t.a11y_start_over || 'Start over'} style={{
@@ -94,9 +94,10 @@ export default function PostMenu({ analytics, diagnostics, selectedAuthor, setSe
           }}>
             {t.menu_replay}
           </div>
-          <div className="fs-display" style={{
+          <div dir="auto" className="fs-display" style={{
             fontSize: 30, lineHeight: 1.0, letterSpacing: '-0.03em', marginTop: 8,
             whiteSpace: 'pre-line', fontWeight: 800,
+            overflowWrap: 'break-word', wordBreak: 'break-word',
           }}>
             {t.menu_watch}
           </div>
@@ -122,9 +123,10 @@ export default function PostMenu({ analytics, diagnostics, selectedAuthor, setSe
           }}>
             {t.menu_roast_mode}
           </div>
-          <div className="fs-display" style={{
+          <div dir="auto" className="fs-display" style={{
             fontSize: 30, lineHeight: 1.0, letterSpacing: '-0.03em', marginTop: 8,
             whiteSpace: 'pre-line', fontWeight: 800,
+            overflowWrap: 'break-word', wordBreak: 'break-word',
           }}>
             {t.menu_roast_everyone}
           </div>
@@ -147,7 +149,7 @@ export default function PostMenu({ analytics, diagnostics, selectedAuthor, setSe
             <div className="fs-sans" style={{ fontSize: 11, color: SKY, letterSpacing: '0.18em', fontWeight: 800, textTransform: 'uppercase' }}>
               👀 {t.menu_viewing_as}
             </div>
-            <div className="fs-display" style={{
+            <div dir="auto" className="fs-display" style={{
               fontSize: 22, fontWeight: 800, marginTop: 4, color: EGGPLANT, letterSpacing: '-0.02em',
               overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
             }}>
@@ -201,11 +203,11 @@ export default function PostMenu({ analytics, diagnostics, selectedAuthor, setSe
               display: 'flex', justifyContent: 'space-between', alignItems: 'center',
             }}>
               <div style={{ minWidth: 0, flex: 1 }}>
-                <div style={{
+                <div dir="auto" style={{
                   fontSize: 22, fontWeight: 600,
                   overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
                 }}>{user.author}</div>
-                <div className="fs-mono" style={{
+                <div dir="auto" className="fs-mono" style={{
                   fontSize: 20, color: '#f9c74f', marginTop: 2, fontStyle: 'italic',
                   overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
                 }}>"{resolveTitle(user, t)}"</div>
