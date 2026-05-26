@@ -17,7 +17,7 @@ const SlideTeaser = React.memo(function SlideTeaser({ t, onMenu, onExit }) {
           {cards.map((c, i) => (
             <div key={i} className="a-slide-up-far" style={{ display: 'flex', alignItems: 'center', gap: 14, padding: '16px 18px', background: 'rgba(42,6,69,0.06)', borderRadius: 16, animationDelay: `${0.4 + i * 0.12}s` }}>
               <div style={{ fontSize: 24, flexShrink: 0 }}>{c.icon}</div>
-              <div className="fs-sans" dir="auto" style={{ flex: 1, fontSize: 16, fontWeight: 700, color: '#2a0645' }}>{c.label}</div>
+              <div className="fs-sans" dir="auto" style={{ flex: 1, minWidth: 0, fontSize: 16, fontWeight: 700, color: '#2a0645', lineHeight: 1.25, overflowWrap: 'break-word', wordBreak: 'break-word' }}>{c.label}</div>
               <div style={{ flexShrink: 0, fontSize: 16, opacity: 0.55 }}>🔒</div>
             </div>
           ))}

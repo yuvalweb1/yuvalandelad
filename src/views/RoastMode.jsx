@@ -195,10 +195,11 @@ export default function RoastMode({ analytics, selectedAuthor, setSelectedAuthor
                 </div>
 
                 {/* Kicker — focal point */}
-                <div className="fs-display" style={{
+                <div className="fs-display" dir="auto" style={{
                   fontStyle: 'italic', fontWeight: 800,
-                  color: '#f3722c', fontSize: 32, lineHeight: 1.12,
-                  letterSpacing: '-0.035em',
+                  color: '#f3722c', fontSize: kicker.length > 90 ? 22 : kicker.length > 60 ? 26 : 32,
+                  lineHeight: 1.15, letterSpacing: '-0.035em',
+                  overflowWrap: 'break-word', wordBreak: 'break-word', hyphens: 'auto',
                 }}>
                   {kicker}
                 </div>

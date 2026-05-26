@@ -52,12 +52,13 @@ const SlideAwards = React.memo(function SlideAwards({ a, t }) {
               <div style={{ fontSize: 24, lineHeight: 1, flexShrink: 0 }}>{aw.trophy}</div>
               <div style={{ flex: 1, minWidth: 0 }}>
                 <div className="fs-sans" style={{
-                  fontSize: 12, color: aw.color, letterSpacing: '0.12em',
-                  fontWeight: 500, textTransform: 'uppercase',
+                  fontSize: 11, color: aw.color, letterSpacing: '0.1em',
+                  fontWeight: 500, textTransform: 'uppercase', lineHeight: 1.25,
+                  overflowWrap: 'break-word', wordBreak: 'break-word', hyphens: 'auto',
                 }}>
                   {aw.label}
                 </div>
-                <div className="fs-sans" style={{
+                <div className="fs-sans" dir="auto" style={{
                   fontSize: 16, fontWeight: 700, marginTop: 3, lineHeight: 1.2, color: '#2a0645',
                   overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
                 }}>
@@ -65,7 +66,8 @@ const SlideAwards = React.memo(function SlideAwards({ a, t }) {
                 </div>
               </div>
               <div className="fs-mono" style={{
-                fontSize: 14, color: 'rgba(42,6,69,0.72)', textAlign: 'right', flexShrink: 0, lineHeight: 1.4,
+                fontSize: 12, color: 'rgba(42,6,69,0.72)', textAlign: 'right', flexShrink: 0, lineHeight: 1.4,
+                maxWidth: 90, overflowWrap: 'break-word',
               }}>
                 {aw.sub}
               </div>

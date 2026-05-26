@@ -34,7 +34,7 @@ export default function PostMenu({ analytics, diagnostics, selectedAuthor, setSe
 
       <div style={{ padding: '16px 20px 32px', position: 'relative', zIndex: 1 }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 }}>
-          <div style={{ fontWeight: 800, fontSize: 18, letterSpacing: '-0.02em', color: '#2a0645' }}>
+          <div dir="ltr" style={{ fontWeight: 800, fontSize: 18, letterSpacing: '-0.02em', color: '#2a0645' }}>
             chat<span style={{ color: '#f06449' }}>wrapped</span>
           </div>
           <button onClick={onReset} className="press" aria-label={t.a11y_start_over || 'Start over'} style={{
@@ -72,8 +72,9 @@ export default function PostMenu({ analytics, diagnostics, selectedAuthor, setSe
               {t.menu_replay}
             </div>
             <div className="fs-display" style={{
-              fontSize: 21, lineHeight: 1.0, letterSpacing: '-0.03em', marginTop: 4,
+              fontSize: 21, lineHeight: 1.05, letterSpacing: '-0.03em', marginTop: 4,
               whiteSpace: 'pre-line', fontWeight: 800,
+              overflowWrap: 'break-word', wordBreak: 'break-word',
             }}>
               {t.menu_watch}
             </div>
@@ -97,8 +98,9 @@ export default function PostMenu({ analytics, diagnostics, selectedAuthor, setSe
               {t.menu_roast_mode}
             </div>
             <div className="fs-display" style={{
-              fontSize: 21, lineHeight: 1.0, letterSpacing: '-0.03em', marginTop: 4,
+              fontSize: 21, lineHeight: 1.05, letterSpacing: '-0.03em', marginTop: 4,
               whiteSpace: 'pre-line', fontWeight: 800,
+              overflowWrap: 'break-word', wordBreak: 'break-word',
             }}>
               {t.menu_roast_everyone}
             </div>
@@ -177,13 +179,16 @@ export default function PostMenu({ analytics, diagnostics, selectedAuthor, setSe
           }}>
             ✦ {t.menu_this_group_is}
           </div>
-          <div className="fs-display" style={{
-            fontSize: 22, lineHeight: 1.05, letterSpacing: '-0.03em',
+          <div className="fs-display" dir="auto" style={{
+            fontSize: 22, lineHeight: 1.08, letterSpacing: '-0.03em',
             fontStyle: 'italic', color: '#573280', fontWeight: 800,
+            overflowWrap: 'break-word', wordBreak: 'break-word',
           }}>
             {analytics.groupPersonality}
           </div>
-          <div style={{ fontSize: 13, color: 'rgba(42,6,69,0.65)', marginTop: 8, lineHeight: 1.5 }}>
+          <div dir="auto" style={{ fontSize: 13, color: 'rgba(42,6,69,0.65)', marginTop: 8, lineHeight: 1.5,
+            overflowWrap: 'break-word', wordBreak: 'break-word',
+          }}>
             {analytics.groupPersonalityReason}
           </div>
         </div>

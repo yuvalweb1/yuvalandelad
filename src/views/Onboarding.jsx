@@ -145,8 +145,10 @@ export default function Onboarding({ analytics, t, profile, setProfile, onComple
         {/* Title (fixed) */}
         <div className="a-fade-up" style={{ marginBottom: 4, flexShrink: 0 }}>
           <div className="fs-display" style={{
-            fontSize: 32, lineHeight: 1.05, letterSpacing: '-0.03em', marginBottom: 6,
+            fontSize: currentStep.question.length > 36 ? 26 : 32,
+            lineHeight: 1.08, letterSpacing: '-0.03em', marginBottom: 6,
             fontWeight: 800, color: '#4A0E4E',
+            overflowWrap: 'break-word', wordBreak: 'break-word', hyphens: 'auto',
           }}>
             {currentStep.question}
           </div>

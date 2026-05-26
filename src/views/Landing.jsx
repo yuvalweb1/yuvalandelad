@@ -111,7 +111,7 @@ export default function Landing({
         position: 'relative', zIndex: 10,
         display: 'flex', justifyContent: 'space-between', alignItems: 'center',
       }}>
-        <div className="a-fade-up" style={{ display: 'flex', alignItems: 'baseline', gap: 0 }}>
+        <div className="a-fade-up" dir="ltr" style={{ display: 'flex', alignItems: 'baseline', gap: 0 }}>
           <span style={{ fontFamily: 'Georgia, serif', fontSize: 19, fontWeight: 700, letterSpacing: '-0.03em', color: '#4A0E4E' }}>re</span>
           <span style={{ fontFamily: 'Georgia, serif', fontSize: 19, fontWeight: 700, letterSpacing: '-0.03em', color: '#f06449' }}>capped</span>
         </div>
@@ -140,13 +140,15 @@ export default function Landing({
         textAlign: 'center',
       }}>
         <h1 className="fs-display" style={{
-          fontSize: 'clamp(38px, 11vw, 54px)', lineHeight: 0.92, letterSpacing: '-0.045em',
+          fontSize: 'clamp(34px, 10vw, 52px)', lineHeight: 0.96, letterSpacing: '-0.045em',
           fontWeight: 800, margin: 0, color: '#4A0E4E',
           textShadow: '0 1px 0 rgba(255,255,255,0.8), 0 3px 0 rgba(74,14,78,0.18), 0 6px 0 rgba(74,14,78,0.10), 0 12px 18px rgba(74,14,78,0.20)',
+          overflowWrap: 'break-word', wordBreak: 'break-word', hyphens: 'auto',
         }}>
           {t.landing_h1_a}{' '}
           <span style={{
             display: 'inline-block',
+            maxWidth: '100%',
             background: '#FF1867',
             color: '#fff',
             padding: '2px 12px 5px',
@@ -155,6 +157,7 @@ export default function Landing({
             verticalAlign: 'middle',
             boxShadow: '0 6px 0 #B3003F, 0 14px 24px -6px rgba(180,0,60,0.55)',
             textShadow: '0 1px 0 rgba(0,0,0,0.18)',
+            overflowWrap: 'break-word', wordBreak: 'break-word',
           }}>{t.landing_h1_b}</span>{' '}
           {t.landing_h1_c}<br/>
           <span>{t.landing_h1_d}</span>
@@ -308,7 +311,7 @@ export default function Landing({
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
                 fontSize: 12, fontWeight: 800,
               }}>1</div>
-              <div className="fs-sans" dir="auto" style={{ flex: 1, fontSize: 13, fontWeight: 600, color: '#2a0645', lineHeight: 1.25 }}>
+              <div className="fs-sans" dir="auto" style={{ flex: 1, minWidth: 0, fontSize: 13, fontWeight: 600, color: '#2a0645', lineHeight: 1.25, overflowWrap: 'break-word', wordBreak: 'break-word' }}>
                 {t.landing_step1}
               </div>
               <button onClick={onHowTo} className="press fs-sans" style={{
@@ -324,7 +327,7 @@ export default function Landing({
             <button onClick={() => fileInputRef.current?.click()} className="press fs-sans" style={{
               display: 'flex', alignItems: 'center', gap: 9,
               width: '100%', background: 'transparent', border: 'none',
-              padding: 0, cursor: 'pointer', textAlign: 'left',
+              padding: 0, cursor: 'pointer', textAlign: 'start',
             }}>
               <div style={{
                 flexShrink: 0, width: 22, height: 22, borderRadius: 999,
@@ -332,10 +335,10 @@ export default function Landing({
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
                 fontSize: 12, fontWeight: 800,
               }}>2</div>
-              <div dir="auto" style={{ flex: 1, fontSize: 13, fontWeight: 600, color: '#2a0645', lineHeight: 1.25 }}>
+              <div dir="auto" style={{ flex: 1, minWidth: 0, fontSize: 13, fontWeight: 600, color: '#2a0645', lineHeight: 1.25, overflowWrap: 'break-word', wordBreak: 'break-word' }}>
                 {t.landing_step2}
               </div>
-              <div style={{
+              <div dir="ltr" style={{
                 flexShrink: 0, padding: '5px 10px',
                 background: '#FFF6E8', border: '1px solid rgba(74,14,78,0.10)',
                 borderRadius: 9, color: '#4A0E4E', fontSize: 11.5, fontWeight: 700,

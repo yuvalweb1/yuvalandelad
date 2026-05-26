@@ -61,8 +61,9 @@ const SlideDramaRole = React.memo(function SlideDramaRole({ u, t }) {
         </div>
         <div className="a-spring" style={{ animationDelay: '0.3s', marginTop: 32 }}>
           <div className="fs-display" style={{
-            fontSize: titleText.length > 20 ? 28 : 36,
+            fontSize: titleText.length > 26 ? 24 : titleText.length > 20 ? 28 : 36,
             lineHeight: 1.15, letterSpacing: '-0.03em', fontStyle: 'italic', color: accent, fontWeight: 700,
+            overflowWrap: 'break-word', wordBreak: 'break-word', padding: '0 8px',
           }}>
             {titleText}
           </div>
@@ -74,13 +75,16 @@ const SlideDramaRole = React.memo(function SlideDramaRole({ u, t }) {
             {animated}{isPercent ? '%' : ''}
           </div>
           <div className="fs-mono" style={{
-            fontSize: 16, color: bodyColor, letterSpacing: '0.08em', marginTop: 8,
+            fontSize: 15, color: bodyColor, letterSpacing: '0.06em', marginTop: 8,
+            lineHeight: 1.35, padding: '0 12px',
+            overflowWrap: 'break-word', wordBreak: 'break-word',
           }}>
             {cleanLabel}
           </div>
         </div>
         <div className="fs-sans a-fade-up" style={{
           animationDelay: '1.3s', marginTop: 32, fontSize: 18, lineHeight: 1.5, color: bodyColor,
+          overflowWrap: 'break-word', wordBreak: 'break-word',
         }}>
           {copyText}
         </div>

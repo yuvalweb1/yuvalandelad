@@ -265,6 +265,7 @@ export default {
   lb_eyebrow: 'LEADERBOARD',
   lb_title: 'Who carried the chat',
   lb_least: 'quietest',
+  lb_more: '+{n} more',
   pp_eyebrow: 'BY THE NUMBERS',
   pp_title: 'Everyone, counted',
   pp_row: '{words} words · {avg} avg/msg',

@@ -1,4 +1,4 @@
-import { useMemo, useRef, useEffect } from 'react';
+import { useMemo, useRef } from 'react';
 import SlidesBlobBackground from '../components/SlidesBlobBackground.jsx';
 import { adEnabled } from '../lib/ads.js';
 
@@ -23,15 +23,6 @@ export default function Wrapped({ analytics, diagnostics, selectedAuthor, setSel
 
   const dirRef = useRef(1);
 
-  useEffect(() => {
-    if (slide >= total - 1) return;
-    const id = setTimeout(() => {
-      dirRef.current = 1;
-      setSlide(s => Math.min(s + 1, total - 1));
-    }, 6500);
-    return () => clearTimeout(id);
-  }, [slide, total, setSlide]);
-
   const next = () => { dirRef.current = 1;  setSlide(Math.min(slide + 1, total - 1)); };
   const prev = () => { dirRef.current = -1; setSlide(Math.max(slide - 1, 0)); };
 
@@ -53,12 +44,17 @@ export default function Wrapped({ analytics, diagnostics, selectedAuthor, setSel
         </svg>
       </button>
 
-      {/* Tap zones — pure touch convenience, hidden from assistive tech */}
-      <div onClick={prev} aria-hidden="true" style={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: '30%', zIndex: 4, touchAction: 'pan-y' }} />
-      {slide < total - 1 && <div onClick={next} aria-hidden="true" style={{ position: 'absolute', right: 0, top: 0, bottom: 0, width: '70%', zIndex: 4, touchAction: 'pan-y' }} />}
-
-      {/* Slide with directional transition */}
+      {/* Slide with directional transition. Tap-to-advance lives on this container
+          (not as an overlay) so the slide's scrollable content stays an ancestor of
+          the touch target — otherwise touch-action:pan-y has nothing to scroll. */}
       <div key={`${current}-${selectedAuthor}`}
+        onClick={(e) => {
+          if (e.target.closest('button, a, input, textarea, label, [role="button"]')) return;
+          const rect = e.currentTarget.getBoundingClientRect();
+          const x = e.clientX - rect.left;
+          if (x < rect.width * 0.3) prev();
+          else if (slide < total - 1) next();
+        }}
         className={dirRef.current >= 0 ? 'slide-in-right' : 'slide-in-left'}
         style={{ flex: 1, position: 'relative', overflow: 'hidden', zIndex: 1 }}>
         {SlideComp && <SlideComp a={analytics} u={user} t={t} profile={profile} achievements={userAchievements} onExit={onExit} onMenu={onMenu} />}
