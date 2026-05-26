@@ -115,7 +115,7 @@ function WaMock({ kind, t }) {
       </MiniPhone>
     );
   }
-  // share sheet — final step
+  // share sheet — final step for Android (tap ChatWrapped)
   if (kind === 'share') {
     return (
       <MiniPhone>
@@ -160,6 +160,43 @@ function WaMock({ kind, t }) {
       </MiniPhone>
     );
   }
+  // iOS final step — save to Files, then upload
+  if (kind === 'savefiles') {
+    return (
+      <MiniPhone>
+        <div style={{ height: '100%', background: '#ECE5DD', display: 'flex', flexDirection: 'column' }}>
+          <WaHeader name={t.howto_mock_group} />
+          <ChatBody />
+          <div style={{
+            position: 'absolute', bottom: 0, left: 0, right: 0,
+            background: '#fff', borderRadius: '16px 16px 0 0',
+            boxShadow: '0 -4px 20px rgba(0,0,0,0.18)', padding: '10px 8px 14px',
+          }}>
+            <div style={{ fontSize: 9, fontWeight: 700, color: '#888', marginBottom: 8, textAlign: 'center' }}>Share via…</div>
+            <div style={{ display: 'flex', gap: 8, justifyContent: 'center' }}>
+              {/* Save to Files — highlighted */}
+              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 }}>
+                <div style={{
+                  width: 42, height: 42, borderRadius: 12,
+                  background: '#1C7FD6', display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  boxShadow: '0 0 0 3px #FFD700, 0 0 0 5px #FF69B4', fontSize: 22,
+                }}>📁</div>
+                <div style={{ fontSize: 7, fontWeight: 800, color: '#1C7FD6', textAlign: 'center', lineHeight: 1.1 }}>Save to{'\n'}Files</div>
+              </div>
+              {/* other icons (greyed out) */}
+              {['📧', '💬', '✈️'].map((ic, i) => (
+                <div key={i} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4, opacity: 0.3 }}>
+                  <div style={{ width: 42, height: 42, borderRadius: 12, background: '#eee', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 20 }}>{ic}</div>
+                  <div style={{ fontSize: 7.5, color: '#aaa' }}>App</div>
+                </div>
+              ))}
+            </div>
+          </div>
+          <HandPointer style={{ bottom: 56, insetInlineStart: 26 }} />
+        </div>
+      </MiniPhone>
+    );
+  }
   return null;
 }
 
@@ -167,11 +204,11 @@ function WaMock({ kind, t }) {
 
 function getSteps(platform, t) {
   if (platform === 'ios') return [
-    { k: 'chat',   label: t.howto_ios_1 },
-    { k: 'name',   label: t.howto_ios_2 },
-    { k: 'export', label: t.howto_ios_3 },
-    { k: 'media',  label: t.howto_ios_4 },
-    { k: 'share',  label: t.howto_ios_5 },
+    { k: 'chat',      label: t.howto_ios_1 },
+    { k: 'name',      label: t.howto_ios_2 },
+    { k: 'export',    label: t.howto_ios_3 },
+    { k: 'media',     label: t.howto_ios_4 },
+    { k: 'savefiles', label: t.howto_ios_5 },
   ];
   return [
     { k: 'chat',   label: t.howto_and_1 },

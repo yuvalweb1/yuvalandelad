@@ -1,8 +1,9 @@
 import React from 'react';
 import SlideShell from './SlideShell.jsx';
-import { interp } from '../i18n';
+import { interp, typedCopy } from '../i18n';
 
-const SlideGroupOverview = React.memo(function SlideGroupOverview({ a, t }) {
+const SlideGroupOverview = React.memo(function SlideGroupOverview({ a, t, profile }) {
+  const type = profile?.relationship || 'other';
   const peakHour = (a.groupHourly && a.groupHourly.length)
     ? a.groupHourly.indexOf(Math.max(...a.groupHourly)) : null;
   const fmt = (d) => { try { return new Date(d).toLocaleDateString(undefined, { month: 'short', year: '2-digit' }); } catch { return ''; } };
@@ -23,8 +24,8 @@ const SlideGroupOverview = React.memo(function SlideGroupOverview({ a, t }) {
   return (
     <SlideShell bg="#577590" accent="#573280">
       <div style={{ position: 'relative', height: '100%', display: 'flex', flexDirection: 'column', padding: '36px 24px 24px' }}>
-        <div className="fs-sans a-fade-up" style={{ textAlign: 'center', fontSize: 12, color: '#573280', letterSpacing: '0.15em', fontWeight: 500, textTransform: 'uppercase' }}>{t.go_eyebrow}</div>
-        <div className="fs-display a-fade-up" style={{ textAlign: 'center', animationDelay: '0.15s', fontSize: 30, lineHeight: 1.12, letterSpacing: '-0.03em', fontWeight: 800, color: '#2a0645', marginTop: 8, marginBottom: 18 }}>{t.go_title}</div>
+        <div className="fs-sans a-fade-up" style={{ textAlign: 'center', fontSize: 12, color: '#573280', letterSpacing: '0.15em', fontWeight: 500, textTransform: 'uppercase' }}>{typedCopy(t, 'go_eyebrow', type)}</div>
+        <div className="fs-display a-fade-up" style={{ textAlign: 'center', animationDelay: '0.15s', fontSize: 30, lineHeight: 1.12, letterSpacing: '-0.03em', fontWeight: 800, color: '#2a0645', marginTop: 8, marginBottom: 18 }}>{typedCopy(t, 'go_title', type)}</div>
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
           {tiles.map((tile, i) => (
             <div key={i} className="a-slide-up-far" style={{ background: 'rgba(42,6,69,0.06)', borderRadius: 18, padding: '18px 16px', textAlign: 'center', animationDelay: `${0.4 + i * 0.12}s` }}>

@@ -1,9 +1,11 @@
 import { useMemo, useRef, useEffect, useState } from 'react';
 import SlidesBlobBackground from '../components/SlidesBlobBackground.jsx';
 import { adEnabled } from '../lib/ads.js';
+import { slideHasData } from '../slides';
 
 // Slides hosting playable audio/video — auto-advance pauses while the user
-// listens, and the tap-zone overlays shrink so media controls stay tappable.
+// listens, and the smart tap-to-advance is replaced with explicit chevron
+// buttons so the audio/video controls own the slide area uncontested.
 const MEDIA_SLIDES = new Set(['voice', 'videos']);
 
 export default function Wrapped({ analytics, diagnostics, selectedAuthor, setSelectedAuthor, slide, setSlide, profile, t, onExit, onMenu, onRoastMode, slidesDef, slideComponents }) {
@@ -11,18 +13,13 @@ export default function Wrapped({ analytics, diagnostics, selectedAuthor, setSel
   if (!user) return null;
   const userAchievements = analytics.achievementsByUser[selectedAuthor] || [];
 
+  // Filter slides that lack data. slideHasData centralizes the rule so each
+  // slide id has exactly one place where its "is there anything to show?"
+  // check lives — including stickers/voice/videos (with-media exports only).
   const slides = useMemo(() => slidesDef.filter(s => {
-    // Group-first deck: skip a slide only when its verified data is missing.
-    if (s === 'signature_words' && !analytics.users.some(x => x.topWord)) return false;
-    if (s === 'group_top' && !((analytics.topWordsGroup && analytics.topWordsGroup.length) || (analytics.topEmojisGroup && analytics.topEmojisGroup.length))) return false;
-    if (s === 'photos' && (!analytics.photos || analytics.photos.length === 0)) return false;
-    if (s === 'stickers' && (!analytics.stickers || analytics.stickers.length === 0)) return false;
-    if (s === 'voice' && (!analytics.voice || analytics.voice.length === 0)) return false;
-    if (s === 'videos' && (!analytics.videos || analytics.videos.length === 0)) return false;
-    if (s === 'drama_role' && !user) return false;
     if (s === 'ad' && !adEnabled('interstitial')) return false;
-    return true;
-  }), [selectedAuthor, userAchievements.length, user, analytics, profile]);
+    return slideHasData(s, analytics, user);
+  }), [selectedAuthor, userAchievements.length, user, analytics, profile, slidesDef]);
 
   const total = slides.length;
   const current = slides[slide];
@@ -73,6 +70,18 @@ export default function Wrapped({ analytics, diagnostics, selectedAuthor, setSel
   const next = () => { dirRef.current = 1;  setSlide(Math.min(slide + 1, total - 1)); };
   const prev = () => { dirRef.current = -1; setSlide(Math.max(slide - 1, 0)); };
 
+  // Smart tap handler for non-media slides: clicks on interactive elements
+  // (including native <audio>/<video> controls) pass through; bare-area clicks
+  // advance the deck. Lives on the slide container, not an overlay, so the
+  // slide's own scroll/touch behavior keeps working.
+  const onSlideClick = (e) => {
+    if (e.target.closest('button, a, input, textarea, label, audio, video, [role="button"]')) return;
+    const rect = e.currentTarget.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    if (x < rect.width * 0.3) prev();
+    else if (slide < total - 1) next();
+  };
+
   return (
     <div style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column', background: '#fff5f7' }}>
       <SlidesBlobBackground />
@@ -91,24 +100,7 @@ export default function Wrapped({ analytics, diagnostics, selectedAuthor, setSel
         </svg>
       </button>
 
-      {/* Tap zones — pure touch convenience, hidden from assistive tech.
-          On media slides we drop the overlays entirely (they used to steal
-          clicks from the audio/video play buttons). Nav still works via the
-          explicit chevron buttons below + post-playback auto-advance. */}
-      {!isMediaSlide && (
-        <>
-          <div onClick={prev} aria-hidden="true" style={{
-            position: 'absolute', left: 0, top: 0, bottom: 0,
-            width: '30%', zIndex: 4, touchAction: 'pan-y',
-          }} />
-          {slide < total - 1 && <div onClick={next} aria-hidden="true" style={{
-            position: 'absolute', right: 0, top: 0, bottom: 0,
-            width: '70%', zIndex: 4, touchAction: 'pan-y',
-          }} />}
-        </>
-      )}
-
-      {/* Media slides need explicit nav since the tap overlays are gone. */}
+      {/* Media slides need explicit nav — the slide area belongs to audio/video. */}
       {isMediaSlide && slide > 0 && (
         <button onClick={prev} className="press" aria-label="Previous" style={{
           position: 'absolute', bottom: 18, insetInlineStart: 18, zIndex: 5,
@@ -136,8 +128,9 @@ export default function Wrapped({ analytics, diagnostics, selectedAuthor, setSel
         </button>
       )}
 
-      {/* Slide with directional transition */}
+      {/* Slide with directional transition. */}
       <div ref={slideContainerRef} key={`${current}-${selectedAuthor}`}
+        onClick={isMediaSlide ? undefined : onSlideClick}
         className={dirRef.current >= 0 ? 'slide-in-right' : 'slide-in-left'}
         style={{ flex: 1, position: 'relative', overflow: 'hidden', zIndex: 1 }}>
         {SlideComp && <SlideComp a={analytics} u={user} t={t} profile={profile} achievements={userAchievements} onExit={onExit} onMenu={onMenu} onRoastMode={onRoastMode} />}

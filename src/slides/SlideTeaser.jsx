@@ -23,12 +23,13 @@ const SlideTeaser = React.memo(function SlideTeaser({ t, onMenu, onExit, onRoast
         <div className="fs-sans a-fade-up" style={{ textAlign: 'center', fontSize: 13, color: '#FF69B4', letterSpacing: '0.18em', fontWeight: 800, textTransform: 'uppercase' }}>
           ✨ {t.tz_eyebrow}
         </div>
-        <div className="fs-display a-fade-up" style={{
+        <div className="fs-display a-fade-up" dir="auto" style={{
           textAlign: 'center', animationDelay: '0.15s',
           fontSize: 44, lineHeight: 1.04, letterSpacing: '-0.04em',
           fontWeight: 800, color: '#4A0E4E',
           marginTop: 8, marginBottom: 18,
           textShadow: '0 2px 0 rgba(255,255,255,0.65), 0 1px 3px rgba(74,14,78,0.12)',
+          overflowWrap: 'break-word', wordBreak: 'break-word', padding: '0 8px',
         }}>
           <span style={{ fontStyle: 'italic', color: '#FF69B4' }}>{titleHead}</span>
           {titleTail && ' ' + titleTail}
@@ -52,7 +53,10 @@ const SlideTeaser = React.memo(function SlideTeaser({ t, onMenu, onExit, onRoast
                 background: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center',
                 fontSize: 26, boxShadow: `0 4px 0 ${c.deep}22`, transform: 'rotate(-4deg)',
               }}>{c.icon}</div>
-              <div className="fs-sans" dir="auto" style={{ flex: 1, fontSize: 17, fontWeight: 800, color: '#4A0E4E', letterSpacing: '-0.01em' }}>{c.label}</div>
+              <div className="fs-sans" dir="auto" style={{
+                flex: 1, fontSize: 17, fontWeight: 800, color: '#4A0E4E', letterSpacing: '-0.01em',
+                overflowWrap: 'break-word', wordBreak: 'break-word', lineHeight: 1.25,
+              }}>{c.label}</div>
               <div style={{
                 flexShrink: 0, width: 28, height: 28, borderRadius: 999,
                 background: c.accent, color: '#fff',

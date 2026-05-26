@@ -57,11 +57,13 @@ const SlideDramaRole = React.memo(function SlideDramaRole({ u, t }) {
         </div>
 
         <div className="a-spring" style={{ animationDelay: '0.3s', marginTop: 20 }}>
-          <div className="fs-display" style={{
-            fontSize: titleText.length > 20 ? 36 : 46,
-            lineHeight: 1.05, letterSpacing: '-0.04em',
+          <div className="fs-display" dir="auto" style={{
+            // Three-tier sizing keeps long Hebrew/RTL titles from overflowing.
+            fontSize: titleText.length > 26 ? 30 : titleText.length > 20 ? 36 : 46,
+            lineHeight: 1.08, letterSpacing: '-0.04em',
             fontStyle: 'italic', color: accent, fontWeight: 800,
             textShadow: '0 2px 0 rgba(255,255,255,0.55), 0 1px 3px rgba(74,14,78,0.12)',
+            overflowWrap: 'break-word', wordBreak: 'break-word', padding: '0 8px',
           }}>
             {titleText}
           </div>
@@ -85,15 +87,17 @@ const SlideDramaRole = React.memo(function SlideDramaRole({ u, t }) {
             </div>
             <div className="fs-mono" style={{
               fontSize: 12, color: deep, letterSpacing: '0.12em', marginTop: 8, fontWeight: 800, textTransform: 'uppercase',
+              overflowWrap: 'break-word', wordBreak: 'break-word',
             }}>
               {cleanLabel}
             </div>
           </div>
         </div>
 
-        <div className="fs-sans a-fade-up" style={{
+        <div className="fs-sans a-fade-up" dir="auto" style={{
           animationDelay: '1.3s', marginTop: 26,
           fontSize: 17, lineHeight: 1.5, color: 'rgba(74,14,78,0.78)', fontWeight: 500,
+          overflowWrap: 'break-word', wordBreak: 'break-word',
         }}>
           {copyText}
         </div>

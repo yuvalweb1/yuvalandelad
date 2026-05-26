@@ -30,6 +30,14 @@ export function interp(str, vars) {
   return str.replace(/\{(\w+)\}/g, (_, k) => vars[k] != null ? vars[k] : `{${k}}`);
 }
 
+// Type-aware copy lookup. Returns `t[key_type]` if present, else falls back to `t[key]`.
+// Lets slides keep one set of generic markup while swapping eyebrow/title/sub
+// per chat type (friends/family/work/couple/other).
+export function typedCopy(t, key, type) {
+  if (!type || type === 'other') return t[key];
+  return t[`${key}_${type}`] || t[key];
+}
+
 // Translate a user's title from their stored key + vars
 export function resolveTitle(u, t) {
   if (!u || !u.titleKey) return '';

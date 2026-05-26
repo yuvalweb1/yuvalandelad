@@ -1,5 +1,6 @@
-import { useRef, useState, useCallback } from 'react';
+import { useRef, useState, useCallback, useMemo } from 'react';
 import BottomSheet from '../components/BottomSheet.jsx';
+import { relativeTime } from '../lib/history.js';
 
 const LANGUAGES = [
   { code: 'en', name: 'English', flag: '🇺🇸' },
@@ -14,11 +15,19 @@ const LANGUAGES = [
   { code: 'tr', name: 'Türkçe', flag: '🇹🇷' },
 ];
 
-export default function Landing({ onFile, onDemo, parseError, t, lang, setLang, onHowTo, includeMedia = true, setIncludeMedia }) {
+export default function Landing({
+  onFile, onDemo, parseError, t, lang, setLang, onHowTo,
+  includeMedia = true, setIncludeMedia,
+  history = [], onLoadRecap, onDeleteRecap, onClearHistory,
+}) {
   const fileInputRef = useRef(null);
   const [langOpen, setLangOpen] = useState(false);
   const [shaking, setShaking] = useState(false);
   const [howToPulse, setHowToPulse] = useState(false);
+  const emojiRots = useMemo(() => [10, -13, 16, -9, 12].map(base => {
+    const jitter = ((Math.random() * 12) | 0) - 6;
+    return base + jitter;
+  }), []);
   const currentLang = LANGUAGES.find(l => l.code === lang) || LANGUAGES[0];
 
   const handleCtaClick = useCallback(() => {
@@ -40,16 +49,20 @@ export default function Landing({ onFile, onDemo, parseError, t, lang, setLang, 
         90%      { transform: translateX(3px); }
       }
       @keyframes pulse-guide {
-        0%,100% { box-shadow: 0 4px 18px -4px rgba(74,14,78,0.13); outline: 2px solid transparent; }
-        25%     { box-shadow: 0 6px 28px -4px rgba(74,14,78,0.3), 0 0 0 3px rgba(255,215,0,0.6); outline: 2px solid rgba(255,215,0,0.6); }
-        55%     { box-shadow: 0 5px 22px -4px rgba(74,14,78,0.2), 0 0 0 2px rgba(255,215,0,0.35); outline: 2px solid rgba(255,215,0,0.35); }
+        0%,100% { box-shadow: 0 6px 0 rgba(74,14,78,0.14), 0 16px 28px -8px rgba(74,14,78,0.22); outline: 2px solid transparent; }
+        25%     { box-shadow: 0 6px 0 rgba(74,14,78,0.14), 0 16px 28px -8px rgba(74,14,78,0.30), 0 0 0 3px rgba(255,215,0,0.6); outline: 2px solid rgba(255,215,0,0.6); }
+        55%     { box-shadow: 0 6px 0 rgba(74,14,78,0.14), 0 16px 28px -8px rgba(74,14,78,0.26), 0 0 0 2px rgba(255,215,0,0.35); outline: 2px solid rgba(255,215,0,0.35); }
       }
       .cta-shake { animation: shake-no 0.48s ease-in-out; }
       .guide-pulse { animation: pulse-guide 0.5s ease-in-out; }
+      .recap-row { transition: background-color 0.18s ease-out; }
+      .recap-row:hover { background: rgba(74,14,78,0.06); }
+      .recap-row:active { background: rgba(74,14,78,0.12); }
+      .recap-row:focus-visible { outline: 2px solid rgba(74,14,78,0.4); outline-offset: -2px; }
     `}</style>
     <div style={{
       position: 'relative', display: 'flex', flexDirection: 'column',
-      padding: '44px 20px 22px', height: '100%',
+      padding: '44px 20px 80px', height: '100%',
       background: 'linear-gradient(180deg, #FFF6D6 0%, #FFF0E2 46%, #FDE6F1 100%)',
       overflow: 'hidden',
     }}>
@@ -67,19 +80,30 @@ export default function Landing({ onFile, onDemo, parseError, t, lang, setLang, 
         </div>
         <div className="a-float" style={{ position: 'absolute', top: 232, right: 14, width: 46, height: 32, background: '#4A0E4E', borderRadius: '16px 16px 4px 16px', boxShadow: '0 8px 18px rgba(74,14,78,0.22)', animationDelay: '1.1s' }} />
 
-        {/* emoji stickers — all above midpoint, clear of CTA zone */}
+        {/* paper sticker cards — emoji on a small white note */}
         {[
-          { e: '😂', top: 116, right: 26, rot: -14, size: 30, delay: '0s' },
-          { e: '🔥', top: 198, left: 22, rot: 12, size: 26, delay: '0.7s' },
-          { e: '👀', top: 258, right: 30, rot: -8, size: 24, delay: '1.4s' },
-          { e: '💀', top: 306, left: 30, rot: 10, size: 24, delay: '0.4s' },
-          { e: '✨', top: 88, left: 96, rot: 0, size: 20, delay: '1.8s' },
+          { e: '😂', top: 108, right: 22, size: 28, delay: '0s' },
+          { e: '🔥', top: 196, left: 18, size: 26, delay: '0.7s' },
+          { e: '👀', top: 262, right: 26, size: 24, delay: '1.4s' },
+          { e: '💀', top: 310, left: 26, size: 24, delay: '0.4s' },
+          { e: '✨', top: 82, left: 90, size: 22, delay: '1.8s' },
         ].map((s, i) => (
-          <span key={i} className="a-float" style={{
-            position: 'absolute', top: s.top, bottom: s.bottom, left: s.left, right: s.right,
-            fontSize: s.size, transform: `rotate(${s.rot}deg)`,
-            filter: 'drop-shadow(0 4px 6px rgba(74,14,78,0.28))', animationDelay: s.delay, opacity: 0.92,
-          }}>{s.e}</span>
+          <div key={i} style={{
+            position: 'absolute', top: s.top, left: s.left, right: s.right,
+            transform: `rotate(${emojiRots[i]}deg)`,
+            width: s.size + 22, height: s.size + 22,
+          }}>
+            <div className="a-float" style={{
+              width: '100%', height: '100%',
+              animationDelay: s.delay,
+              background: 'rgba(255,255,255,0.92)',
+              borderRadius: 10,
+              boxShadow: '0 4px 14px rgba(74,14,78,0.18), 0 1px 3px rgba(74,14,78,0.10)',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+            }}>
+              <span style={{ fontSize: s.size, lineHeight: 1 }}>{s.e}</span>
+            </div>
+          </div>
         ))}
       </div>
 
@@ -88,17 +112,16 @@ export default function Landing({ onFile, onDemo, parseError, t, lang, setLang, 
         position: 'relative', zIndex: 10,
         display: 'flex', justifyContent: 'space-between', alignItems: 'center',
       }}>
-        <div className="fs-mono a-fade-up" style={{
-          fontSize: 13, color: '#f06449', letterSpacing: '0.16em',
-          fontWeight: 800, textTransform: 'uppercase',
-        }}>
-          ✦ {t.landing_eyebrow}
+        <div className="a-fade-up" dir="ltr" style={{ display: 'flex', alignItems: 'baseline', gap: 0 }}>
+          <span style={{ fontFamily: 'Georgia, serif', fontSize: 19, fontWeight: 700, letterSpacing: '-0.03em', color: '#4A0E4E' }}>re</span>
+          <span style={{ fontFamily: 'Georgia, serif', fontSize: 19, fontWeight: 700, letterSpacing: '-0.03em', color: '#f06449' }}>capped</span>
         </div>
         <button onClick={() => setLangOpen(true)} className="press" aria-label={t.a11y_change_language || `Change language. Current: ${currentLang.name}`} style={{
           display: 'flex', alignItems: 'center', gap: 5,
           padding: '0 10px', height: 34, borderRadius: 999,
-          background: 'rgba(87,50,128,0.08)', border: '1px solid rgba(87,50,128,0.18)',
+          background: '#FFF6E8', border: '1.5px solid rgba(255,255,255,0.85)',
           color: '#573280', cursor: 'pointer',
+          boxShadow: '0 4px 0 rgba(87,50,128,0.28), 0 10px 18px -6px rgba(87,50,128,0.35)',
         }}>
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
             <circle cx="12" cy="12" r="10"/>
@@ -113,16 +136,30 @@ export default function Landing({ onFile, onDemo, parseError, t, lang, setLang, 
       {/* Hero — emotional promise + subtitle */}
       <div className="a-fade-up" style={{
         position: 'relative', zIndex: 10,
-        marginTop: 26,
+        marginTop: 48,
         animationDelay: '0.12s',
+        textAlign: 'center',
       }}>
         <h1 className="fs-display" style={{
-          fontSize: 'clamp(38px, 11vw, 54px)', lineHeight: 0.98, letterSpacing: '-0.045em',
+          fontSize: 'clamp(34px, 10vw, 52px)', lineHeight: 0.96, letterSpacing: '-0.045em',
           fontWeight: 800, margin: 0, color: '#4A0E4E',
-          textShadow: '0 2px 0 rgba(255,255,255,0.6)',
+          textShadow: '0 1px 0 rgba(255,255,255,0.8), 0 3px 0 rgba(74,14,78,0.18), 0 6px 0 rgba(74,14,78,0.10), 0 12px 18px rgba(74,14,78,0.20)',
+          overflowWrap: 'break-word', wordBreak: 'break-word', hyphens: 'auto',
         }}>
           {t.landing_h1_a}{' '}
-          <span style={{ fontStyle: 'italic', color: '#FF8C00' }}>{t.landing_h1_b}</span>{' '}
+          <span style={{
+            display: 'inline-block',
+            maxWidth: '100%',
+            background: '#FF1867',
+            color: '#fff',
+            padding: '2px 12px 5px',
+            borderRadius: 999,
+            transform: 'rotate(-2.5deg)',
+            verticalAlign: 'middle',
+            boxShadow: '0 6px 0 #B3003F, 0 14px 24px -6px rgba(180,0,60,0.55)',
+            textShadow: '0 1px 0 rgba(0,0,0,0.18)',
+            overflowWrap: 'break-word', wordBreak: 'break-word',
+          }}>{t.landing_h1_b}</span>{' '}
           {t.landing_h1_c}<br/>
           <span>{t.landing_h1_d}</span>
           {t.landing_h1_e ? <> {t.landing_h1_e}</> : null}
@@ -149,6 +186,110 @@ export default function Landing({ onFile, onDemo, parseError, t, lang, setLang, 
       )}
       </div>
 
+      <div className="a-fade-up" style={{
+        position: 'relative', zIndex: 10, flexShrink: 0,
+        marginTop: 12,
+        background: 'rgba(255,255,255,0.82)',
+        border: '1.5px solid rgba(255,255,255,0.95)',
+        borderRadius: 18,
+        padding: '11px 12px',
+        boxShadow: '0 6px 0 rgba(74,14,78,0.14), 0 16px 28px -8px rgba(74,14,78,0.22)',
+        animationDelay: '0.30s',
+      }}>
+        <div style={{
+          display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+          minHeight: 18, padding: '0 4px 6px',
+        }}>
+          <span className="fs-sans" style={{
+            fontSize: 11.5, fontWeight: 700, letterSpacing: '0.04em',
+            textTransform: 'uppercase', color: 'rgba(74,14,78,0.55)',
+          }}>{t.past_recaps}</span>
+          {history.length > 0 && (
+            <button onClick={onClearHistory} className="press fs-sans" style={{
+              background: 'transparent', border: 'none', cursor: 'pointer',
+              padding: '2px 4px', fontSize: 11.5, fontWeight: 700,
+              color: '#d04848', letterSpacing: '-0.01em',
+            }}>{t.past_recaps_clear}</button>
+          )}
+        </div>
+
+        {history.length === 0 ? (
+          <div style={{
+            display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
+            gap: 6, padding: '18px 8px 14px', textAlign: 'center',
+          }}>
+            <div aria-hidden="true" style={{
+              width: 36, height: 36, borderRadius: 999,
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              background: '#fff',
+              border: '1.5px solid rgba(255,255,255,0.9)',
+              fontSize: 18, lineHeight: 1,
+              boxShadow: '0 4px 0 rgba(74,14,78,0.18), 0 10px 18px -4px rgba(74,14,78,0.22)',
+            }}>👀</div>
+            <div className="fs-sans" style={{
+              fontSize: 13, fontWeight: 600, color: 'rgba(74,14,78,0.5)',
+              letterSpacing: '-0.005em',
+            }}>{t.past_recaps_empty}</div>
+          </div>
+        ) : (
+          <div role="list">
+            {history.map((r, i) => {
+              const isLast = i === history.length - 1;
+              return (
+                <div
+                  key={r.id}
+                  role="button"
+                  tabIndex={0}
+                  className="recap-row"
+                  onClick={() => onLoadRecap(r.id)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                      e.preventDefault();
+                      onLoadRecap(r.id);
+                    }
+                  }}
+                  style={{
+                    display: 'flex', alignItems: 'center', gap: 8,
+                    padding: '10px 6px',
+                    borderBottom: isLast ? 'none' : '1px solid rgba(74,14,78,0.09)',
+                    cursor: 'pointer',
+                    borderRadius: 6,
+                  }}
+                >
+                  <span dir="auto" style={{
+                    flex: 1, minWidth: 0,
+                    fontSize: 14, fontWeight: 600, color: '#2a0645',
+                    lineHeight: 1.25,
+                    whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
+                  }}>{r.chatName}</span>
+                  <span className="fs-sans" style={{
+                    flexShrink: 0, fontSize: 11.5, fontWeight: 500,
+                    color: 'rgba(74,14,78,0.5)', letterSpacing: '-0.005em',
+                  }}>{relativeTime(r.date, lang)}</span>
+                  <button
+                    onClick={(e) => { e.stopPropagation(); onDeleteRecap(r.id); }}
+                    onKeyDown={(e) => e.stopPropagation()}
+                    aria-label={t.past_recaps_remove}
+                    className="press"
+                    style={{
+                      flexShrink: 0, width: 22, height: 22,
+                      display: 'flex', alignItems: 'center', justifyContent: 'center',
+                      background: 'transparent', border: 'none', cursor: 'pointer',
+                      color: 'rgba(74,14,78,0.4)', fontSize: 14, lineHeight: 1,
+                      borderRadius: 999, padding: 0,
+                    }}
+                  >✕</button>
+                  <span aria-hidden="true" style={{
+                    flexShrink: 0, fontSize: 16, color: 'rgba(74,14,78,0.55)',
+                    fontWeight: 700, lineHeight: 1,
+                  }}>→</span>
+                </div>
+              );
+            })}
+          </div>
+        )}
+      </div>
+
       <div className="a-fade-up" style={{ position: 'relative', zIndex: 10, flexShrink: 0, paddingTop: 16, animationDelay: '0.45s' }}>
         <input ref={fileInputRef} type="file" accept=".txt,.zip,application/zip,text/plain"
           style={{ display: 'none' }}
@@ -158,11 +299,11 @@ export default function Landing({ onFile, onDemo, parseError, t, lang, setLang, 
         {onHowTo && (
           <div className={howToPulse ? 'guide-pulse' : ''} style={{
             marginBottom: 10,
-            background: 'rgba(255,255,255,0.62)',
-            border: '1.5px solid rgba(255,255,255,0.88)',
+            background: 'rgba(255,255,255,0.82)',
+            border: '1.5px solid rgba(255,255,255,0.95)',
             borderRadius: 18,
             padding: '11px 12px',
-            boxShadow: '0 4px 18px -4px rgba(74,14,78,0.13)',
+            boxShadow: '0 6px 0 rgba(74,14,78,0.14), 0 16px 28px -8px rgba(74,14,78,0.22)',
           }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 9 }}>
               <div style={{
@@ -171,7 +312,7 @@ export default function Landing({ onFile, onDemo, parseError, t, lang, setLang, 
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
                 fontSize: 12, fontWeight: 800,
               }}>1</div>
-              <div className="fs-sans" dir="auto" style={{ flex: 1, fontSize: 13, fontWeight: 600, color: '#2a0645', lineHeight: 1.25 }}>
+              <div className="fs-sans" dir="auto" style={{ flex: 1, minWidth: 0, fontSize: 13, fontWeight: 600, color: '#2a0645', lineHeight: 1.25, overflowWrap: 'break-word', wordBreak: 'break-word' }}>
                 {t.landing_step1}
               </div>
               <button onClick={onHowTo} className="press fs-sans" style={{
@@ -187,7 +328,7 @@ export default function Landing({ onFile, onDemo, parseError, t, lang, setLang, 
             <button onClick={() => fileInputRef.current?.click()} className="press fs-sans" style={{
               display: 'flex', alignItems: 'center', gap: 9,
               width: '100%', background: 'transparent', border: 'none',
-              padding: 0, cursor: 'pointer', textAlign: 'left',
+              padding: 0, cursor: 'pointer', textAlign: 'start',
             }}>
               <div style={{
                 flexShrink: 0, width: 22, height: 22, borderRadius: 999,
@@ -195,12 +336,12 @@ export default function Landing({ onFile, onDemo, parseError, t, lang, setLang, 
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
                 fontSize: 12, fontWeight: 800,
               }}>2</div>
-              <div dir="auto" style={{ flex: 1, fontSize: 13, fontWeight: 600, color: '#2a0645', lineHeight: 1.25 }}>
+              <div dir="auto" style={{ flex: 1, minWidth: 0, fontSize: 13, fontWeight: 600, color: '#2a0645', lineHeight: 1.25, overflowWrap: 'break-word', wordBreak: 'break-word' }}>
                 {t.landing_step2}
               </div>
-              <div style={{
+              <div dir="ltr" style={{
                 flexShrink: 0, padding: '5px 10px',
-                background: 'rgba(74,14,78,0.08)', border: '1.5px solid rgba(74,14,78,0.18)',
+                background: '#FFF6E8', border: '1px solid rgba(74,14,78,0.10)',
                 borderRadius: 9, color: '#4A0E4E', fontSize: 11.5, fontWeight: 700,
                 whiteSpace: 'nowrap', letterSpacing: '-0.01em',
               }}>
@@ -218,7 +359,7 @@ export default function Landing({ onFile, onDemo, parseError, t, lang, setLang, 
           backgroundSize: '200% 200%',
           border: '2px solid rgba(255,255,255,0.7)', borderRadius: 22,
           fontSize: 20, fontWeight: 800, cursor: 'pointer', letterSpacing: '-0.01em',
-          boxShadow: '0 8px 0 #E0A800, 0 18px 34px -6px rgba(224,168,0,0.6)',
+          boxShadow: '0 5px 0 #E0A800, 0 12px 22px -8px rgba(224,168,0,0.45)',
         }}>
           <div className="a-shine" style={{ position: 'absolute', inset: 0 }} />
           <span className="fs-display" style={{ position: 'relative' }}>{t.landing_cta}</span>
@@ -263,27 +404,31 @@ export default function Landing({ onFile, onDemo, parseError, t, lang, setLang, 
         )}
 
         {/* Secondary: demo only — how-to is now surfaced in the prereq card above */}
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', marginTop: 12 }}>
-          <button onClick={onDemo} className="press fs-sans" style={{
-            padding: '8px 4px', background: 'transparent', border: 'none',
-            color: 'rgba(74,14,78,0.55)', fontSize: 14, fontWeight: 600,
-            cursor: 'pointer', textDecoration: 'underline', textUnderlineOffset: 3,
-          }}>
-            {t.landing_demo_soft}
-          </button>
-        </div>
+        {onDemo && (
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', marginTop: 12 }}>
+            <button onClick={onDemo} className="press fs-sans" style={{
+              padding: '8px 4px', background: 'transparent', border: 'none',
+              color: 'rgba(74,14,78,0.55)', fontSize: 14, fontWeight: 600,
+              cursor: 'pointer', textDecoration: 'underline', textUnderlineOffset: 3,
+            }}>
+              {t.landing_demo_soft}
+            </button>
+          </div>
+        )}
+      </div>
 
-        {/* Trust footer */}
-        <div className="fs-sans" style={{
-          display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
-          textAlign: 'center', marginTop: 12,
-          fontSize: 11.5, color: 'rgba(74,14,78,0.45)', lineHeight: 1.4,
-        }}>
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" style={{ flexShrink: 0 }}>
-            <rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>
-          </svg>
-          {t.landing_trust}
-        </div>
+      {/* Trust footer — pinned to bottom of container */}
+      <div className="fs-sans" style={{
+        position: 'absolute', bottom: 20, left: 0, right: 0,
+        display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
+        textAlign: 'center',
+        fontSize: 11.5, color: 'rgba(74,14,78,0.45)', lineHeight: 1.4,
+        pointerEvents: 'none',
+      }}>
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" style={{ flexShrink: 0 }}>
+          <rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+        </svg>
+        {t.landing_trust}
       </div>
 
     {langOpen && (

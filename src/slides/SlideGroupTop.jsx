@@ -1,9 +1,10 @@
 import React from 'react';
 import SlideShell from './SlideShell.jsx';
 import ListSlideDecor from '../components/ListSlideDecor.jsx';
-import { interp } from '../i18n';
+import { interp, typedCopy } from '../i18n';
 
-const SlideGroupTop = React.memo(function SlideGroupTop({ a, t }) {
+const SlideGroupTop = React.memo(function SlideGroupTop({ a, t, profile }) {
+  const type = profile?.relationship || 'other';
   const word = (a.topWordsGroup && a.topWordsGroup[0]) || null;
   const emoji = (a.topEmojisGroup && a.topEmojisGroup[0]) || null;
   if (!word && !emoji) return null;
@@ -18,7 +19,7 @@ const SlideGroupTop = React.memo(function SlideGroupTop({ a, t }) {
         <div className="fs-sans a-fade-up" style={{
           fontSize: 13, color: '#f3722c', letterSpacing: '0.2em', fontWeight: 800, textTransform: 'uppercase',
         }}>
-          💬 {t.gt_eyebrow}
+          💬 {typedCopy(t, 'gt_eyebrow', type)}
         </div>
 
         {emoji && (
