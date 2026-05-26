@@ -16,6 +16,8 @@ import Wrapped from './views/Wrapped.jsx';
 import PostMenu from './views/PostMenu.jsx';
 import VerifyView from './views/VerifyView.jsx';
 import RoastMode from './views/RoastMode.jsx';
+import VideoAdSlot from './components/VideoAdSlot.jsx';
+import { adEnabled } from './lib/ads.js';
 import { SLIDES_BY_TYPE, SLIDE_COMPONENTS } from './slides';
 
 // ============================================================
@@ -105,7 +107,7 @@ function ChatWrappedApp() {
       setAnalytics(a);
       setSelectedAuthor(a.users[0].author);
       setSlide(0);
-      setStage('onboard');
+      setStage(adEnabled('post_parse') ? 'ad_post_parse' : 'onboard');
     } catch (e) {
       console.error(e);
       setParseError(e.message || t.err_format);
@@ -162,7 +164,7 @@ function ChatWrappedApp() {
     setAnalytics(a);
     setSelectedAuthor(a.users[0].author);
     setSlide(0);
-    setStage('onboard');
+    setStage(adEnabled('post_parse') ? 'ad_post_parse' : 'onboard');
   }, [includeMedia]);
 
   // Capacitor Android: MainActivity reads the shared file and calls this global
@@ -270,6 +272,13 @@ function ChatWrappedApp() {
           {stage === 'parsing' && (
             <Parsing fileName={fileName} parsingStage={parsingStage} diagnostics={diagnostics} t={t} />
           )}
+          {stage === 'ad_post_parse' && (
+            <VideoAdSlot
+              slot="post_parse"
+              t={t}
+              onComplete={() => setStage('onboard')}
+            />
+          )}
           {stage === 'onboard' && analytics && (
             <Onboarding
               analytics={analytics}
@@ -281,9 +290,16 @@ function ChatWrappedApp() {
                 if (finalProfile.self && analytics.userMap[finalProfile.self]) {
                   setSelectedAuthor(finalProfile.self);
                 }
-                setStage('wrapped');
+                setStage(adEnabled('pre_wrapped') ? 'ad_pre_wrapped' : 'wrapped');
               }}
-              onSkip={() => setStage('wrapped')}
+              onSkip={() => setStage(adEnabled('pre_wrapped') ? 'ad_pre_wrapped' : 'wrapped')}
+            />
+          )}
+          {stage === 'ad_pre_wrapped' && (
+            <VideoAdSlot
+              slot="pre_wrapped"
+              t={t}
+              onComplete={() => setStage('wrapped')}
             />
           )}
           {stage === 'verify' && diagnostics && analytics && (
@@ -309,8 +325,15 @@ function ChatWrappedApp() {
               profile={profile}
               t={t}
               onExit={() => setStage('landing')}
-              onMenu={() => setStage('menu')}
-              onRoastMode={() => setStage('roastmode')}
+              onMenu={() => setStage(adEnabled('pre_menu') ? 'ad_pre_menu' : 'menu')}
+              onRoastMode={() => setStage(adEnabled('pre_roast') ? 'ad_pre_roast' : 'roastmode')}
+            />
+          )}
+          {stage === 'ad_pre_menu' && (
+            <VideoAdSlot
+              slot="pre_menu"
+              t={t}
+              onComplete={() => setStage('menu')}
             />
           )}
           {stage === 'menu' && analytics && (
@@ -323,7 +346,14 @@ function ChatWrappedApp() {
               onReplay={() => { setSlide(0); setStage('wrapped'); }}
               onReset={reset}
               onDebug={() => setStage('verify')}
-              onRoastMode={() => setStage('roastmode')}
+              onRoastMode={() => setStage(adEnabled('pre_roast') ? 'ad_pre_roast' : 'roastmode')}
+            />
+          )}
+          {stage === 'ad_pre_roast' && (
+            <VideoAdSlot
+              slot="pre_roast"
+              t={t}
+              onComplete={() => setStage('roastmode')}
             />
           )}
           {stage === 'roastmode' && analytics && (

@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { interp, resolveTitle } from '../i18n';
+import ShareSheet from '../components/ShareSheet.jsx';
 
 const WARM_PALETTE = ['#f3722c', '#f9c74f', '#e8533a', '#FF8C00', '#c44d2e', '#8b5a3c'];
 const EXHIBITS = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'];
@@ -47,11 +48,21 @@ function highlightNumbers(text) {
 export default function RoastMode({ analytics, selectedAuthor, setSelectedAuthor, t, onBack }) {
   const [animKey, setAnimKey] = useState(0);
   const [toast, setToast] = useState(null);
+  const [shareOpen, setShareOpen] = useState(false);
 
   const u = analytics.userMap[selectedAuthor];
   if (!u) return null;
 
   const otherUsers = analytics.users.filter(x => x.author !== selectedAuthor);
+
+  // Build the share text from the user's most cutting roast (kicker = punchline).
+  // Falls back to a generic line when the user has no roasts on file.
+  const topRoast = (u.roasts && u.roasts[0]) || null;
+  const topKicker = topRoast ? interp(t[topRoast.kickerKey] || '', topRoast.vars || {}) : '';
+  const shareText = topKicker
+    ? `🔥 ${u.author} ${t.share_caught || 'just got served by ChatWrapped'}.\n\n"${topKicker}"`
+    : `🔥 ${u.author} ${t.share_caught || 'just got served by ChatWrapped'}.`;
+  const shareTitle = `${t.share_title || 'Roast'} · ${u.author}`;
 
   useEffect(() => {
     setAnimKey(k => k + 1);
@@ -245,7 +256,7 @@ export default function RoastMode({ analytics, selectedAuthor, setSelectedAuthor
               </svg>
               Screenshot
             </button>
-            <button className="press" onClick={() => popToast('Link copied')} style={{
+            <button className="press" onClick={() => setShareOpen(true)} style={{
               padding: '10px 18px', background: 'transparent', border: '1.5px solid #f9c74f',
               borderRadius: 999, cursor: 'pointer', color: '#f9c74f',
               fontFamily: 'var(--font-display)', fontWeight: 800, fontSize: 13, letterSpacing: '-0.01em',
@@ -309,6 +320,14 @@ export default function RoastMode({ analytics, selectedAuthor, setSelectedAuthor
           Deterministic. Defensible. Devastating.
         </div>
       </div>
+
+      <ShareSheet
+        open={shareOpen}
+        onClose={() => setShareOpen(false)}
+        title={shareTitle}
+        text={shareText}
+        t={t}
+      />
 
       {/* Toast */}
       {toast && (
