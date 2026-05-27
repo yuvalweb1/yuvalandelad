@@ -104,7 +104,8 @@
       "Bash(2>&1)",
       "Bash(SKIP_CAP_SYNC=1 npx vite build)",
       "Bash(curl -sI http://yuval.ella.org.il/privacy.html)",
-      "Bash(node scripts/generate-icons.mjs)"
+      "Bash(node scripts/generate-icons.mjs)",
+      "Bash(node scripts/generate-ads.mjs)"
     ],
     "additionalDirectories": [
       "\\tmp"
