@@ -85,9 +85,21 @@ export default function Wrapped({ analytics, diagnostics, selectedAuthor, setSel
   return (
     <div style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column', background: '#fff5f7' }}>
       <SlidesBlobBackground />
+
+      {/* Progress bar */}
+      <div style={{ display: 'flex', gap: 3, padding: '12px 12px 8px', zIndex: 5, position: 'relative' }}>
+        {slides.map((_, i) => (
+          <div key={i} style={{
+            flex: 1, height: 2, borderRadius: 2,
+            background: i < slide ? 'rgba(255,255,255,0.6)' : i === slide ? '#fff' : 'rgba(255,255,255,0.25)',
+            transition: 'background 0.3s',
+          }} />
+        ))}
+      </div>
+
       {/* Close */}
       <button onClick={onExit} className="press" aria-label={t.a11y_close || 'Close'} style={{
-        position: 'absolute', top: 16, right: 16, zIndex: 5,
+        position: 'absolute', top: 34, right: 16, zIndex: 5,
         background: 'rgba(0,0,0,0.25)', backdropFilter: 'blur(12px)',
         color: '#fff', border: 'none', width: 40, height: 40,
         borderRadius: '50%', cursor: 'pointer',

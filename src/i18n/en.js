@@ -353,6 +353,16 @@ export default {
   menu_hl_top_emoji: 'top emoji',
   menu_hl_top_word: 'top word',
   menu_hl_avg_reply: 'avg reply',
+  // Hero CTAs surfaced in PostMenu — labels reuse the tz_* family for parity
+  // with SlideTeaser (the "warm-up" deck-final slide).
+  menu_duo_eyebrow: 'DUO MODE',
+  menu_duo_action: 'Duo\nanalysis →',
+  menu_profile_eyebrow: 'PERSONAL',
+  menu_profile_action: 'Your\nprofile →',
+  menu_chaos_eyebrow: 'CHAOS MODE',
+  menu_chaos_action: 'Chaos\ntimeline →',
+  duo_coming_soon: 'Coming soon.',
+  chaos_coming_soon: 'Coming soon.',
   // Roast mode
   rm_back: '← Back',
   rm_title: '🔥 ROAST MODE',

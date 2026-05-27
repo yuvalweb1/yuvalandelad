@@ -34,7 +34,7 @@ const STICKER_POSITIONS = [
 ];
 const STICKER_EMOJIS = ['✨', '🎬', '🎉', '💫', '⭐', '🎯'];
 
-export default function PostMenu({ analytics, diagnostics, selectedAuthor, setSelectedAuthor, t, onReplay, onReset, onDebug, onRoastMode, onOpenSettings }) {
+export default function PostMenu({ analytics, diagnostics, selectedAuthor, setSelectedAuthor, t, onReplay, onReset, onDebug, onRoastMode, onDuo, onChaos, onOpenSettings }) {
   const [pickerOpen, setPickerOpen] = useState(false);
   const u = analytics.userMap[selectedAuthor];
   if (!u) return null;
@@ -182,66 +182,54 @@ export default function PostMenu({ analytics, diagnostics, selectedAuthor, setSe
           </div>
         )}
 
-        {/* Hero CTAs — primary actions, breathing gently. */}
-        <button onClick={onReplay} className="a-fade-up press lift cta-breathe" style={{
-          position: 'relative', overflow: 'hidden', textAlign: 'start',
-          background: `linear-gradient(135deg, ${BANANA} 0%, ${MANGO} 100%)`,
-          border: `3px solid rgba(255,255,255,0.9)`,
-          borderRadius: 26, padding: '24px 22px', cursor: 'pointer',
-          color: EGGPLANT, boxShadow: `0 10px 0 ${MANGO}33, 0 22px 36px -8px ${MANGO}66`,
-          animationDelay: '0.3s',
-        }}>
-          <div className="a-shine" style={{ position: 'absolute', inset: 0 }} />
-          <div aria-hidden="true" className="fs-display cta-icon-drift" style={{
-            position: 'absolute', insetInlineEnd: -10, top: -18, fontSize: 120,
-            opacity: 0.2, lineHeight: 1, fontStyle: 'italic',
-            pointerEvents: 'none',
-          }}>✦</div>
-          <div className="fs-sans" style={{
-            fontSize: 11, letterSpacing: '0.24em', opacity: 0.78, fontWeight: 800,
-            textTransform: 'uppercase',
-          }}>
-            {t.menu_replay}
-          </div>
-          <div dir="auto" className="fs-display" style={{
-            fontSize: 30, lineHeight: 1.0, letterSpacing: '-0.035em', marginTop: 8,
-            whiteSpace: 'pre-line', fontWeight: 800,
-            overflowWrap: 'break-word', wordBreak: 'break-word',
-            textShadow: '0 2px 0 rgba(255,255,255,0.35)',
-          }}>
-            {t.menu_watch}
-          </div>
-        </button>
-
-        <button onClick={onRoastMode} className="a-fade-up press lift cta-breathe-2" style={{
-          marginTop: 12,
-          position: 'relative', overflow: 'hidden', textAlign: 'start',
-          background: `linear-gradient(135deg, ${PINK} 0%, ${ROSE} 100%)`,
-          border: `3px solid rgba(255,255,255,0.9)`,
-          borderRadius: 26, padding: '24px 22px', cursor: 'pointer',
-          color: '#fff', boxShadow: `0 10px 0 ${DEEP_PINK}33, 0 22px 36px -8px ${ROSE}66`,
-          animationDelay: '0.38s',
-        }}>
-          <div className="a-shine" style={{ position: 'absolute', inset: 0 }} />
-          <div aria-hidden="true" className="cta-icon-drift" style={{
-            position: 'absolute', insetInlineEnd: -8, top: -14, fontSize: 86,
-            opacity: 0.28, lineHeight: 1, pointerEvents: 'none',
-          }}>🔥</div>
-          <div className="fs-sans" style={{
-            fontSize: 11, letterSpacing: '0.24em', opacity: 0.95, fontWeight: 800,
-            textTransform: 'uppercase',
-          }}>
-            {t.menu_roast_mode}
-          </div>
-          <div dir="auto" className="fs-display" style={{
-            fontSize: 30, lineHeight: 1.0, letterSpacing: '-0.035em', marginTop: 8,
-            whiteSpace: 'pre-line', fontWeight: 800,
-            overflowWrap: 'break-word', wordBreak: 'break-word',
-            textShadow: '0 2px 0 rgba(0,0,0,0.15)',
-          }}>
-            {t.menu_roast_everyone}
-          </div>
-        </button>
+        {/* Hero CTAs — five primary actions, all sharing the same chunky-pop
+            treatment. Replay first (return to deck), then the four "warm-up"
+            destinations from SlideTeaser (full roast / duo / profile / chaos).
+            Colors match the teaser palette so the menu feels continuous. */}
+        {(() => {
+          const ctas = [
+            { onClick: onReplay,    eyebrow: t.menu_replay,         action: t.menu_watch,           icon: '✦',  bg: `linear-gradient(135deg, ${BANANA} 0%, ${MANGO} 100%)`,    shadow: MANGO,    deep: MANGO,     ink: EGGPLANT, italic: true,  cls: 'cta-breathe'   },
+            { onClick: onRoastMode, eyebrow: t.menu_roast_mode,     action: t.menu_roast_everyone,  icon: '🔥', bg: `linear-gradient(135deg, ${PINK} 0%, ${ROSE} 100%)`,       shadow: DEEP_PINK, deep: ROSE,     ink: '#fff',   italic: false, cls: 'cta-breathe-2' },
+            { onClick: onDuo,       eyebrow: t.menu_duo_eyebrow,    action: t.menu_duo_action,      icon: '👯', bg: `linear-gradient(135deg, #FFD580 0%, #FF8C00 100%)`,       shadow: '#D17000', deep: '#D17000', ink: EGGPLANT, italic: false, cls: 'cta-breathe'   },
+            { onClick: () => setPickerOpen(true), eyebrow: t.menu_profile_eyebrow, action: t.menu_profile_action, icon: '👤', bg: `linear-gradient(135deg, #7FDBFF 0%, ${SKY} 100%)`, shadow: '#0089C4', deep: '#0089C4', ink: EGGPLANT, italic: false, cls: 'cta-breathe-2' },
+            { onClick: onChaos,     eyebrow: t.menu_chaos_eyebrow,  action: t.menu_chaos_action,    icon: '🌪️', bg: `linear-gradient(135deg, #B388FF 0%, ${PURPLE} 100%)`,    shadow: '#6624B0', deep: '#6624B0', ink: '#fff',   italic: false, cls: 'cta-breathe'   },
+          ];
+          return ctas.map((c, i) => c.onClick && (
+            <button key={i} onClick={c.onClick} className={`a-fade-up press lift ${c.cls}`} style={{
+              marginTop: i === 0 ? 0 : 12,
+              position: 'relative', overflow: 'hidden', textAlign: 'start',
+              background: c.bg,
+              border: `3px solid rgba(255,255,255,0.9)`,
+              borderRadius: 26, padding: '24px 22px', cursor: 'pointer',
+              color: c.ink, boxShadow: `0 10px 0 ${c.shadow}33, 0 22px 36px -8px ${c.deep}66`,
+              animationDelay: `${0.3 + i * 0.08}s`,
+            }}>
+              <div className="a-shine" style={{ position: 'absolute', inset: 0 }} />
+              <div aria-hidden="true" className={c.italic ? 'fs-display cta-icon-drift' : 'cta-icon-drift'} style={{
+                position: 'absolute', insetInlineEnd: -10, top: -18, fontSize: c.italic ? 120 : 86,
+                opacity: c.italic ? 0.2 : 0.28, lineHeight: 1,
+                fontStyle: c.italic ? 'italic' : 'normal',
+                pointerEvents: 'none',
+              }}>{c.icon}</div>
+              <div className="fs-sans" style={{
+                fontSize: 11, letterSpacing: '0.24em', opacity: c.ink === '#fff' ? 0.95 : 0.78,
+                fontWeight: 800, textTransform: 'uppercase',
+              }}>
+                {c.eyebrow}
+              </div>
+              <div dir="auto" className="fs-display" style={{
+                fontSize: 30, lineHeight: 1.0, letterSpacing: '-0.035em', marginTop: 8,
+                whiteSpace: 'pre-line', fontWeight: 800,
+                overflowWrap: 'break-word', wordBreak: 'break-word',
+                textShadow: c.ink === '#fff'
+                  ? '0 2px 0 rgba(0,0,0,0.15)'
+                  : '0 2px 0 rgba(255,255,255,0.35)',
+              }}>
+                {c.action}
+              </div>
+            </button>
+          ));
+        })()}
 
         {/* Highlights grid — each card on a white "sticker" with a colored
             pop shadow, exactly like the data cards on every other slide. */}

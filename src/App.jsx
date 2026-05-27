@@ -16,6 +16,8 @@ import Wrapped from './views/Wrapped.jsx';
 import PostMenu from './views/PostMenu.jsx';
 import VerifyView from './views/VerifyView.jsx';
 import RoastMode from './views/RoastMode.jsx';
+import DuoAnalysis from './views/DuoAnalysis.jsx';
+import ChaosTimeline from './views/ChaosTimeline.jsx';
 import Settings from './views/Settings.jsx';
 import VideoAdSlot from './components/VideoAdSlot.jsx';
 import { adEnabled } from './lib/ads.js';
@@ -361,7 +363,15 @@ function ChatWrappedApp() {
               onDebug={() => setStage('verify')}
               onOpenSettings={() => openSettings('menu')}
               onRoastMode={() => setStage(adEnabled('pre_roast') ? 'ad_pre_roast' : 'roastmode')}
+              onDuo={() => setStage('duo')}
+              onChaos={() => setStage('chaos')}
             />
+          )}
+          {stage === 'duo' && analytics && (
+            <DuoAnalysis t={t} onBack={() => setStage('menu')} />
+          )}
+          {stage === 'chaos' && analytics && (
+            <ChaosTimeline t={t} onBack={() => setStage('menu')} />
           )}
           {stage === 'settings' && (
             <Settings
