@@ -91,7 +91,13 @@
       "Bash(grep -r \"t\\\\.\" \"C:\\\\work space\\\\whatsappRecap\\\\yuvalandelad\\\\src\\\\views\" \"C:\\\\work space\\\\whatsappRecap\\\\yuvalandelad\\\\src\\\\components\" | grep -o \"t\\\\.[a-zA-Z_][a-zA-Z0-9_]*\" | sort -u > /tmp/used_keys.txt && wc -l /tmp/used_keys.txt)",
       "Bash(Chaos)",
       "Bash(Personal)",
-      "Bash(HowTo\")"
+      "Bash(HowTo\")",
+      "Bash(git push *)",
+      "Bash(git ls-remote *)",
+      "Bash(curl -sI http://yuval.ella.org.il/)",
+      "Bash(curl -s http://yuval.ella.org.il/)",
+      "Bash(ssh yuvalellaorg@185.162.127.14 \"ls -la public_html/index.html public_html/assets/ 2>&1 | head -10\")",
+      "Bash(curl -s http://yuval.ella.org.il/assets/index-41skvKXZ.js)"
     ],
     "additionalDirectories": [
       "\\tmp"
