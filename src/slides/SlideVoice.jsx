@@ -1,11 +1,9 @@
-import React from 'react';
+import React, { useState } from 'react';
 import SlideShell from './SlideShell.jsx';
 import ListSlideDecor from '../components/ListSlideDecor.jsx';
 import { interp } from '../i18n';
 
-// Opus voice notes are ~constant bitrate (~16 kbps for WhatsApp PTT), so
-// filesize is a deterministic proxy for duration. We don't decode anything.
-const BYTES_PER_SECOND = 2000; // 16 kbps / 8 bits → ~2000 bytes per second
+const BYTES_PER_SECOND = 2000;
 const fmtDuration = (bytes) => {
   const s = Math.max(1, Math.round(bytes / BYTES_PER_SECOND));
   if (s < 60) return `${s}s`;
@@ -13,9 +11,16 @@ const fmtDuration = (bytes) => {
   return `${m}:${String(r).padStart(2, '0')}`;
 };
 
+const MAX_ROWS = 4;
+
 const SlideVoice = React.memo(function SlideVoice({ a, t }) {
-  const list = a.voice || [];
-  if (list.length === 0) return null;
+  const allList = a.voice || [];
+  if (allList.length === 0) return null;
+  const [expanded, setExpanded] = useState(false);
+  const overflow = allList.length - MAX_ROWS;
+  const showOverflow = overflow > 0 && !expanded;
+  const list = showOverflow ? allList.slice(0, MAX_ROWS) : allList;
+  const moreLabel = (t.lb_more || '+{n} more').replace('{n}', overflow);
   return (
     <SlideShell bg="#577590" accent="#00BFFF">
       <ListSlideDecor emojis={['🎙️', '🔊', '🗣️', '🎧', '✨', '💬']} />
@@ -52,6 +57,15 @@ const SlideVoice = React.memo(function SlideVoice({ a, t }) {
               <audio controls preload="metadata" src={v.url} style={{ width: '100%', height: 40 }} />
             </div>
           ))}
+          {showOverflow && (
+            <button onClick={() => setExpanded(true)} className="press" style={{
+              background: 'none', border: 'none', cursor: 'pointer',
+              textAlign: 'center', fontSize: 11, color: '#00BFFF',
+              fontWeight: 700, letterSpacing: '0.12em', padding: '6px 0', width: '100%',
+            }}>
+              {moreLabel} ↓
+            </button>
+          )}
         </div>
       </div>
     </SlideShell>

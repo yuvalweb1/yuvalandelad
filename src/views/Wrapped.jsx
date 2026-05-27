@@ -1,4 +1,4 @@
-import { useMemo, useRef, useEffect, useState } from 'react';
+import { useMemo, useRef } from 'react';
 import SlidesBlobBackground from '../components/SlidesBlobBackground.jsx';
 import { adEnabled } from '../lib/ads.js';
 import { slideHasData } from '../slides';
@@ -28,44 +28,6 @@ export default function Wrapped({ analytics, diagnostics, selectedAuthor, setSel
 
   const dirRef = useRef(1);
   const slideContainerRef = useRef(null);
-  const [mediaPlaying, setMediaPlaying] = useState(false);
-
-  // Reset playback flag on every slide change — a fresh slide can't already be
-  // mid-playback. Without this the flag would stick if a slide unmounts while
-  // its audio was "playing".
-  useEffect(() => { setMediaPlaying(false); }, [current, selectedAuthor]);
-
-  // Watch the slide subtree for any <audio>/<video> play/pause/ended events.
-  // Capture phase because media events do not bubble. We re-query on each
-  // pause/ended to see if ANY player is still active.
-  useEffect(() => {
-    const el = slideContainerRef.current;
-    if (!el) return;
-    const recompute = () => {
-      const meds = el.querySelectorAll('audio, video');
-      const anyPlaying = Array.from(meds).some(m => !m.paused && !m.ended);
-      setMediaPlaying(anyPlaying);
-    };
-    const onPlay = () => setMediaPlaying(true);
-    el.addEventListener('play', onPlay, true);
-    el.addEventListener('pause', recompute, true);
-    el.addEventListener('ended', recompute, true);
-    return () => {
-      el.removeEventListener('play', onPlay, true);
-      el.removeEventListener('pause', recompute, true);
-      el.removeEventListener('ended', recompute, true);
-    };
-  }, [current, selectedAuthor]);
-
-  useEffect(() => {
-    if (slide >= total - 1) return;
-    if (mediaPlaying) return; // don't yank the user away mid-listen
-    const id = setTimeout(() => {
-      dirRef.current = 1;
-      setSlide(s => Math.min(s + 1, total - 1));
-    }, 6500);
-    return () => clearTimeout(id);
-  }, [slide, total, setSlide, mediaPlaying]);
 
   const next = () => { dirRef.current = 1;  setSlide(Math.min(slide + 1, total - 1)); };
   const prev = () => { dirRef.current = -1; setSlide(Math.max(slide - 1, 0)); };
@@ -85,9 +47,21 @@ export default function Wrapped({ analytics, diagnostics, selectedAuthor, setSel
   return (
     <div style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column', background: '#fff5f7' }}>
       <SlidesBlobBackground />
+
+      {/* Progress bar */}
+      <div style={{ position: 'absolute', top: 0, left: 0, right: 0, zIndex: 5, display: 'flex', gap: 5, padding: '14px 14px 0' }}>
+        {slides.map((_, i) => (
+          <div key={i} style={{
+            flex: 1, height: 3, borderRadius: 8,
+            background: i < slide ? 'rgba(255,255,255,0.6)' : i === slide ? '#fff' : 'rgba(255,255,255,0.25)',
+            transition: 'background 0.3s',
+          }} />
+        ))}
+      </div>
+
       {/* Close */}
       <button onClick={onExit} className="press" aria-label={t.a11y_close || 'Close'} style={{
-        position: 'absolute', top: 16, right: 16, zIndex: 5,
+        position: 'absolute', top: 34, right: 16, zIndex: 5,
         background: 'rgba(0,0,0,0.25)', backdropFilter: 'blur(12px)',
         color: '#fff', border: 'none', width: 40, height: 40,
         borderRadius: '50%', cursor: 'pointer',

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import SlideShell from './SlideShell.jsx';
 import ListSlideDecor from '../components/ListSlideDecor.jsx';
 import { typedCopy } from '../i18n';
@@ -11,13 +11,11 @@ const SlideLeaderboard = React.memo(function SlideLeaderboard({ a, t, profile })
   if (users.length === 0) return null;
   const max = users[0].messageCount || 1;
   const medals = ['🥇', '🥈', '🥉'];
-  const DEEP = '#C25516'; // shadow tint for sticker cards
+  const DEEP = '#C25516';
 
-  // Overflow rule: when the chat has more than MAX_ROWS speakers, show the
-  // top (MAX_ROWS - 1) plus a "+X more" tag and the single quietest speaker.
-  // Otherwise show the full list.
+  const [expanded, setExpanded] = useState(false);
   const overflow = users.length - MAX_ROWS;
-  const showOverflow = overflow > 0;
+  const showOverflow = overflow > 0 && !expanded;
   const topUsers = showOverflow ? users.slice(0, MAX_ROWS - 1) : users;
   const quietest = users.length > 1 ? users[users.length - 1] : null;
   const moreLabel = (t.lb_more || '+{n} more').replace('{n}', overflow);
@@ -86,13 +84,14 @@ const SlideLeaderboard = React.memo(function SlideLeaderboard({ a, t, profile })
         <div className="no-sb" style={{ flex: 1, overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: 9, minHeight: 0 }}>
           {topUsers.map((usr, i) => renderRow(usr, i + 1, { isLast: !showOverflow && i === users.length - 1 && users.length > 1 }))}
           {showOverflow && (
-            <div className="a-fade-up" style={{
-              textAlign: 'center', fontSize: 11, color: 'rgba(74,14,78,0.5)',
-              fontWeight: 700, letterSpacing: '0.12em', padding: '4px 0',
-              animationDelay: `${0.4 + (MAX_ROWS - 1) * 0.08}s`,
+            <button onClick={() => setExpanded(true)} className="press" style={{
+              background: 'none', border: 'none', cursor: 'pointer',
+              textAlign: 'center', fontSize: 11, color: '#f3722c',
+              fontWeight: 700, letterSpacing: '0.12em', padding: '6px 0',
+              width: '100%', animationDelay: `${0.4 + (MAX_ROWS - 1) * 0.08}s`,
             }}>
-              {moreLabel}
-            </div>
+              {moreLabel} ↓
+            </button>
           )}
           {showOverflow && quietest && renderRow(quietest, users.length, { isLast: true, key: 'quietest' })}
         </div>
