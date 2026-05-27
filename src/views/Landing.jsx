@@ -22,6 +22,7 @@ export default function Landing({
 }) {
   const fileInputRef = useRef(null);
   const [langOpen, setLangOpen] = useState(false);
+  const [historyOpen, setHistoryOpen] = useState(false);
   const [shaking, setShaking] = useState(false);
   const [howToPulse, setHowToPulse] = useState(false);
   const emojiRots = useMemo(() => [10, -13, 16, -9, 12].map(base => {
@@ -116,35 +117,20 @@ export default function Landing({
           <span style={{ fontFamily: 'Georgia, serif', fontSize: 19, fontWeight: 700, letterSpacing: '-0.03em', color: '#4A0E4E' }}>re</span>
           <span style={{ fontFamily: 'Georgia, serif', fontSize: 19, fontWeight: 700, letterSpacing: '-0.03em', color: '#f06449' }}>capped</span>
         </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-          <button onClick={() => setLangOpen(true)} className="press" aria-label={t.a11y_change_language || `Change language. Current: ${currentLang.name}`} style={{
-            display: 'flex', alignItems: 'center', gap: 5,
-            padding: '0 10px', height: 34, borderRadius: 999,
+        {onOpenSettings && (
+          <button onClick={onOpenSettings} className="press" aria-label={t.settings_title || 'Settings'} style={{
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            width: 34, height: 34, borderRadius: 999,
             background: '#FFF6E8', border: '1.5px solid rgba(255,255,255,0.85)',
             color: '#573280', cursor: 'pointer',
             boxShadow: '0 4px 0 rgba(87,50,128,0.28), 0 10px 18px -6px rgba(87,50,128,0.35)',
           }}>
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-              <circle cx="12" cy="12" r="10"/>
-              <path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+              <circle cx="12" cy="12" r="3" />
+              <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" />
             </svg>
-            <span style={{ fontSize: 12, fontWeight: 700, letterSpacing: '0.01em' }}>{currentLang.name}</span>
           </button>
-          {onOpenSettings && (
-            <button onClick={onOpenSettings} className="press" aria-label={t.settings_title || 'Settings'} style={{
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-              width: 34, height: 34, borderRadius: 999,
-              background: '#FFF6E8', border: '1.5px solid rgba(255,255,255,0.85)',
-              color: '#573280', cursor: 'pointer',
-              boxShadow: '0 4px 0 rgba(87,50,128,0.28), 0 10px 18px -6px rgba(87,50,128,0.35)',
-            }}>
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                <circle cx="12" cy="12" r="3" />
-                <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" />
-              </svg>
-            </button>
-          )}
-        </div>
+        )}
       </div>
 
       {/* Middle — hero. Keeps the CTA pinned & always visible. */}
@@ -202,107 +188,100 @@ export default function Landing({
       )}
       </div>
 
+      {/* Compact utility row — Past Recaps + Media toggle, 50/50.
+          The full recap list opens in a bottom sheet on tap. */}
       <div className="a-fade-up" style={{
         position: 'relative', zIndex: 10, flexShrink: 0,
-        marginTop: 12,
-        background: 'rgba(255,255,255,0.82)',
-        border: '1.5px solid rgba(255,255,255,0.95)',
-        borderRadius: 18,
-        padding: '11px 12px',
-        boxShadow: '0 6px 0 rgba(74,14,78,0.14), 0 16px 28px -8px rgba(74,14,78,0.22)',
+        marginTop: 10, display: 'flex', gap: 8,
         animationDelay: '0.30s',
       }}>
-        <div style={{
-          display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-          minHeight: 18, padding: '0 4px 6px',
-        }}>
-          <span className="fs-sans" style={{
-            fontSize: 11.5, fontWeight: 700, letterSpacing: '0.04em',
-            textTransform: 'uppercase', color: 'rgba(74,14,78,0.55)',
-          }}>{t.past_recaps}</span>
-          {history.length > 0 && (
-            <button onClick={onClearHistory} className="press fs-sans" style={{
-              background: 'transparent', border: 'none', cursor: 'pointer',
-              padding: '2px 4px', fontSize: 11.5, fontWeight: 700,
-              color: '#d04848', letterSpacing: '-0.01em',
-            }}>{t.past_recaps_clear}</button>
-          )}
-        </div>
-
-        {history.length === 0 ? (
-          <div style={{
-            display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
-            gap: 6, padding: '18px 8px 14px', textAlign: 'center',
+        <button
+          onClick={() => history.length > 0 && setHistoryOpen(true)}
+          disabled={history.length === 0}
+          aria-label={t.past_recaps}
+          className="press"
+          style={{
+            flex: 1, minWidth: 0,
+            display: 'flex', alignItems: 'center', gap: 8,
+            padding: '8px 10px',
+            background: 'rgba(255,255,255,0.82)',
+            border: '1.5px solid rgba(255,255,255,0.95)',
+            borderRadius: 14,
+            boxShadow: '0 4px 0 rgba(74,14,78,0.12), 0 10px 18px -6px rgba(74,14,78,0.18)',
+            cursor: history.length > 0 ? 'pointer' : 'default',
+            textAlign: 'start', font: 'inherit',
+            opacity: history.length === 0 ? 0.6 : 1,
           }}>
+          <span aria-hidden="true" style={{ fontSize: 16, flexShrink: 0 }}>👀</span>
+          <div style={{ flex: 1, minWidth: 0 }}>
+            <div className="fs-mono" style={{
+              fontSize: 9, fontWeight: 700, color: 'rgba(74,14,78,0.50)',
+              letterSpacing: '0.14em', textTransform: 'uppercase', lineHeight: 1,
+            }}>{t.past_recaps}</div>
+            <div dir="auto" className="fs-sans" style={{
+              fontSize: 12, fontWeight: 700, color: '#4A0E4E',
+              marginTop: 3, lineHeight: 1,
+              overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+            }}>
+              {history.length === 0
+                ? (t.past_recaps_empty)
+                : history.length === 1
+                  ? history[0].chatName
+                  : `${history.length} ${t.settings_recap_many || 'saved'}`}
+            </div>
+          </div>
+          {history.length > 0 && (
+            <span aria-hidden="true" style={{
+              fontSize: 12, color: '#573280', fontWeight: 800, flexShrink: 0,
+            }}>→</span>
+          )}
+        </button>
+
+        {setIncludeMedia && (
+          <button
+            type="button"
+            onClick={() => setIncludeMedia(!includeMedia)}
+            aria-pressed={includeMedia}
+            aria-label={t.landing_media_title}
+            className="press"
+            style={{
+              flex: 1, minWidth: 0,
+              display: 'flex', alignItems: 'center', gap: 8,
+              padding: '8px 10px',
+              background: includeMedia ? 'rgba(0,191,255,0.12)' : 'rgba(255,255,255,0.82)',
+              border: `1.5px solid ${includeMedia ? 'rgba(0,191,255,0.40)' : 'rgba(255,255,255,0.95)'}`,
+              borderRadius: 14,
+              boxShadow: '0 4px 0 rgba(74,14,78,0.12), 0 10px 18px -6px rgba(74,14,78,0.18)',
+              cursor: 'pointer', textAlign: 'start', font: 'inherit',
+            }}>
+            <span aria-hidden="true" style={{ fontSize: 16, flexShrink: 0 }}>{includeMedia ? '📸' : '📝'}</span>
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <div className="fs-mono" style={{
+                fontSize: 9, fontWeight: 700, color: 'rgba(74,14,78,0.50)',
+                letterSpacing: '0.14em', textTransform: 'uppercase', lineHeight: 1,
+              }}>{t.landing_media_title}</div>
+              <div className="fs-sans" style={{
+                fontSize: 12, fontWeight: 700,
+                color: includeMedia ? '#0089C4' : '#4A0E4E',
+                marginTop: 3, lineHeight: 1,
+              }}>
+                {includeMedia ? (t.landing_media_on_short || 'On') : (t.landing_media_off_short || 'Off')}
+              </div>
+            </div>
+            {/* Mini iOS-style switch */}
             <div aria-hidden="true" style={{
-              width: 36, height: 36, borderRadius: 999,
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-              background: '#fff',
-              border: '1.5px solid rgba(255,255,255,0.9)',
-              fontSize: 18, lineHeight: 1,
-              boxShadow: '0 4px 0 rgba(74,14,78,0.18), 0 10px 18px -4px rgba(74,14,78,0.22)',
-            }}>👀</div>
-            <div className="fs-sans" style={{
-              fontSize: 13, fontWeight: 600, color: 'rgba(74,14,78,0.5)',
-              letterSpacing: '-0.005em',
-            }}>{t.past_recaps_empty}</div>
-          </div>
-        ) : (
-          <div role="list">
-            {history.map((r, i) => {
-              const isLast = i === history.length - 1;
-              return (
-                <div
-                  key={r.id}
-                  role="button"
-                  tabIndex={0}
-                  className="recap-row"
-                  onClick={() => onLoadRecap(r.id)}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter' || e.key === ' ') {
-                      e.preventDefault();
-                      onLoadRecap(r.id);
-                    }
-                  }}
-                  style={{
-                    display: 'flex', alignItems: 'center', gap: 8,
-                    padding: '10px 6px',
-                    borderBottom: isLast ? 'none' : '1px solid rgba(74,14,78,0.09)',
-                    cursor: 'pointer',
-                    borderRadius: 6,
-                  }}
-                >
-                  <span dir="auto" style={{
-                    flex: 1, minWidth: 0,
-                    fontSize: 14, fontWeight: 600, color: '#2a0645',
-                    lineHeight: 1.25,
-                    whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
-                  }}>{r.chatName}</span>
-                  <span className="fs-sans" style={{
-                    flexShrink: 0, fontSize: 11.5, fontWeight: 500,
-                    color: 'rgba(74,14,78,0.5)', letterSpacing: '-0.005em',
-                  }}>{relativeTime(r.date, lang)}</span>
-                  <button
-                    onClick={(e) => { e.stopPropagation(); onDeleteRecap(r.id); }}
-                    onKeyDown={(e) => e.stopPropagation()}
-                    aria-label={t.past_recaps_remove}
-                    className="press"
-                    style={{
-                      flexShrink: 0, width: 22, height: 22,
-                      display: 'flex', alignItems: 'center', justifyContent: 'center',
-                      background: 'transparent', border: 'none', cursor: 'pointer',
-                      color: 'rgba(74,14,78,0.4)', fontSize: 14, lineHeight: 1,
-                      borderRadius: 999, padding: 0,
-                    }}
-                  >✕</button>
-                  <span aria-hidden="true" style={{
-                    flexShrink: 0, fontSize: 16, color: 'rgba(74,14,78,0.55)',
-                    fontWeight: 700, lineHeight: 1,
-                  }}>→</span>
-                </div>
-              );
-            })}
-          </div>
+              flexShrink: 0, width: 24, height: 14, borderRadius: 999,
+              background: includeMedia ? '#00BFFF' : 'rgba(74,14,78,0.18)',
+              position: 'relative', transition: 'background 0.18s',
+            }}>
+              <div style={{
+                position: 'absolute', top: 2, insetInlineStart: includeMedia ? 12 : 2,
+                width: 10, height: 10, borderRadius: '50%', background: '#fff',
+                boxShadow: '0 1px 2px rgba(0,0,0,0.18)',
+                transition: 'inset-inline-start 0.18s',
+              }} />
+            </div>
+          </button>
         )}
       </div>
 
@@ -381,44 +360,6 @@ export default function Landing({
           <span className="fs-display" style={{ position: 'relative' }}>{t.landing_cta}</span>
         </button>
 
-        {/* Media toggle — turns on/off photos, voice, sticker, video analysis */}
-        {setIncludeMedia && (
-          <button
-            type="button"
-            onClick={() => setIncludeMedia(!includeMedia)}
-            aria-pressed={includeMedia}
-            className="press"
-            style={{
-              display: 'flex', alignItems: 'center', gap: 10,
-              width: '100%', marginTop: 10, padding: '11px 14px',
-              background: includeMedia ? 'rgba(0,191,255,0.14)' : 'rgba(74,14,78,0.05)',
-              border: `2px solid ${includeMedia ? 'rgba(0,191,255,0.45)' : 'rgba(74,14,78,0.12)'}`,
-              borderRadius: 16, cursor: 'pointer', font: 'inherit', textAlign: 'start',
-            }}>
-            <div style={{ fontSize: 22, flexShrink: 0 }}>{includeMedia ? '📸' : '📝'}</div>
-            <div style={{ flex: 1, minWidth: 0 }}>
-              <div className="fs-sans" style={{ fontSize: 14, fontWeight: 800, color: '#4A0E4E', lineHeight: 1.15 }}>
-                {t.landing_media_title}
-              </div>
-              <div className="fs-mono" style={{ fontSize: 11, color: 'rgba(74,14,78,0.6)', marginTop: 2 }}>
-                {includeMedia ? t.landing_media_on : t.landing_media_off}
-              </div>
-            </div>
-            {/* iOS-style switch */}
-            <div style={{
-              flexShrink: 0, width: 40, height: 24, borderRadius: 999,
-              background: includeMedia ? '#00BFFF' : 'rgba(74,14,78,0.18)',
-              position: 'relative', transition: 'background 0.18s',
-            }}>
-              <div style={{
-                position: 'absolute', top: 2, insetInlineStart: includeMedia ? 18 : 2,
-                width: 20, height: 20, borderRadius: '50%', background: '#fff',
-                boxShadow: '0 1px 3px rgba(0,0,0,0.18)', transition: 'inset-inline-start 0.18s',
-              }} />
-            </div>
-          </button>
-        )}
-
         {/* Secondary: demo only — how-to is now surfaced in the prereq card above */}
         {onDemo && (
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', marginTop: 12 }}>
@@ -467,6 +408,49 @@ export default function Landing({
                 <span style={{ color: '#f9c74f', fontSize: 18 }}>✓</span>
               )}
             </button>
+          ))}
+        </BottomSheet>
+      )}
+
+      {historyOpen && (
+        <BottomSheet onClose={() => setHistoryOpen(false)} title={t.past_recaps}>
+          {history.map(r => (
+            <div key={r.id} style={{
+              display: 'flex', alignItems: 'center', gap: 10,
+              padding: '14px 8px', minHeight: 56,
+              borderBottom: '1px solid #2a2a36',
+            }}>
+              <button
+                onClick={() => { onLoadRecap(r.id); setHistoryOpen(false); }}
+                className="press"
+                style={{
+                  flex: 1, minWidth: 0,
+                  display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: 3,
+                  background: 'transparent', border: 'none', color: '#f4f4f8',
+                  textAlign: 'start', cursor: 'pointer', padding: 0,
+                }}>
+                <div dir="auto" style={{
+                  fontSize: 18, fontWeight: 600, color: '#f4f4f8',
+                  overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+                  width: '100%',
+                }}>{r.chatName}</div>
+                <div className="fs-mono" style={{
+                  fontSize: 12, color: '#c8c8dc', letterSpacing: '0.04em',
+                }}>{relativeTime(r.date, lang)}</div>
+              </button>
+              <button
+                onClick={() => onDeleteRecap(r.id)}
+                aria-label={t.past_recaps_remove}
+                className="press"
+                style={{
+                  flexShrink: 0, width: 32, height: 32,
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  background: 'rgba(255,255,255,0.06)', border: 'none', cursor: 'pointer',
+                  color: 'rgba(255,255,255,0.55)', fontSize: 15,
+                  borderRadius: 999,
+                }}
+              >✕</button>
+            </div>
           ))}
         </BottomSheet>
       )}
