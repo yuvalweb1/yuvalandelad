@@ -1,4 +1,19 @@
 import { useState } from 'react';
+import BottomSheet from '../components/BottomSheet.jsx';
+
+// Languages list — same set used in Landing/Settings. Keep in sync.
+const LANGUAGES = [
+  { code: 'en', name: 'English', flag: '🇺🇸' },
+  { code: 'he', name: 'עברית', flag: '🇮🇱' },
+  { code: 'es', name: 'Español', flag: '🇪🇸' },
+  { code: 'fr', name: 'Français', flag: '🇫🇷' },
+  { code: 'de', name: 'Deutsch', flag: '🇩🇪' },
+  { code: 'pt', name: 'Português', flag: '🇧🇷' },
+  { code: 'it', name: 'Italiano', flag: '🇮🇹' },
+  { code: 'ru', name: 'Русский', flag: '🇷🇺' },
+  { code: 'ar', name: 'العربية', flag: '🇸🇦' },
+  { code: 'tr', name: 'Türkçe', flag: '🇹🇷' },
+];
 
 // ── mini WhatsApp phone mockups ──────────────────────────────────────────────
 
@@ -221,9 +236,11 @@ function getSteps(platform, t) {
 
 // ── main component ────────────────────────────────────────────────────────────
 
-export default function HowToGuide({ t, onStart }) {
+export default function HowToGuide({ t, onStart, lang, setLang }) {
   const [platform, setPlatform] = useState('ios');
   const [stepIdx, setStepIdx] = useState(0);
+  const [langOpen, setLangOpen] = useState(false);
+  const currentLang = LANGUAGES.find(l => l.code === lang) || LANGUAGES[0];
 
   const steps = getSteps(platform, t);
   const step = steps[stepIdx];
@@ -247,10 +264,36 @@ export default function HowToGuide({ t, onStart }) {
         <div style={{ position: 'absolute', bottom: -60, left: -60, width: 200, height: 200, borderRadius: '50%', background: '#FF69B4', opacity: 0.28, filter: 'blur(70px)' }} />
       </div>
 
-      {/* ── top bar: eyebrow + platform toggle ── */}
+      {/* ── top bar: eyebrow + lang picker + platform toggle ── */}
       <div style={{ position: 'relative', zIndex: 10, flexShrink: 0, padding: '44px 20px 0' }}>
-        <div className="fs-mono" style={{ fontSize: 11, color: '#FF8C00', letterSpacing: '0.18em', fontWeight: 700, textTransform: 'uppercase', marginBottom: 14 }}>
-          ✦ {t.howto_eyebrow}
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 10, marginBottom: 14 }}>
+          <div className="fs-mono" style={{
+            fontSize: 11, color: '#FF8C00', letterSpacing: '0.18em',
+            fontWeight: 700, textTransform: 'uppercase',
+            overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+          }}>
+            ✦ {t.howto_eyebrow}
+          </div>
+          {setLang && (
+            <button
+              onClick={() => setLangOpen(true)}
+              className="press"
+              aria-label={t.a11y_change_language || `Change language. Current: ${currentLang.name}`}
+              style={{
+                flexShrink: 0,
+                display: 'flex', alignItems: 'center', gap: 5,
+                padding: '0 10px', height: 28, borderRadius: 999,
+                background: '#FFF6E8', border: '1.5px solid rgba(255,255,255,0.9)',
+                color: '#4A0E4E', cursor: 'pointer',
+                boxShadow: '0 3px 0 rgba(74,14,78,0.18), 0 8px 14px -6px rgba(74,14,78,0.25)',
+                font: 'inherit',
+              }}>
+              <span style={{ fontSize: 14, lineHeight: 1 }}>{currentLang.flag}</span>
+              <span style={{ fontSize: 11.5, fontWeight: 700, letterSpacing: '-0.01em' }}>
+                {currentLang.name}
+              </span>
+            </button>
+          )}
         </div>
         <div style={{ display: 'flex', gap: 4, padding: 4, background: 'rgba(74,14,78,0.07)', borderRadius: 16 }}>
           {[{ id: 'ios', label: `🍏 ${t.howto_ios}` }, { id: 'android', label: `🤖 ${t.howto_android}` }].map(({ id, label }) => (
@@ -320,6 +363,30 @@ export default function HowToGuide({ t, onStart }) {
           </span>
         </button>
       </div>
+
+      {langOpen && (
+        <BottomSheet onClose={() => setLangOpen(false)} title={t.settings_language || 'Language'}>
+          {LANGUAGES.map(l => (
+            <button key={l.code} className="press" onClick={() => {
+              setLang(l.code);
+              setLangOpen(false);
+            }} style={{
+              width: '100%', padding: '16px 8px', minHeight: 56, background: 'transparent',
+              border: 'none', borderBottom: '1px solid #2a2a36', color: '#f4f4f8',
+              fontSize: 23, fontWeight: 500, textAlign: 'left', cursor: 'pointer',
+              display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 12,
+            }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                <span style={{ fontSize: 22 }}>{l.flag}</span>
+                <span style={{ fontSize: 23, fontWeight: 600 }}>{l.name}</span>
+              </div>
+              {l.code === lang && (
+                <span style={{ color: '#f9c74f', fontSize: 18 }}>✓</span>
+              )}
+            </button>
+          ))}
+        </BottomSheet>
+      )}
     </div>
   );
 }

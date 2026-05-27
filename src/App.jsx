@@ -287,6 +287,8 @@ function ChatWrappedApp() {
           {stage === 'howto' && (
             <HowToGuide
               t={t}
+              lang={lang}
+              setLang={setLang}
               onStart={() => {
                 try { localStorage.setItem('cw_seen_guide', '1'); } catch {}
                 setStage('landing');
