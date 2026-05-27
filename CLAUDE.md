@@ -11,34 +11,36 @@ npm run build       # production build to dist/
 npm run preview     # serve dist/ locally
 ```
 
-There are no tests, no linter, and no type checker configured. "Working" means: builds clean, runs in the browser, the demo flow (Try Demo button on landing) plays through all 23 slides without errors.
+There are no tests, no linter, and no type checker configured. "Working" means: builds clean, runs in the browser, the demo flow (Try Demo link on landing) plays through every slide without errors.
 
 ## Architecture
 
-This is a **single-page React app where essentially the whole product lives in [src/App.jsx](src/App.jsx)** (~7150 LOC). [src/main.jsx](src/main.jsx) is a 9-line bootstrap. Treat App.jsx as a structured monolith — sections are demarcated with `// ===` banner comments. Use those banners (or the function names below) to navigate; do not split the file without a reason, since keeping everything in one module is an intentional simplicity choice (see README).
+This was originally a single-file React app — `src/App.jsx` is still the stage-machine root, but pipeline code has been pulled into focused modules. Roughly: parsing → analytics → slides → stage rendering. Inline styles + a small `<style>` block in `src/components/GlobalStyles.jsx`. No Tailwind, no CSS modules, no Framer Motion. Animations are CSS keyframes + the `useAnimatedNumber` hook ([src/hooks/useAnimatedNumber.js](src/hooks/useAnimatedNumber.js)). The app renders inside a `100vw × 100vh` "phone frame" (`.cw-frame`) — design for a 9:16 mobile viewport, not desktop.
 
 ### The pipeline
 
-1. **ZIP decoder** — [`readZipText`](src/App.jsx#L280) hand-parses the ZIP central directory and uses the browser-native `DecompressionStream('deflate-raw')`. There is no JSZip dependency. If you add file-format support, extend this directly.
-2. **Parser** — [`parseWhatsApp`](src/App.jsx#L91) handles iOS `[DD.MM.YYYY, HH:MM:SS] Sender: msg` and Android `DD/MM/YY, HH:MM - Sender: msg`. Assumes DD/MM order. Strips LRM/RLM/directional marks (critical for Hebrew exports). Classifies system / deleted / media / voice via the `*_PATTERNS` arrays at the top. Returns `{ messages, diagnostics }` — diagnostics are surfaced in VerifyView, so every parser change should keep those counters honest.
-3. **Analytics** — [`computeAll`](src/App.jsx#L341) is the only consumer of parsed messages. It produces per-user + group stats (bursts, conversation revivals/kills, trimmed-mean response times, eras, chaos moments, etc.). Every downstream slide reads from this object — do not compute metrics inside slides.
-4. **Social layer** — deterministic rule engine inside `computeAll` and per-user fields. Titles, roasts, achievements, group descriptions all ship with an `evidence` string. **No LLM, no randomness, no network.** Same input → same output. Preserve this invariant.
-5. **i18n** — [`I18N`](src/App.jsx#L1171) object holds every user-facing string keyed by locale (`en` is the fallback). [`buildT(lang)`](src/App.jsx#L3716) merges the requested locale over `en`. RTL is driven by `RTL_LANGS` (`he`, `ar`) and the `dir` attribute on the inner frame. When you add UI copy, add it as a key in `I18N.en` (and ideally `I18N.he`) — do not inline English strings into slides.
-6. **Slides** — order lives in [`SLIDES_DEF`](src/App.jsx#L4367) (an array of 23 string ids). Each id maps to a `Slide*` component lower in the file. [`Wrapped`](src/App.jsx#L4658) is the auto-advancing player (6.5s/slide). To add/reorder slides, edit `SLIDES_DEF` and add the component — there is no separate registration step.
+1. **ZIP decoder** — [src/parser/zip.js](src/parser/zip.js) hand-parses the ZIP central directory and inflates entries via `DecompressionStream('deflate-raw')`. Supports Zip64 (archives > 4 GB or > 65,535 entries). No JSZip dependency. `readZipText` returns the transcript; `readZipBundle` returns text + photos/voice/videos/stickers (each capped).
+2. **Parser** — [src/parser/parse.js](src/parser/parse.js) handles iOS `[DD.MM.YYYY, HH:MM:SS] Sender: msg` and Android `DD/MM/YY, HH:MM - Sender: msg`. Strips LRM/RLM/directional marks (critical for Hebrew exports). Classifies system / deleted / media / voice via `*_PATTERNS` arrays in [src/parser/patterns.js](src/parser/patterns.js). Returns `{ messages, diagnostics }` — diagnostics are surfaced in VerifyView, so every parser change should keep those counters honest.
+3. **Web Worker** — parsing runs in [src/parser/worker.js](src/parser/worker.js) via the [src/parser/client.js](src/parser/client.js) wrapper so huge exports never block the UI. Returns blob URLs for media; main thread is responsible for revoking them (see `reset()` in App.jsx).
+4. **Analytics** — [src/lib/analytics.js](src/lib/analytics.js) `computeAll` is the only consumer of parsed messages. It produces per-user + group stats (bursts, conversation revivals/kills, trimmed-mean response times, eras, chaos moments, etc.). Every downstream slide reads from this object — do not compute metrics inside slides.
+5. **Social layer** — deterministic rule engine inside `computeAll` and per-user fields. Titles, roasts, achievements, group descriptions all ship with an `evidence` string. **No LLM, no randomness, no network.** Same input → same output. Preserve this invariant.
+6. **i18n** — [src/i18n/](src/i18n/) holds one file per locale (`en.js` is the canonical key list and fallback). [src/i18n/index.js](src/i18n/index.js) exposes `buildT(lang)` (merges requested locale over `en`), `RTL_LANGS` (`he`, `ar`), `typedCopy(t, key, type)` (relationship-aware copy), and `interp(template, vars)`. When you add UI copy, add it to `en.js` first (and ideally `he.js`) — never inline English strings into components.
+7. **Slides** — [src/slides/index.js](src/slides/index.js) exports `SLIDE_COMPONENTS` (id → component map), `SLIDES_BY_TYPE` (per chat-type ordered lineup: `friends` / `family` / `work` / `couple` / `other`), and `slideHasData(id, analytics, user)` (per-slide data check). Wrapped picks the lineup by `profile.relationship`, filters via `slideHasData`. Generic "metric" slides (night_owls, early_birds, etc.) are factories around [src/slides/SlideMetric.jsx](src/slides/SlideMetric.jsx). To add a slide: add the component, register it in `SLIDE_COMPONENTS`, add data-check case in `slideHasData`, append to relevant `SLIDES_BY_TYPE` lineups.
 
 ### The stage machine
 
-[`ChatWrappedApp`](src/App.jsx#L3736) holds a `stage` string with these transitions:
+`ChatWrappedApp` in [src/App.jsx](src/App.jsx) holds a `stage` string. Current transitions:
 
 ```
-landing → parsing → onboard → wrapped ⇄ menu → { verify | roastmode | wrapped(replay) | landing(reset) }
+howto → landing → parsing → [ad_post_parse] → onboard → [ad_pre_wrapped] → wrapped
+                ↓
+            settings (from gear icon; returns to caller via settingsReturn)
+                ↓
+wrapped → [ad_pre_menu] → menu → { verify | [ad_pre_roast] → roastmode
+                                  | duo | chaos | profile | wrapped(replay) | landing(reset) }
 ```
 
-State (analytics, diagnostics, profile, selectedAuthor, lang) lives on this component and is threaded down as props. There is no context, no store, no router.
-
-### Styling
-
-Inline styles + `<style>` blocks in [`GlobalStyles`](src/App.jsx#L3931). No Tailwind, no CSS modules, no Framer Motion — animations are CSS keyframes and the `useAnimatedNumber` hook ([line 1121](src/App.jsx#L1121)). The whole app renders inside a fixed 380px-wide "phone frame" — design for that 9:16 viewport, not desktop width.
+Square brackets `[...]` are video-ad gates — only entered when `adEnabled(slot)` is true. State (analytics, diagnostics, profile, selectedAuthor, lang, isPremium, history) lives on this component and threads down as props. No context, no store, no router.
 
 ## Invariants worth preserving
 

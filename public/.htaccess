@@ -21,7 +21,7 @@
 # forever (immutable). Anything else (HTML entry, manifest, service worker)
 # must NOT cache — the SW relies on a fresh check to ship updates.
 <IfModule mod_headers.c>
-  <FilesMatch "\.(js|css|woff2|woff|png|jpg|jpeg|gif|svg|webp|ico)$">
+  <FilesMatch "\.(js|css|woff2|woff|ttf|otf|png|jpg|jpeg|gif|svg|webp|avif|ico|wasm|mp4|webm|mp3|m4a|opus|ogg)$">
     Header set Cache-Control "public, max-age=31536000, immutable"
   </FilesMatch>
   <FilesMatch "^(index\.html|manifest\.json|sw\.js)$">

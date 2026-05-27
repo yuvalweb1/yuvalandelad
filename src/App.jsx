@@ -216,7 +216,9 @@ function ChatWrappedApp() {
       fetch(url)
         .then(r => r.blob())
         .then(b => handleFileRef.current(new File([b], name, { type })))
-        .catch(err => console.error('Failed to load shared file', err));
+        // Silent in production: a failed shared-file fetch isn't actionable
+        // by the user. Set localStorage `cw_debug='1'` to surface it.
+        .catch(err => { if (localStorage.getItem('cw_debug') === '1') console.error('Failed to load shared file', err); });
     };
     return () => { delete window.__capacitorSharedFile; };
   }, []);
@@ -313,7 +315,9 @@ function ChatWrappedApp() {
                 onDeleteRecap={handleDeleteRecap}
                 onClearHistory={handleClearHistory}
               />
-              {promoOpen && !isPremium && (
+              {/* shouldShowPromo() already returns false when isPremium is true,
+                  so promoOpen alone is the sufficient condition. */}
+              {promoOpen && (
                 <PremiumPromo
                   t={t}
                   onUpgrade={acceptPromo}
