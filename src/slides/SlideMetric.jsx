@@ -218,14 +218,15 @@ const SlideMetric = React.memo(function SlideMetric({ a, t, profile, metricKey }
               </div>
             );
           })}
-          {showOverflow && (
-            <div className="a-fade-up" style={{
-              textAlign: 'center', fontSize: 11, color: 'rgba(42,6,69,0.45)',
-              fontWeight: 700, letterSpacing: '0.12em', padding: '4px 0',
-              animationDelay: `${0.4 + MAX_ROWS * 0.08}s`,
+          {showOverflow && !expanded && (
+            <button onClick={() => setExpanded(true)} className="press" style={{
+              background: 'none', border: 'none', cursor: 'pointer',
+              textAlign: 'center', fontSize: 11, color: def.color,
+              fontWeight: 700, letterSpacing: '0.12em', padding: '6px 0',
+              width: '100%', animationDelay: `${0.4 + MAX_ROWS * 0.08}s`,
             }}>
-              {moreLabel}
-            </div>
+              {moreLabel} ↓
+            </button>
           )}
         </div>
       </div>
