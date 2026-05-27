@@ -102,7 +102,9 @@
       "Bash(file public/recapped_logo_clean*.png)",
       "Bash(ssh yuvalellaorg@185.162.127.14 \"cat > repositories/site.git/hooks/post-receive && chmod +x repositories/site.git/hooks/post-receive && echo 'hook updated' && cat repositories/site.git/hooks/post-receive\")",
       "Bash(2>&1)",
-      "Bash(SKIP_CAP_SYNC=1 npx vite build)"
+      "Bash(SKIP_CAP_SYNC=1 npx vite build)",
+      "Bash(curl -sI http://yuval.ella.org.il/privacy.html)",
+      "Bash(node scripts/generate-icons.mjs)"
     ],
     "additionalDirectories": [
       "\\tmp"
