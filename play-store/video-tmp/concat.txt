@@ -1,0 +1,3 @@
+file 'C:/work space/whatsappRecap/yuvalandelad/play-store/video-tmp/intro.mp4'
+file 'C:/work space/whatsappRecap/yuvalandelad/play-store/video-tmp/main.mp4'
+file 'C:/work space/whatsappRecap/yuvalandelad/play-store/video-tmp/outro.mp4'

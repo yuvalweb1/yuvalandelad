@@ -105,7 +105,11 @@
       "Bash(SKIP_CAP_SYNC=1 npx vite build)",
       "Bash(curl -sI http://yuval.ella.org.il/privacy.html)",
       "Bash(node scripts/generate-icons.mjs)",
-      "Bash(node scripts/generate-ads.mjs)"
+      "Bash(node scripts/generate-ads.mjs)",
+      "Bash(powershell -Command \"Invoke-Item 'play-store/ad-square-1080-en.png'; Start-Sleep -Seconds 1; Invoke-Item 'play-store/ad-story-1080x1920-en.png'; Start-Sleep -Seconds 1; Invoke-Item 'play-store/feature-graphic-1024x500-en.png'; Start-Sleep -Seconds 1; explorer.exe play-store\")",
+      "Bash(node scripts/record-demo.mjs)",
+      "Bash(powershell -Command \"Invoke-Item 'play-store/demo.mp4'\")",
+      "Bash(powershell -Command 'Add-Type -AssemblyName System.Speech; \\(New-Object System.Speech.Synthesis.SpeechSynthesizer\\).GetInstalledVoices\\(\\) | ForEach-Object { Write-Host \\($_.VoiceInfo.Name + '\\\\'' ['\\\\'' + $_.VoiceInfo.Culture.Name + '\\\\'']'\\\\''\\) }')"
     ],
     "additionalDirectories": [
       "\\tmp"
