@@ -1,12 +1,19 @@
-import React from 'react';
+import React, { useState } from 'react';
 import SlideShell from './SlideShell.jsx';
 import ListSlideDecor from '../components/ListSlideDecor.jsx';
 import { interp, typedCopy } from '../i18n';
 
+const MAX_ROWS = 6;
+
 const SlidePerPerson = React.memo(function SlidePerPerson({ a, t, profile }) {
   const type = profile?.relationship || 'other';
-  const users = a.users || [];
-  if (users.length === 0) return null;
+  const allUsers = a.users || [];
+  if (allUsers.length === 0) return null;
+  const [expanded, setExpanded] = useState(false);
+  const overflow = allUsers.length - MAX_ROWS;
+  const showOverflow = overflow > 0 && !expanded;
+  const users = showOverflow ? allUsers.slice(0, MAX_ROWS) : allUsers;
+  const moreLabel = (t.lb_more || '+{n} more').replace('{n}', overflow);
   const DEEP = '#0089C4';
   return (
     <SlideShell bg="#577590" accent="#277da1">
@@ -45,6 +52,15 @@ const SlidePerPerson = React.memo(function SlidePerPerson({ a, t, profile }) {
               </div>
             </div>
           ))}
+          {showOverflow && (
+            <button onClick={() => setExpanded(true)} className="press" style={{
+              background: 'none', border: 'none', cursor: 'pointer',
+              textAlign: 'center', fontSize: 11, color: '#277da1',
+              fontWeight: 700, letterSpacing: '0.12em', padding: '6px 0', width: '100%',
+            }}>
+              {moreLabel} ↓
+            </button>
+          )}
         </div>
       </div>
     </SlideShell>

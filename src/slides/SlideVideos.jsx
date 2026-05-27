@@ -1,13 +1,20 @@
-import React from 'react';
+import React, { useState } from 'react';
 import SlideShell from './SlideShell.jsx';
 import ListSlideDecor from '../components/ListSlideDecor.jsx';
 import { interp } from '../i18n';
 
 const fmtMB = (bytes) => (bytes / (1024 * 1024)).toFixed(1) + ' MB';
 
+const MAX_ROWS = 2;
+
 const SlideVideos = React.memo(function SlideVideos({ a, t }) {
-  const list = a.videos || [];
-  if (list.length === 0) return null;
+  const allList = a.videos || [];
+  if (allList.length === 0) return null;
+  const [expanded, setExpanded] = useState(false);
+  const overflow = allList.length - MAX_ROWS;
+  const showOverflow = overflow > 0 && !expanded;
+  const list = showOverflow ? allList.slice(0, MAX_ROWS) : allList;
+  const moreLabel = (t.lb_more || '+{n} more').replace('{n}', overflow);
   return (
     <SlideShell bg="#577590" accent="#FF8C00">
       <ListSlideDecor emojis={['🎬', '🎥', '🍿', '📹', '✨', '🎞️']} />
@@ -46,6 +53,15 @@ const SlideVideos = React.memo(function SlideVideos({ a, t }) {
               </div>
             </div>
           ))}
+          {showOverflow && (
+            <button onClick={() => setExpanded(true)} className="press" style={{
+              background: 'none', border: 'none', cursor: 'pointer',
+              textAlign: 'center', fontSize: 11, color: '#FF8C00',
+              fontWeight: 700, letterSpacing: '0.12em', padding: '6px 0', width: '100%',
+            }}>
+              {moreLabel} ↓
+            </button>
+          )}
         </div>
       </div>
     </SlideShell>

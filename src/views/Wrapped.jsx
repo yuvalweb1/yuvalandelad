@@ -87,10 +87,10 @@ export default function Wrapped({ analytics, diagnostics, selectedAuthor, setSel
       <SlidesBlobBackground />
 
       {/* Progress bar */}
-      <div style={{ display: 'flex', gap: 3, padding: '12px 12px 8px', zIndex: 5, position: 'relative' }}>
+      <div style={{ position: 'absolute', top: 0, left: 0, right: 0, zIndex: 5, display: 'flex', gap: 5, padding: '14px 14px 0' }}>
         {slides.map((_, i) => (
           <div key={i} style={{
-            flex: 1, height: 2, borderRadius: 2,
+            flex: 1, height: 3, borderRadius: 8,
             background: i < slide ? 'rgba(255,255,255,0.6)' : i === slide ? '#fff' : 'rgba(255,255,255,0.25)',
             transition: 'background 0.3s',
           }} />

@@ -1,10 +1,17 @@
-import React from 'react';
+import React, { useState } from 'react';
 import SlideShell from './SlideShell.jsx';
 import { typedCopy } from '../i18n';
 
+const MAX_ROWS = 7;
+
 const SlideSignatureEmoji = React.memo(function SlideSignatureEmoji({ a, t, profile }) {
-  const rows = (a.users || []).filter(u => u.topEmoji);
-  if (rows.length === 0) return null;
+  const allRows = (a.users || []).filter(u => u.topEmoji);
+  if (allRows.length === 0) return null;
+  const [expanded, setExpanded] = useState(false);
+  const overflow = allRows.length - MAX_ROWS;
+  const showOverflow = overflow > 0 && !expanded;
+  const rows = showOverflow ? allRows.slice(0, MAX_ROWS) : allRows;
+  const moreLabel = (t.lb_more || '+{n} more').replace('{n}', overflow);
 
   const type = profile?.relationship || 'other';
   const eyebrow = typedCopy(t, 'se_eyebrow', type);
@@ -55,6 +62,15 @@ const SlideSignatureEmoji = React.memo(function SlideSignatureEmoji({ a, t, prof
               </div>
             </div>
           ))}
+          {showOverflow && (
+            <button onClick={() => setExpanded(true)} className="press" style={{
+              background: 'none', border: 'none', cursor: 'pointer',
+              textAlign: 'center', fontSize: 11, color: '#f94144',
+              fontWeight: 700, letterSpacing: '0.12em', padding: '6px 0', width: '100%',
+            }}>
+              {moreLabel} ↓
+            </button>
+          )}
         </div>
       </div>
     </SlideShell>

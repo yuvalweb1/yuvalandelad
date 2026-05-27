@@ -1,13 +1,20 @@
-import React from 'react';
+import React, { useState } from 'react';
 import SlideShell from './SlideShell.jsx';
 import ListSlideDecor from '../components/ListSlideDecor.jsx';
 import { interp } from '../i18n';
+
+const MAX_TILES = 9;
 
 // Top stickers used in the chat — already deduped & ranked by repeat count
 // (see readZipBundle → sticker hash-dedup).
 const SlideStickers = React.memo(function SlideStickers({ a, t }) {
   const all = a.stickers || [];
   if (all.length === 0) return null;
+  const [expanded, setExpanded] = useState(false);
+  const overflow = all.length - MAX_TILES;
+  const showOverflow = overflow > 0 && !expanded;
+  const shown = showOverflow ? all.slice(0, MAX_TILES) : all;
+  const moreLabel = (t.lb_more || '+{n} more').replace('{n}', overflow);
   const tilts = [-4, 3, -2, 4, -3, 2, -4, 3, -1, 2, -3, 4];
   const totalUses = all.reduce((s, x) => s + (x.count || 1), 0);
   return (
@@ -31,7 +38,7 @@ const SlideStickers = React.memo(function SlideStickers({ a, t }) {
         </div>
         <div className="no-sb" style={{ flex: 1, overflowY: 'auto', WebkitOverflowScrolling: 'touch' }}>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 10, paddingBottom: 12 }}>
-            {all.map((s, i) => (
+            {shown.map((s, i) => (
               <div key={s.url} className="a-spring" style={{
                 position: 'relative', aspectRatio: '1 / 1', borderRadius: 14, overflow: 'visible',
                 background: '#fff', padding: 6, transform: `rotate(${tilts[i % tilts.length]}deg)`,
@@ -51,6 +58,15 @@ const SlideStickers = React.memo(function SlideStickers({ a, t }) {
               </div>
             ))}
           </div>
+          {showOverflow && (
+            <button onClick={() => setExpanded(true)} className="press" style={{
+              background: 'none', border: 'none', cursor: 'pointer',
+              textAlign: 'center', fontSize: 11, color: '#FF69B4',
+              fontWeight: 700, letterSpacing: '0.12em', padding: '6px 0', width: '100%',
+            }}>
+              {moreLabel} ↓
+            </button>
+          )}
         </div>
       </div>
     </SlideShell>
