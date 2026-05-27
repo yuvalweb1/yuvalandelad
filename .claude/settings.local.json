@@ -80,7 +80,8 @@
       "Bash(rm -f scripts/test-systemauthor.mjs)",
       "Bash(curl -s -o /dev/null -w \"dev: %{http_code}\\\\n\" http://localhost:5173/)",
       "Bash(git fetch *)",
-      "Bash(curl -sv -o /dev/null https://yuval.ella.org.il/)"
+      "Bash(curl -sv -o /dev/null https://yuval.ella.org.il/)",
+      "Bash(powershell -Command 'Get-NetTCPConnection -LocalPort 5173 -ErrorAction SilentlyContinue | Select-Object -First 1 -ExpandProperty OwningProcess | ForEach-Object { Stop-Process -Id $_ -Force; Write-Host \"killed PID $_\" }')"
     ]
   }
 }
