@@ -174,15 +174,20 @@ function ChatWrappedApp() {
     setStage(adEnabled('post_parse') ? 'ad_post_parse' : 'onboard');
   }, [includeMedia]);
 
-  // Capacitor Android: MainActivity reads the shared file and calls this global
-  // with base64 content once the WebView is ready.
+  // Capacitor Android: MainActivity copies the shared file into the app's cache
+  // dir and hands us the *path* (not the bytes). We fetch it via Capacitor's
+  // file-serving URL, which gives us a Blob backed by the WebView's blob storage —
+  // the parser's Blob.slice() reads then pull byte ranges on demand instead of
+  // holding the whole archive (potentially hundreds of MB) in JS heap.
   const handleFileRef = useRef(handleFile);
   useEffect(() => { handleFileRef.current = handleFile; }, [handleFile]);
   useEffect(() => {
-    window.__capacitorSharedFile = (base64, name, type) => {
-      const bytes = Uint8Array.from(atob(base64), c => c.charCodeAt(0));
-      const file = new File([bytes], name, { type });
-      handleFileRef.current(file);
+    window.__capacitorSharedFile = (path, name, type) => {
+      const url = window.Capacitor?.convertFileSrc?.(path) || ('file://' + path);
+      fetch(url)
+        .then(r => r.blob())
+        .then(b => handleFileRef.current(new File([b], name, { type })))
+        .catch(err => console.error('Failed to load shared file', err));
     };
     return () => { delete window.__capacitorSharedFile; };
   }, []);

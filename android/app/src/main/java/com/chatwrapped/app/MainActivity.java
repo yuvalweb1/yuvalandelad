@@ -8,21 +8,23 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.provider.OpenableColumns;
-import android.util.Base64;
 import com.getcapacitor.BridgeActivity;
-import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.InputStream;
 
 public class MainActivity extends BridgeActivity {
 
-    // Held in memory until the WebView is ready to receive it.
-    private String pendingBase64;
+    // Path to the cached copy of the shared file, held until the WebView consumes it.
+    // The raw bytes NEVER cross the JS bridge — only this path string does.
+    private String pendingPath;
     private String pendingName;
     private String pendingType;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        cleanupStaleCache();
         handleShareIntent(getIntent());
     }
 
@@ -54,45 +56,55 @@ public class MainActivity extends BridgeActivity {
                 cursor.close();
             }
 
-            // Read file bytes
+            // Stream the file straight to disk — no in-memory accumulation, no base64.
+            // For a 500 MB WhatsApp export this peaks at ~64 KB resident on the Java
+            // side instead of the ~3 GB the old ByteArrayOutputStream + Base64 path
+            // forced through Java heap and the WebView bridge.
+            File outFile = new File(getCacheDir(), "shared_" + System.currentTimeMillis() + ".bin");
             InputStream is = getContentResolver().openInputStream(uri);
             if (is == null) return;
-            ByteArrayOutputStream out = new ByteArrayOutputStream();
-            byte[] chunk = new byte[8192];
-            int n;
-            while ((n = is.read(chunk)) > 0) out.write(chunk, 0, n);
-            is.close();
+            FileOutputStream os = new FileOutputStream(outFile);
+            try {
+                byte[] chunk = new byte[64 * 1024];
+                int n;
+                while ((n = is.read(chunk)) > 0) os.write(chunk, 0, n);
+            } finally {
+                try { is.close(); } catch (Exception ignored) {}
+                try { os.close(); } catch (Exception ignored) {}
+            }
 
             String type = getContentResolver().getType(uri);
             if (type == null) type = name.endsWith(".txt") ? "text/plain" : "application/zip";
 
-            pendingBase64 = Base64.encodeToString(out.toByteArray(), Base64.NO_WRAP);
+            pendingPath = outFile.getAbsolutePath();
             pendingName = name;
             pendingType = type;
             scheduleDelivery(0);
         } catch (Exception e) {
-            pendingBase64 = null;
+            pendingPath = null;
         }
     }
 
-    // Retry delivering the file to the WebView until window.__capacitorSharedFile is registered.
+    // Retry delivering the path to the WebView until window.__capacitorSharedFile is registered.
     private void scheduleDelivery(int attempt) {
-        if (pendingBase64 == null || attempt > 20) return;
+        if (pendingPath == null || attempt > 20) return;
         long delay = attempt == 0 ? 300 : Math.min(300L * (1 << Math.min(attempt, 4)), 3000);
         new Handler(Looper.getMainLooper()).postDelayed(() -> {
-            if (getBridge() == null || pendingBase64 == null) return;
+            if (getBridge() == null || pendingPath == null) return;
             String safeName = pendingName.replace("\\", "\\\\").replace("'", "\\'");
+            String safePath = pendingPath.replace("\\", "\\\\").replace("'", "\\'");
+            String safeType = pendingType.replace("\\", "\\\\").replace("'", "\\'");
             String js =
                 "(function(){" +
                 "  try {" +
                 "    if (typeof window.__capacitorSharedFile !== 'function') return 'noop';" +
-                "    window.__capacitorSharedFile('" + pendingBase64 + "','" + safeName + "','" + pendingType + "');" +
+                "    window.__capacitorSharedFile('" + safePath + "','" + safeName + "','" + safeType + "');" +
                 "    return 'ok';" +
                 "  } catch(e) { return 'err'; }" +
                 "})()";
             getBridge().getWebView().evaluateJavascript(js, result -> {
                 if ("\"ok\"".equals(result)) {
-                    pendingBase64 = null;
+                    pendingPath = null;
                     pendingName = null;
                     pendingType = null;
                 } else {
@@ -100,5 +112,22 @@ public class MainActivity extends BridgeActivity {
                 }
             });
         }, delay);
+    }
+
+    // The JS side reads the cache file via fetch(Capacitor.convertFileSrc(path)). We don't
+    // know exactly when it's done, so we sweep leftovers on next app start instead of
+    // trying to coordinate a delete signal across the bridge.
+    private void cleanupStaleCache() {
+        try {
+            File dir = getCacheDir();
+            File[] files = dir.listFiles();
+            if (files == null) return;
+            for (File f : files) {
+                if (f.getName().startsWith("shared_")) {
+                    //noinspection ResultOfMethodCallIgnored
+                    f.delete();
+                }
+            }
+        } catch (Exception ignored) {}
     }
 }
