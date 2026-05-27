@@ -20,22 +20,27 @@ import { fileURLToPath } from 'node:url';
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 
-// Per-language copy. The Hebrew sample name "Maya" is romanized in the
-// English creative so the same audience read the punchline at a glance.
+// Per-language copy. NOTE: Hebrew is currently disabled (see the loop at
+// the bottom) because librsvg — which sharp uses to rasterize SVG — does
+// not reliably bidi-shape Hebrew text or place mid-line accent spans
+// correctly. The HE entries are kept for the day we swap to a Chromium-
+// based renderer (puppeteer / playwright), or for hand-editing in Canva.
 const COPY = {
   en: {
-    kicker: 'your WhatsApp,',
-    punch:  'WRAPPED.',
-    sub:    '13 slides · stats · roasts',
+    kicker:    'your WhatsApp,',
+    punch:     'WRAPPED.',
+    sub:       '13 slides · stats · roasts',
+    subBanner: '13 slides · stats · roasts · 100% on your device',
     verdictLabel: '✦  VERDICT',
     verdictLine1: (name) => ['Send this to ', name, '.'],
     verdictLine2: 'You know you want to.',
     sampleName: 'Maya',
   },
   he: {
-    kicker: 'ה-WhatsApp שלך,',
-    punch:  'עטוף.',
-    sub:    '13 שקופיות · סטטיסטיקות · רואסטים',
+    kicker:    'ה-WhatsApp שלך,',
+    punch:     'עטוף.',
+    sub:       '13 שקופיות · סטטיסטיקות · רואסטים',
+    subBanner: '13 שקופיות · סטטיסטיקות · רואסטים · 100% במכשיר שלך',
     verdictLabel: '✦  VERDICT',
     verdictLine1: (name) => ['שלח את זה ל', name, '.'],
     verdictLine2: 'אתה יודע שאתה רוצה.',
@@ -79,26 +84,29 @@ function buildSvg({ w, h, layout, c }) {
   }
   if (layout === 'banner') {
     // 1024×500 landscape — Play Store feature graphic.
+    // Two columns: text on the left, Verdict card on the right. Sizing was
+    // tuned so 'WRAPPED.' at fontSize 120 (width ~480px) plus 30px gap fits
+    // before the card column starts at x=560.
     return `
-      <text x="60" y="160" font-family="Georgia, serif" font-style="italic"
-            font-size="44" fill="rgba(74,14,78,0.85)">
+      <text x="50" y="130" font-family="Georgia, serif" font-style="italic"
+            font-size="40" fill="rgba(74,14,78,0.85)">
         ${c.kicker}
       </text>
-      <text x="60" y="320" font-family="Inter Tight, Inter, Arial, sans-serif"
-            font-size="170" font-weight="900" fill="#4A0E4E"
-            letter-spacing="-5">
+      <text x="50" y="250" font-family="Inter Tight, Inter, Arial, sans-serif"
+            font-size="100" font-weight="900" fill="#4A0E4E"
+            letter-spacing="-4">
         ${c.punch}
       </text>
-      <text x="60" y="400" font-family="Inter, Arial, sans-serif"
-            font-size="26" fill="rgba(74,14,78,0.65)" font-weight="600">
-        ${c.sub} · 100% on your device
+      <text x="50" y="330" font-family="Inter, Arial, sans-serif"
+            font-size="22" fill="rgba(74,14,78,0.70)" font-weight="600">
+        ${c.subBanner}
       </text>
-      <text x="60" y="450" font-family="Georgia, serif" font-style="italic"
+      <text x="50" y="390" font-family="Georgia, serif" font-style="italic"
             font-size="32" fill="#4A0E4E" font-weight="700">
         chat<tspan fill="#FF8C00">wrapped</tspan>
       </text>
 
-      ${verdictCard({ cx: 740, cy: 250, w: 520, h: 280, c })}
+      ${verdictCard({ cx: 800, cy: 250, w: 400, h: 240, c, compact: true })}
     `;
   }
   // Default: 1080×1080 square — Instagram / Facebook feed.
@@ -129,9 +137,15 @@ function buildSvg({ w, h, layout, c }) {
 
 // The faux roast verdict card — small dark rounded rectangle with a yellow
 // stamp label and an italic 2-line tagline. cx/cy is the card's CENTER.
-function verdictCard({ cx, cy, w, h, c }) {
+// `compact` shrinks the text for narrow cards (used in the banner layout
+// where the card has to share the canvas with the WRAPPED. word).
+function verdictCard({ cx, cy, w, h, c, compact = false }) {
   const x = cx - w / 2;
   const y = cy - h / 2;
+  const labelSize = compact ? 16 : 22;
+  const labelSpace = compact ? 3 : 5;
+  const lineSize  = compact ? 32 : 46;
+  const subSize   = compact ? 18 : 26;
   // verdictLine1 returns [prefix, highlightedName, suffix]; we splice the
   // accent-colored sample name in the middle while keeping the rest white.
   const [pre, name, post] = c.verdictLine1(c.sampleName);
@@ -145,18 +159,18 @@ function verdictCard({ cx, cy, w, h, c }) {
       </defs>
       <rect x="${x}" y="${y}" width="${w}" height="${h}" rx="28"
             fill="url(#cardGrad)" stroke="rgba(243,114,44,0.30)" stroke-width="2" />
-      <text x="${x + w / 2}" y="${y + 60}" font-family="Inter, Arial, sans-serif"
-            font-size="22" fill="#f9c74f" text-anchor="middle"
-            font-weight="800" letter-spacing="5">
+      <text x="${x + w / 2}" y="${y + (compact ? 44 : 60)}" font-family="Inter, Arial, sans-serif"
+            font-size="${labelSize}" fill="#f9c74f" text-anchor="middle"
+            font-weight="800" letter-spacing="${labelSpace}">
         ${c.verdictLabel}
       </text>
-      <text x="${x + w / 2}" y="${y + h / 2 + 10}" font-family="Georgia, serif"
-            font-style="italic" font-size="46" fill="#fff" text-anchor="middle"
+      <text x="${x + w / 2}" y="${y + h / 2 + 8}" font-family="Georgia, serif"
+            font-style="italic" font-size="${lineSize}" fill="#fff" text-anchor="middle"
             font-weight="700">
         ${pre}<tspan fill="#f3722c">${name}</tspan>${post}
       </text>
-      <text x="${x + w / 2}" y="${y + h - 50}" font-family="Inter, Arial, sans-serif"
-            font-size="26" fill="rgba(255,255,255,0.55)" text-anchor="middle">
+      <text x="${x + w / 2}" y="${y + h - (compact ? 36 : 50)}" font-family="Inter, Arial, sans-serif"
+            font-size="${subSize}" fill="rgba(255,255,255,0.55)" text-anchor="middle">
         ${c.verdictLine2}
       </text>
     </g>
@@ -194,10 +208,14 @@ async function render(out, w, h, layout, lang) {
   console.log('  ✓', out, `${w}×${h}`, `(${buf.length.toLocaleString()} bytes)`);
 }
 
+// Hebrew is disabled — see COPY comment above. Re-enable by adding 'he'.
+const LANGS = ['en'];
+
 console.log('Generating ad creatives...\n');
-for (const lang of ['en', 'he']) {
+for (const lang of LANGS) {
   await render(`play-store/ad-square-1080-${lang}.png`,           1080, 1080, 'square', lang);
   await render(`play-store/ad-story-1080x1920-${lang}.png`,       1080, 1920, 'story',  lang);
   await render(`play-store/feature-graphic-1024x500-${lang}.png`, 1024, 500,  'banner', lang);
 }
-console.log('\nDone. 6 creatives written to play-store/.');
+console.log(`\nDone. ${LANGS.length * 3} creatives written to play-store/.`);
+console.log('Hebrew creatives: build in Canva — see play-store/AD_COPY.md.');
