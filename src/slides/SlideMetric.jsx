@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import SlideShell from './SlideShell.jsx';
 import { typedCopy, interp } from '../i18n';
 
@@ -122,11 +122,18 @@ export function metricHasData(metricKey, a) {
   return def.rows(a).length >= 1;
 }
 
+const MAX_ROWS = 7;
+
 const SlideMetric = React.memo(function SlideMetric({ a, t, profile, metricKey }) {
   const def = METRIC_DEFS[metricKey];
   if (!def) return null;
-  const rows = def.rows(a);
-  if (rows.length === 0) return null;
+  const allRows = def.rows(a);
+  if (allRows.length === 0) return null;
+  const overflow = allRows.length - MAX_ROWS;
+  const showOverflow = overflow > 0;
+  const [expanded, setExpanded] = useState(false);
+  const rows = (showOverflow && !expanded) ? allRows.slice(0, MAX_ROWS) : allRows;
+  const moreLabel = (t.lb_more || '+{n} more').replace('{n}', overflow);
 
   const type = profile?.relationship || 'other';
   const eyebrow = typedCopy(t, `m_${metricKey}_eyebrow`, type);
@@ -211,6 +218,15 @@ const SlideMetric = React.memo(function SlideMetric({ a, t, profile, metricKey }
               </div>
             );
           })}
+          {showOverflow && (
+            <div className="a-fade-up" style={{
+              textAlign: 'center', fontSize: 11, color: 'rgba(42,6,69,0.45)',
+              fontWeight: 700, letterSpacing: '0.12em', padding: '4px 0',
+              animationDelay: `${0.4 + MAX_ROWS * 0.08}s`,
+            }}>
+              {moreLabel}
+            </div>
+          )}
         </div>
       </div>
     </SlideShell>
