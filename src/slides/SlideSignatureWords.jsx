@@ -32,7 +32,7 @@ const SlideSignatureWords = React.memo(function SlideSignatureWords({ a, t, prof
         }}>
           {typedCopy(t, 'sw_title', type)}
         </div>
-        <div className="no-sb" style={{ flex: 1, overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: 10 }}>
+        <div className="no-sb" style={{ flex: 1, overflowY: showOverflow ? 'hidden' : 'auto', display: 'flex', flexDirection: 'column', gap: 10 }}>
           {rows.map((usr, i) => (
             <div key={usr.author} dir="auto" className="a-slide-up-far" style={{
               display: 'flex', alignItems: 'center', gap: 12,
@@ -41,6 +41,7 @@ const SlideSignatureWords = React.memo(function SlideSignatureWords({ a, t, prof
               borderRadius: 22,
               border: '2px solid rgba(255,255,255,0.85)',
               boxShadow: `0 6px 0 ${DEEP}22, 0 14px 24px -8px ${DEEP}55`,
+              flexShrink: 0,
               animationDelay: `${0.4 + i * 0.1}s`,
             }}>
               <div className="fs-sans" style={{ width: '34%', flexShrink: 0, fontSize: 14, fontWeight: 700, color: 'rgba(74,14,78,0.75)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{usr.author}</div>

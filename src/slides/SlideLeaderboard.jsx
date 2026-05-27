@@ -32,7 +32,7 @@ const SlideLeaderboard = React.memo(function SlideLeaderboard({ a, t, profile })
         borderRadius: 20,
         border: `2px solid ${isWinner ? '#FFD700' : 'rgba(255,255,255,0.85)'}`,
         boxShadow: `0 6px 0 ${DEEP}22, 0 14px 24px -8px ${DEEP}55`,
-        overflow: 'hidden',
+        overflow: 'hidden', flexShrink: 0,
         animationDelay: `${0.4 + (displayRank - 1) * 0.08}s`,
       }}>
         {/* bar fill (over the white card) */}

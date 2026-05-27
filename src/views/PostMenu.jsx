@@ -34,7 +34,7 @@ const STICKER_POSITIONS = [
 ];
 const STICKER_EMOJIS = ['✨', '🎬', '🎉', '💫', '⭐', '🎯'];
 
-export default function PostMenu({ analytics, diagnostics, selectedAuthor, setSelectedAuthor, t, onReplay, onReset, onDebug, onRoastMode, onDuo, onChaos, onOpenSettings }) {
+export default function PostMenu({ analytics, diagnostics, selectedAuthor, setSelectedAuthor, t, onReplay, onReset, onDebug, onRoastMode, onDuo, onChaos, onProfile, onOpenSettings }) {
   const [pickerOpen, setPickerOpen] = useState(false);
   const u = analytics.userMap[selectedAuthor];
   if (!u) return null;
@@ -191,7 +191,7 @@ export default function PostMenu({ analytics, diagnostics, selectedAuthor, setSe
             { onClick: onReplay,    eyebrow: t.menu_replay,         action: t.menu_watch,           icon: '✦',  bg: `linear-gradient(135deg, ${BANANA} 0%, ${MANGO} 100%)`,    shadow: MANGO,    deep: MANGO,     ink: EGGPLANT, italic: true,  cls: 'cta-breathe'   },
             { onClick: onRoastMode, eyebrow: t.menu_roast_mode,     action: t.menu_roast_everyone,  icon: '🔥', bg: `linear-gradient(135deg, ${PINK} 0%, ${ROSE} 100%)`,       shadow: DEEP_PINK, deep: ROSE,     ink: '#fff',   italic: false, cls: 'cta-breathe-2' },
             { onClick: onDuo,       eyebrow: t.menu_duo_eyebrow,    action: t.menu_duo_action,      icon: '👯', bg: `linear-gradient(135deg, #FFD580 0%, #FF8C00 100%)`,       shadow: '#D17000', deep: '#D17000', ink: EGGPLANT, italic: false, cls: 'cta-breathe'   },
-            { onClick: () => setPickerOpen(true), eyebrow: t.menu_profile_eyebrow, action: t.menu_profile_action, icon: '👤', bg: `linear-gradient(135deg, #7FDBFF 0%, ${SKY} 100%)`, shadow: '#0089C4', deep: '#0089C4', ink: EGGPLANT, italic: false, cls: 'cta-breathe-2' },
+            { onClick: onProfile, eyebrow: t.menu_profile_eyebrow, action: t.menu_profile_action, icon: '👤', bg: `linear-gradient(135deg, #7FDBFF 0%, ${SKY} 100%)`, shadow: '#0089C4', deep: '#0089C4', ink: EGGPLANT, italic: false, cls: 'cta-breathe-2' },
             { onClick: onChaos,     eyebrow: t.menu_chaos_eyebrow,  action: t.menu_chaos_action,    icon: '🌪️', bg: `linear-gradient(135deg, #B388FF 0%, ${PURPLE} 100%)`,    shadow: '#6624B0', deep: '#6624B0', ink: '#fff',   italic: false, cls: 'cta-breathe'   },
           ];
           return ctas.map((c, i) => c.onClick && (
@@ -299,20 +299,22 @@ export default function PostMenu({ analytics, diagnostics, selectedAuthor, setSe
             }}>→</span>
           </button>
 
-          <button onClick={onDebug} className="press" aria-label={t.menu_verify} style={{
-            display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
-            padding: '10px 14px',
-            background: '#FFF8E0', border: `2px solid ${BANANA}88`,
-            borderRadius: 14, cursor: 'pointer', flexShrink: 0,
-            boxShadow: popShadow(BANANA),
-          }}>
-            <span className="fs-mono" style={{
-              fontSize: 12, fontWeight: 800, color: '#B8860B',
-              letterSpacing: '0.05em',
+          {diagnostics != null && (
+            <button onClick={onDebug} className="press" aria-label={t.menu_verify} style={{
+              display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
+              padding: '10px 14px',
+              background: '#FFF8E0', border: `2px solid ${BANANA}88`,
+              borderRadius: 14, cursor: 'pointer', flexShrink: 0,
+              boxShadow: popShadow(BANANA),
             }}>
-              ✓ {diagnostics?.confidence ?? 0}%
-            </span>
-          </button>
+              <span className="fs-mono" style={{
+                fontSize: 12, fontWeight: 800, color: '#B8860B',
+                letterSpacing: '0.05em',
+              }}>
+                ✓ {diagnostics.confidence}%
+              </span>
+            </button>
+          )}
         </div>
       </div>
 

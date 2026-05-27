@@ -176,7 +176,7 @@ const SlideMetric = React.memo(function SlideMetric({ a, t, profile, metricKey }
               <div key={r.author} dir="auto" className="a-slide-up-far" style={{
                 position: 'relative', padding: '12px 16px',
                 background: i === 0 ? `${def.color}1f` : 'rgba(42,6,69,0.06)',
-                borderRadius: 14, overflow: 'hidden',
+                borderRadius: 14, overflow: 'hidden', flexShrink: 0,
                 animationDelay: `${0.4 + i * 0.08}s`,
               }}>
                 <div className="a-slide-right" style={{

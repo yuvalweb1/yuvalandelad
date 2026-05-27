@@ -47,6 +47,7 @@ const SlideVoice = React.memo(function SlideVoice({ a, t }) {
               padding: '12px 14px', background: '#fff', borderRadius: 20,
               border: '2px solid rgba(255,255,255,0.85)',
               boxShadow: '0 6px 0 rgba(0,137,196,0.22), 0 14px 24px -8px rgba(0,137,196,0.45)',
+              flexShrink: 0,
               animationDelay: `${0.3 + i * 0.1}s`,
             }}>
               <div style={{ display: 'flex', alignItems: 'baseline', gap: 8, marginBottom: 8 }}>

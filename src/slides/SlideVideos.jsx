@@ -41,6 +41,7 @@ const SlideVideos = React.memo(function SlideVideos({ a, t }) {
               padding: 10, background: '#fff', borderRadius: 22,
               border: '2px solid rgba(255,255,255,0.85)',
               boxShadow: '0 6px 0 rgba(209,112,0,0.22), 0 14px 24px -8px rgba(209,112,0,0.45)',
+              flexShrink: 0,
               animationDelay: `${0.3 + i * 0.12}s`,
             }}>
               <video controls preload="metadata" playsInline src={v.url} style={{

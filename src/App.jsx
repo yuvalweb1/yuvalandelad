@@ -18,6 +18,7 @@ import VerifyView from './views/VerifyView.jsx';
 import RoastMode from './views/RoastMode.jsx';
 import DuoAnalysis from './views/DuoAnalysis.jsx';
 import ChaosTimeline from './views/ChaosTimeline.jsx';
+import PersonalProfile from './views/PersonalProfile.jsx';
 import Settings from './views/Settings.jsx';
 import VideoAdSlot from './components/VideoAdSlot.jsx';
 import PremiumPromo, { shouldShowPromo, markPromoDismissed } from './components/PremiumPromo.jsx';
@@ -400,6 +401,7 @@ function ChatWrappedApp() {
               onRoastMode={() => setStage(adEnabled('pre_roast') ? 'ad_pre_roast' : 'roastmode')}
               onDuo={() => setStage('duo')}
               onChaos={() => setStage('chaos')}
+              onProfile={() => setStage('profile')}
             />
           )}
           {stage === 'duo' && analytics && (
@@ -407,6 +409,9 @@ function ChatWrappedApp() {
           )}
           {stage === 'chaos' && analytics && (
             <ChaosTimeline t={t} onBack={() => setStage('menu')} />
+          )}
+          {stage === 'profile' && analytics && (
+            <PersonalProfile t={t} onBack={() => setStage('menu')} />
           )}
           {stage === 'settings' && (
             <Settings

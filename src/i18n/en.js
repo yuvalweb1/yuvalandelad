@@ -380,6 +380,7 @@ export default {
   menu_chaos_action: 'Chaos\ntimeline →',
   duo_coming_soon: 'Coming soon.',
   chaos_coming_soon: 'Coming soon.',
+  profile_coming_soon: 'Coming soon.',
   // Roast mode
   rm_back: '← Back',
   rm_title: '🔥 ROAST MODE',

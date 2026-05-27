@@ -40,6 +40,7 @@ const SlidePerPerson = React.memo(function SlidePerPerson({ a, t, profile }) {
               borderRadius: 20,
               border: '2px solid rgba(255,255,255,0.85)',
               boxShadow: `0 6px 0 ${DEEP}22, 0 14px 24px -8px ${DEEP}55`,
+              flexShrink: 0,
               animationDelay: `${0.4 + i * 0.08}s`,
             }}>
               <div style={{ display: 'flex', alignItems: 'baseline', gap: 8 }}>

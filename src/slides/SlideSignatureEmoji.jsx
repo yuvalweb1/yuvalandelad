@@ -41,6 +41,7 @@ const SlideSignatureEmoji = React.memo(function SlideSignatureEmoji({ a, t, prof
               padding: '12px 16px',
               background: i === 0 ? 'rgba(249,65,68,0.12)' : 'rgba(42,6,69,0.06)',
               borderRadius: 16,
+              flexShrink: 0,
               animationDelay: `${0.4 + i * 0.08}s`,
             }}>
               <div className="fs-sans" style={{
