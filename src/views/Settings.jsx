@@ -30,6 +30,7 @@ const LANGUAGES = [
 export default function Settings({
   t, lang, setLang,
   includeMedia, setIncludeMedia,
+  isPremium, setPremium,
   history = [], onClearHistory,
   onBack,
 }) {
@@ -87,6 +88,90 @@ export default function Settings({
           }}>
             {t.settings_title || 'Settings'}
           </div>
+        </div>
+
+        {/* Premium — first so it's the most prominent. Phase 1 is a UI stub:
+            no real payment yet, just a button that flips the localStorage flag
+            so the ad-free experience can be tested. */}
+        <div style={{ marginBottom: 20 }}>
+          <div className="fs-sans a-fade-up" style={{
+            fontSize: 12, color: isPremium ? MINT : MANGO, letterSpacing: '0.20em',
+            marginBottom: 9, fontWeight: 800, textTransform: 'uppercase',
+            paddingInlineStart: 4,
+          }}>
+            💎 {isPremium ? (t.settings_premium_active || 'Premium active') : (t.settings_premium || 'Premium')}
+          </div>
+
+          {isPremium ? (
+            <div className="a-fade-up" style={{
+              background: '#fff', border: `2px solid ${MINT}66`,
+              borderRadius: 18, padding: '16px 16px 14px',
+              boxShadow: popShadow(MINT),
+              animationDelay: '0.05s',
+            }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 8 }}>
+                <div style={{
+                  width: 40, height: 40, borderRadius: 12, flexShrink: 0,
+                  background: `${MINT}22`, border: `2px solid ${MINT}44`,
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  fontSize: 20,
+                }}>✓</div>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div className="fs-display" style={{
+                    fontSize: 19, fontWeight: 800, color: EGGPLANT, letterSpacing: '-0.02em',
+                  }}>
+                    {t.settings_premium_thanks || 'You\'re ad-free'}
+                  </div>
+                  <div className="fs-mono" style={{
+                    fontSize: 11, color: 'rgba(74,14,78,0.55)', marginTop: 2, fontWeight: 600,
+                  }}>
+                    {t.settings_premium_subscribed || '₪15 / month · all video & banner ads removed'}
+                  </div>
+                </div>
+              </div>
+              <button onClick={() => setPremium(false)} className="press" style={{
+                width: '100%', padding: '10px 14px', marginTop: 6,
+                background: 'rgba(74,14,78,0.06)', border: 'none', borderRadius: 10,
+                color: EGGPLANT, fontWeight: 700, fontSize: 12.5, cursor: 'pointer',
+                letterSpacing: '-0.01em',
+              }}>
+                {t.settings_premium_cancel_stub || 'Cancel (testing mode)'}
+              </button>
+            </div>
+          ) : (
+            <button onClick={() => setPremium(true)} className="press lift a-fade-up" style={{
+              width: '100%', position: 'relative', overflow: 'hidden', textAlign: 'start',
+              background: `linear-gradient(135deg, ${BANANA} 0%, ${MANGO} 100%)`,
+              border: '2px solid rgba(255,255,255,0.85)',
+              borderRadius: 18, padding: '16px 18px', cursor: 'pointer', color: EGGPLANT,
+              boxShadow: `0 8px 0 ${MANGO}33, 0 18px 30px -8px ${MANGO}66`,
+              animationDelay: '0.05s',
+            }}>
+              <div className="a-shine" style={{ position: 'absolute', inset: 0 }} />
+              <div aria-hidden="true" className="fs-display" style={{
+                position: 'absolute', insetInlineEnd: -8, top: -14, fontSize: 80,
+                opacity: 0.20, lineHeight: 1, fontStyle: 'italic', pointerEvents: 'none',
+              }}>💎</div>
+              <div className="fs-sans" style={{
+                fontSize: 10, letterSpacing: '0.22em', opacity: 0.78, fontWeight: 800,
+                textTransform: 'uppercase',
+              }}>
+                {t.settings_premium_upsell_eyebrow || 'Remove ads'}
+              </div>
+              <div dir="auto" className="fs-display" style={{
+                fontSize: 24, lineHeight: 1.05, letterSpacing: '-0.03em', marginTop: 4,
+                fontWeight: 800, position: 'relative',
+              }}>
+                {t.settings_premium_upsell_title || 'Skip every ad · ₪15/mo'}
+              </div>
+              <div className="fs-mono" style={{
+                fontSize: 11, color: 'rgba(74,14,78,0.65)', marginTop: 8, fontWeight: 600,
+                position: 'relative',
+              }}>
+                {t.settings_premium_upsell_hint || 'Testing mode — payment not connected yet'}
+              </div>
+            </button>
+          )}
         </div>
 
         {/* Language */}

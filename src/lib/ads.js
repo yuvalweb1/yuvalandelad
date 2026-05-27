@@ -36,9 +36,15 @@ export const ADS = {
   },
   // ({ slot, format }) => React node | null.  Return null to keep the placeholder.
   render: null,
+  // Runtime flag set by App.jsx when a user is on the Premium plan.
+  // Mutated here (not React state) so module-level callers like the stage
+  // machine in App.jsx see the latest value without a prop drill.
+  userPremium: false,
 };
 
-/** Whether a given placement should show (master switch AND per-slot toggle). */
+/** Whether a given placement should show. Premium users see no ads at all,
+ *  regardless of master/slot toggles. */
 export function adEnabled(slot) {
+  if (ADS.userPremium) return false;
   return !!(ADS.enabled && ADS.slots[slot]);
 }

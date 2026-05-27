@@ -18,7 +18,8 @@ import VerifyView from './views/VerifyView.jsx';
 import RoastMode from './views/RoastMode.jsx';
 import Settings from './views/Settings.jsx';
 import VideoAdSlot from './components/VideoAdSlot.jsx';
-import { adEnabled } from './lib/ads.js';
+import PremiumPromo, { shouldShowPromo, markPromoDismissed } from './components/PremiumPromo.jsx';
+import { ADS, adEnabled } from './lib/ads.js';
 import { SLIDES_BY_TYPE, SLIDE_COMPONENTS } from './slides';
 
 // ============================================================
@@ -68,6 +69,31 @@ function ChatWrappedApp() {
     setSettingsReturn(from);
     setStage('settings');
   }, []);
+
+  // Premium plan flag — Phase 1: client-side only, no real payment yet.
+  // Sync the boolean to localStorage AND to ADS.userPremium so the module-level
+  // adEnabled() returns false everywhere when premium is on.
+  const [isPremium, setIsPremium] = useState(() => {
+    try { return localStorage.getItem('cw_premium') === '1'; } catch { return false; }
+  });
+  useEffect(() => { ADS.userPremium = isPremium; }, [isPremium]);
+  const updatePremium = useCallback((v) => {
+    setIsPremium(v);
+    try { localStorage.setItem('cw_premium', v ? '1' : '0'); } catch {}
+  }, []);
+
+  // Entry-time premium promo — opens once on app mount for non-premium users
+  // who haven't dismissed it in the last 24h. Closed for the rest of the
+  // session even if user comes back to Landing (e.g., after Reset).
+  const [promoOpen, setPromoOpen] = useState(() => shouldShowPromo(isPremium));
+  const dismissPromo = useCallback(() => {
+    markPromoDismissed();
+    setPromoOpen(false);
+  }, []);
+  const acceptPromo = useCallback(() => {
+    updatePremium(true);
+    setPromoOpen(false);
+  }, [updatePremium]);
   const t = useMemo(() => buildT(lang), [lang]);
   const isRTL = RTL_LANGS.has(lang);
 
@@ -265,22 +291,31 @@ function ChatWrappedApp() {
             />
           )}
           {stage === 'landing' && (
-            <Landing
-              onFile={handleFile}
-              parseError={parseError}
-              t={t}
-              lang={lang}
-              setLang={setLang}
-              onHowTo={() => setStage('howto')}
-              onDemo={loadDemo}
-              onOpenSettings={() => openSettings('landing')}
-              includeMedia={includeMedia}
-              setIncludeMedia={updateIncludeMedia}
-              history={history}
-              onLoadRecap={handleLoadRecap}
-              onDeleteRecap={handleDeleteRecap}
-              onClearHistory={handleClearHistory}
-            />
+            <>
+              <Landing
+                onFile={handleFile}
+                parseError={parseError}
+                t={t}
+                lang={lang}
+                setLang={setLang}
+                onHowTo={() => setStage('howto')}
+                onDemo={loadDemo}
+                onOpenSettings={() => openSettings('landing')}
+                includeMedia={includeMedia}
+                setIncludeMedia={updateIncludeMedia}
+                history={history}
+                onLoadRecap={handleLoadRecap}
+                onDeleteRecap={handleDeleteRecap}
+                onClearHistory={handleClearHistory}
+              />
+              {promoOpen && !isPremium && (
+                <PremiumPromo
+                  t={t}
+                  onUpgrade={acceptPromo}
+                  onDismiss={dismissPromo}
+                />
+              )}
+            </>
           )}
           {stage === 'parsing' && (
             <Parsing fileName={fileName} parsingStage={parsingStage} diagnostics={diagnostics} t={t} />
@@ -370,6 +405,8 @@ function ChatWrappedApp() {
               setLang={setLang}
               includeMedia={includeMedia}
               setIncludeMedia={updateIncludeMedia}
+              isPremium={isPremium}
+              setPremium={updatePremium}
               history={history}
               onClearHistory={handleClearHistory}
               onBack={() => setStage(settingsReturn)}
