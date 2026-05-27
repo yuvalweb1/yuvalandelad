@@ -1,0 +1,30 @@
+# php -- BEGIN cPanel-generated handler, do not edit
+# Preserved from the server-side default so cPanel's PHP version checks pass
+# even though this SPA serves no PHP.
+<IfModule mime_module>
+  AddHandler application/x-httpd-ea-php81 .php .php8 .phtml
+</IfModule>
+# php -- END cPanel-generated handler, do not edit
+
+# SPA fallback — every request that isn't a real file/dir falls back to
+# index.html so React routing (and the Web Share Target redirect) works.
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  RewriteBase /
+  RewriteRule ^index\.html$ - [L]
+  RewriteCond %{REQUEST_FILENAME} !-f
+  RewriteCond %{REQUEST_FILENAME} !-d
+  RewriteRule . /index.html [L]
+</IfModule>
+
+# Cache headers — Vite emits hash-stamped asset filenames so they can cache
+# forever (immutable). Anything else (HTML entry, manifest, service worker)
+# must NOT cache — the SW relies on a fresh check to ship updates.
+<IfModule mod_headers.c>
+  <FilesMatch "\.(js|css|woff2|woff|png|jpg|jpeg|gif|svg|webp|ico)$">
+    Header set Cache-Control "public, max-age=31536000, immutable"
+  </FilesMatch>
+  <FilesMatch "^(index\.html|manifest\.json|sw\.js)$">
+    Header set Cache-Control "no-cache, no-store, must-revalidate"
+  </FilesMatch>
+</IfModule>
