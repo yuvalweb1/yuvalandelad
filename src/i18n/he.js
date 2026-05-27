@@ -106,6 +106,7 @@ export default {
   settings_data_empty: 'אין ריקפים שמורים',
   settings_about: 'אודות',
   settings_privacy_claim: '100% מקומי. שום דבר לא יוצא מהמכשיר. בלי analytics, בלי LLM, בלי קריאות רשת.',
+  settings_privacy_policy: 'מדיניות פרטיות',
   settings_premium: 'פרימיום',
   settings_premium_active: 'פרימיום פעיל',
   settings_premium_thanks: 'אתה ללא פרסומות',

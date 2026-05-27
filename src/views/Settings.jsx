@@ -311,6 +311,25 @@ export default function Settings({
                 {t.settings_privacy_claim || '100% local. Nothing leaves your device. No analytics, no LLM, no remote calls.'}
               </span>
             </div>
+            {/* Privacy Policy link — required by app stores. Opens static page
+                served alongside the app, with HE/EN language toggle. */}
+            <a
+              href="/privacy.html"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="press"
+              style={{
+                display: 'inline-flex', alignItems: 'center', gap: 6,
+                marginTop: 14, padding: '8px 12px',
+                background: `${EGGPLANT}0d`, border: `1.5px solid ${EGGPLANT}22`,
+                borderRadius: 999, color: EGGPLANT, textDecoration: 'none',
+                fontSize: 12, fontWeight: 700, letterSpacing: '-0.01em',
+              }}
+            >
+              <span aria-hidden="true">📄</span>
+              <span>{t.settings_privacy_policy || 'Privacy Policy'}</span>
+              <span aria-hidden="true" style={{ opacity: 0.55 }}>↗</span>
+            </a>
           </div>
         </Section>
       </div>

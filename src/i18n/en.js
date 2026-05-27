@@ -106,6 +106,7 @@ export default {
   settings_data_empty: 'No saved recaps yet',
   settings_about: 'About',
   settings_privacy_claim: '100% local. Nothing leaves your device. No analytics, no LLM, no remote calls.',
+  settings_privacy_policy: 'Privacy Policy',
   settings_premium: 'Premium',
   settings_premium_active: 'Premium active',
   settings_premium_thanks: "You're ad-free",

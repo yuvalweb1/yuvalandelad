@@ -1,0 +1,206 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Privacy Policy — ChatWrapped</title>
+  <link rel="icon" href="/recapped_logo_clean.png" type="image/png" />
+  <style>
+    :root {
+      --banana: #FFD700;
+      --mango: #FF8C00;
+      --eggplant: #4A0E4E;
+      --pink: #FF69B4;
+      --mint: #43AA8B;
+      --cream: #fff5f7;
+      --ink: #2a0645;
+      --ink-soft: rgba(74,14,78,0.65);
+      --ink-faint: rgba(74,14,78,0.45);
+    }
+    * { box-sizing: border-box; }
+    html, body { margin: 0; padding: 0; background: var(--cream); color: var(--ink); }
+    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "DM Sans", system-ui, sans-serif; line-height: 1.6; }
+    .wrap { max-width: 720px; margin: 0 auto; padding: 40px 24px 80px; position: relative; }
+    .wrap::before { content: ''; position: fixed; inset: 0; background:
+      radial-gradient(ellipse at top left, rgba(255,215,0,0.18) 0%, transparent 50%),
+      radial-gradient(ellipse at top right, rgba(255,105,180,0.14) 0%, transparent 50%),
+      radial-gradient(ellipse at bottom right, rgba(0,191,255,0.14) 0%, transparent 50%);
+      pointer-events: none; z-index: -1; }
+    .brand { display: inline-flex; align-items: baseline; text-decoration: none; color: inherit; font-weight: 800; font-size: 22px; letter-spacing: -0.03em; }
+    .brand i { color: var(--mango); font-style: italic; }
+    .lang-switch { display: flex; gap: 6px; margin-top: 18px; }
+    .lang-switch a {
+      padding: 5px 12px; border-radius: 999px; background: #fff;
+      border: 1.5px solid rgba(255,255,255,0.95); color: var(--ink);
+      box-shadow: 0 3px 0 rgba(74,14,78,0.12), 0 8px 14px -6px rgba(74,14,78,0.22);
+      text-decoration: none; font-size: 13px; font-weight: 700;
+    }
+    .lang-switch a.active { background: var(--eggplant); color: #fff; box-shadow: 0 3px 0 #2a0645, 0 8px 16px -4px rgba(74,14,78,0.5); }
+    h1 { font-size: clamp(28px, 5vw, 40px); margin: 30px 0 6px; letter-spacing: -0.035em; line-height: 1.1; color: var(--eggplant); }
+    .updated { font-size: 12px; color: var(--ink-faint); letter-spacing: 0.12em; text-transform: uppercase; font-weight: 700; }
+    .tldr {
+      margin: 24px 0; padding: 18px 20px; border-radius: 18px;
+      background: #fff; border: 2px solid rgba(67,170,139,0.5);
+      box-shadow: 0 6px 0 rgba(67,170,139,0.22), 0 14px 24px -8px rgba(67,170,139,0.45);
+    }
+    .tldr h2 { margin: 0 0 6px; font-size: 13px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--mint); font-weight: 800; }
+    .tldr p { margin: 0; font-size: 15px; color: var(--ink); font-weight: 500; }
+    h2 { font-size: 22px; margin: 36px 0 10px; color: var(--eggplant); letter-spacing: -0.02em; }
+    h3 { font-size: 16px; margin: 22px 0 6px; color: var(--eggplant); letter-spacing: -0.01em; }
+    p, li { font-size: 15px; color: var(--ink); }
+    ul { padding-left: 22px; }
+    li { margin-bottom: 4px; }
+    code { background: rgba(74,14,78,0.06); padding: 1px 6px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: 13px; }
+    a { color: var(--mango); }
+    a:hover { color: var(--eggplant); }
+    .back {
+      display: inline-block; margin-top: 36px; padding: 10px 18px; border-radius: 999px;
+      background: linear-gradient(135deg, var(--banana) 0%, var(--mango) 100%);
+      color: var(--eggplant); text-decoration: none; font-weight: 800; font-size: 14px;
+      border: 2px solid rgba(255,255,255,0.85);
+      box-shadow: 0 6px 0 rgba(209,112,0,0.35), 0 14px 24px -6px rgba(209,112,0,0.5);
+    }
+    section.lang { display: none; }
+    section.lang.active { display: block; }
+    [dir="rtl"] ul { padding-right: 22px; padding-left: 0; }
+    .lang-he h1, .lang-he h2, .lang-he h3, .lang-he p, .lang-he li { text-align: right; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <a class="brand" href="/" dir="ltr">chat<i>wrapped</i></a>
+
+    <div class="lang-switch" role="navigation" aria-label="Language">
+      <a href="#en" data-lang="en" class="active">English</a>
+      <a href="#he" data-lang="he">עברית</a>
+    </div>
+
+    <!-- ===== English ===== -->
+    <section class="lang lang-en active" id="en">
+      <h1>Privacy Policy</h1>
+      <div class="updated">Last updated: 28 May 2026</div>
+
+      <div class="tldr">
+        <h2>✦ TL;DR</h2>
+        <p>ChatWrapped runs entirely in your browser. We don't collect, store, or transmit your chat data. There's no server-side database. Your WhatsApp export never leaves your device.</p>
+      </div>
+
+      <h2>What we collect</h2>
+      <p><strong>From the app itself: nothing.</strong> The app parses your WhatsApp export locally in your browser using a Web Worker. The parsed messages, statistics, and any extracted media (photos, voice notes, videos, stickers) stay in your device's memory and local storage only.</p>
+
+      <h3>Local storage on your device</h3>
+      <p>We save the following on your device's <code>localStorage</code>, never on a server:</p>
+      <ul>
+        <li>Past recap summaries — so you can re-open them without re-uploading</li>
+        <li>Your selected language</li>
+        <li>Your media-analysis preference (on/off)</li>
+        <li>A flag indicating you've seen the how-to guide</li>
+        <li>Your Premium subscription status (when applicable)</li>
+        <li>Premium promo dismissal timestamp</li>
+      </ul>
+      <p>You can clear all of this anytime via Settings → Data, or via your browser's site-data controls.</p>
+
+      <h2>Network requests</h2>
+      <p>The app makes these network requests:</p>
+      <ul>
+        <li><strong>Loading the app itself</strong> from <code>yuval.ella.org.il</code> (HTML, JavaScript, CSS, image assets, service worker).</li>
+        <li><strong>Google Fonts</strong> — fetched once for typography. Google may log the request as it does for any site that uses Google Fonts.</li>
+      </ul>
+      <p>We do not use analytics, error reporting, A/B testing, third-party SDKs, or any other tracking. Your chat content is never sent anywhere.</p>
+
+      <h2>Payments (Premium plan)</h2>
+      <p>If you subscribe to the Premium plan (₪15 / month), payment is processed by an external payment provider (e.g., Lemon Squeezy or Google Play Billing inside the Android app). They receive your name, email address, and payment details — we do not. Their privacy policies apply at the moment of checkout.</p>
+      <p>To activate Premium inside the web app, you'll receive a license key by email from the payment provider and enter it manually. We don't keep a database mapping users to keys; the key is validated against the payment provider's API directly from your browser.</p>
+
+      <h2>Sharing</h2>
+      <p>When you tap "Share" on a roast, the app opens your operating system's share sheet, WhatsApp, Telegram, X (Twitter), email, or SMS with the text pre-filled. The receiving app handles delivery — we are not involved in the transmission.</p>
+
+      <h2>Your rights</h2>
+      <p>Because we do not collect, store, or transmit personal data, there's nothing to request, export, or delete on our side. Everything is on your device and under your control. Use Settings → Data → Clear saved recaps, or clear your browser's site data, to wipe it instantly.</p>
+
+      <h2>Children</h2>
+      <p>ChatWrapped is not directed at children under 13. We do not knowingly collect data from anyone.</p>
+
+      <h2>Changes</h2>
+      <p>If we update this policy, the "Last updated" date above changes and the new version replaces this one at the same URL. Significant changes will be flagged in the app's release notes.</p>
+
+      <h2>Contact</h2>
+      <p>Questions about this policy? Email <a href="mailto:nahum@ella3g.com">nahum@ella3g.com</a>.</p>
+    </section>
+
+    <!-- ===== עברית ===== -->
+    <section class="lang lang-he" id="he" dir="rtl" lang="he">
+      <h1>מדיניות פרטיות</h1>
+      <div class="updated">עודכן לאחרונה: 28 במאי 2026</div>
+
+      <div class="tldr">
+        <h2>✦ בקצרה</h2>
+        <p>ChatWrapped רץ כולו בדפדפן שלך. אנחנו לא אוספים, שומרים או שולחים את נתוני הצ'אט שלך. אין שרת ואין מסד נתונים. יצוא הוואטסאפ שלך לא יוצא מהמכשיר שלך.</p>
+      </div>
+
+      <h2>מה אנחנו אוספים</h2>
+      <p><strong>מהאפליקציה עצמה: כלום.</strong> האפליקציה מנתחת את יצוא הוואטסאפ שלך באופן מקומי בדפדפן שלך באמצעות Web Worker. ההודעות המנותחות, הסטטיסטיקות, וכל מדיה שחולצה (תמונות, הודעות קוליות, סרטונים, סטיקרים) נשארים בזיכרון ובאחסון המקומי של המכשיר שלך בלבד.</p>
+
+      <h3>אחסון מקומי במכשיר שלך</h3>
+      <p>אנחנו שומרים את הדברים הבאים ב-<code>localStorage</code> במכשיר שלך, אף פעם לא בשרת:</p>
+      <ul>
+        <li>סיכומי ריקפים קודמים — כדי שתוכל לפתוח אותם שוב בלי להעלות מחדש</li>
+        <li>השפה שבחרת</li>
+        <li>העדפת ניתוח המדיה שלך (פעיל/לא פעיל)</li>
+        <li>דגל שמציין שכבר ראית את מדריך היצוא</li>
+        <li>סטטוס מנוי הפרימיום שלך (כשרלוונטי)</li>
+        <li>חותמת זמן של דחיית מסך הפרסום של הפרימיום</li>
+      </ul>
+      <p>אפשר למחוק את כל זה בכל רגע דרך הגדרות → נתונים, או דרך הבקרות של הדפדפן.</p>
+
+      <h2>בקשות רשת</h2>
+      <p>האפליקציה מבצעת את בקשות הרשת הבאות:</p>
+      <ul>
+        <li><strong>טעינת האפליקציה עצמה</strong> מ-<code>yuval.ella.org.il</code> (HTML, JavaScript, CSS, נכסי תמונה, service worker).</li>
+        <li><strong>Google Fonts</strong> — נטענים פעם אחת לטיפוגרפיה. Google עשויה לרשום את הבקשה כפי שהיא עושה לכל אתר שמשתמש ב-Google Fonts.</li>
+      </ul>
+      <p>אנחנו לא משתמשים ב-analytics, דיווח שגיאות, A/B testing, SDK של צד שלישי, או כל מעקב אחר. תוכן הצ'אט שלך אף פעם לא נשלח לשום מקום.</p>
+
+      <h2>תשלומים (תוכנית פרימיום)</h2>
+      <p>אם תירשם לתוכנית הפרימיום (₪15 לחודש), התשלום מעובד על ידי ספק תשלום חיצוני (למשל Lemon Squeezy, או Google Play Billing בתוך אפליקציית האנדרואיד). הם מקבלים את שמך, כתובת המייל שלך ופרטי התשלום — אנחנו לא. מדיניות הפרטיות שלהם חלה ברגע התשלום.</p>
+      <p>כדי להפעיל פרימיום באפליקציית הוואב, תקבל license key במייל מספק התשלום ותכניס אותו ידנית. אנחנו לא שומרים מסד נתונים שמקשר משתמשים למפתחות; המפתח מאומת מול ה-API של ספק התשלום ישירות מהדפדפן שלך.</p>
+
+      <h2>שיתוף</h2>
+      <p>כשתלחץ על "שיתוף" של רואסט, האפליקציה פותחת את תפריט השיתוף של מערכת ההפעלה, וואטסאפ, טלגרם, X (טוויטר), מייל או SMS עם הטקסט ממולא מראש. האפליקציה המקבלת מטפלת בהעברה — אנחנו לא מעורבים בשידור.</p>
+
+      <h2>הזכויות שלך</h2>
+      <p>מכיוון שאנחנו לא אוספים, שומרים או משדרים נתונים אישיים, אין מה לבקש, לייצא או למחוק אצלנו. הכל נמצא במכשיר שלך ובשליטתך. השתמש בהגדרות → נתונים → מחק ריקפים שמורים, או מחק את נתוני האתר בדפדפן, כדי לאפס הכל מיד.</p>
+
+      <h2>ילדים</h2>
+      <p>ChatWrapped לא מיועד לילדים מתחת לגיל 13. אנחנו לא אוספים נתונים מאף אחד ביודעין.</p>
+
+      <h2>שינויים</h2>
+      <p>אם נעדכן את המדיניות הזו, תאריך ה"עודכן לאחרונה" למעלה יתעדכן, והגרסה החדשה תחליף את הקיימת באותו URL. שינויים משמעותיים יסומנו ב-release notes של האפליקציה.</p>
+
+      <h2>יצירת קשר</h2>
+      <p>שאלות על המדיניות הזו? כתוב ל-<a href="mailto:nahum@ella3g.com">nahum@ella3g.com</a>.</p>
+    </section>
+
+    <a class="back" href="/" dir="ltr">← Back to app</a>
+  </div>
+
+  <script>
+    // Language switcher — toggles between #en and #he sections.
+    // Defaults to URL hash if present, otherwise browser language.
+    (function () {
+      const sections = document.querySelectorAll('section.lang');
+      const links = document.querySelectorAll('.lang-switch a');
+      function activate(code) {
+        sections.forEach(s => s.classList.toggle('active', s.id === code));
+        links.forEach(a => a.classList.toggle('active', a.dataset.lang === code));
+        document.documentElement.lang = code;
+        history.replaceState(null, '', '#' + code);
+      }
+      const initial = location.hash.replace('#', '') ||
+        (navigator.language && navigator.language.toLowerCase().startsWith('he') ? 'he' : 'en');
+      activate(initial === 'he' ? 'he' : 'en');
+      links.forEach(a => a.addEventListener('click', e => { e.preventDefault(); activate(a.dataset.lang); }));
+    })();
+  </script>
+</body>
+</html>

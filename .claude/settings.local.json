@@ -97,7 +97,12 @@
       "Bash(curl -sI http://yuval.ella.org.il/)",
       "Bash(curl -s http://yuval.ella.org.il/)",
       "Bash(ssh yuvalellaorg@185.162.127.14 \"ls -la public_html/index.html public_html/assets/ 2>&1 | head -10\")",
-      "Bash(curl -s http://yuval.ella.org.il/assets/index-41skvKXZ.js)"
+      "Bash(curl -s http://yuval.ella.org.il/assets/index-41skvKXZ.js)",
+      "Bash(npm list *)",
+      "Bash(file public/recapped_logo_clean*.png)",
+      "Bash(ssh yuvalellaorg@185.162.127.14 \"cat > repositories/site.git/hooks/post-receive && chmod +x repositories/site.git/hooks/post-receive && echo 'hook updated' && cat repositories/site.git/hooks/post-receive\")",
+      "Bash(2>&1)",
+      "Bash(SKIP_CAP_SYNC=1 npx vite build)"
     ],
     "additionalDirectories": [
       "\\tmp"

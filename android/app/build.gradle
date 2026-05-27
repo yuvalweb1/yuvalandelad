@@ -1,5 +1,15 @@
 apply plugin: 'com.android.application'
 
+// Load release-signing credentials from android/keystore.properties (gitignored).
+// If the file is missing, release builds will fall back to the debug signing key,
+// which is fine for local installs but NOT acceptable for Play Console uploads.
+def keystorePropertiesFile = rootProject.file("keystore.properties")
+def keystoreProperties = new Properties()
+def hasKeystoreProperties = keystorePropertiesFile.exists()
+if (hasKeystoreProperties) {
+    keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
+}
+
 android {
     namespace = "com.chatwrapped.app"
     compileSdk = rootProject.ext.compileSdkVersion
@@ -16,10 +26,26 @@ android {
             ignoreAssetsPattern = '!.svn:!.git:!.ds_store:!*.scc:.*:!CVS:!thumbs.db:!picasa.ini:!*~'
         }
     }
+    signingConfigs {
+        release {
+            if (hasKeystoreProperties) {
+                storeFile rootProject.file(keystoreProperties['storeFile'])
+                storePassword keystoreProperties['storePassword']
+                keyAlias keystoreProperties['keyAlias']
+                keyPassword keystoreProperties['keyPassword']
+            }
+        }
+    }
     buildTypes {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            // Only attach the release signing config when keystore.properties exists.
+            // Otherwise gradle would error on missing credentials. Local debug builds
+            // (`./gradlew assembleDebug`) are unaffected either way.
+            if (hasKeystoreProperties) {
+                signingConfig signingConfigs.release
+            }
         }
     }
 }
