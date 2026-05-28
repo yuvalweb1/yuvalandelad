@@ -393,14 +393,14 @@ export default function Landing({
       </div>
 
     {langOpen && (
-        <BottomSheet onClose={() => setLangOpen(false)} title="Language">
+        <BottomSheet light onClose={() => setLangOpen(false)} title="Language">
           {LANGUAGES.map(l => (
             <button key={l.code} className="press" onClick={() => {
               setLang(l.code);
               setLangOpen(false);
             }} style={{
               width: '100%', padding: '16px 8px', minHeight: 56, background: 'transparent',
-              border: 'none', borderBottom: '1px solid #2a2a36', color: '#f4f4f8',
+              border: 'none', borderBottom: '1px solid rgba(74,14,78,0.09)', color: '#2a0645',
               fontSize: 23, fontWeight: 500, textAlign: 'left', cursor: 'pointer',
               display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 12,
             }}>
@@ -409,7 +409,7 @@ export default function Landing({
                 <span style={{ fontSize: 23, fontWeight: 600 }}>{l.name}</span>
               </div>
               {l.code === lang && (
-                <span style={{ color: '#f9c74f', fontSize: 18 }}>✓</span>
+                <span style={{ color: '#4A0E4E', fontSize: 18 }}>✓</span>
               )}
             </button>
           ))}
@@ -417,29 +417,30 @@ export default function Landing({
       )}
 
       {historyOpen && (
-        <BottomSheet onClose={() => setHistoryOpen(false)} title={t.past_recaps}>
+        <BottomSheet light onClose={() => setHistoryOpen(false)} title={t.past_recaps}>
           {history.map(r => (
             <div key={r.id} style={{
               display: 'flex', alignItems: 'center', gap: 10,
               padding: '14px 8px', minHeight: 56,
-              borderBottom: '1px solid #2a2a36',
+              borderBottom: '1px solid rgba(74,14,78,0.09)',
             }}>
               <button
                 onClick={() => { onLoadRecap(r.id); setHistoryOpen(false); }}
-                className="press"
+                className="press recap-row"
                 style={{
                   flex: 1, minWidth: 0,
                   display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: 3,
-                  background: 'transparent', border: 'none', color: '#f4f4f8',
-                  textAlign: 'start', cursor: 'pointer', padding: 0,
+                  background: 'transparent', border: 'none', color: '#2a0645',
+                  textAlign: 'start', cursor: 'pointer', padding: '4px 6px',
+                  borderRadius: 10,
                 }}>
                 <div dir="auto" style={{
-                  fontSize: 18, fontWeight: 600, color: '#f4f4f8',
+                  fontSize: 18, fontWeight: 600, color: '#2a0645',
                   overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
                   width: '100%',
                 }}>{r.chatName}</div>
                 <div className="fs-mono" style={{
-                  fontSize: 12, color: '#c8c8dc', letterSpacing: '0.04em',
+                  fontSize: 12, color: 'rgba(74,14,78,0.50)', letterSpacing: '0.04em',
                 }}>{relativeTime(r.date, lang)}</div>
               </button>
               <button
@@ -449,8 +450,8 @@ export default function Landing({
                 style={{
                   flexShrink: 0, width: 32, height: 32,
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  background: 'rgba(255,255,255,0.06)', border: 'none', cursor: 'pointer',
-                  color: 'rgba(255,255,255,0.55)', fontSize: 15,
+                  background: 'rgba(74,14,78,0.07)', border: 'none', cursor: 'pointer',
+                  color: 'rgba(74,14,78,0.50)', fontSize: 15,
                   borderRadius: 999,
                 }}
               >✕</button>
