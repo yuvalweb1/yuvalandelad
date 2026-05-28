@@ -19,14 +19,20 @@
 let _idSeq = 0;
 
 // Materialize transferred bytes into <img>/<audio>/<video>-ready blob URLs.
+// `blob` is kept on each item so callers can persist it to IndexedDB without
+// needing to round-trip through the object URL.
 function materializeList(items) {
   if (!items || !items.length) return [];
-  return items.map(m => ({
-    name: m.name, mime: m.mime, author: m.author, ts: m.ts,
-    size: m.size ?? (m.bytes && m.bytes.length) ?? 0,
-    count: m.count, // stickers carry an occurrence count
-    url: URL.createObjectURL(new Blob([m.bytes], { type: m.mime })),
-  }));
+  return items.map(m => {
+    const blob = new Blob([m.bytes], { type: m.mime });
+    return {
+      name: m.name, mime: m.mime, author: m.author, ts: m.ts,
+      size: m.size ?? (m.bytes && m.bytes.length) ?? 0,
+      count: m.count,
+      blob,
+      url: URL.createObjectURL(blob),
+    };
+  });
 }
 function materializeMedia(media) {
   if (!media) return { photos: [], voice: [], videos: [], stickers: [] };

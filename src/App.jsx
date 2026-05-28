@@ -3,6 +3,7 @@ import { parseChat } from './parser/client.js';
 import { computeAll } from './lib/analytics.js';
 import { generateSampleText, generateSampleMedia } from './lib/sample.js';
 import { loadHistory, saveRecap, removeRecap, clearHistory, deriveChatName } from './lib/history.js';
+import { saveMedia, loadMedia, deleteMedia, clearAllMedia } from './lib/mediaStore.js';
 import { RTL_LANGS, detectLang, buildT } from './i18n';
 import ErrorBoundary from './components/ErrorBoundary.jsx';
 import GlobalStyles from './components/GlobalStyles.jsx';
@@ -134,9 +135,11 @@ function ChatWrappedApp() {
       a.voice    = media?.voice    || [];
       a.videos   = media?.videos   || [];
       a.stickers = media?.stickers || [];
-      // Persist a snapshot (without blob URLs — those die on reload).
+      // Persist stats snapshot (without blob URLs — those die on reload).
+      // Media blobs go to IndexedDB separately via mediaStore.
       const { photos: _photos, voice: _voice, videos: _videos, stickers: _stickers, ...stats } = a;
-      saveRecap({ chatName: deriveChatName({ diagnostics: diag, fileName: file.name }), stats });
+      const entry = saveRecap({ chatName: deriveChatName({ diagnostics: diag, fileName: file.name }), stats });
+      saveMedia(entry.id, { photos: a.photos, voice: a.voice, videos: a.videos, stickers: a.stickers });
       setHistory(loadHistory());
       setParsingStage(4);
       await new Promise(r => setTimeout(r, 400));
@@ -241,12 +244,21 @@ function ChatWrappedApp() {
     setSlide(0);
   };
 
-  const handleLoadRecap = useCallback((id) => {
+  const analyticsRef = useRef(analytics);
+  useEffect(() => { analyticsRef.current = analytics; }, [analytics]);
+
+  const handleLoadRecap = useCallback(async (id) => {
     const entry = loadHistory().find(r => r.id === id);
     if (!entry) return;
-    // Reconstruct analytics shape: stored stats + empty photos
-    // (blob URLs from the original session are long gone).
-    const a = { ...entry.stats, photos: [] };
+    // Revoke blob URLs from whatever recap is currently active before swapping.
+    const prev = analyticsRef.current;
+    if (prev) {
+      for (const m of [...(prev.photos||[]), ...(prev.voice||[]), ...(prev.videos||[]), ...(prev.stickers||[])]) {
+        try { URL.revokeObjectURL(m.url); } catch {}
+      }
+    }
+    const media = await loadMedia(id);
+    const a = { ...entry.stats, ...media };
     setDiagnostics(null);
     setAnalytics(a);
     setSelectedAuthor(a.users?.[0]?.author || '');
@@ -256,10 +268,12 @@ function ChatWrappedApp() {
   }, []);
 
   const handleDeleteRecap = useCallback((id) => {
+    deleteMedia(id);
     setHistory(removeRecap(id));
   }, []);
 
   const handleClearHistory = useCallback(() => {
+    clearAllMedia();
     clearHistory();
     setHistory([]);
   }, []);

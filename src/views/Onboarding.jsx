@@ -9,11 +9,10 @@ function nameInitial(name) {
 }
 
 export default function Onboarding({ analytics, t, profile, setProfile, onComplete, onSkip }) {
-  const [step, setStep] = useState(0); // 0: who_are_you, 1: relationship, 2: tone
+  const [step, setStep] = useState(0); // 0: who_are_you, 1: relationship
   const [draft, setDraft] = useState({
     self: profile.self || analytics.users[0]?.author || null,
     relationship: profile.relationship || null,
-    tone: profile.tone || null,
   });
 
   const steps = [
@@ -33,16 +32,6 @@ export default function Onboarding({ analytics, t, profile, setProfile, onComple
         { value: 'work', label: t.q_relationship_work, icon: '💼' },
         { value: 'couple', label: t.q_relationship_couple, icon: '💕' },
         { value: 'other', label: t.q_relationship_other, icon: '✦' },
-      ],
-    },
-    {
-      key: 'tone',
-      question: t.q_tone,
-      type: 'tone',
-      options: [
-        { value: 'mild', label: t.q_tone_mild, desc: t.q_tone_mild_d, color: '#277da1', icon: '😊' },
-        { value: 'medium', label: t.q_tone_medium, desc: t.q_tone_medium_d, color: '#d99412', icon: '😏' },
-        { value: 'spicy', label: t.q_tone_spicy, desc: t.q_tone_spicy_d, color: '#f3722c', icon: '🔥' },
       ],
     },
   ];
@@ -303,49 +292,6 @@ export default function Onboarding({ analytics, t, profile, setProfile, onComple
             </div>
           )}
 
-          {currentStep.type === 'tone' && (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-              {currentStep.options.map((opt, i) => {
-                const selected = draft.tone === opt.value;
-                return (
-                  <button key={opt.value} dir="auto" onClick={() => setDraft({ ...draft, tone: opt.value })}
-                    className="press lift" style={{
-                      width: '100%', textAlign: 'start',
-                      padding: '18px 20px', cursor: 'pointer',
-                      background: selected
-                        ? `linear-gradient(135deg, ${opt.color}22, ${opt.color}08)`
-                        : '#ffffff',
-                      border: `1px solid ${selected ? opt.color : 'rgba(74,14,78,0.10)'}`,
-                      borderRadius: 18, color: '#4A0E4E',
-                      display: 'flex', alignItems: 'center', gap: 14,
-                      animation: `fadeUp 0.4s cubic-bezier(0.16,1,0.3,1) ${i * 0.06}s both`,
-                      boxShadow: selected
-                        ? `0 12px 28px ${opt.color}40`
-                        : '0 4px 12px rgba(74,14,78,0.08)',
-                      transition: 'background 0.2s, border-color 0.2s, box-shadow 0.2s',
-                    }}>
-                    <div style={{ fontSize: 32, lineHeight: 1, flexShrink: 0 }}>{opt.icon}</div>
-                    <div style={{ flex: 1 }}>
-                      <div className="fs-display" style={{
-                        fontSize: 20, lineHeight: 1.1, letterSpacing: '-0.02em',
-                        fontStyle: selected ? 'italic' : 'normal',
-                        color: selected ? opt.color : '#4A0E4E',
-                        fontWeight: 800,
-                      }}>
-                        {opt.label}
-                      </div>
-                      <div style={{
-                        fontSize: 13, color: '#573280', marginTop: 4, lineHeight: 1.4,
-                        opacity: 0.82,
-                      }}>
-                        {opt.desc}
-                      </div>
-                    </div>
-                  </button>
-                );
-              })}
-            </div>
-          )}
         </div>
 
         {/* Continue CTA (fixed) */}

@@ -1,17 +1,11 @@
 import { useState } from 'react';
-import { interp, resolveTitle } from '../i18n';
+import { resolveTitle } from '../i18n';
 
 // ── Icons ──────────────────────────────────────────────────────────────────
 const IconGear = () => (
   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
     <circle cx="12" cy="12" r="3"/>
     <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09a1.65 1.65 0 0 0 1.51-1 1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33h0a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51h0a1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82v0a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
-  </svg>
-);
-const IconRefresh = () => (
-  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-    <polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/>
-    <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/>
   </svg>
 );
 const IconChevronDown = () => (
@@ -24,9 +18,11 @@ const IconCheck = () => (
     <polyline points="20 6 9 17 4 12"/>
   </svg>
 );
-const IconPlay = ({ size = 20 }) => (
-  <svg width={size} height={size} viewBox="0 0 24 24" fill="currentColor">
-    <path d="M8 5v14l11-7z"/>
+const IconReplay = ({ size = 18 }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M3 12a9 9 0 1 0 3.5-7.1"/>
+    <polyline points="3 3 3 9 9 9"/>
+    <path d="M10.5 9.2v5.6l4.5-2.8z" fill="currentColor" stroke="none"/>
   </svg>
 );
 
@@ -72,39 +68,37 @@ function StatChip({ value, label, color = '#2a0645' }) {
   );
 }
 
-// ── Mode tile (Roast / Duo / Chaos) ───────────────────────────────────────
+// ── Mode tile (horizontal row) ─────────────────────────────────────────────
 function ModeTile({ label, title, emoji, gradient, fg = '#fff', shadowColor = '#3a0a3d', onClick }) {
   return (
     <button onClick={onClick} className="press lift" style={{
-      flex: 1, position: 'relative', overflow: 'hidden',
+      width: '100%', position: 'relative', overflow: 'hidden',
       textAlign: 'left',
       background: gradient,
-      border: 'none',
-      borderRadius: 18,
-      padding: '12px 12px 14px',
+      border: '3px solid rgba(255,255,255,0.10)',
+      borderRadius: 20,
+      padding: '14px 18px',
       cursor: 'pointer',
       color: fg,
-      minHeight: 108,
-      display: 'flex', flexDirection: 'column', justifyContent: 'space-between',
-      boxShadow: `0 8px 22px -4px ${shadowColor}66`,
+      display: 'flex', alignItems: 'center', gap: 14,
+      boxShadow: `0 7px 0 ${shadowColor}44, 0 16px 30px -8px ${shadowColor}88`,
     }}>
       <div aria-hidden style={{
-        position: 'absolute', right: -10, bottom: -14,
-        fontSize: 50, lineHeight: 1, opacity: 0.65,
+        fontSize: 30, lineHeight: 1, flexShrink: 0,
         filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.18))',
-        transform: 'rotate(-10deg)',
-        pointerEvents: 'none',
       }}>{emoji}</div>
-      <div className="fs-mono" style={{
-        fontSize: 9, letterSpacing: '0.16em', textTransform: 'uppercase',
-        fontWeight: 800, opacity: 0.95, position: 'relative',
-        textShadow: fg === '#fff' ? '0 1px 2px rgba(0,0,0,0.15)' : 'none',
-      }}>{label}</div>
-      <div className="fs-display" style={{
-        fontSize: 18, fontWeight: 800, lineHeight: 1.0,
-        letterSpacing: '-0.03em', position: 'relative',
-        textShadow: fg === '#fff' ? '0 1px 3px rgba(0,0,0,0.18)' : 'none',
-      }}>{title} <span style={{ fontWeight: 700 }}>→</span></div>
+      <div style={{ flex: 1, minWidth: 0 }}>
+        <div className="fs-mono" style={{
+          fontSize: 9, letterSpacing: '0.16em', textTransform: 'uppercase',
+          fontWeight: 800, opacity: 0.9,
+          textShadow: fg === '#fff' ? '0 1px 2px rgba(0,0,0,0.15)' : 'none',
+        }}>{label}</div>
+        <div className="fs-display" style={{
+          fontSize: 19, fontWeight: 800, lineHeight: 1.05, marginTop: 1,
+          letterSpacing: '-0.03em',
+          textShadow: fg === '#fff' ? '0 1px 3px rgba(0,0,0,0.18)' : 'none',
+        }}>{title}</div>
+      </div>
     </button>
   );
 }
@@ -205,45 +199,6 @@ export default function PostMenu({
   const confidence = diagnostics?.confidence ?? null;
   const isRTL = /[֐-׿؀-ۿ]/.test(u.author);
 
-  // Awards from analytics superlatives — same logic as SlideAwards.jsx
-  const a = analytics;
-  const allAwards = [
-    a.fastestResponder && {
-      trophy: '⚡', label: t.awards_fastest || 'Fastest',
-      winner: a.fastestResponder.author,
-      sub: interp(t.awards_fastest_sub || '{m}m avg reply', { m: a.fastestResponder.avgRespMin.toFixed(1) }),
-    },
-    a.yapper && {
-      trophy: '🎤', label: t.awards_yapper || 'Yapper',
-      winner: a.yapper.author,
-      sub: interp(t.awards_yapper_sub || '{n} messages', { n: a.yapper.messageCount.toLocaleString() }),
-    },
-    a.nightOwl && a.nightOwl.nightPct > 5 && {
-      trophy: '🌙', label: t.awards_nightowl || 'Night Owl',
-      winner: a.nightOwl.author,
-      sub: interp(t.awards_nightowl_sub || '{pct}% after midnight', { pct: a.nightOwl.nightPct.toFixed(0) }),
-    },
-    a.ghost && a.ghost.longestAbsenceDays >= 7 && {
-      trophy: '👻', label: t.awards_ghost || 'Ghost',
-      winner: a.ghost.author,
-      sub: interp(t.awards_ghost_sub || '{n}d gone', { n: a.ghost.longestAbsenceDays }),
-    },
-    a.killer && a.killer.conversationsKilled >= 3 && {
-      trophy: '💀', label: t.awards_killer || 'Killer',
-      winner: a.killer.author,
-      sub: interp(t.awards_killer_sub || '{n} dead-ends', { n: a.killer.conversationsKilled }),
-    },
-    a.reviver && a.reviver.conversationsRevived >= 3 && {
-      trophy: '✨', label: t.awards_defib || 'Reviver',
-      winner: a.reviver.author,
-      sub: interp(t.awards_defib_sub || '{n} revivals', { n: a.reviver.conversationsRevived }),
-    },
-  ].filter(Boolean);
-
-  const myAwards = allAwards.filter(aw => aw.winner === u.author).slice(0, 3);
-  const awardsToShow = myAwards.length > 0 ? myAwards : allAwards.slice(0, 3);
-  const accentColors = ['#f06449', '#FFD700', '#00BFFF'];
-
   return (
     <div style={{
       position: 'relative', height: '100%', overflow: 'hidden',
@@ -267,9 +222,24 @@ export default function PostMenu({
         <div className="fs-display" style={{ fontWeight: 800, fontSize: 16, letterSpacing: '-0.02em', color: '#2a0645' }}>
           chat<span style={{ color: '#f06449' }}>wrapped</span>
         </div>
-        <IconBtn label={t.a11y_start_over || 'Start over'} onClick={onReset}>
-          <IconRefresh />
-        </IconBtn>
+        <button
+          aria-label={t.menu_replay || 'Replay'}
+          className="press"
+          onClick={onReplay}
+          style={{
+            display: 'flex', alignItems: 'center', gap: 7,
+            height: 38, padding: '0 14px 0 11px', borderRadius: 999,
+            background: 'rgba(255,255,255,0.7)', color: '#573280',
+            border: '1px solid rgba(87,50,128,0.12)',
+            backdropFilter: 'blur(10px)', cursor: 'pointer',
+            boxShadow: '0 2px 10px rgba(87,50,128,0.10)',
+          }}
+        >
+          <IconReplay size={16} />
+          <span className="fs-mono" style={{
+            fontSize: 10, fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase',
+          }}>{t.menu_replay || 'Replay'}</span>
+        </button>
       </div>
 
       {/* ── Identity hero ── */}
@@ -302,7 +272,7 @@ export default function PostMenu({
           </div>
         </div>
 
-        {/* 4 stat chips */}
+        {/* 4 stat chips in a single row */}
         <div style={{ display: 'flex', gap: 10, marginTop: 14 }}>
           <StatChip
             value={u.messageCount.toLocaleString()}
@@ -326,54 +296,19 @@ export default function PostMenu({
         </div>
       </div>
 
-      {/* ── Play again CTA ── */}
-      <button
-        onClick={onReplay}
-        className="press lift a-gradient-shift"
-        style={{
-          position: 'relative', zIndex: 10, marginTop: 17, flexShrink: 0,
-          width: '100%', overflow: 'hidden',
-          background: 'linear-gradient(135deg, #FFE45C 0%, #FFD700 50%, #FFB800 100%)',
-          backgroundSize: '200% 200%',
-          color: '#2a0645',
-          border: 'none',
-          borderRadius: 22,
-          padding: '18px 20px',
-          cursor: 'pointer',
-          boxShadow: '0 10px 28px -4px rgba(224,168,0,0.55)',
-          textAlign: 'left',
-          display: 'flex', alignItems: 'center', gap: 16,
-        }}
-      >
-        <div className="a-shine" style={{ position: 'absolute', inset: 0, pointerEvents: 'none' }} />
-        <div style={{
-          width: 60, height: 60, borderRadius: 999,
-          background: '#4A0E4E', color: '#FFD700',
-          display: 'flex', alignItems: 'center', justifyContent: 'center',
-          flexShrink: 0, position: 'relative',
-          boxShadow: '0 4px 0 rgba(46,8,50,0.6)',
-        }}>
-          <IconPlay size={28} />
-        </div>
-        <div style={{ flex: 1, position: 'relative' }}>
-          <div className="fs-mono" style={{ fontSize: 9.5, letterSpacing: '0.22em', textTransform: 'uppercase', fontWeight: 800, opacity: 0.7 }}>
-            {t.menu_replay || 'The main event'}
-          </div>
-          <div className="fs-display" style={{ fontSize: 24, fontWeight: 800, letterSpacing: '-0.03em', lineHeight: 1.02, marginTop: 3 }}>
-            Play <span style={{ fontStyle: 'italic' }}>again</span> →
-          </div>
-          <div className="fs-mono" style={{ fontSize: 10.5, marginTop: 5, opacity: 0.95, fontWeight: 700, color: '#4A0E4E' }}>
-            23 slides · 90 seconds
-          </div>
-        </div>
-      </button>
+      {/* ── Choose your mode label ── */}
+      <div className="fs-mono" style={{
+        position: 'relative', zIndex: 10, marginTop: 19, flexShrink: 0,
+        fontSize: 10, letterSpacing: '0.22em', color: '#f06449',
+        fontWeight: 800, textTransform: 'uppercase', textAlign: 'center',
+      }}>✦ {t.menu_choose_mode || 'Choose your mode'}</div>
 
-      {/* ── 3 mode tiles ── */}
-      <div style={{ position: 'relative', zIndex: 10, display: 'flex', gap: 11, marginTop: 13, flexShrink: 0 }}>
+      {/* ── 3 mode tiles (horizontal rows) ── */}
+      <div style={{ position: 'relative', zIndex: 10, display: 'flex', flexDirection: 'column', gap: 10, marginTop: 10, flexShrink: 0 }}>
         {onRoastMode && (
           <ModeTile
             label={t.menu_roast_mode || 'Roast mode'}
-            title={<>Roast<br />everyone</>}
+            title={t.menu_roast_title || 'Roast everyone'}
             emoji="🔥"
             gradient="linear-gradient(135deg, #FF69B4 0%, #f06449 100%)"
             fg="#fff"
@@ -384,7 +319,7 @@ export default function PostMenu({
         {onDuo && (
           <ModeTile
             label={t.menu_duo_eyebrow || 'Duo mode'}
-            title={<>Compare<br />two</>}
+            title={t.menu_duo_title || 'Compare two'}
             emoji="👯"
             gradient="linear-gradient(135deg, #FFD700 0%, #FF8C00 100%)"
             fg="#4A0E4E"
@@ -395,7 +330,7 @@ export default function PostMenu({
         {onChaos && (
           <ModeTile
             label={t.menu_chaos_eyebrow || 'Chaos mode'}
-            title={<>Chaos<br />timeline</>}
+            title={t.menu_chaos_title || 'Chaos timeline'}
             emoji="🌀"
             gradient="linear-gradient(135deg, #00BFFF 0%, #573280 100%)"
             fg="#fff"
@@ -407,66 +342,35 @@ export default function PostMenu({
 
       {/* ── Group personality strip ── */}
       <div style={{
-        position: 'relative', zIndex: 10, marginTop: 13, flexShrink: 0,
-        background: '#4A0E4E',
+        position: 'relative', zIndex: 10, marginTop: 15, flexShrink: 0,
+        background: 'rgba(241,228,243,0.55)',
+        border: '1px solid rgba(87,50,128,0.12)',
         borderRadius: 16,
         padding: '12px 14px',
         display: 'flex', alignItems: 'center', gap: 12,
-        boxShadow: '0 8px 22px -4px rgba(74,14,78,0.40)',
+        boxShadow: '0 2px 10px rgba(87,50,128,0.06)',
       }}>
-        <div style={{ fontSize: 24, lineHeight: 1, flexShrink: 0, filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.25))' }}>
+        <div style={{ fontSize: 24, lineHeight: 1, flexShrink: 0 }}>
           👨‍👩‍👧
         </div>
         <div style={{ minWidth: 0, flex: 1 }}>
-          <div className="fs-mono" style={{ fontSize: 9, letterSpacing: '0.20em', color: '#FFD700', fontWeight: 800, textTransform: 'uppercase' }}>
+          <div className="fs-mono" style={{ fontSize: 9, letterSpacing: '0.20em', color: '#f06449', fontWeight: 800, textTransform: 'uppercase' }}>
             ✦ This group is
           </div>
           <div className="fs-display" style={{
             fontSize: 14, fontStyle: 'italic', fontWeight: 800,
-            color: '#fff', lineHeight: 1.15, marginTop: 1,
+            color: '#2a0645', lineHeight: 1.15, marginTop: 1,
             overflow: 'hidden', textOverflow: 'ellipsis',
             display: '-webkit-box', WebkitLineClamp: 1, WebkitBoxOrient: 'vertical',
           }}>
             {analytics.groupPersonality || '—'}
           </div>
         </div>
-        <div className="fs-mono" style={{ fontSize: 11, color: '#FFD700', fontWeight: 800, flexShrink: 0, letterSpacing: '0.04em' }}>
+        <div className="fs-mono" style={{ fontSize: 11, color: '#573280', fontWeight: 800, flexShrink: 0, letterSpacing: '0.04em' }}>
           {analytics.totalMessages.toLocaleString()}
-          <span style={{ opacity: 0.85, fontWeight: 600, marginLeft: 2 }}>msgs</span>
+          <span style={{ opacity: 0.7, fontWeight: 600, marginLeft: 2 }}>msgs</span>
         </div>
       </div>
-
-      {/* ── Awards strip ── */}
-      {awardsToShow.length > 0 && (
-        <div style={{ position: 'relative', zIndex: 10, marginTop: 11, flexShrink: 0, display: 'flex', gap: 10 }}>
-          {awardsToShow.map((aw, i) => (
-            <div key={i} style={{
-              flex: 1, position: 'relative', overflow: 'hidden',
-              background: '#ffffff',
-              border: '1px solid rgba(87,50,128,0.10)',
-              borderRadius: 14,
-              padding: '9px 10px 10px',
-              minWidth: 0,
-              boxShadow: '0 4px 14px -2px rgba(42,6,69,0.10)',
-              display: 'flex', flexDirection: 'column', alignItems: 'flex-start',
-            }}>
-              <div aria-hidden style={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: 3, background: accentColors[i % 3] }} />
-              <div style={{ fontSize: 20, lineHeight: 1, marginBottom: 5 }}>{aw.trophy}</div>
-              <div className="fs-mono" style={{
-                fontSize: 9, letterSpacing: '0.08em', color: '#573280',
-                fontWeight: 800, textTransform: 'uppercase', lineHeight: 1.1,
-                maxWidth: '100%', whiteSpace: 'nowrap',
-              }}>{aw.label}</div>
-              <div className="fs-display" style={{
-                fontSize: 11, color: '#2a0645', marginTop: 3,
-                fontWeight: 700, fontStyle: 'italic', lineHeight: 1.15,
-                maxWidth: '100%', whiteSpace: 'nowrap',
-                overflow: 'hidden', textOverflow: 'ellipsis',
-              }}>{aw.sub}</div>
-            </div>
-          ))}
-        </div>
-      )}
 
       {/* ── Footer: switch person + verified ── */}
       <div style={{
