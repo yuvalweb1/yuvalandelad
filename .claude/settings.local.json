@@ -110,7 +110,11 @@
       "Bash(node scripts/record-demo.mjs)",
       "Bash(powershell -Command \"Invoke-Item 'play-store/demo.mp4'\")",
       "Bash(powershell -Command 'Add-Type -AssemblyName System.Speech; \\(New-Object System.Speech.Synthesis.SpeechSynthesizer\\).GetInstalledVoices\\(\\) | ForEach-Object { Write-Host \\($_.VoiceInfo.Name + '\\\\'' ['\\\\'' + $_.VoiceInfo.Culture.Name + '\\\\'']'\\\\''\\) }')",
-      "mcp__claude_ai_Canva__generate-design"
+      "mcp__claude_ai_Canva__generate-design",
+      "Bash(mkdir -p play-store/canva)",
+      "Bash(curl -sL \"https://design.canva.ai/_8Afd45vu70v0PX\" -o play-store/canva/opt1.png)",
+      "mcp__claude_ai_Canva__create-design-from-candidate",
+      "mcp__claude_ai_Canva__export-design"
     ],
     "additionalDirectories": [
       "\\tmp"
