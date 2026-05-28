@@ -109,7 +109,8 @@
       "Bash(powershell -Command \"Invoke-Item 'play-store/ad-square-1080-en.png'; Start-Sleep -Seconds 1; Invoke-Item 'play-store/ad-story-1080x1920-en.png'; Start-Sleep -Seconds 1; Invoke-Item 'play-store/feature-graphic-1024x500-en.png'; Start-Sleep -Seconds 1; explorer.exe play-store\")",
       "Bash(node scripts/record-demo.mjs)",
       "Bash(powershell -Command \"Invoke-Item 'play-store/demo.mp4'\")",
-      "Bash(powershell -Command 'Add-Type -AssemblyName System.Speech; \\(New-Object System.Speech.Synthesis.SpeechSynthesizer\\).GetInstalledVoices\\(\\) | ForEach-Object { Write-Host \\($_.VoiceInfo.Name + '\\\\'' ['\\\\'' + $_.VoiceInfo.Culture.Name + '\\\\'']'\\\\''\\) }')"
+      "Bash(powershell -Command 'Add-Type -AssemblyName System.Speech; \\(New-Object System.Speech.Synthesis.SpeechSynthesizer\\).GetInstalledVoices\\(\\) | ForEach-Object { Write-Host \\($_.VoiceInfo.Name + '\\\\'' ['\\\\'' + $_.VoiceInfo.Culture.Name + '\\\\'']'\\\\''\\) }')",
+      "mcp__claude_ai_Canva__generate-design"
     ],
     "additionalDirectories": [
       "\\tmp"
