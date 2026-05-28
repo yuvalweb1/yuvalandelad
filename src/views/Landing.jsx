@@ -25,6 +25,8 @@ export default function Landing({
   const [historyOpen, setHistoryOpen] = useState(false);
   const [shaking, setShaking] = useState(false);
   const [howToPulse, setHowToPulse] = useState(false);
+  const [shakingHistory, setShakingHistory] = useState(false);
+  const [shakingMedia, setShakingMedia] = useState(false);
   const emojiRots = useMemo(() => [10, -13, 16, -9, 12].map(base => {
     const jitter = ((Math.random() * 12) | 0) - 6;
     return base + jitter;
@@ -35,6 +37,18 @@ export default function Landing({
     setShaking(true);
     setHowToPulse(true);
     setTimeout(() => { setShaking(false); setHowToPulse(false); }, 520);
+  }, []);
+
+  const handleDisabledHistoryClick = useCallback(() => {
+    setShakingHistory(true);
+    setHowToPulse(true);
+    setTimeout(() => { setShakingHistory(false); setHowToPulse(false); }, 520);
+  }, []);
+
+  const handleDisabledMediaClick = useCallback(() => {
+    setShakingMedia(true);
+    setHowToPulse(true);
+    setTimeout(() => { setShakingMedia(false); setHowToPulse(false); }, 520);
   }, []);
 
   return (
@@ -196,10 +210,9 @@ export default function Landing({
         animationDelay: '0.30s',
       }}>
         <button
-          onClick={() => history.length > 0 && setHistoryOpen(true)}
-          disabled={history.length === 0}
+          onClick={() => history.length > 0 ? setHistoryOpen(true) : handleDisabledHistoryClick()}
           aria-label={t.past_recaps}
-          className="press"
+          className={`press${shakingHistory ? ' cta-shake' : ''}`}
           style={{
             flex: 1, minWidth: 0,
             display: 'flex', alignItems: 'center', gap: 8,
@@ -243,10 +256,9 @@ export default function Landing({
         {setIncludeMedia && (
           <button
             type="button"
-            onClick={() => setIncludeMedia(!includeMedia)}
-            aria-pressed={includeMedia}
+            onClick={handleDisabledMediaClick}
             aria-label={t.landing_media_title}
-            className="press"
+            className={`press${shakingMedia ? ' cta-shake' : ''}`}
             style={{
               flex: 1, minWidth: 0,
               display: 'flex', alignItems: 'center', gap: 8,
