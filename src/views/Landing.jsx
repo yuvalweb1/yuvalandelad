@@ -204,13 +204,16 @@ export default function Landing({
             flex: 1, minWidth: 0,
             display: 'flex', alignItems: 'center', gap: 8,
             padding: '8px 10px',
-            background: 'rgba(255,255,255,0.82)',
-            border: '1.5px solid rgba(255,255,255,0.95)',
+            background: history.length === 0 ? 'rgba(220,215,210,0.55)' : 'rgba(255,255,255,0.82)',
+            border: `1.5px solid ${history.length === 0 ? 'rgba(200,195,190,0.60)' : 'rgba(255,255,255,0.95)'}`,
             borderRadius: 14,
-            boxShadow: '0 4px 0 rgba(74,14,78,0.12), 0 10px 18px -6px rgba(74,14,78,0.18)',
+            boxShadow: history.length === 0
+              ? '0 2px 0 rgba(74,14,78,0.06), 0 6px 12px -6px rgba(74,14,78,0.08)'
+              : '0 4px 0 rgba(74,14,78,0.12), 0 10px 18px -6px rgba(74,14,78,0.18)',
             cursor: history.length > 0 ? 'pointer' : 'default',
             textAlign: 'start', font: 'inherit',
-            opacity: history.length === 0 ? 0.6 : 1,
+            opacity: history.length === 0 ? 0.52 : 1,
+            filter: history.length === 0 ? 'grayscale(0.4)' : 'none',
           }}>
           <span aria-hidden="true" style={{ fontSize: 16, flexShrink: 0 }}>👀</span>
           <div style={{ flex: 1, minWidth: 0 }}>
@@ -248,13 +251,15 @@ export default function Landing({
               flex: 1, minWidth: 0,
               display: 'flex', alignItems: 'center', gap: 8,
               padding: '8px 10px',
-              background: includeMedia ? 'rgba(0,191,255,0.12)' : 'rgba(255,255,255,0.82)',
-              border: `1.5px solid ${includeMedia ? 'rgba(0,191,255,0.40)' : 'rgba(255,255,255,0.95)'}`,
+              background: 'rgba(220,215,210,0.55)',
+              border: '1.5px solid rgba(200,195,190,0.60)',
               borderRadius: 14,
-              boxShadow: '0 4px 0 rgba(74,14,78,0.12), 0 10px 18px -6px rgba(74,14,78,0.18)',
+              boxShadow: '0 2px 0 rgba(74,14,78,0.06), 0 6px 12px -6px rgba(74,14,78,0.08)',
               cursor: 'pointer', textAlign: 'start', font: 'inherit',
+              opacity: 0.52,
+              filter: 'grayscale(0.4)',
             }}>
-            <span aria-hidden="true" style={{ fontSize: 16, flexShrink: 0 }}>{includeMedia ? '📸' : '📝'}</span>
+            <span aria-hidden="true" style={{ fontSize: 16, flexShrink: 0 }}>📸</span>
             <div style={{ flex: 1, minWidth: 0 }}>
               <div className="fs-mono" style={{
                 fontSize: 9, fontWeight: 700, color: 'rgba(74,14,78,0.50)',
@@ -262,7 +267,7 @@ export default function Landing({
               }}>{t.landing_media_title}</div>
               <div className="fs-sans" style={{
                 fontSize: 12, fontWeight: 700,
-                color: includeMedia ? '#0089C4' : '#4A0E4E',
+                color: '#4A0E4E',
                 marginTop: 3, lineHeight: 1,
               }}>
                 {includeMedia ? (t.landing_media_on_short || 'On') : (t.landing_media_off_short || 'Off')}
@@ -346,17 +351,16 @@ export default function Landing({
           </div>
         )}
 
-        {/* Main CTA — big, exciting, the obvious next action */}
-        <button onClick={handleCtaClick} className={`press a-gradient-shift${shaking ? ' cta-shake' : ''}`} style={{
+        {/* Main CTA — visually disabled until a file is uploaded via step 2 */}
+        <button onClick={handleCtaClick} className={`press${shaking ? ' cta-shake' : ''}`} style={{
           width: '100%', position: 'relative', overflow: 'hidden',
-          padding: '20px 18px', color: '#4A0E4E',
-          background: 'linear-gradient(135deg, #FFE45C 0%, #FFD700 50%, #FFB800 100%)',
-          backgroundSize: '200% 200%',
-          border: '2px solid rgba(255,255,255,0.7)', borderRadius: 22,
-          fontSize: 20, fontWeight: 800, cursor: 'pointer', letterSpacing: '-0.01em',
-          boxShadow: '0 5px 0 #E0A800, 0 12px 22px -8px rgba(224,168,0,0.45)',
+          padding: '20px 18px', color: 'rgba(74,14,78,0.58)',
+          background: 'linear-gradient(135deg, rgba(235,215,200,0.78) 0%, rgba(218,205,188,0.72) 100%)',
+          border: '2px solid rgba(255,255,255,0.72)', borderRadius: 22,
+          fontSize: 20, fontWeight: 800, cursor: 'default', letterSpacing: '-0.01em',
+          boxShadow: '0 4px 0 rgba(74,14,78,0.13), 0 10px 20px -6px rgba(74,14,78,0.14)',
+          opacity: 0.88,
         }}>
-          <div className="a-shine" style={{ position: 'absolute', inset: 0 }} />
           <span className="fs-display" style={{ position: 'relative' }}>{t.landing_cta}</span>
         </button>
 

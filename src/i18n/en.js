@@ -38,7 +38,7 @@ export default {
   howto_ios_2: 'Tap the group / contact name at the top.',
   howto_ios_3: 'Scroll down and tap "Export Chat".',
   howto_ios_4: 'Choose "Attach Media" for photos (or "Without Media" for speed).',
-  howto_ios_5: 'Tap "Save to Files" in the share sheet, then come back here and tap Upload.',
+  howto_ios_5: 'In the share sheet, tap ChatWrapped — the file opens instantly.',
   howto_and_1: 'Open the chat or group you want to wrap.',
   howto_and_2: 'Tap the ⋮ menu (top right) → More → Export Chat.',
   howto_and_3: 'Tap "Export chat".',

@@ -223,7 +223,7 @@ function getSteps(platform, t) {
     { k: 'name',      label: t.howto_ios_2 },
     { k: 'export',    label: t.howto_ios_3 },
     { k: 'media',     label: t.howto_ios_4 },
-    { k: 'savefiles', label: t.howto_ios_5 },
+    { k: 'share',     label: t.howto_ios_5 },
   ];
   return [
     { k: 'chat',   label: t.howto_and_1 },
