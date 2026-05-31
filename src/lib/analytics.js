@@ -521,7 +521,7 @@ export function computeAll(messages) {
         vars: { pct: user.sharePct.toFixed(0) } },
       { cond: user.avgRespMin !== null && user.avgRespMin < 2 && user.respSampleSize >= 30,
         titleKey: 'st_title_available', evidenceKey: 'st_ev_available',
-        vars: { m: user.avgRespMin.toFixed(1), n: user.respSampleSize } },
+        vars: { m: (user.avgRespMin ?? 0).toFixed(1), n: user.respSampleSize } },
       { cond: user.questionRate > 0.30,
         titleKey: 'st_title_ceo_overthink', evidenceKey: 'st_ev_questions',
         vars: { pct: (user.questionRate*100).toFixed(0) } },
