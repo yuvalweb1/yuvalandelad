@@ -24,16 +24,20 @@ function persist(list) {
 // Strip the "WhatsApp Chat with " preamble across the languages this app supports.
 const FILENAME_PREFIX_PATTERNS = [
   /^WhatsApp\s+Chat\s+(?:with|-)\s*/i,             // en  (iOS + Android)
-  /^WhatsApp\s+צ['׳']?אט\s+עם\s*/i,                // he
+  /^WhatsApp\s+צ\S?אט\s+עם\s*/i,  // he (WhatsApp first)
+  /^צ\S?אט\s+WhatsApp\s+עם\s*/i,  // he (chat first — Android/some iOS)
   /^Chat\s+de\s+WhatsApp\s+con\s*/i,               // es
   /^Discussion\s+WhatsApp\s+avec\s*/i,             // fr
   /^WhatsApp[-\s]Chat\s+mit\s*/i,                  // de
   /^Conversa\s+do\s+WhatsApp\s+com\s*/i,           // pt
   /^Chat\s+WhatsApp\s+con\s*/i,                    // it
-  /^Чат\s+WhatsApp\s+с\s*/i,                       // ru
-  /^محادثة\s+WhatsApp\s+مع\s*/i,                    // ar
+  /^Чат\s+WhatsApp\s+с\s*/i,  // ru
+  /^محادثة\s+WhatsApp\s+مع\s*/i, // ar
   /^WhatsApp\s+Sohbeti[-:\s]+/i,                   // tr
 ];
+
+// Emoji range covering most modern emoji (U+1F000–U+1FBFF, U+2600–U+27BF).
+const EMOJI_RE = /[\u{1F000}-\u{1FBFF}\u{2600}-\u{27BF}]/u;
 
 // Friendly chat name from an export filename — last-resort fallback when the
 // parser couldn't detect the group's own subject from the chat content.
@@ -41,9 +45,21 @@ export function chatNameFromFile(name) {
   if (!name) return '';
   let n = name.replace(/\.(txt|zip)$/i, '').trim();
   if (/^_chat$/i.test(n)) return 'Chat';
+
+  // Try the language-specific prefix patterns first.
+  let prefixStripped = false;
   for (const re of FILENAME_PREFIX_PATTERNS) {
-    if (re.test(n)) { n = n.replace(re, ''); break; }
+    if (re.test(n)) { n = n.replace(re, ''); prefixStripped = true; break; }
   }
+
+  // Fallback: if the pattern didn't match (leading emoji or invisible char blocked
+  // the ^ anchor), search for the "with" keyword anywhere inside the filename
+  // and take everything after it.
+  if (!prefixStripped && /WhatsApp/i.test(n)) {
+    const m = n.match(/(?:עם|with|con|avec|mit|com|с|مع)\s+(.+)/i);
+    if (m) { n = m[1]; prefixStripped = true; }
+  }
+
   return n.trim() || 'Chat';
 }
 

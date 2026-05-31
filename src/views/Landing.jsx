@@ -1,6 +1,6 @@
 import { useRef, useState, useCallback, useMemo } from 'react';
 import BottomSheet from '../components/BottomSheet.jsx';
-import { relativeTime } from '../lib/history.js';
+import { relativeTime, chatNameFromFile } from '../lib/history.js';
 
 const LANGUAGES = [
   { code: 'en', name: 'English', flag: '🇺🇸' },
@@ -25,30 +25,51 @@ export default function Landing({
   const [historyOpen, setHistoryOpen] = useState(false);
   const [shaking, setShaking] = useState(false);
   const [howToPulse, setHowToPulse] = useState(false);
-  const [shakingHistory, setShakingHistory] = useState(false);
-  const [shakingMedia, setShakingMedia] = useState(false);
+  const [pendingFile, setPendingFile] = useState(null);
+  const [selectedHistoryId, setSelectedHistoryId] = useState(() =>
+    history.length > 0 ? history[0].id : null
+  );
   const emojiRots = useMemo(() => [10, -13, 16, -9, 12].map(base => {
     const jitter = ((Math.random() * 12) | 0) - 6;
     return base + jitter;
   }), []);
-  const currentLang = LANGUAGES.find(l => l.code === lang) || LANGUAGES[0];
 
-  const handleCtaClick = useCallback(() => {
-    setShaking(true);
-    setHowToPulse(true);
-    setTimeout(() => { setShaking(false); setHowToPulse(false); }, 520);
+  const selectedHistoryItem = selectedHistoryId ? history.find(r => r.id === selectedHistoryId) : null;
+  const hasSelection = pendingFile !== null || selectedHistoryItem != null;
+
+  const handleCtaMain = useCallback(() => {
+    if (pendingFile) {
+      onFile(pendingFile);
+    } else if (selectedHistoryItem) {
+      onLoadRecap(selectedHistoryItem.id);
+    } else {
+      setShaking(true);
+      setHowToPulse(true);
+      setTimeout(() => { setShaking(false); setHowToPulse(false); }, 520);
+    }
+  }, [pendingFile, selectedHistoryItem, onFile, onLoadRecap]);
+
+  const handleFileChange = useCallback((e) => {
+    const f = e.target.files?.[0];
+    if (f) {
+      setPendingFile(f);
+      setSelectedHistoryId(null);
+    }
+    e.target.value = '';
   }, []);
 
-  const handleDisabledHistoryClick = useCallback(() => {
-    setShakingHistory(true);
-    setHowToPulse(true);
-    setTimeout(() => { setShakingHistory(false); setHowToPulse(false); }, 520);
-  }, []);
+  const handleSwitchClick = useCallback(() => {
+    if (history.length > 0) {
+      setHistoryOpen(true);
+    } else {
+      fileInputRef.current?.click();
+    }
+  }, [history.length]);
 
-  const handleDisabledMediaClick = useCallback(() => {
-    setShakingMedia(true);
-    setHowToPulse(true);
-    setTimeout(() => { setShakingMedia(false); setHowToPulse(false); }, 520);
+  const handleSelectHistory = useCallback((id) => {
+    setSelectedHistoryId(id);
+    setPendingFile(null);
+    setHistoryOpen(false);
   }, []);
 
   return (
@@ -202,110 +223,132 @@ export default function Landing({
       )}
       </div>
 
-      {/* Compact utility row — Past Recaps + Media toggle, 50/50.
-          The full recap list opens in a bottom sheet on tap. */}
+      {/* ===== NOW SELECTED card ===== */}
       <div className="a-fade-up" style={{
         position: 'relative', zIndex: 10, flexShrink: 0,
-        marginTop: 10, display: 'flex', gap: 8,
-        animationDelay: '0.30s',
+        marginTop: 10, animationDelay: '0.28s',
       }}>
-        <button
-          onClick={() => history.length > 0 ? setHistoryOpen(true) : handleDisabledHistoryClick()}
-          aria-label={t.past_recaps}
-          className={`press${shakingHistory ? ' cta-shake' : ''}`}
-          style={{
-            flex: 1, minWidth: 0,
-            display: 'flex', alignItems: 'center', gap: 8,
-            padding: '8px 10px',
-            background: history.length === 0 ? 'rgba(220,215,210,0.55)' : 'rgba(255,255,255,0.82)',
-            border: `1.5px solid ${history.length === 0 ? 'rgba(200,195,190,0.60)' : 'rgba(255,255,255,0.95)'}`,
-            borderRadius: 14,
-            boxShadow: history.length === 0
-              ? '0 2px 0 rgba(74,14,78,0.06), 0 6px 12px -6px rgba(74,14,78,0.08)'
-              : '0 4px 0 rgba(74,14,78,0.12), 0 10px 18px -6px rgba(74,14,78,0.18)',
-            cursor: history.length > 0 ? 'pointer' : 'default',
-            textAlign: 'start', font: 'inherit',
-            opacity: history.length === 0 ? 0.52 : 1,
-            filter: history.length === 0 ? 'grayscale(0.4)' : 'none',
-          }}>
-          <span aria-hidden="true" style={{ fontSize: 16, flexShrink: 0 }}>👀</span>
-          <div style={{ flex: 1, minWidth: 0 }}>
-            <div className="fs-mono" style={{
-              fontSize: 9, fontWeight: 700, color: 'rgba(74,14,78,0.50)',
-              letterSpacing: '0.14em', textTransform: 'uppercase', lineHeight: 1,
-            }}>{t.past_recaps}</div>
-            <div dir="auto" className="fs-sans" style={{
-              fontSize: 12, fontWeight: 700, color: '#4A0E4E',
-              marginTop: 3, lineHeight: 1,
-              overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
-            }}>
-              {history.length === 0
-                ? (t.past_recaps_empty)
-                : history.length === 1
-                  ? history[0].chatName
-                  : `${history.length} ${t.settings_recap_many || 'saved'}`}
-            </div>
-          </div>
-          {history.length > 0 && (
-            <span aria-hidden="true" style={{
-              fontSize: 12, color: '#573280', fontWeight: 800, flexShrink: 0,
-            }}>→</span>
-          )}
-        </button>
-
-        {setIncludeMedia && (
-          <button
-            type="button"
-            onClick={handleDisabledMediaClick}
-            aria-label={t.landing_media_title}
-            className={`press${shakingMedia ? ' cta-shake' : ''}`}
-            style={{
-              flex: 1, minWidth: 0,
-              display: 'flex', alignItems: 'center', gap: 8,
-              padding: '8px 10px',
-              background: 'rgba(220,215,210,0.55)',
-              border: '1.5px solid rgba(200,195,190,0.60)',
-              borderRadius: 14,
-              boxShadow: '0 2px 0 rgba(74,14,78,0.06), 0 6px 12px -6px rgba(74,14,78,0.08)',
-              cursor: 'pointer', textAlign: 'start', font: 'inherit',
-              opacity: 0.52,
-              filter: 'grayscale(0.4)',
-            }}>
-            <span aria-hidden="true" style={{ fontSize: 16, flexShrink: 0 }}>📸</span>
-            <div style={{ flex: 1, minWidth: 0 }}>
-              <div className="fs-mono" style={{
-                fontSize: 9, fontWeight: 700, color: 'rgba(74,14,78,0.50)',
-                letterSpacing: '0.14em', textTransform: 'uppercase', lineHeight: 1,
-              }}>{t.landing_media_title}</div>
-              <div className="fs-sans" style={{
-                fontSize: 12, fontWeight: 700,
-                color: '#4A0E4E',
-                marginTop: 3, lineHeight: 1,
+        <div style={{
+          background: 'rgba(255,255,255,0.82)',
+          border: '1.5px solid rgba(255,255,255,0.95)',
+          borderRadius: 18,
+          padding: '11px 12px',
+          boxShadow: '0 4px 0 rgba(74,14,78,0.12), 0 10px 18px -6px rgba(74,14,78,0.18)',
+        }}>
+          {/* Header row */}
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: hasSelection ? 8 : 0 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
+              <span aria-hidden="true" style={{ color: '#FF1867', fontSize: 11, lineHeight: 1 }}>★</span>
+              <span className="fs-mono" style={{
+                fontSize: 9, fontWeight: 700, letterSpacing: '0.13em',
+                color: 'rgba(74,14,78,0.55)', textTransform: 'uppercase',
               }}>
-                {includeMedia ? (t.landing_media_on_short || 'On') : (t.landing_media_off_short || 'Off')}
+                {hasSelection ? 'NOW SELECTED' : 'NO CHAT SELECTED'}
+              </span>
+            </div>
+            <button
+              onClick={handleSwitchClick}
+              className="press fs-sans"
+              style={{
+                padding: '4px 9px',
+                background: 'rgba(74,14,78,0.08)',
+                border: 'none', borderRadius: 8,
+                fontSize: 11, fontWeight: 700, color: '#573280',
+                cursor: 'pointer', letterSpacing: '-0.01em',
+              }}>
+              SWITCH ↓
+            </button>
+          </div>
+
+          {hasSelection && (
+            <>
+              {/* Chat identity row */}
+              <div style={{ display: 'flex', alignItems: 'center', gap: 9 }}>
+                <div style={{
+                  flexShrink: 0, width: 34, height: 34, borderRadius: 999,
+                  background: pendingFile ? 'rgba(74,14,78,0.15)' : '#FF69B4',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  fontSize: 17,
+                }}>
+                  {pendingFile ? '📄' : '💬'}
+                </div>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div dir="auto" style={{
+                    fontSize: 17, fontWeight: 800, color: '#2a0645',
+                    overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+                    lineHeight: 1.2,
+                  }}>
+                    {pendingFile
+                      ? chatNameFromFile(pendingFile.name)
+                      : selectedHistoryItem?.chatName}
+                  </div>
+                  <div style={{ fontSize: 11, color: 'rgba(74,14,78,0.50)', marginTop: 2, lineHeight: 1.3 }}>
+                    {pendingFile
+                      ? 'Ready to analyze'
+                      : selectedHistoryItem
+                        ? `Viewed ${relativeTime(selectedHistoryItem.date, lang)} · since ${new Date(selectedHistoryItem.stats.start).toLocaleDateString(lang, { month: 'short', year: 'numeric' })}`
+                        : ''}
+                  </div>
+                </div>
               </div>
-            </div>
-            {/* Mini iOS-style switch */}
-            <div aria-hidden="true" style={{
-              flexShrink: 0, width: 24, height: 14, borderRadius: 999,
-              background: includeMedia ? '#00BFFF' : 'rgba(74,14,78,0.18)',
-              position: 'relative', transition: 'background 0.18s',
-            }}>
-              <div style={{
-                position: 'absolute', top: 2, insetInlineStart: includeMedia ? 12 : 2,
-                width: 10, height: 10, borderRadius: '50%', background: '#fff',
-                boxShadow: '0 1px 2px rgba(0,0,0,0.18)',
-                transition: 'inset-inline-start 0.18s',
-              }} />
-            </div>
-          </button>
-        )}
+
+              {/* Stats row — real values for parsed recaps, ? for pending files */}
+              {(selectedHistoryItem?.stats || pendingFile) && (
+                <>
+                  <div style={{ height: 1, background: 'rgba(74,14,78,0.09)', margin: '9px 0 8px' }} />
+                  <div style={{ display: 'flex', alignItems: 'center' }}>
+                    {[
+                      {
+                        label: 'MESSAGES',
+                        value: pendingFile ? '?' : selectedHistoryItem.stats.totalMessages != null
+                          ? selectedHistoryItem.stats.totalMessages.toLocaleString()
+                          : '—',
+                      },
+                      {
+                        label: 'PEOPLE',
+                        value: pendingFile ? '?' : (selectedHistoryItem.stats.totalParticipants
+                          ?? selectedHistoryItem.stats.users?.length
+                          ?? '—'),
+                      },
+                      {
+                        label: 'SPAN',
+                        value: pendingFile ? '?' : selectedHistoryItem.stats.durationDays != null
+                          ? `${selectedHistoryItem.stats.durationDays}d`
+                          : '—',
+                      },
+                    ].map((stat, i, arr) => (
+                      <div key={stat.label} style={{
+                        flex: 1, textAlign: 'center',
+                        borderRight: i < arr.length - 1 ? '1px solid rgba(74,14,78,0.12)' : 'none',
+                        padding: '0 4px',
+                      }}>
+                        <div className="fs-sans" style={{
+                          fontSize: 15, fontWeight: 800, lineHeight: 1,
+                          color: pendingFile ? 'rgba(74,14,78,0.30)' : '#2a0645',
+                        }}>
+                          {stat.value}
+                        </div>
+                        <div className="fs-mono" style={{
+                          fontSize: 8.5, fontWeight: 700, letterSpacing: '0.10em',
+                          color: 'rgba(74,14,78,0.45)', textTransform: 'uppercase', marginTop: 2,
+                        }}>
+                          {stat.label}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </>
+              )}
+            </>
+          )}
+        </div>
       </div>
 
-      <div className="a-fade-up" style={{ position: 'relative', zIndex: 10, flexShrink: 0, paddingTop: 16, animationDelay: '0.45s' }}>
+
+      <div className="a-fade-up" style={{ position: 'relative', zIndex: 10, flexShrink: 0, paddingTop: 8, animationDelay: '0.45s' }}>
         <input ref={fileInputRef} type="file" accept=".txt,.zip,application/zip,text/plain"
           style={{ display: 'none' }}
-          onChange={e => { const f = e.target.files?.[0]; if (f) onFile(f); e.target.value = ''; }} />
+          onChange={handleFileChange} />
 
         {/* Prereq card — shows the 2-step flow so the upload CTA has context */}
         {onHowTo && (
@@ -363,16 +406,28 @@ export default function Landing({
           </div>
         )}
 
-        {/* Main CTA — visually disabled until a file is uploaded via step 2 */}
-        <button onClick={handleCtaClick} className={`press${shaking ? ' cta-shake' : ''}`} style={{
-          width: '100%', position: 'relative', overflow: 'hidden',
-          padding: '20px 18px', color: 'rgba(74,14,78,0.58)',
-          background: 'linear-gradient(135deg, rgba(235,215,200,0.78) 0%, rgba(218,205,188,0.72) 100%)',
-          border: '2px solid rgba(255,255,255,0.72)', borderRadius: 22,
-          fontSize: 20, fontWeight: 800, cursor: 'default', letterSpacing: '-0.01em',
-          boxShadow: '0 4px 0 rgba(74,14,78,0.13), 0 10px 20px -6px rgba(74,14,78,0.14)',
-          opacity: 0.88,
-        }}>
+        {/* Main CTA — active when a chat is selected */}
+        <button
+          onClick={handleCtaMain}
+          className={`press${shaking && !hasSelection ? ' cta-shake' : ''}`}
+          style={{
+            width: '100%', position: 'relative', overflow: 'hidden',
+            padding: '20px 18px',
+            color: hasSelection ? '#4A0E4E' : 'rgba(74,14,78,0.58)',
+            background: hasSelection
+              ? 'linear-gradient(135deg, #FFD700 0%, #FFC200 100%)'
+              : 'linear-gradient(135deg, rgba(235,215,200,0.78) 0%, rgba(218,205,188,0.72) 100%)',
+            border: hasSelection ? '2px solid rgba(255,255,255,0.80)' : '2px solid rgba(255,255,255,0.72)',
+            borderRadius: 22,
+            fontSize: 20, fontWeight: 800,
+            cursor: hasSelection ? 'pointer' : 'default',
+            letterSpacing: '-0.01em',
+            boxShadow: hasSelection
+              ? '0 6px 0 rgba(74,14,78,0.25), 0 14px 24px -6px rgba(74,14,78,0.30)'
+              : '0 4px 0 rgba(74,14,78,0.13), 0 10px 20px -6px rgba(74,14,78,0.14)',
+            opacity: hasSelection ? 1 : 0.88,
+            transition: 'background 0.25s, color 0.25s, box-shadow 0.25s, opacity 0.25s',
+          }}>
           <span className="fs-display" style={{ position: 'relative' }}>{t.landing_cta}</span>
         </button>
 
@@ -437,12 +492,13 @@ export default function Landing({
               borderBottom: '1px solid rgba(74,14,78,0.09)',
             }}>
               <button
-                onClick={() => { onLoadRecap(r.id); setHistoryOpen(false); }}
+                onClick={() => handleSelectHistory(r.id)}
                 className="press recap-row"
                 style={{
                   flex: 1, minWidth: 0,
                   display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: 3,
-                  background: 'transparent', border: 'none', color: '#2a0645',
+                  background: r.id === selectedHistoryId ? 'rgba(74,14,78,0.06)' : 'transparent',
+                  border: 'none', color: '#2a0645',
                   textAlign: 'start', cursor: 'pointer', padding: '4px 6px',
                   borderRadius: 10,
                 }}>
@@ -455,6 +511,9 @@ export default function Landing({
                   fontSize: 12, color: 'rgba(74,14,78,0.50)', letterSpacing: '0.04em',
                 }}>{relativeTime(r.date, lang)}</div>
               </button>
+              {r.id === selectedHistoryId && (
+                <span style={{ fontSize: 16, color: '#FF1867', flexShrink: 0 }}>✓</span>
+              )}
               <button
                 onClick={() => onDeleteRecap(r.id)}
                 aria-label={t.past_recaps_remove}
