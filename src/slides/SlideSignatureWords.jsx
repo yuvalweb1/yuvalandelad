@@ -3,14 +3,19 @@ import SlideShell from './SlideShell.jsx';
 import ListSlideDecor from '../components/ListSlideDecor.jsx';
 import { typedCopy } from '../i18n';
 
+// Show this many rows immediately; reveal the rest only when the user taps
+// "+N more". Same pattern as SlidePerPerson / SlideLeaderboard.
+const MAX_ROWS = 8;
+
 const SlideSignatureWords = React.memo(function SlideSignatureWords({ a, t, profile }) {
   const type = profile?.relationship || 'other';
   const allRows = (a.users || []).filter(usr => usr.topWord);
   if (allRows.length === 0) return null;
   const [expanded, setExpanded] = useState(false);
-  const rows = expanded ? allRows : [];
-  const showButton = !expanded;
-  const moreLabel = (t.lb_more || '+{n} more').replace('{n}', allRows.length);
+  const overflow = allRows.length - MAX_ROWS;
+  const showOverflow = overflow > 0 && !expanded;
+  const rows = showOverflow ? allRows.slice(0, MAX_ROWS) : allRows;
+  const moreLabel = (t.lb_more || '+{n} more').replace('{n}', overflow);
   const DEEP = '#6624B0';
   return (
     <SlideShell bg="#577590" accent="#8338ec">
@@ -46,7 +51,7 @@ const SlideSignatureWords = React.memo(function SlideSignatureWords({ a, t, prof
               <div className="fs-mono" style={{ flexShrink: 0, fontSize: 12, color: 'rgba(74,14,78,0.55)', fontWeight: 600 }}>{usr.topWordCount}×</div>
             </div>
           ))}
-          {showButton && (
+          {showOverflow && (
             <button onClick={() => setExpanded(true)} className="press" style={{
               background: 'none', border: 'none', cursor: 'pointer',
               textAlign: 'center', fontSize: 11, color: '#8338ec',
