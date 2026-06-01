@@ -75,7 +75,7 @@ function ModeTile({ label, title, emoji, gradient, fg = '#fff', shadowColor = '#
       width: '100%', position: 'relative', overflow: 'hidden',
       textAlign: 'left',
       background: gradient,
-      border: '3px solid rgba(255,255,255,0.10)',
+      border: 'none',
       borderRadius: 20,
       padding: '14px 18px',
       cursor: 'pointer',
