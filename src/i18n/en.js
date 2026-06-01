@@ -19,6 +19,7 @@ export default {
   landing_trust: 'Everything is processed locally. Your chat never leaves your device.',
   landing_step1: 'Export your chat',
   landing_step2: 'Upload an exported file',
+  landing_demo_soft: 'Try the demo →',
   // Past recaps
   past_recaps: 'past recaps',
   past_recaps_clear: 'clear all',

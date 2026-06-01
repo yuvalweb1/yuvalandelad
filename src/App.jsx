@@ -51,7 +51,19 @@ function ChatWrappedApp() {
   const [fileName, setFileName] = useState('');
   const [slide, setSlide] = useState(0);
   const [parsingStage, setParsingStage] = useState(0);
-  const [lang, setLang] = useState(() => detectLang());
+  // Lang persists across visits: prefer the user's explicit choice from a
+  // previous session, fall back to navigator.language on first visit.
+  const [lang, setLangRaw] = useState(() => {
+    try {
+      const saved = localStorage.getItem('cw_lang');
+      if (saved) return saved;
+    } catch {}
+    return detectLang();
+  });
+  const setLang = useCallback((l) => {
+    setLangRaw(l);
+    try { localStorage.setItem('cw_lang', l); } catch {}
+  }, []);
   // Include media (photos / voice / stickers / videos) in the analysis.
   // Off = faster, text-only. Persisted so users don't re-toggle each visit.
   const [includeMedia, setIncludeMedia] = useState(() => {

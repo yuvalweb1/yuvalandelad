@@ -19,6 +19,7 @@ export default {
   landing_trust: 'הכל מעובד מקומית. הצ׳אט שלך לא עוזב את המכשיר.',
   landing_step1: 'ייצא את הצ׳אט מ-WhatsApp',
   landing_step2: 'העלה את הקובץ שייצאת',
+  landing_demo_soft: 'נסה את הדמו ←',
   // ריקאפים קודמים
   past_recaps: 'ריקאפים קודמים',
   past_recaps_clear: 'נקה הכל',
