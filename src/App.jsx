@@ -155,6 +155,13 @@ function ChatWrappedApp() {
       setHistory(loadHistory());
       setParsingStage(4);
       await new Promise(r => setTimeout(r, 400));
+      if (!a.users || a.users.length === 0) {
+        // Parsed lines but classified zero senders — usually a system-only
+        // export (joins/leaves) or an unsupported format the parser couldn't
+        // attach to any header. Surface the diagnostic counters via
+        // VerifyView rather than crashing on a.users[0].author.
+        throw new Error(t.err_no_msgs);
+      }
       setAnalytics(a);
       setSelectedAuthor(a.users[0].author);
       setSlide(0);
@@ -212,11 +219,20 @@ function ChatWrappedApp() {
     await new Promise(r => setTimeout(r, 500));
     setParsingStage(4);
     await new Promise(r => setTimeout(r, 400));
+    if (!a.users || a.users.length === 0) {
+      // The bundled sample text always has multiple users, so reaching
+      // here means generateSampleText() got corrupted somehow — fail loud
+      // rather than crashing on undefined.author.
+      console.error('Demo produced no users — sample text is broken');
+      setParseError(t.err_no_msgs);
+      setStage('landing');
+      return;
+    }
     setAnalytics(a);
     setSelectedAuthor(a.users[0].author);
     setSlide(0);
     setStage(adEnabled('post_parse') ? 'ad_post_parse' : 'onboard');
-  }, [includeMedia]);
+  }, [includeMedia, t]);
 
   // Capacitor Android: MainActivity copies the shared file into the app's cache
   // dir and hands us the *path* (not the bytes). We fetch it via Capacitor's

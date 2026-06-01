@@ -355,7 +355,7 @@ export default function PostMenu({
         </div>
         <div style={{ minWidth: 0, flex: 1 }}>
           <div className="fs-mono" style={{ fontSize: 9, letterSpacing: '0.20em', color: '#f06449', fontWeight: 800, textTransform: 'uppercase' }}>
-            ✦ This group is
+            {t.menu_this_group_is || '✦ This group is'}
           </div>
           <div className="fs-display" style={{
             fontSize: 14, fontStyle: 'italic', fontWeight: 800,
@@ -368,7 +368,7 @@ export default function PostMenu({
         </div>
         <div className="fs-mono" style={{ fontSize: 11, color: '#573280', fontWeight: 800, flexShrink: 0, letterSpacing: '0.04em' }}>
           {analytics.totalMessages.toLocaleString()}
-          <span style={{ opacity: 0.7, fontWeight: 600, marginLeft: 2 }}>msgs</span>
+          <span style={{ opacity: 0.7, fontWeight: 600, marginInlineStart: 2 }}>{t.menu_msgs || 'msgs'}</span>
         </div>
       </div>
 
@@ -407,7 +407,7 @@ export default function PostMenu({
             </div>
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 4, color: '#f06449', fontSize: 10, fontWeight: 800, letterSpacing: '0.16em', textTransform: 'uppercase' }}>
-            Switch <IconChevronDown />
+            {t.menu_switch_inline || 'Switch'} <IconChevronDown />
           </div>
         </button>
 
@@ -430,7 +430,7 @@ export default function PostMenu({
               <IconCheck />{confidence}%
             </div>
             <div className="fs-mono" style={{ fontSize: 8, color: 'rgba(26,135,84,0.85)', marginTop: 2, letterSpacing: '0.14em', fontWeight: 700, textTransform: 'uppercase' }}>
-              Verified
+              {t.menu_verified_label || 'Verified'}
             </div>
           </button>
         )}

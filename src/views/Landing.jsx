@@ -1,6 +1,7 @@
 import { useRef, useState, useCallback, useMemo } from 'react';
 import BottomSheet from '../components/BottomSheet.jsx';
 import { relativeTime, chatNameFromFile } from '../lib/history.js';
+import { interp } from '../i18n';
 
 const LANGUAGES = [
   { code: 'en', name: 'English', flag: '🇺🇸' },
@@ -243,7 +244,7 @@ export default function Landing({
                 fontSize: 9, fontWeight: 700, letterSpacing: '0.13em',
                 color: 'rgba(74,14,78,0.55)', textTransform: 'uppercase',
               }}>
-                {hasSelection ? 'NOW SELECTED' : 'NO CHAT SELECTED'}
+                {hasSelection ? (t.landing_now_selected || 'NOW SELECTED') : (t.landing_no_chat_selected || 'NO CHAT SELECTED')}
               </span>
             </div>
             <button
@@ -284,9 +285,12 @@ export default function Landing({
                   </div>
                   <div style={{ fontSize: 11, color: 'rgba(74,14,78,0.50)', marginTop: 2, lineHeight: 1.3 }}>
                     {pendingFile
-                      ? 'Ready to analyze'
+                      ? (t.landing_ready_to_analyze || 'Ready to analyze')
                       : selectedHistoryItem
-                        ? `Viewed ${relativeTime(selectedHistoryItem.date, lang)} · since ${new Date(selectedHistoryItem.stats.start).toLocaleDateString(lang, { month: 'short', year: 'numeric' })}`
+                        ? interp(t.landing_history_viewed || 'Viewed {rel} · since {date}', {
+                            rel: relativeTime(selectedHistoryItem.date, lang),
+                            date: new Date(selectedHistoryItem.stats.start).toLocaleDateString(lang, { month: 'short', year: 'numeric' }),
+                          })
                         : ''}
                   </div>
                 </div>
@@ -299,19 +303,19 @@ export default function Landing({
                   <div style={{ display: 'flex', alignItems: 'center' }}>
                     {[
                       {
-                        label: 'MESSAGES',
+                        label: t.landing_stat_messages || 'MESSAGES',
                         value: pendingFile ? '?' : selectedHistoryItem.stats.totalMessages != null
                           ? selectedHistoryItem.stats.totalMessages.toLocaleString()
                           : '—',
                       },
                       {
-                        label: 'PEOPLE',
+                        label: t.landing_stat_people || 'PEOPLE',
                         value: pendingFile ? '?' : (selectedHistoryItem.stats.totalParticipants
                           ?? selectedHistoryItem.stats.users?.length
                           ?? '—'),
                       },
                       {
-                        label: 'SPAN',
+                        label: t.landing_stat_span || 'SPAN',
                         value: pendingFile ? '?' : selectedHistoryItem.stats.durationDays != null
                           ? `${selectedHistoryItem.stats.durationDays}d`
                           : '—',
@@ -394,13 +398,13 @@ export default function Landing({
               <div dir="auto" style={{ flex: 1, minWidth: 0, fontSize: 13, fontWeight: 600, color: '#2a0645', lineHeight: 1.25, overflowWrap: 'break-word', wordBreak: 'break-word' }}>
                 {t.landing_step2}
               </div>
-              <div dir="ltr" style={{
+              <div dir="auto" style={{
                 flexShrink: 0, padding: '5px 10px',
                 background: '#FFF6E8', border: '1px solid rgba(74,14,78,0.10)',
                 borderRadius: 9, color: '#4A0E4E', fontSize: 11.5, fontWeight: 700,
                 whiteSpace: 'nowrap', letterSpacing: '-0.01em',
               }}>
-                Upload ↑
+                {t.landing_upload_btn || 'Upload ↑'}
               </div>
             </button>
           </div>

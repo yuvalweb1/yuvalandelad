@@ -59,9 +59,11 @@ export default function Wrapped({ analytics, diagnostics, selectedAuthor, setSel
         ))}
       </div>
 
-      {/* Close */}
+      {/* Close — insetInlineEnd keeps the X on the trailing edge (top-right
+          in LTR, top-left in RTL) so it doesn't collide with RTL slide
+          titles/content that aligns to the right. */}
       <button onClick={onExit} className="press" aria-label={t.a11y_close || 'Close'} style={{
-        position: 'absolute', top: 34, right: 16, zIndex: 5,
+        position: 'absolute', top: 34, insetInlineEnd: 16, zIndex: 5,
         background: 'rgba(0,0,0,0.25)', backdropFilter: 'blur(12px)',
         color: '#fff', border: 'none', width: 40, height: 40,
         borderRadius: '50%', cursor: 'pointer',
@@ -76,7 +78,7 @@ export default function Wrapped({ analytics, diagnostics, selectedAuthor, setSel
 
       {/* Media slides need explicit nav — the slide area belongs to audio/video. */}
       {isMediaSlide && slide > 0 && (
-        <button onClick={prev} className="press" aria-label="Previous" style={{
+        <button onClick={prev} className="press" aria-label={t.a11y_previous || 'Previous'} style={{
           position: 'absolute', bottom: 18, insetInlineStart: 18, zIndex: 5,
           width: 44, height: 44, borderRadius: '50%', border: 'none', cursor: 'pointer',
           background: 'rgba(0,0,0,0.35)', backdropFilter: 'blur(12px)', color: '#fff',
@@ -89,7 +91,7 @@ export default function Wrapped({ analytics, diagnostics, selectedAuthor, setSel
         </button>
       )}
       {isMediaSlide && slide < total - 1 && (
-        <button onClick={next} className="press" aria-label="Next" style={{
+        <button onClick={next} className="press" aria-label={t.a11y_next || 'Next'} style={{
           position: 'absolute', bottom: 18, insetInlineEnd: 18, zIndex: 5,
           width: 44, height: 44, borderRadius: '50%', border: 'none', cursor: 'pointer',
           background: 'rgba(0,0,0,0.35)', backdropFilter: 'blur(12px)', color: '#fff',
