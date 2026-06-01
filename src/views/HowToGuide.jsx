@@ -130,7 +130,7 @@ function WaMock({ kind, t }) {
       </MiniPhone>
     );
   }
-  // share sheet — final step for Android (tap ChatWrapped)
+  // share sheet — final step for Android (tap Recapped)
   if (kind === 'share') {
     return (
       <MiniPhone>
@@ -145,7 +145,7 @@ function WaMock({ kind, t }) {
           }}>
             <div style={{ fontSize: 9, fontWeight: 700, color: '#888', marginBottom: 8, textAlign: 'center' }}>Share via…</div>
             <div style={{ display: 'flex', gap: 8, justifyContent: 'center' }}>
-              {/* ChatWrapped icon — highlighted */}
+              {/* Recapped icon — highlighted */}
               <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 }}>
                 <div style={{
                   width: 42, height: 42, borderRadius: 12,
@@ -159,7 +159,7 @@ function WaMock({ kind, t }) {
                     <circle cx="312" cy="240" r="18" fill="#4A0E4E"/>
                   </svg>
                 </div>
-                <div style={{ fontSize: 7.5, fontWeight: 800, color: '#4A0E4E' }}>ChatWrapped</div>
+                <div style={{ fontSize: 7.5, fontWeight: 800, color: '#4A0E4E' }}>Recapped</div>
               </div>
               {/* other app icons (greyed out) */}
               {['📧', '📁', '💬'].map((ic, i) => (

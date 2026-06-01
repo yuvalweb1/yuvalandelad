@@ -60,8 +60,8 @@ export default function RoastMode({ analytics, selectedAuthor, setSelectedAuthor
   const topRoast = (u.roasts && u.roasts[0]) || null;
   const topKicker = topRoast ? interp(t[topRoast.kickerKey] || '', topRoast.vars || {}) : '';
   const shareText = topKicker
-    ? `🔥 ${u.author} ${t.share_caught || 'just got served by ChatWrapped'}.\n\n"${topKicker}"`
-    : `🔥 ${u.author} ${t.share_caught || 'just got served by ChatWrapped'}.`;
+    ? `🔥 ${u.author} ${t.share_caught || 'just got served by Recapped'}.\n\n"${topKicker}"`
+    : `🔥 ${u.author} ${t.share_caught || 'just got served by Recapped'}.`;
   const shareTitle = `${t.share_title || 'Roast'} · ${u.author}`;
 
   useEffect(() => {

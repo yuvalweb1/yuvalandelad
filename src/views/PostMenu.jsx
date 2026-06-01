@@ -62,7 +62,8 @@ function StatChip({ value, label, color = '#2a0645' }) {
       }}>{value}</div>
       <div className="fs-mono" style={{
         fontSize: 9, color: '#573280', marginTop: 6,
-        letterSpacing: '0.10em', fontWeight: 800, textTransform: 'uppercase',
+        letterSpacing: '0.06em', fontWeight: 800, textTransform: 'uppercase',
+        overflow: 'hidden', whiteSpace: 'nowrap', textOverflow: 'ellipsis',
       }}>{label}</div>
     </div>
   );
@@ -216,9 +217,6 @@ export default function PostMenu({
 
       {/* ── Top chrome ── */}
       <div style={{ position: 'relative', zIndex: 10, display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexShrink: 0 }}>
-        <IconBtn label={t.settings_title || 'Settings'} onClick={onOpenSettings || (() => {})}>
-          <IconGear />
-        </IconBtn>
         <div className="fs-display" style={{ fontWeight: 800, fontSize: 16, letterSpacing: '-0.02em', color: '#2a0645' }}>
           chat<span style={{ color: '#f06449' }}>wrapped</span>
         </div>
@@ -343,7 +341,7 @@ export default function PostMenu({
       {/* ── Group personality strip ── */}
       <div style={{
         position: 'relative', zIndex: 10, marginTop: 15, flexShrink: 0,
-        background: 'rgba(241,228,243,0.55)',
+        background: '#ffffff',
         border: '1px solid rgba(87,50,128,0.12)',
         borderRadius: 16,
         padding: '12px 14px',

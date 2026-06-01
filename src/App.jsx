@@ -33,12 +33,12 @@ import { SLIDES_BY_TYPE, SLIDE_COMPONENTS } from './slides';
 export default function App() {
   return (
     <ErrorBoundary>
-      <ChatWrappedApp />
+      <RecappedApp />
     </ErrorBoundary>
   );
 }
 
-function ChatWrappedApp() {
+function RecappedApp() {
   // First visit shows the how-to-export guide before the home screen; returning
   // visitors skip straight to home (the guide stays reachable from the home link).
   const [stage, setStage] = useState(() => {

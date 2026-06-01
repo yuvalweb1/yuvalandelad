@@ -1,5 +1,6 @@
 import React from 'react';
 import SlideShell from './SlideShell.jsx';
+import ListSlideDecor from '../components/ListSlideDecor.jsx';
 import { interp, typedCopy } from '../i18n';
 
 const SlideGroupOverview = React.memo(function SlideGroupOverview({ a, t, profile }) {
@@ -23,23 +24,71 @@ const SlideGroupOverview = React.memo(function SlideGroupOverview({ a, t, profil
   ];
   return (
     <SlideShell bg="#577590" accent="#573280">
-      <div style={{ position: 'relative', height: '100%', display: 'flex', flexDirection: 'column', padding: '36px 24px 24px' }}>
-        <div className="fs-sans a-fade-up" style={{ textAlign: 'center', fontSize: 12, color: '#573280', letterSpacing: '0.15em', fontWeight: 500, textTransform: 'uppercase' }}>{typedCopy(t, 'go_eyebrow', type)}</div>
-        <div className="fs-display a-fade-up" style={{ textAlign: 'center', animationDelay: '0.15s', fontSize: 30, lineHeight: 1.12, letterSpacing: '-0.03em', fontWeight: 800, color: '#2a0645', marginTop: 8, marginBottom: 18 }}>{typedCopy(t, 'go_title', type)}</div>
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+      <ListSlideDecor emojis={['💬', '👥', '📅', '⏰', '🔥', '✨']} />
+      <div style={{ position: 'relative', zIndex: 1, height: '100%', display: 'flex', flexDirection: 'column', padding: '36px 20px 20px' }}>
+        <div className="fs-sans a-fade-up" style={{ textAlign: 'center', fontSize: 12, color: '#573280', letterSpacing: '0.18em', fontWeight: 800, textTransform: 'uppercase' }}>
+          {typedCopy(t, 'go_eyebrow', type)}
+        </div>
+        <div className="fs-display a-fade-up" style={{
+          textAlign: 'center', animationDelay: '0.15s',
+          fontSize: 30, lineHeight: 1.12, letterSpacing: '-0.03em',
+          fontWeight: 800, color: '#2a0645', marginTop: 8, marginBottom: 18,
+          textShadow: '0 2px 0 rgba(255,255,255,0.65), 0 1px 3px rgba(42,6,69,0.1)',
+          padding: '0 8px',
+        }}>
+          {typedCopy(t, 'go_title', type)}
+        </div>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, flex: 1 }}>
           {tiles.map((tile, i) => (
-            <div key={i} className="a-slide-up-far" style={{ background: 'rgba(42,6,69,0.06)', borderRadius: 18, padding: '18px 16px', textAlign: 'center', animationDelay: `${0.4 + i * 0.12}s` }}>
-              <div className="fs-display" style={{ fontSize: tile.big.length > 6 ? 28 : 34, fontWeight: 800, color: tile.color, letterSpacing: '-0.03em', lineHeight: 1 }}>{tile.big}</div>
-              <div className="fs-sans" style={{ marginTop: 6, fontSize: 12, color: 'rgba(42,6,69,0.7)', letterSpacing: '0.08em', textTransform: 'uppercase', fontWeight: 500 }}>{tile.label}</div>
-              {tile.sub && <div className="fs-mono" style={{ marginTop: 4, fontSize: 11, color: 'rgba(42,6,69,0.55)' }}>{tile.sub}</div>}
+            <div key={i} className="a-slide-up-far" style={{
+              background: '#fff',
+              borderRadius: 20,
+              border: '2px solid rgba(255,255,255,0.85)',
+              boxShadow: `0 6px 0 ${tile.color}22, 0 14px 24px -8px ${tile.color}44`,
+              padding: '0 16px',
+              textAlign: 'center',
+              animationDelay: `${0.35 + i * 0.1}s`,
+              display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
+              position: 'relative', overflow: 'hidden',
+            }}>
+              <div style={{
+                position: 'absolute', top: 0, left: 0, right: 0, height: 4,
+                background: tile.color, borderRadius: '18px 18px 0 0',
+              }} />
+              <div className="fs-display" style={{
+                fontSize: tile.big.length > 6 ? 30 : 38,
+                fontWeight: 800, color: tile.color,
+                letterSpacing: '-0.03em', lineHeight: 1,
+              }}>
+                {tile.big}
+              </div>
+              <div className="fs-sans" style={{
+                marginTop: 8, fontSize: 11, color: 'rgba(42,6,69,0.6)',
+                letterSpacing: '0.1em', textTransform: 'uppercase', fontWeight: 600,
+              }}>
+                {tile.label}
+              </div>
+              {tile.sub && (
+                <div className="fs-mono" style={{ marginTop: 5, fontSize: 10, color: 'rgba(42,6,69,0.45)' }}>
+                  {tile.sub}
+                </div>
+              )}
             </div>
           ))}
         </div>
         {peakDayStr && (
-          <div className="a-fade-up" style={{ animationDelay: '0.9s', marginTop: 14, textAlign: 'center', background: 'rgba(243,114,44,0.1)', borderRadius: 16, padding: '14px 16px' }}>
-            <span className="fs-sans" style={{ fontSize: 12, color: '#f3722c', letterSpacing: '0.1em', textTransform: 'uppercase', fontWeight: 600 }}>{t.go_busiest} </span>
-            <span className="fs-display" style={{ fontSize: 18, fontWeight: 800, color: '#2a0645' }}>{peakDayStr}</span>
-            <span className="fs-mono" style={{ fontSize: 13, color: 'rgba(42,6,69,0.6)' }}> · {interp(t.go_busiest_msgs, { n: peakDayCount.toLocaleString() })}</span>
+          <div className="a-fade-up" style={{
+            animationDelay: '0.85s', marginTop: 12,
+            background: '#fff',
+            borderRadius: 18,
+            border: '2px solid rgba(255,255,255,0.85)',
+            boxShadow: '0 6px 0 rgba(243,114,44,0.18), 0 14px 24px -8px rgba(243,114,44,0.38)',
+            padding: '14px 18px',
+            display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, flexWrap: 'wrap',
+          }}>
+            <span className="fs-sans" style={{ fontSize: 11, color: '#f3722c', letterSpacing: '0.1em', textTransform: 'uppercase', fontWeight: 700 }}>{t.go_busiest}</span>
+            <span className="fs-display" style={{ fontSize: 20, fontWeight: 800, color: '#2a0645' }}>{peakDayStr}</span>
+            <span className="fs-mono" style={{ fontSize: 13, color: 'rgba(42,6,69,0.55)' }}>· {interp(t.go_busiest_msgs, { n: peakDayCount.toLocaleString() })}</span>
           </div>
         )}
       </div>

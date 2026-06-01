@@ -9,7 +9,7 @@ export default class ErrorBoundary extends React.Component {
     return { error };
   }
   componentDidCatch(error, info) {
-    console.error('ChatWrapped error:', error, info);
+    console.error('Recapped error:', error, info);
   }
   render() {
     if (this.state.error) {
@@ -19,7 +19,7 @@ export default class ErrorBoundary extends React.Component {
           padding: 24, fontFamily: 'monospace', fontSize: 23,
         }}>
           <div style={{ color: '#f3722c', fontWeight: 700, marginBottom: 12 }}>
-            ChatWrapped hit an unexpected error.
+            Recapped hit an unexpected error.
           </div>
           <div style={{ marginBottom: 6 }}>{String(this.state.error)}</div>
           <div style={{ color: '#c8c8dc', marginTop: 12 }}>
