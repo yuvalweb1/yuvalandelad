@@ -67,17 +67,32 @@ const SlideTeaser = React.memo(function SlideTeaser({ t, onMenu, onExit, onRoast
           ))}
         </div>
 
-        <button onClick={go} className="press a-gradient-shift" style={{
-          marginTop: 14, width: '100%', position: 'relative', overflow: 'hidden',
-          padding: '17px', color: '#4A0E4E',
-          background: 'linear-gradient(135deg, #FFE45C 0%, #FFD700 50%, #FFB800 100%)',
-          backgroundSize: '200% 200%', border: '2px solid rgba(255,255,255,0.7)', borderRadius: 22,
-          fontSize: 18, fontWeight: 800, cursor: 'pointer',
-          boxShadow: '0 8px 0 #E0A800, 0 16px 32px -6px rgba(224,168,0,0.55)',
-        }}>
-          <div className="a-shine" style={{ position: 'absolute', inset: 0 }} />
-          <span className="fs-display" style={{ position: 'relative' }}>{t.tz_cta}</span>
-        </button>
+        {/* CTA with pulsing rings */}
+        <div className="a-slide-up-far" style={{ position: 'relative', marginTop: 14, animationDelay: '0.85s' }}>
+          {/* Ripple rings */}
+          {[0, 0.75, 1.5].map((delay, i) => (
+            <div key={i} className="a-cta-ping" style={{
+              position: 'absolute', inset: 0, borderRadius: 26,
+              border: `2px solid rgba(255,200,0,${0.65 - i * 0.15})`,
+              animationDelay: `${delay}s`,
+            }} />
+          ))}
+          <button onClick={go} className="press a-cta-bob" style={{
+            width: '100%', position: 'relative', overflow: 'hidden',
+            padding: '20px 20px',
+            background: 'linear-gradient(135deg, #FFE84A 0%, #FFC200 45%, #FF8D00 100%)',
+            border: '2.5px solid rgba(255,255,255,0.88)', borderRadius: 24,
+            fontSize: 18, fontWeight: 900, color: '#3A0600', cursor: 'pointer',
+            boxShadow: '0 10px 0 #B85000, 0 22px 40px -6px rgba(180,70,0,0.55)',
+            display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 12,
+            letterSpacing: '-0.01em',
+          }}>
+            <div className="a-shine" style={{ position: 'absolute', inset: 0 }} />
+            <span style={{ fontSize: 20, position: 'relative', filter: 'drop-shadow(0 1px 4px rgba(0,0,0,0.2))' }}>🔓</span>
+            <span className="fs-display" style={{ position: 'relative', fontSize: 18 }}>{t.tz_cta}</span>
+            <span className="a-shimmer-flash" style={{ fontSize: 18, position: 'relative' }}>✨</span>
+          </button>
+        </div>
       </div>
     </SlideShell>
   );

@@ -115,6 +115,15 @@ export default function GlobalStyles() {
         30% { transform: translate(20px, 30px) scale(1.1); }
         60% { transform: translate(-30px, -20px) scale(0.92); }
       }
+      @keyframes ctaPing {
+        0%   { transform: scale(0.96); opacity: 0.75; }
+        70%  { transform: scale(1.14); opacity: 0; }
+        100% { transform: scale(1.14); opacity: 0; }
+      }
+      @keyframes ctaBob {
+        0%, 100% { transform: translateY(0px); }
+        50%      { transform: translateY(-5px); }
+      }
       .slide-content { color: #2a0645; }
       .slide-content * { text-shadow: 0 1px 8px rgba(255,255,255,0.8); }
       .a-fade-up { animation: fadeUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) both; }
@@ -136,6 +145,8 @@ export default function GlobalStyles() {
         animation: gradientShift 6s ease-in-out infinite;
       }
       .a-shimmer-flash { animation: shimmerFlash 1.4s ease-in-out infinite; }
+      .a-cta-ping { animation: ctaPing 2.4s ease-out infinite; pointer-events: none; }
+      .a-cta-bob { animation: ctaBob 3.2s ease-in-out infinite; }
       .a-shine {
         background: linear-gradient(90deg, transparent, rgba(255,255,255,0.18), transparent);
         background-size: 200% 100%;
@@ -209,7 +220,8 @@ export default function GlobalStyles() {
       /* Respect reduced-motion preference: stop infinite/decorative animations. */
       @media (prefers-reduced-motion: reduce) {
         .a-pulse-glow, .a-spin, .a-shine, .a-shimmer-flash,
-        .a-gradient-shift, .a-shake, .a-wobble, .a-float {
+        .a-gradient-shift, .a-shake, .a-wobble, .a-float,
+        .a-cta-ping, .a-cta-bob {
           animation: none !important;
         }
         .a-fade-up, .a-fade-in, .a-scale-in, .a-spring,
