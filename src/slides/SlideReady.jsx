@@ -48,11 +48,8 @@ function TapHint({ color, glow, glowSide, label }) {
         <div className="a-tap-press" style={{
           width: 54, height: 54, borderRadius: '50%',
           background: color,
-          display: 'flex', alignItems: 'center', justifyContent: 'center',
           boxShadow: `0 6px 18px ${color}77`,
-        }}>
-          <span style={{ fontSize: 26, lineHeight: 1 }}>👆</span>
-        </div>
+        }} />
       </div>
 
       <span className="fs-sans" style={{
@@ -125,7 +122,7 @@ const SlideReady = React.memo(function SlideReady() {
             color="#4f86c6"
             glow="rgba(80,140,210,0.55)"
             glowSide="left"
-            label="Tap here to go back"
+            label="Always tap here to go back"
           />
 
           {/* Forward zone */}
@@ -133,7 +130,7 @@ const SlideReady = React.memo(function SlideReady() {
             color={DEEP}
             glow={`${ACCENT}aa`}
             glowSide="right"
-            label="Tap here to go forward"
+            label="Always tap here to go forward"
           />
 
         </div>

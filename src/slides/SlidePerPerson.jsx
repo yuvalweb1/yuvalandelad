@@ -84,15 +84,37 @@ const SlidePerPerson = React.memo(function SlidePerPerson({ a, t, profile }) {
                 animationDelay: `${cardDelay}s`,
               }}>
 
-                <div style={{ display: 'flex', alignItems: 'flex-start', gap: 10 }}>
-                  <div style={{ flex: 1, minWidth: 0 }}>
-                    <div className="fs-sans" style={{
+                {/* dir=ltr keeps the number physically on the left and the name on
+                    the right regardless of the name's script; the name span keeps
+                    dir=auto so Hebrew/Arabic still renders correctly. */}
+                <div dir="ltr" style={{ display: 'flex', alignItems: 'flex-start', gap: 12 }}>
+                  {/* Left: the average number */}
+                  <div style={{ flexShrink: 0 }}>
+                    <div className="fs-display" style={{
+                      fontSize: numStr.length > 4 ? 28 : 34,
+                      fontWeight: 900, color,
+                      letterSpacing: '-0.04em', lineHeight: 1,
+                    }}>
+                      {numStr}
+                    </div>
+                    <div className="fs-mono" style={{
+                      marginTop: 2,
+                      fontSize: 9, color: 'rgba(74,14,78,0.4)',
+                      letterSpacing: '0.08em', textTransform: 'uppercase', fontWeight: 700,
+                    }}>
+                      {t.pp_words_per_msg || 'words per message'}
+                    </div>
+                  </div>
+
+                  {/* Right: name + verbosity label */}
+                  <div style={{ flex: 1, minWidth: 0, textAlign: 'right' }}>
+                    <div dir="auto" className="fs-sans" style={{
                       fontSize: 15, fontWeight: 800, color: '#4A0E4E',
                       overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
                     }}>
                       {usr.author}
                     </div>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginTop: 3 }}>
+                    <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: 4 }}>
                       <span className="fs-mono" style={{
                         fontSize: 9, fontWeight: 800, letterSpacing: '0.1em',
                         textTransform: 'uppercase', color,
@@ -101,22 +123,6 @@ const SlidePerPerson = React.memo(function SlidePerPerson({ a, t, profile }) {
                       }}>
                         {label}
                       </span>
-                    </div>
-
-                    <div style={{ marginTop: 6 }}>
-                      <div className="fs-display" style={{
-                        fontSize: numStr.length > 4 ? 28 : 34,
-                        fontWeight: 900, color,
-                        letterSpacing: '-0.04em', lineHeight: 1,
-                      }}>
-                        {numStr}
-                      </div>
-                      <div className="fs-mono" style={{
-                        fontSize: 9, color: 'rgba(74,14,78,0.4)',
-                        letterSpacing: '0.08em', textTransform: 'uppercase', fontWeight: 700,
-                      }}>
-                        {t.pp_words_per_msg || 'words per message'}
-                      </div>
                     </div>
                   </div>
                 </div>

@@ -31,7 +31,7 @@ const SlideGroupTop = React.memo(function SlideGroupTop({ a, t, profile }) {
         </div>
 
         {emoji && (
-          <div className="a-spring" style={{ animationDelay: '0.25s', marginTop: 40 }}>
+          <div className="a-spring" style={{ animationDelay: '0.25s', marginTop: 100 }}>
             {/* big emoji in a tilted white sticker badge */}
             <div style={{
               display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
