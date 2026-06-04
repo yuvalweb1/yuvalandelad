@@ -351,9 +351,16 @@ export default {
   lb_title: 'Who carried the chat',
   lb_least: 'quietest',
   lb_more: '+{n} more',
-  pp_eyebrow: 'BY THE NUMBERS',
-  pp_title: 'Everyone, counted',
+  pp_eyebrow: 'WORDS PER MESSAGE',
+  pp_title: 'Who types the most?',
   pp_row: '{words} words · {avg} avg/msg',
+  pp_msgs: 'messages',
+  pp_words_per_msg: 'words per message',
+  pp_label_essayist: 'Essayist',
+  pp_label_verbose: 'Verbose',
+  pp_label_chatty: 'Chatty',
+  pp_label_brief: 'Brief',
+  pp_label_minimal: 'Minimal',
   sw_eyebrow: 'SIGNATURE WORDS',
   sw_title: 'One word each',
   gt_eyebrow: 'THE GROUP SPEAKS',
@@ -794,10 +801,10 @@ export default {
   lb_title_work: 'The team\'s loudest voices',
 
   // per_person
-  pp_eyebrow_family: 'EVERYONE\'S PART',
-  pp_title_family: 'Family contributions',
-  pp_eyebrow_couple: 'BETWEEN US',
-  pp_title_couple: 'Who texts more?',
+  pp_eyebrow_family: 'WORDS PER MESSAGE',
+  pp_title_family: 'How the family texts',
+  pp_eyebrow_couple: 'YOUR WRITING STYLES',
+  pp_title_couple: 'Whose texts are longer?',
 
   // signature_words
   sw_eyebrow_friends: 'DEAD GIVEAWAYS',

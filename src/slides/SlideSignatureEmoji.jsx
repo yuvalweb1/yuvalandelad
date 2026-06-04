@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import SlideShell from './SlideShell.jsx';
 import { typedCopy } from '../i18n';
 
-const MAX_ROWS = 7;
+const MAX_ROWS = 5;
 
 const SlideSignatureEmoji = React.memo(function SlideSignatureEmoji({ a, t, profile }) {
   const allRows = (a.users || []).filter(u => u.topEmoji);

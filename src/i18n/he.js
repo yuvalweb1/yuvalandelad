@@ -327,9 +327,16 @@ export default {
   lb_title: 'מי הוביל את הצ׳אט',
   lb_least: 'הכי שקט/ה',
   lb_more: '+{n} נוספים',
-  pp_eyebrow: 'במספרים',
-  pp_title: 'כולם, בספירה',
+  pp_eyebrow: 'מילים להודעה',
+  pp_title: 'מי כותב הכי הרבה?',
   pp_row: '{words} מילים · {avg} ממוצע להודעה',
+  pp_msgs: 'הודעות',
+  pp_words_per_msg: 'מילים להודעה',
+  pp_label_essayist: 'מסאיסט',
+  pp_label_verbose: 'מרובה מילים',
+  pp_label_chatty: 'שיחתן',
+  pp_label_brief: 'קצר',
+  pp_label_minimal: 'מינימלי',
   sw_eyebrow: 'מילות החתימה',
   sw_title: 'מילה אחת לכל אחד',
   gt_eyebrow: 'שפת הקבוצה',
@@ -760,10 +767,10 @@ export default {
   lb_title_work: 'הקולות החזקים של הצוות',
 
   // per_person typed
-  pp_eyebrow_family: 'התרומה של כולם',
-  pp_title_family: 'תרומה משפחתית',
-  pp_eyebrow_couple: 'בינינו',
-  pp_title_couple: 'מי כותב/ת יותר?',
+  pp_eyebrow_family: 'מילים להודעה',
+  pp_title_family: 'איך המשפחה מתנסחת',
+  pp_eyebrow_couple: 'הסגנון שלכם',
+  pp_title_couple: 'של מי ההודעות יותר ארוכות?',
 
   // signature_words typed
   sw_eyebrow_friends: 'סימני זיהוי',

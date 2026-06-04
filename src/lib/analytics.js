@@ -6,6 +6,10 @@ export const STOPWORDS = new Set([
   // media-omission noise (safety net — these lines should be flagged as media,
   // but never let the "omitted" word become a signature/top word)
   'הושמט','הושמטה','הושמטו','נכללה',
+  // deleted-message noise (safety net for any DELETED_PATTERNS misses)
+  'נמחקה','נמחק','מחקת',
+  // poll noise (safety net for multi-line poll bodies that start with a question)
+  'אפשרות',
   // English
   'the','a','an','is','are','was','were','be','been','being','have','has','had','do','does','did','will','would','should','could','can','may','might','must','i','you','he','she','it','we','they','me','him','her','us','them','my','your','his','its','our','their','this','that','these','those','and','or','but','if','then','so','for','of','at','by','with','from','to','in','on','as','no','yes','not','just','very','too','also','only','all','some','any','more','most','lol','omg','idk','tbh','btw','oh','ah','hmm','yeah','yep','ok','okay','like','one','two','get','got','going','gonna','wanna','what','when','where','why','how','who','which','because','about','out','up','down','here','there','omitted',
 ]);
@@ -177,7 +181,7 @@ export function computeAll(messages) {
     }
 
     // Tokenize content for word freq
-    if (!m.hasMedia && !m.isVoice && m.content.length > 0) {
+    if (!m.hasMedia && !m.isVoice && !m.isPoll && m.content.length > 0) {
       // Skip LINK_RE scan (costly global regex) when content has no URL prefix
       const text = m.content.includes('http')
         ? m.content.replace(LINK_RE, '').replace(EMOJI_RE, '').toLowerCase()

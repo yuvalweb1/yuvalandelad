@@ -59,7 +59,7 @@ const SlideDramaRole = React.memo(function SlideDramaRole({ u, t }) {
         <div className="a-spring" style={{ animationDelay: '0.3s', marginTop: 20 }}>
           <div className="fs-display" dir="auto" style={{
             // Three-tier sizing keeps long Hebrew/RTL titles from overflowing.
-            fontSize: titleText.length > 26 ? 30 : titleText.length > 20 ? 36 : 46,
+            fontSize: titleText.length > 26 ? 26 : titleText.length > 20 ? 32 : 40,
             lineHeight: 1.08, letterSpacing: '-0.04em',
             fontStyle: 'italic', color: accent, fontWeight: 800,
             textShadow: '0 2px 0 rgba(255,255,255,0.55), 0 1px 3px rgba(74,14,78,0.12)',

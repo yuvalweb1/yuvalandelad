@@ -5,7 +5,7 @@ import { typedCopy } from '../i18n';
 
 // Show this many rows immediately; reveal the rest only when the user taps
 // "+N more". Same pattern as SlidePerPerson / SlideLeaderboard.
-const MAX_ROWS = 8;
+const MAX_ROWS = 5;
 
 const SlideSignatureWords = React.memo(function SlideSignatureWords({ a, t, profile }) {
   const type = profile?.relationship || 'other';
@@ -47,7 +47,11 @@ const SlideSignatureWords = React.memo(function SlideSignatureWords({ a, t, prof
               animationDelay: `${0.4 + i * 0.1}s`,
             }}>
               <div className="fs-sans" style={{ width: '34%', flexShrink: 0, fontSize: 14, fontWeight: 700, color: 'rgba(74,14,78,0.75)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{usr.author}</div>
-              <div className="fs-display" style={{ flex: 1, minWidth: 0, fontSize: usr.topWord.length > 10 ? 18 : 24, fontStyle: 'italic', fontWeight: 800, color: '#8338ec', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>"{usr.topWord}"</div>
+              <div style={{ flex: 1, minWidth: 0, display: 'flex', alignItems: 'center' }}>
+                <span className="fs-display" style={{ flexShrink: 0, fontSize: usr.topWord.length > 10 ? 18 : 24, fontStyle: 'italic', fontWeight: 800, color: '#8338ec' }}>"</span>
+                <span className="fs-display" dir="auto" style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', fontSize: usr.topWord.length > 10 ? 18 : 24, fontStyle: 'italic', fontWeight: 800, color: '#8338ec' }}>{usr.topWord}</span>
+                <span className="fs-display" style={{ flexShrink: 0, fontSize: usr.topWord.length > 10 ? 18 : 24, fontStyle: 'italic', fontWeight: 800, color: '#8338ec' }}>"</span>
+              </div>
               <div className="fs-mono" style={{ flexShrink: 0, fontSize: 12, color: 'rgba(74,14,78,0.55)', fontWeight: 600 }}>{usr.topWordCount}×</div>
             </div>
           ))}

@@ -122,7 +122,7 @@ export function metricHasData(metricKey, a) {
   return def.rows(a).length >= 1;
 }
 
-const MAX_ROWS = 7;
+const MAX_ROWS = 5;
 
 const SlideMetric = React.memo(function SlideMetric({ a, t, profile, metricKey }) {
   const def = METRIC_DEFS[metricKey];

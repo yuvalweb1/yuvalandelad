@@ -16,6 +16,7 @@ import {
   MEDIA_PATTERNS,
   VOICE_PATTERNS,
   DELETED_PATTERNS,
+  POLL_PATTERNS,
   GROUP_IDENTITY_PATTERNS,
   SYSTEM_AUTHOR_NAMES,
   HEADER_PATTERNS,
@@ -184,6 +185,7 @@ export function parseWhatsApp(rawText) {
       (cleanAuthor.match(EMOJI_RE) || []).forEach(e => authorNameEmojis.add(e));
 
       const isDeleted = DELETED_PATTERNS.some(p => p.test(content));
+      const isPoll = !isDeleted && POLL_PATTERNS.some(p => p.test(content));
       // Voice takes precedence: a voice note ("הודעה קולית הושמטה") also matches
       // the generic media "omitted" tail, so resolve it as voice only.
       const isVoice = VOICE_PATTERNS.some(p => p.test(content));
@@ -203,7 +205,7 @@ export function parseWhatsApp(rawText) {
         author: cleanAuthor,
         content,
         contentLength: content.length,
-        isDeleted, hasMedia, isVoice, hasLink: linkMatches.length > 0,
+        isDeleted, isPoll, hasMedia, isVoice, hasLink: linkMatches.length > 0,
         mediaFile: hasMedia ? extractMediaFile(content) : null,
         linkCount: linkMatches.length,
         emojis, wordCount, isQuestion,

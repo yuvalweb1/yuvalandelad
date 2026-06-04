@@ -3,7 +3,7 @@ import SlideShell from './SlideShell.jsx';
 import ListSlideDecor from '../components/ListSlideDecor.jsx';
 import { typedCopy } from '../i18n';
 
-const MAX_ROWS = 9;
+const MAX_ROWS = 5;
 
 const SlideLeaderboard = React.memo(function SlideLeaderboard({ a, t, profile }) {
   const type = profile?.relationship || 'other';

@@ -5,7 +5,7 @@ import { interp } from '../i18n';
 
 const fmtMB = (bytes) => (bytes / (1024 * 1024)).toFixed(1) + ' MB';
 
-const MAX_ROWS = 2;
+const MAX_ROWS = 1;
 
 const SlideVideos = React.memo(function SlideVideos({ a, t }) {
   const allList = a.videos || [];
@@ -18,7 +18,7 @@ const SlideVideos = React.memo(function SlideVideos({ a, t }) {
   return (
     <SlideShell bg="#577590" accent="#FF8C00">
       <ListSlideDecor emojis={['🎬', '🎥', '🍿', '📹', '✨', '🎞️']} />
-      <div style={{ position: 'relative', zIndex: 1, height: '100%', display: 'flex', flexDirection: 'column', padding: '28px 20px 80px' }}>
+      <div style={{ position: 'relative', zIndex: 1, height: '100%', display: 'flex', flexDirection: 'column', padding: '28px 20px 24px' }}>
         <div className="fs-sans a-fade-up" style={{ textAlign: 'center', fontSize: 13, color: '#FF8C00', letterSpacing: '0.18em', fontWeight: 800, textTransform: 'uppercase' }}>
           🎬 {t.vid_eyebrow}
         </div>

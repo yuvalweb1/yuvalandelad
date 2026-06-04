@@ -3,7 +3,7 @@ import SlideShell from './SlideShell.jsx';
 import ListSlideDecor from '../components/ListSlideDecor.jsx';
 import { interp } from '../i18n';
 
-const MAX_TILES = 9;
+const MAX_TILES = 6;
 
 // Top stickers used in the chat — already deduped & ranked by repeat count
 // (see readZipBundle → sticker hash-dedup).

@@ -366,12 +366,10 @@ export default function Landing({
           }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 9 }}>
               <div style={{
-                flexShrink: 0, width: 22, height: 22, borderRadius: 999,
-                background: '#4A0E4E', color: '#FFD700',
-                display: 'flex', alignItems: 'center', justifyContent: 'center',
-                fontSize: 12, fontWeight: 800,
-              }}>1</div>
-              <div className="fs-sans" dir="auto" style={{ flex: 1, minWidth: 0, fontSize: 13, fontWeight: 600, color: '#2a0645', lineHeight: 1.25, overflowWrap: 'break-word', wordBreak: 'break-word' }}>
+                flexShrink: 0, width: 7, height: 7, borderRadius: 999,
+                background: '#4A0E4E', marginLeft: 2,
+              }} />
+              <div className="fs-sans" dir="auto" style={{ flex: 1, minWidth: 0, fontSize: 15, fontWeight: 700, color: '#2a0645', lineHeight: 1.25, overflowWrap: 'break-word', wordBreak: 'break-word' }}>
                 {t.landing_step1}
               </div>
               <button onClick={onHowTo} className="press fs-sans" style={{
@@ -383,25 +381,23 @@ export default function Landing({
                 {t.howto_link}
               </button>
             </div>
-            <div style={{ height: 1, background: 'rgba(74,14,78,0.09)', margin: '9px 0' }} />
+            <div style={{ height: 1, background: 'rgba(74,14,78,0.07)', margin: '9px 0' }} />
             <button onClick={() => fileInputRef.current?.click()} className="press fs-sans" style={{
               display: 'flex', alignItems: 'center', gap: 9,
               width: '100%', background: 'transparent', border: 'none',
               padding: 0, cursor: 'pointer', textAlign: 'start',
             }}>
               <div style={{
-                flexShrink: 0, width: 22, height: 22, borderRadius: 999,
-                background: '#4A0E4E', color: '#FFD700',
-                display: 'flex', alignItems: 'center', justifyContent: 'center',
-                fontSize: 12, fontWeight: 800,
-              }}>2</div>
-              <div dir="auto" style={{ flex: 1, minWidth: 0, fontSize: 13, fontWeight: 600, color: '#2a0645', lineHeight: 1.25, overflowWrap: 'break-word', wordBreak: 'break-word' }}>
+                flexShrink: 0, width: 5, height: 5, borderRadius: 999,
+                background: 'rgba(74,14,78,0.35)', marginLeft: 3,
+              }} />
+              <div dir="auto" style={{ flex: 1, minWidth: 0, fontSize: 12, fontWeight: 500, color: 'rgba(74,14,78,0.55)', lineHeight: 1.25, overflowWrap: 'break-word', wordBreak: 'break-word' }}>
                 {t.landing_step2}
               </div>
               <div dir="auto" style={{
-                flexShrink: 0, padding: '5px 10px',
-                background: '#FFF6E8', border: '1px solid rgba(74,14,78,0.10)',
-                borderRadius: 9, color: '#4A0E4E', fontSize: 11.5, fontWeight: 700,
+                flexShrink: 0, padding: '4px 9px',
+                background: 'rgba(74,14,78,0.06)', border: '1px solid rgba(74,14,78,0.08)',
+                borderRadius: 8, color: 'rgba(74,14,78,0.50)', fontSize: 11, fontWeight: 600,
                 whiteSpace: 'nowrap', letterSpacing: '-0.01em',
               }}>
                 {t.landing_upload_btn || 'Upload ↑'}

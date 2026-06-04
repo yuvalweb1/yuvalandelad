@@ -50,6 +50,14 @@ export const VOICE_PATTERNS = [
   /PTT-.*\.opus/, /\.opus/,
 ];
 
+// Poll-vote messages — WhatsApp exports poll votes as plain messages starting
+// with "אפשרות" (Hebrew) or "option" (English). Not real conversation content;
+// excluded from word-frequency only (still counted as a message/interaction).
+export const POLL_PATTERNS = [
+  /^אפשרות(?:\s|$)/,  // Hebrew: "אפשרות 1", "אפשרות: כן"
+  /^option(?:\s|$)/i, // English: "Option 1", "Option: Yes"
+];
+
 // Deleted-message notices — many phrasings, so kept broad (unanchored,
 // tolerant of trailing punctuation). These messages are excluded from all
 // analytics (counted only as `deletedMessages` in diagnostics).
