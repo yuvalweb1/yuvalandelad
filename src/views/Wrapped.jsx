@@ -45,72 +45,80 @@ export default function Wrapped({ analytics, diagnostics, selectedAuthor, setSel
   };
 
   return (
-    <div style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column', background: '#fff5f7' }}>
+    <div style={{ position: 'absolute', inset: 0, background: '#fff5f7' }}>
+      {/* Background fills the full screen including the safe area */}
       <SlidesBlobBackground />
 
-      {/* Progress bar */}
-      <div style={{ position: 'absolute', top: 0, left: 0, right: 0, zIndex: 5, display: 'flex', gap: 5, padding: '14px 14px 0' }}>
-        {slides.map((_, i) => (
-          <div key={i} style={{
-            flex: 1, height: 3, borderRadius: 8,
-            background: i < slide ? 'rgba(255,255,255,0.6)' : i === slide ? '#fff' : 'rgba(255,255,255,0.25)',
-            transition: 'background 0.3s',
-          }} />
-        ))}
-      </div>
-
-      {/* Close — insetInlineEnd keeps the X on the trailing edge (top-right
-          in LTR, top-left in RTL) so it doesn't collide with RTL slide
-          titles/content that aligns to the right. */}
-      <button onClick={onExit} className="press" aria-label={t.a11y_close || 'Close'} style={{
-        position: 'absolute', top: 34, insetInlineEnd: 16, zIndex: 5,
-        background: 'rgba(0,0,0,0.25)', backdropFilter: 'blur(12px)',
-        color: '#fff', border: 'none', width: 40, height: 40,
-        borderRadius: '50%', cursor: 'pointer',
-        display: 'flex', alignItems: 'center', justifyContent: 'center',
-      }}>
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-          strokeWidth="2.4" strokeLinecap="round" aria-hidden="true">
-          <line x1="18" y1="6" x2="6" y2="18"/>
-          <line x1="6" y1="6" x2="18" y2="18"/>
-        </svg>
-      </button>
-
-      {/* Media slides need explicit nav — the slide area belongs to audio/video. */}
-      {isMediaSlide && slide > 0 && (
-        <button onClick={prev} className="press" aria-label={t.a11y_previous || 'Previous'} style={{
-          position: 'absolute', bottom: 18, insetInlineStart: 18, zIndex: 5,
-          width: 44, height: 44, borderRadius: '50%', border: 'none', cursor: 'pointer',
-          background: 'rgba(0,0,0,0.35)', backdropFilter: 'blur(12px)', color: '#fff',
-          display: 'flex', alignItems: 'center', justifyContent: 'center',
-          boxShadow: '0 6px 18px rgba(0,0,0,0.25)',
-        }}>
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-            <polyline points="15 18 9 12 15 6" />
-          </svg>
-        </button>
-      )}
-      {isMediaSlide && slide < total - 1 && (
-        <button onClick={next} className="press" aria-label={t.a11y_next || 'Next'} style={{
-          position: 'absolute', bottom: 18, insetInlineEnd: 18, zIndex: 5,
-          width: 44, height: 44, borderRadius: '50%', border: 'none', cursor: 'pointer',
-          background: 'rgba(0,0,0,0.35)', backdropFilter: 'blur(12px)', color: '#fff',
-          display: 'flex', alignItems: 'center', justifyContent: 'center',
-          boxShadow: '0 6px 18px rgba(0,0,0,0.25)',
-        }}>
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-            <polyline points="9 18 15 12 9 6" />
-          </svg>
-        </button>
-      )}
-
-      {/* Slide with directional transition. */}
+      {/* Slide covers the full screen so its background is flush with the
+          status-bar safe zone — no color seam at the top. */}
       <div ref={slideContainerRef} key={`${current}-${selectedAuthor}`}
         onClick={isMediaSlide ? undefined : onSlideClick}
         className={dirRef.current >= 0 ? 'slide-in-right' : 'slide-in-left'}
-        style={{ flex: 1, position: 'relative', overflow: 'hidden', zIndex: 1 }}>
+        style={{ position: 'absolute', inset: 0, overflow: 'hidden', zIndex: 1 }}>
         {SlideComp && <SlideComp a={analytics} u={user} t={t} profile={profile} achievements={userAchievements} onExit={onExit} onMenu={onMenu} onRoastMode={onRoastMode} />}
       </div>
+
+      {/* Controls overlay — pointer-events: none so taps pass through to the
+          slide; interactive children restore their own pointer events. */}
+      <div style={{ position: 'absolute', top: 'env(safe-area-inset-top, 0px)', left: 0, right: 0, bottom: 0, pointerEvents: 'none', zIndex: 5 }}>
+
+        {/* Progress bar */}
+        <div style={{ position: 'absolute', top: 0, left: 0, right: 0, display: 'flex', gap: 5, padding: '14px 14px 0' }}>
+          {slides.map((_, i) => (
+            <div key={i} style={{
+              flex: 1, height: 3, borderRadius: 8,
+              background: i < slide ? 'rgba(255,255,255,0.6)' : i === slide ? '#fff' : 'rgba(255,255,255,0.25)',
+              transition: 'background 0.3s',
+            }} />
+          ))}
+        </div>
+
+        {/* Close — insetInlineEnd keeps the X on the trailing edge (top-right
+            in LTR, top-left in RTL) so it doesn't collide with RTL slide
+            titles/content that aligns to the right. */}
+        <button onClick={onExit} className="press" aria-label={t.a11y_close || 'Close'} style={{
+          position: 'absolute', top: 34, insetInlineEnd: 16, pointerEvents: 'auto',
+          background: 'rgba(0,0,0,0.25)', backdropFilter: 'blur(12px)',
+          color: '#fff', border: 'none', width: 40, height: 40,
+          borderRadius: '50%', cursor: 'pointer',
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+        }}>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+            strokeWidth="2.4" strokeLinecap="round" aria-hidden="true">
+            <line x1="18" y1="6" x2="6" y2="18"/>
+            <line x1="6" y1="6" x2="18" y2="18"/>
+          </svg>
+        </button>
+
+        {/* Media slides need explicit nav — the slide area belongs to audio/video. */}
+        {isMediaSlide && slide > 0 && (
+          <button onClick={prev} className="press" aria-label={t.a11y_previous || 'Previous'} style={{
+            position: 'absolute', bottom: 18, insetInlineStart: 18, pointerEvents: 'auto',
+            width: 44, height: 44, borderRadius: '50%', border: 'none', cursor: 'pointer',
+            background: 'rgba(0,0,0,0.35)', backdropFilter: 'blur(12px)', color: '#fff',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            boxShadow: '0 6px 18px rgba(0,0,0,0.25)',
+          }}>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+              <polyline points="15 18 9 12 15 6" />
+            </svg>
+          </button>
+        )}
+        {isMediaSlide && slide < total - 1 && (
+          <button onClick={next} className="press" aria-label={t.a11y_next || 'Next'} style={{
+            position: 'absolute', bottom: 18, insetInlineEnd: 18, pointerEvents: 'auto',
+            width: 44, height: 44, borderRadius: '50%', border: 'none', cursor: 'pointer',
+            background: 'rgba(0,0,0,0.35)', backdropFilter: 'blur(12px)', color: '#fff',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            boxShadow: '0 6px 18px rgba(0,0,0,0.25)',
+          }}>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+              <polyline points="9 18 15 12 9 6" />
+            </svg>
+          </button>
+        )}
+
+      </div>{/* end controls overlay */}
     </div>
   );
 }

@@ -30,6 +30,7 @@ const LANGUAGES = [
 export default function Settings({
   t, lang, setLang,
   includeMedia, setIncludeMedia,
+  showDemo, setShowDemo,
   isPremium, setPremium,
   history = [], onClearHistory,
   onBack,
@@ -207,6 +208,14 @@ export default function Settings({
             hint={includeMedia ? (t.settings_media_on || 'Photos · voice · stickers · videos') : (t.settings_media_off || 'Text only — faster')}
             checked={includeMedia}
             onChange={setIncludeMedia}
+            accent={PINK}
+          />
+          <div style={{ height: 1, background: 'rgba(74,14,78,0.08)', margin: '0 14px' }} />
+          <Toggle
+            label={t.settings_demo_label || 'Show demo button'}
+            hint={showDemo ? (t.settings_demo_hint_on || 'Try Demo link visible on home screen') : (t.settings_demo_hint_off || 'Demo link hidden')}
+            checked={!!showDemo}
+            onChange={setShowDemo}
             accent={PINK}
           />
         </Section>

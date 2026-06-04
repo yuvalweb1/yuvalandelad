@@ -151,7 +151,7 @@ export default function Landing({
       }}>
         <div className="a-fade-up" dir="ltr" style={{ display: 'flex', alignItems: 'baseline', gap: 0 }}>
           <span style={{ fontFamily: 'Georgia, serif', fontSize: 19, fontWeight: 700, letterSpacing: '-0.03em', color: '#4A0E4E' }}>re</span>
-          <span style={{ fontFamily: 'Georgia, serif', fontSize: 19, fontWeight: 700, letterSpacing: '-0.03em', color: '#f06449' }}>capped</span>
+          <span style={{ fontFamily: 'Georgia, serif', fontSize: 19, fontWeight: 700, letterSpacing: '-0.03em', color: '#FF1867' }}>capped</span>
         </div>
         {onOpenSettings && (
           <button onClick={onOpenSettings} className="press" aria-label={t.settings_title || 'Settings'} style={{

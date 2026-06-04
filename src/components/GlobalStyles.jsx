@@ -126,6 +126,7 @@ export default function GlobalStyles() {
       }
       .slide-content { color: #2a0645; }
       .slide-content * { text-shadow: 0 1px 8px rgba(255,255,255,0.8); }
+      .slide-content .fs-display.a-fade-up { filter: drop-shadow(0 0 14px rgba(255,255,255,0.5)); }
       .a-fade-up { animation: fadeUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) both; }
       .a-fade-in { animation: fadeIn 0.6s ease-out both; }
       .a-scale-in { animation: scaleIn 0.5s cubic-bezier(0.16, 1, 0.3, 1) both; }

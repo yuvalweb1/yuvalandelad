@@ -73,6 +73,13 @@ function RecappedApp() {
     setIncludeMedia(v);
     try { localStorage.setItem('cw_include_media', v ? '1' : '0'); } catch {}
   };
+  const [showDemo, setShowDemo] = useState(() => {
+    try { return localStorage.getItem('cw_show_demo') === '1'; } catch { return false; }
+  });
+  const updateShowDemo = useCallback((v) => {
+    setShowDemo(v);
+    try { localStorage.setItem('cw_show_demo', v ? '1' : '0'); } catch {}
+  }, []);
   const [profile, setProfile] = useState({
     relationship: null,
     tone: null,
@@ -322,17 +329,7 @@ function RecappedApp() {
         isolation: 'isolate',
       }}>
         <BlobBackground />
-        {/* Safe-area overlay: height = device notch/status-bar inset.
-            backdrop-filter picks up whatever slide color is behind it,
-            so it blends naturally on every page. 0px on desktop. */}
-        <div aria-hidden="true" style={{
-          position: 'absolute', top: 0, left: 0, right: 0,
-          height: 'env(safe-area-inset-top, 0px)',
-          backdropFilter: 'blur(24px) saturate(1.6)',
-          WebkitBackdropFilter: 'blur(24px) saturate(1.6)',
-          zIndex: 20, pointerEvents: 'none',
-        }} />
-        <div style={{ position: 'absolute', top: 'env(safe-area-inset-top, 0px)', left: 0, right: 0, bottom: 0, overflow: 'hidden' }} dir={isRTL ? 'rtl' : 'auto'}>
+        <div style={{ position: 'absolute', inset: 0, overflow: 'hidden' }} dir={isRTL ? 'rtl' : 'auto'}>
           {stage === 'howto' && (
             <HowToGuide
               t={t}
@@ -353,7 +350,7 @@ function RecappedApp() {
                 lang={lang}
                 setLang={setLang}
                 onHowTo={() => setStage('howto')}
-                onDemo={loadDemo}
+                onDemo={showDemo ? loadDemo : null}
                 onOpenSettings={() => openSettings('landing')}
                 includeMedia={includeMedia}
                 setIncludeMedia={updateIncludeMedia}
@@ -473,6 +470,8 @@ function RecappedApp() {
               setLang={setLang}
               includeMedia={includeMedia}
               setIncludeMedia={updateIncludeMedia}
+              showDemo={showDemo}
+              setShowDemo={updateShowDemo}
               isPremium={isPremium}
               setPremium={updatePremium}
               history={history}
