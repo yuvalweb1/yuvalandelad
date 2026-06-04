@@ -6,7 +6,7 @@ import { slideHasData } from '../slides';
 // Slides hosting playable audio/video — auto-advance pauses while the user
 // listens, and the smart tap-to-advance is replaced with explicit chevron
 // buttons so the audio/video controls own the slide area uncontested.
-const MEDIA_SLIDES = new Set(['voice', 'videos']);
+const MEDIA_SLIDES = new Set(['videos']);
 
 export default function Wrapped({ analytics, diagnostics, selectedAuthor, setSelectedAuthor, slide, setSlide, profile, t, onExit, onMenu, onRoastMode, slidesDef, slideComponents }) {
   const user = analytics.userMap[selectedAuthor];

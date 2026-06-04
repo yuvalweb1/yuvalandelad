@@ -88,9 +88,7 @@ const SlideTeaser = React.memo(function SlideTeaser({ t, onMenu, onExit, onRoast
             letterSpacing: '-0.01em',
           }}>
             <div className="a-shine" style={{ position: 'absolute', inset: 0 }} />
-            <span style={{ fontSize: 20, position: 'relative', filter: 'drop-shadow(0 1px 4px rgba(0,0,0,0.2))' }}>🔓</span>
             <span className="fs-display" style={{ position: 'relative', fontSize: 18 }}>{t.tz_cta}</span>
-            <span className="a-shimmer-flash" style={{ fontSize: 18, position: 'relative' }}>✨</span>
           </button>
         </div>
       </div>

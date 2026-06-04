@@ -451,7 +451,7 @@ export default function Landing({
 
       {/* Trust footer — pinned to bottom of container */}
       <div className="fs-sans" style={{
-        position: 'absolute', bottom: 20, left: 0, right: 0,
+        position: 'absolute', bottom: 20, left: 24, right: 24,
         display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
         textAlign: 'center',
         fontSize: 11.5, color: 'rgba(74,14,78,0.45)', lineHeight: 1.4,

@@ -1,17 +1,128 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import SlideShell from './SlideShell.jsx';
 import ListSlideDecor from '../components/ListSlideDecor.jsx';
-import { interp } from '../i18n';
-
-const BYTES_PER_SECOND = 2000;
-const fmtDuration = (bytes) => {
-  const s = Math.max(1, Math.round(bytes / BYTES_PER_SECOND));
-  if (s < 60) return `${s}s`;
-  const m = Math.floor(s / 60), r = s % 60;
-  return `${m}:${String(r).padStart(2, '0')}`;
-};
 
 const MAX_ROWS = 4;
+
+const SPEEDS = [1, 1.5, 2];
+
+function VoiceRow({ v, index }) {
+  const [playing, setPlaying] = useState(false);
+  const [speedIdx, setSpeedIdx] = useState(0);
+  const [progress, setProgress] = useState(0);
+  const audioRef = useRef(null);
+
+  const onTimeUpdate = () => {
+    const el = audioRef.current;
+    if (!el || !el.duration) return;
+    setProgress(el.currentTime / el.duration);
+  };
+
+  const seekTo = (e) => {
+    e.stopPropagation();
+    const el = audioRef.current;
+    if (!el || !el.duration) return;
+    const rect = e.currentTarget.getBoundingClientRect();
+    el.currentTime = ((e.clientX - rect.left) / rect.width) * el.duration;
+  };
+
+  const toggle = (e) => {
+    e.stopPropagation();
+    const el = audioRef.current;
+    if (!el) return;
+    if (playing) { el.pause(); } else { el.play(); }
+  };
+
+  const cycleSpeed = (e) => {
+    e.stopPropagation();
+    const next = (speedIdx + 1) % SPEEDS.length;
+    setSpeedIdx(next);
+    if (audioRef.current) audioRef.current.playbackRate = SPEEDS[next];
+  };
+
+  const btnStyle = {
+    flexShrink: 0, height: 36, borderRadius: 10,
+    background: '#00BFFF', border: 'none', cursor: 'pointer',
+    display: 'flex', alignItems: 'center', justifyContent: 'center',
+    boxShadow: '0 3px 0 #0089C4', color: '#fff',
+  };
+
+  return (
+    <div dir="auto" className="a-slide-up-far" style={{
+      padding: '12px 14px', background: '#fff', borderRadius: 20,
+      border: '2px solid rgba(255,255,255,0.85)',
+      boxShadow: '0 6px 0 rgba(0,137,196,0.22), 0 14px 24px -8px rgba(0,137,196,0.45)',
+      flexShrink: 0,
+      animationDelay: `${0.3 + index * 0.1}s`,
+    }}>
+      <audio
+        ref={audioRef}
+        src={v.url}
+        preload="none"
+        onPlay={() => setPlaying(true)}
+        onPause={() => setPlaying(false)}
+        onEnded={() => { setPlaying(false); setProgress(0); }}
+        onTimeUpdate={onTimeUpdate}
+      />
+      <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
+        <div className="fs-display" style={{ width: 26, flexShrink: 0, fontSize: 17, fontWeight: 800, color: 'rgba(74,14,78,0.45)' }}>{index + 1}</div>
+        <div className="fs-sans" style={{ flex: 1, minWidth: 0, fontSize: 15, fontWeight: 800, color: '#4A0E4E', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{v.author || '—'}</div>
+      </div>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+        {/* Play / pause */}
+        <button type="button" onClick={toggle} className="press" style={{ ...btnStyle, width: 36 }}>
+          {playing ? (
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="#fff" aria-hidden="true">
+              <rect x="5" y="4" width="4" height="16" rx="1.5" />
+              <rect x="15" y="4" width="4" height="16" rx="1.5" />
+            </svg>
+          ) : (
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="#fff" aria-hidden="true">
+              <polygon points="6,4 20,12 6,20" />
+            </svg>
+          )}
+        </button>
+        {/* Speed */}
+        <button type="button" onClick={cycleSpeed} className="press" style={{ ...btnStyle, width: 44, fontSize: 12, fontWeight: 800 }}>
+          {SPEEDS[speedIdx]}x
+        </button>
+        {/* Seekable progress bar */}
+        <div onClick={seekTo} style={{
+          flex: 1, height: 18, display: 'flex', alignItems: 'center', cursor: 'pointer',
+        }}>
+          <div style={{ position: 'relative', width: '100%', height: 4, borderRadius: 999, background: 'rgba(0,137,196,0.18)' }}>
+            <div style={{
+              height: '100%', borderRadius: 999, background: '#00BFFF',
+              width: `${progress * 100}%`,
+              transition: playing ? 'none' : 'width 0.2s',
+            }} />
+            <div style={{
+              position: 'absolute', top: '50%', left: `${progress * 100}%`,
+              width: 12, height: 12, borderRadius: '50%',
+              background: '#00BFFF', border: '2px solid #fff',
+              transform: 'translate(-50%, -50%)',
+              boxShadow: '0 1px 4px rgba(0,137,196,0.5)',
+              transition: playing ? 'none' : 'left 0.2s',
+            }} />
+          </div>
+        </div>
+        {/* Download */}
+        <a
+          href={v.url}
+          download
+          onClick={e => e.stopPropagation()}
+          className="press"
+          style={{ ...btnStyle, width: 36, textDecoration: 'none' }}
+        >
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+            <path d="M12 3v13M7 11l5 5 5-5" />
+            <path d="M5 20h14" />
+          </svg>
+        </a>
+      </div>
+    </div>
+  );
+}
 
 const SlideVoice = React.memo(function SlideVoice({ a, t }) {
   const allList = a.voice || [];
@@ -24,7 +135,7 @@ const SlideVoice = React.memo(function SlideVoice({ a, t }) {
   return (
     <SlideShell bg="#577590" accent="#00BFFF">
       <ListSlideDecor emojis={['🎙️', '🔊', '🗣️', '🎧', '✨', '💬']} />
-      <div style={{ position: 'relative', zIndex: 1, height: '100%', display: 'flex', flexDirection: 'column', padding: '28px 20px 80px' }}>
+      <div style={{ position: 'relative', zIndex: 1, height: '100%', display: 'flex', flexDirection: 'column', padding: '28px 20px 24px' }}>
         <div className="fs-sans a-fade-up" style={{ textAlign: 'center', fontSize: 13, color: '#00BFFF', letterSpacing: '0.18em', fontWeight: 800, textTransform: 'uppercase' }}>
           🎙️ {t.voice_eyebrow}
         </div>
@@ -43,20 +154,7 @@ const SlideVoice = React.memo(function SlideVoice({ a, t }) {
         </div>
         <div className="no-sb" style={{ flex: 1, overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: 10 }}>
           {list.map((v, i) => (
-            <div key={v.url} dir="auto" className="a-slide-up-far" style={{
-              padding: '12px 14px', background: '#fff', borderRadius: 20,
-              border: '2px solid rgba(255,255,255,0.85)',
-              boxShadow: '0 6px 0 rgba(0,137,196,0.22), 0 14px 24px -8px rgba(0,137,196,0.45)',
-              flexShrink: 0,
-              animationDelay: `${0.3 + i * 0.1}s`,
-            }}>
-              <div style={{ display: 'flex', alignItems: 'baseline', gap: 8, marginBottom: 8 }}>
-                <div className="fs-display" style={{ width: 26, fontSize: 17, fontWeight: 800, color: 'rgba(74,14,78,0.45)' }}>{i + 1}</div>
-                <div className="fs-sans" style={{ flex: 1, minWidth: 0, fontSize: 15, fontWeight: 800, color: '#4A0E4E', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{v.author || '—'}</div>
-                <div className="fs-mono" style={{ fontSize: 14, fontWeight: 800, color: '#00BFFF' }}>{fmtDuration(v.size)}</div>
-              </div>
-              <audio controls preload="metadata" src={v.url} style={{ width: '100%', height: 40 }} />
-            </div>
+            <VoiceRow key={v.url} v={v} index={i} />
           ))}
           {showOverflow && (
             <button onClick={() => setExpanded(true)} className="press" style={{

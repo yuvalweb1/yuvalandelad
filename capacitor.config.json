@@ -1,6 +1,6 @@
 {
   "appId": "com.chatwrapped.app",
-  "appName": "ChatWrapped",
+  "appName": "Recapped",
   "webDir": "dist",
   "server": {
     "androidScheme": "https"

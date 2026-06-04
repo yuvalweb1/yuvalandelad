@@ -15,7 +15,7 @@ function appUrl() {
   if (typeof window !== 'undefined' && window.location && window.location.origin) {
     return window.location.origin;
   }
-  return 'https://chatwrapped.app';
+  return 'https://recapped.app';
 }
 
 // Brand-colored circular icon. Children is the glyph (SVG or text).

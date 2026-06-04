@@ -164,6 +164,12 @@ export default function GlobalStyles() {
       .lift { transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.2s; }
       .lift:active { transform: scale(0.97) translateY(2px); }
       .cw-frame * { box-sizing: border-box; }
+      .cw-frame {
+        --safe-top: env(safe-area-inset-top, 0px);
+        --safe-bottom: env(safe-area-inset-bottom, 0px);
+        --safe-left: env(safe-area-inset-left, 0px);
+        --safe-right: env(safe-area-inset-right, 0px);
+      }
 
       /* ===== Ultra-Pop "Roast Cards" — high-contrast, rounded, floating ===== */
       .roast-card {

@@ -322,12 +322,17 @@ function RecappedApp() {
         isolation: 'isolate',
       }}>
         <BlobBackground />
+        {/* Safe-area overlay: height = device notch/status-bar inset.
+            backdrop-filter picks up whatever slide color is behind it,
+            so it blends naturally on every page. 0px on desktop. */}
         <div aria-hidden="true" style={{
-          position: 'absolute', top: 0, left: 0, right: 0, height: 28,
-          background: 'linear-gradient(to bottom, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.55) 30%, rgba(0,0,0,0.18) 65%, transparent 100%)',
-          zIndex: 1, pointerEvents: 'none',
+          position: 'absolute', top: 0, left: 0, right: 0,
+          height: 'env(safe-area-inset-top, 0px)',
+          backdropFilter: 'blur(24px) saturate(1.6)',
+          WebkitBackdropFilter: 'blur(24px) saturate(1.6)',
+          zIndex: 20, pointerEvents: 'none',
         }} />
-        <div style={{ flex: 1, position: 'relative', overflow: 'hidden' }} dir={isRTL ? 'rtl' : 'auto'}>
+        <div style={{ position: 'absolute', top: 'env(safe-area-inset-top, 0px)', left: 0, right: 0, bottom: 0, overflow: 'hidden' }} dir={isRTL ? 'rtl' : 'auto'}>
           {stage === 'howto' && (
             <HowToGuide
               t={t}

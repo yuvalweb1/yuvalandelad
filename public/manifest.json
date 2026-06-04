@@ -1,6 +1,6 @@
 {
-  "name": "ChatWrapped",
-  "short_name": "ChatWrapped",
+  "name": "Recapped",
+  "short_name": "Recapped",
   "description": "A cinematic recap of your WhatsApp group chat. 100% on-device.",
   "start_url": "/",
   "display": "standalone",
