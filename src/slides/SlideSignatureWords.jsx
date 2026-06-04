@@ -47,10 +47,8 @@ const SlideSignatureWords = React.memo(function SlideSignatureWords({ a, t, prof
               animationDelay: `${0.4 + i * 0.1}s`,
             }}>
               <div className="fs-sans" style={{ width: '34%', flexShrink: 0, fontSize: 14, fontWeight: 700, color: 'rgba(74,14,78,0.75)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{usr.author}</div>
-              <div style={{ flex: 1, minWidth: 0, display: 'flex', alignItems: 'center' }}>
-                <span className="fs-display" style={{ flexShrink: 0, fontSize: usr.topWord.length > 10 ? 18 : 24, fontStyle: 'italic', fontWeight: 800, color: '#8338ec' }}>"</span>
-                <span className="fs-display" dir="auto" style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', fontSize: usr.topWord.length > 10 ? 18 : 24, fontStyle: 'italic', fontWeight: 800, color: '#8338ec' }}>{usr.topWord}</span>
-                <span className="fs-display" style={{ flexShrink: 0, fontSize: usr.topWord.length > 10 ? 18 : 24, fontStyle: 'italic', fontWeight: 800, color: '#8338ec' }}>"</span>
+              <div style={{ flex: 1, minWidth: 0, overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <span className="fs-display" dir="auto" style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', fontSize: usr.topWord.length > 10 ? 18 : 24, fontStyle: 'italic', fontWeight: 800, color: '#8338ec', padding: '2px 4px' }}>{`"${usr.topWord}"`}</span>
               </div>
               <div className="fs-mono" style={{ flexShrink: 0, fontSize: 12, color: 'rgba(74,14,78,0.55)', fontWeight: 600 }}>{usr.topWordCount}×</div>
             </div>

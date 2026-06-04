@@ -16,6 +16,7 @@ import SlideMetric, { metricHasData } from './SlideMetric.jsx';
 import SlideLongestStreak from './SlideLongestStreak.jsx';
 import SlideBusiestWeekday from './SlideBusiestWeekday.jsx';
 import SlideSignatureEmoji from './SlideSignatureEmoji.jsx';
+import SlideReady from './SlideReady.jsx';
 
 // Tiny wrapper factory: each metric id renders the shared SlideMetric base
 // with a fixed metricKey. Lets the slide registry stay id → component.
@@ -29,6 +30,7 @@ const metricSlide = (metricKey) => {
 // id → component lookup used by Wrapped. Every id used in SLIDES_BY_TYPE
 // MUST appear here.
 export const SLIDE_COMPONENTS = {
+  ready:           SlideReady,
   // Original group slides
   group_overview:  SlideGroupOverview,
   leaderboard:     SlideLeaderboard,
@@ -67,6 +69,7 @@ export const SLIDE_COMPONENTS = {
 // actually included media; slideHasData drops them otherwise.
 export const SLIDES_BY_TYPE = {
   friends: [
+    'ready',
     'group_overview',
     'leaderboard',
     'night_owls',
@@ -83,6 +86,7 @@ export const SLIDES_BY_TYPE = {
     'teaser',
   ],
   family: [
+    'ready',
     'group_overview',
     'early_birds',
     'leaderboard',
@@ -98,6 +102,7 @@ export const SLIDES_BY_TYPE = {
     'teaser',
   ],
   work: [
+    'ready',
     'group_overview',
     'overtime',
     'response_times',
@@ -114,6 +119,7 @@ export const SLIDES_BY_TYPE = {
     'teaser',
   ],
   couple: [
+    'ready',
     'group_overview',
     'per_person',
     'double_texts',
@@ -130,6 +136,7 @@ export const SLIDES_BY_TYPE = {
     'teaser',
   ],
   other: [
+    'ready',
     'group_overview',
     'leaderboard',
     'per_person',

@@ -64,6 +64,12 @@ function RevealTile({ question, icon, color, numValue, strValue, label, sub, del
           }}>
             ?
           </div>
+          <div className="fs-sans" style={{
+            fontSize: 9, color: 'rgba(42,6,69,0.28)',
+            letterSpacing: '0.12em', textTransform: 'uppercase', fontWeight: 600,
+          }}>
+            press
+          </div>
         </div>
 
         {/* BACK — answer */}
