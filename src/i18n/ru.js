@@ -42,7 +42,7 @@ export default {
   parsing_detail_read: 'Разбор временных меток',
   parsing_detail_analyze: 'Обнаружение драмы, эр, пиков',
   parsing_detail_build: 'Почти готово…',
-  intro_eyebrow: 'CHATWRAPPED',
+  intro_eyebrow: 'RECAPPED',
   intro_get: 'Готовься.',
   intro_ready: '',
   intro_summary: '{msgs} сообщений. {people} людей. {days} дней. Одна история.',

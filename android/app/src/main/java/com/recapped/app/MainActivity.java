@@ -1,4 +1,4 @@
-package com.chatwrapped.app;
+package com.recapped.app;
 
 import android.content.Intent;
 import android.database.Cursor;
@@ -23,6 +23,7 @@ public class MainActivity extends BridgeActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        registerPlugin(OpenAppPlugin.class);
         super.onCreate(savedInstanceState);
         cleanupStaleCache();
         handleShareIntent(getIntent());

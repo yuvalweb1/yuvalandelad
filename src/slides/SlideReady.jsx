@@ -12,6 +12,58 @@ const PREVIEWS = [
   { icon: '📸', label: 'Photos' },
 ];
 
+// A looping "tap here" hint: concentric rings ripple outward from a dot that
+// presses on a loop, mimicking a tap response. One per side of the slide.
+function TapHint({ color, glow, glowSide, label }) {
+  return (
+    <div style={{
+      flex: 1, position: 'relative',
+      display: 'flex', flexDirection: 'column',
+      alignItems: 'center', justifyContent: 'center', gap: 16,
+    }}>
+      {/* soft ambient glow behind the dot */}
+      <div style={{
+        position: 'absolute',
+        width: '85%', height: '55%',
+        [glowSide]: '-10%',
+        background: glow,
+        filter: 'blur(36px)',
+        borderRadius: 20,
+        pointerEvents: 'none',
+      }} />
+
+      {/* tap target: rippling rings + a pressing dot */}
+      <div style={{
+        position: 'relative', zIndex: 1,
+        width: 76, height: 76,
+        display: 'flex', alignItems: 'center', justifyContent: 'center',
+      }}>
+        {[0, 1].map(i => (
+          <div key={i} className="a-tap-ripple" style={{
+            position: 'absolute', inset: 0, borderRadius: '50%',
+            border: `2.5px solid ${color}`,
+            animationDelay: `${i}s`,
+          }} />
+        ))}
+        <div className="a-tap-press" style={{
+          width: 54, height: 54, borderRadius: '50%',
+          background: color,
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          boxShadow: `0 6px 18px ${color}77`,
+        }}>
+          <span style={{ fontSize: 26, lineHeight: 1 }}>👆</span>
+        </div>
+      </div>
+
+      <span className="fs-sans" style={{
+        position: 'relative', zIndex: 1,
+        fontSize: 12, fontWeight: 800, letterSpacing: '0.04em',
+        textAlign: 'center', color, maxWidth: 120, lineHeight: 1.3,
+      }}>{label}</span>
+    </div>
+  );
+}
+
 const SlideReady = React.memo(function SlideReady() {
   return (
     <SlideShell bg={ACCENT} accent={ACCENT}>
@@ -69,58 +121,20 @@ const SlideReady = React.memo(function SlideReady() {
         }}>
 
           {/* Back zone */}
-          <div style={{
-            flex: 1, position: 'relative',
-            display: 'flex', flexDirection: 'column',
-            alignItems: 'center', justifyContent: 'center', gap: 4,
-          }}>
-            <div style={{
-              position: 'absolute',
-              width: '85%', height: '55%',
-              left: '-10%',
-              background: 'rgba(80,140,210,0.55)',
-              filter: 'blur(36px)',
-              borderRadius: 20,
-              pointerEvents: 'none',
-            }} />
-            <div style={{ position: 'relative', zIndex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4, transform: 'translateX(-28%)' }}>
-              <span className="fs-sans" style={{
-                fontSize: 10, fontWeight: 800, letterSpacing: '0.15em',
-                textTransform: 'uppercase', color: 'rgba(74,14,78,0.75)',
-              }}>press here</span>
-              <span className="fs-sans" style={{
-                fontSize: 9, fontWeight: 500,
-                color: 'rgba(74,14,78,0.55)',
-              }}>to go back</span>
-            </div>
-          </div>
+          <TapHint
+            color="#4f86c6"
+            glow="rgba(80,140,210,0.55)"
+            glowSide="left"
+            label="Tap here to go back"
+          />
 
           {/* Forward zone */}
-          <div style={{
-            flex: 1, position: 'relative',
-            display: 'flex', flexDirection: 'column',
-            alignItems: 'center', justifyContent: 'center', gap: 4,
-          }}>
-            <div style={{
-              position: 'absolute',
-              width: '85%', height: '55%',
-              right: '-10%',
-              background: `${ACCENT}aa`,
-              filter: 'blur(36px)',
-              borderRadius: 20,
-              pointerEvents: 'none',
-            }} />
-            <div style={{ position: 'relative', zIndex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4, transform: 'translateX(28%)' }}>
-              <span className="fs-sans" style={{
-                fontSize: 10, fontWeight: 800, letterSpacing: '0.15em',
-                textTransform: 'uppercase', color: `${DEEP}cc`,
-              }}>press here</span>
-              <span className="fs-sans" style={{
-                fontSize: 9, fontWeight: 600,
-                color: `${DEEP}99`,
-              }}>to move forward</span>
-            </div>
-          </div>
+          <TapHint
+            color={DEEP}
+            glow={`${ACCENT}aa`}
+            glowSide="right"
+            label="Tap here to go forward"
+          />
 
         </div>
       </div>

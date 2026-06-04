@@ -13,17 +13,25 @@ const SlideGroupTop = React.memo(function SlideGroupTop({ a, t, profile }) {
       <ListSlideDecor emojis={['💬', '🗨️', '✨', '💭', '🎉', '⭐']} />
       <div style={{
         position: 'relative', zIndex: 1, height: '100%',
-        display: 'flex', flexDirection: 'column', justifyContent: 'center',
-        textAlign: 'center', padding: '0 24px', gap: 14,
+        display: 'flex', flexDirection: 'column', justifyContent: 'flex-start',
+        textAlign: 'center', padding: '72px 24px 0', gap: 8,
       }}>
         <div className="fs-sans a-fade-up" style={{
           fontSize: 13, color: '#f3722c', letterSpacing: '0.2em', fontWeight: 800, textTransform: 'uppercase',
         }}>
           💬 {typedCopy(t, 'gt_eyebrow', type)}
         </div>
+        <div className="fs-display a-fade-up" style={{
+          animationDelay: '0.1s',
+          fontSize: 44, fontWeight: 900, letterSpacing: '-0.04em', lineHeight: 1.0,
+          color: '#2a0645',
+          textShadow: '0 2px 0 rgba(255,255,255,0.65), 0 1px 3px rgba(74,14,78,0.12)',
+        }}>
+          {t.gt_title || 'Most Used'}
+        </div>
 
         {emoji && (
-          <div className="a-spring" style={{ animationDelay: '0.2s' }}>
+          <div className="a-spring" style={{ animationDelay: '0.25s', marginTop: 40 }}>
             {/* big emoji in a tilted white sticker badge */}
             <div style={{
               display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
@@ -41,7 +49,7 @@ const SlideGroupTop = React.memo(function SlideGroupTop({ a, t, profile }) {
         )}
 
         {word && (
-          <div className="a-fade-up" style={{ animationDelay: '0.7s', marginTop: 8 }}>
+          <div className="a-fade-up" style={{ animationDelay: '0.7s', marginTop: 24 }}>
             {/* word in a sticker quote card */}
             <div dir="auto" style={{
               display: 'inline-block',

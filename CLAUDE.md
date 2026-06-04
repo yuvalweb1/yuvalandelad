@@ -29,7 +29,7 @@ This was originally a single-file React app — `src/App.jsx` is still the stage
 
 ### The stage machine
 
-`ChatWrappedApp` in [src/App.jsx](src/App.jsx) holds a `stage` string. Current transitions:
+`RecappedApp` in [src/App.jsx](src/App.jsx) holds a `stage` string. Current transitions:
 
 ```
 howto → landing → parsing → [ad_post_parse] → onboard → [ad_pre_wrapped] → wrapped

@@ -1,4 +1,4 @@
-// ChatWrapped service worker — only purpose is to handle the Web Share Target.
+// Recapped service worker — only purpose is to handle the Web Share Target.
 // No caching: all network requests fall through to the browser.
 
 self.addEventListener('install', () => self.skipWaiting());

@@ -26,7 +26,7 @@ Pair them with the copy below.
 ```
 ה-WhatsApp שלך הוא בלגן. הגיע הזמן להוכיח עם נתונים.
 
-ChatWrapped הופך כל יצוא של צ'אט וואטסאפ ל-13 שקופיות:
+Recapped הופך כל יצוא של צ'אט וואטסאפ ל-13 שקופיות:
 מי מדבר הכי הרבה, מי עונה הכי מהר, מי הורג שיחות,
 ומי האימוג'י הכי שלו.
 
@@ -35,7 +35,7 @@ ChatWrapped הופך כל יצוא של צ'אט וואטסאפ ל-13 שקופי�
 
 לינק בביו ↑
 
-#וואטסאפ #ChatWrapped #WhatsAppWrapped #ישראל
+#וואטסאפ #Recapped #WhatsAppWrapped #ישראל
 ```
 
 **Caption (English):**
@@ -43,7 +43,7 @@ ChatWrapped הופך כל יצוא של צ'אט וואטסאפ ל-13 שקופי�
 ```
 Your WhatsApp is a mess. Time to prove it with data.
 
-ChatWrapped turns any WhatsApp chat export into 13 slides:
+Recapped turns any WhatsApp chat export into 13 slides:
 who talks the most, who replies fastest, who kills conversations,
 and which emoji defines each person.
 
@@ -52,7 +52,7 @@ and which emoji defines each person.
 
 Link in bio ↑
 
-#WhatsApp #ChatWrapped #WhatsAppWrapped #YearInReview
+#WhatsApp #Recapped #WhatsAppWrapped #YearInReview
 ```
 
 ---
@@ -66,7 +66,7 @@ Shorter, hookier:
 ```
 התשובה לשאלה "מי האנשים הכי מעצבנים בקבוצה שלכם". 13 שקופיות. Spotify Wrapped אבל לוואטסאפ. בלי שום שרת — הכל בטלפון.
 
-#וואטסאפ #ChatWrapped #ישראל
+#וואטסאפ #Recapped #ישראל
 ```
 
 **English:**
@@ -74,7 +74,7 @@ Shorter, hookier:
 ```
 Spotify Wrapped, but for your group chat. 13 slides. Roasts. Stats. Drama. 100% on your phone. No login.
 
-#WhatsAppWrapped #ChatWrapped #fyp
+#WhatsAppWrapped #Recapped #fyp
 ```
 
 ---
@@ -151,7 +151,7 @@ Free at yuval.ella.org.il
 ## Hashtags to seed
 
 **Hebrew side:**
-`#וואטסאפ #ChatWrapped #ספוטיפיוופד #וואטסאפ_וופד #קבוצות_וואטסאפ #ישראל #טכנולוגיה #אפליקציה_חדשה`
+`#וואטסאפ #Recapped #ספוטיפיוופד #וואטסאפ_וופד #קבוצות_וואטסאפ #ישראל #טכנולוגיה #אפליקציה_חדשה`
 
 **English side:**
-`#WhatsApp #ChatWrapped #WhatsAppWrapped #SpotifyWrapped #YearInReview #IndieApp #PrivacyFirst #IsraelTech`
+`#WhatsApp #Recapped #WhatsAppWrapped #SpotifyWrapped #YearInReview #IndieApp #PrivacyFirst #IsraelTech`

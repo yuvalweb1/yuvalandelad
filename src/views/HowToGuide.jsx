@@ -1,5 +1,11 @@
 import { useState } from 'react';
+import { Capacitor, registerPlugin } from '@capacitor/core';
+import { AppLauncher } from '@capacitor/app-launcher';
 import BottomSheet from '../components/BottomSheet.jsx';
+
+// Native (Android) plugin defined in OpenAppPlugin.java — opens WhatsApp via the
+// OS launcher intent, like tapping its icon. iOS uses the whatsapp:// scheme.
+const OpenApp = registerPlugin('OpenApp');
 
 // Languages list — same set used in Landing/Settings. Keep in sync.
 const LANGUAGES = [
@@ -246,8 +252,25 @@ export default function HowToGuide({ t, onStart, lang, setLang }) {
   const step = steps[stepIdx];
   const isLast = stepIdx === steps.length - 1;
 
-  const advance = () => {
-    if (isLast) { onStart(); } else { setStepIdx(i => i + 1); }
+  const advance = async () => {
+    if (isLast) {
+      // Native: hand the scheme straight to the OS so the WhatsApp APP opens
+      // (browser sandboxing blocks this, which is why the web attempts failed).
+      // On web (dev in a browser) AppLauncher no-ops and we just continue.
+      if (Capacitor.isNativePlatform()) {
+        try {
+          if (Capacitor.getPlatform() === 'android') {
+            await OpenApp.openWhatsApp();
+          } else {
+            await AppLauncher.openUrl({ url: 'whatsapp://' });
+          }
+          console.log('[deeplink] open ok', Capacitor.getPlatform());
+        } catch (e) { console.error('[deeplink] error', e); }
+      }
+      onStart();
+    } else {
+      setStepIdx(i => i + 1);
+    }
   };
 
   const switchPlatform = (id) => { setPlatform(id); setStepIdx(0); };

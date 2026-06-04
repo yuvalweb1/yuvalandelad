@@ -124,6 +124,17 @@ export default function GlobalStyles() {
         0%, 100% { transform: translateY(0px); }
         50%      { transform: translateY(-5px); }
       }
+      /* Tap hint: a dot that "presses" on a loop while rings ripple outward. */
+      @keyframes tapPress {
+        0%, 100% { transform: scale(1); }
+        12%      { transform: scale(0.78); }
+        30%      { transform: scale(1); }
+      }
+      @keyframes tapRipple {
+        0%   { transform: scale(0.55); opacity: 0.55; }
+        70%  { opacity: 0; }
+        100% { transform: scale(1.7); opacity: 0; }
+      }
       .slide-content { color: #2a0645; }
       .slide-content * { text-shadow: 0 1px 8px rgba(255,255,255,0.8); }
       .slide-content .fs-display.a-fade-up { filter: drop-shadow(0 0 14px rgba(255,255,255,0.5)); }
@@ -148,6 +159,8 @@ export default function GlobalStyles() {
       .a-shimmer-flash { animation: shimmerFlash 1.4s ease-in-out infinite; }
       .a-cta-ping { animation: ctaPing 2.4s ease-out infinite; pointer-events: none; }
       .a-cta-bob { animation: ctaBob 3.2s ease-in-out infinite; }
+      .a-tap-press { animation: tapPress 2s ease-in-out infinite; }
+      .a-tap-ripple { animation: tapRipple 2s ease-out infinite; pointer-events: none; }
       .a-shine {
         background: linear-gradient(90deg, transparent, rgba(255,255,255,0.18), transparent);
         background-size: 200% 100%;
@@ -228,7 +241,7 @@ export default function GlobalStyles() {
       @media (prefers-reduced-motion: reduce) {
         .a-pulse-glow, .a-spin, .a-shine, .a-shimmer-flash,
         .a-gradient-shift, .a-shake, .a-wobble, .a-float,
-        .a-cta-ping, .a-cta-bob {
+        .a-cta-ping, .a-cta-bob, .a-tap-press, .a-tap-ripple {
           animation: none !important;
         }
         .a-fade-up, .a-fade-in, .a-scale-in, .a-spring,

@@ -42,7 +42,7 @@ export default {
   parsing_detail_read: 'Zaman damgaları ayrıştırılıyor',
   parsing_detail_analyze: 'Drama, çağ, zirve tespiti',
   parsing_detail_build: 'Neredeyse bitti…',
-  intro_eyebrow: 'CHATWRAPPED',
+  intro_eyebrow: 'RECAPPED',
   intro_get: 'Hazır',
   intro_ready: 'ol.',
   intro_summary: '{msgs} mesaj. {people} kişi. {days} gün. Tek hikaye.',

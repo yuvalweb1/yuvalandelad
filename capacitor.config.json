@@ -1,5 +1,5 @@
 {
-  "appId": "com.chatwrapped.app",
+  "appId": "com.recapped.app",
   "appName": "Recapped",
   "webDir": "dist",
   "server": {

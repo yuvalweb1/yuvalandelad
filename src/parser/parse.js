@@ -206,7 +206,9 @@ export function parseWhatsApp(rawText) {
         content,
         contentLength: content.length,
         isDeleted, isPoll, hasMedia, isVoice, hasLink: linkMatches.length > 0,
-        mediaFile: hasMedia ? extractMediaFile(content) : null,
+        // Voice notes reference a filename too (`<attached: PTT-…opus>`); extract
+        // it so the voice slide can match each note to its sender (else → '—').
+        mediaFile: (hasMedia || isVoice) ? extractMediaFile(content) : null,
         linkCount: linkMatches.length,
         emojis, wordCount, isQuestion,
         hour: date.getHours(),

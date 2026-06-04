@@ -233,7 +233,7 @@ export async function readZipBundle(file, opts = {}) {
     maxImages: 60,       maxImageBytes: 6_000_000,  maxImagesTotal: 45_000_000,
     maxVoice:  20,       maxVoiceBytes: 4_000_000,  maxVoiceTotal:  24_000_000,
     maxVideos: 12,       maxVideoBytes: 12_000_000, maxVideosTotal: 45_000_000,
-    maxStickers: 120,    maxStickerBytes: 300_000,  maxStickersTotal: 14_000_000,
+    maxStickerBytes: 300_000,  maxStickersTotal: 14_000_000,
     ...opts,
   };
 
@@ -244,20 +244,28 @@ export async function readZipBundle(file, opts = {}) {
   const text = new TextDecoder('utf-8').decode(await inflateEntry(file, chatEntry));
 
   // Categorize candidates by extension/name (stickers split from photos).
+  // totalPhotoCount counts EVERY photo sent (every non-sticker image), even the
+  // ones too big to inflate — the slide displays a sample but the headline number
+  // must reflect the whole chat.
   const candidates = { photos: [], voice: [], videos: [], stickers: [] };
+  let totalPhotoCount = 0;
   for (const e of entries) {
     if (e.uncompSize === 0) continue;
     const ext = extOf(e.name);
-    if (isStickerName(e.name) && e.uncompSize <= cfg.maxStickerBytes) {
-      candidates.stickers.push(e);
-    } else if (IMAGE_MIME[ext] && e.uncompSize <= cfg.maxImageBytes) {
-      candidates.photos.push(e);
+    if (isStickerName(e.name)) {
+      if (e.uncompSize <= cfg.maxStickerBytes) candidates.stickers.push(e);
+    } else if (IMAGE_MIME[ext]) {
+      totalPhotoCount++;
+      if (e.uncompSize <= cfg.maxImageBytes) candidates.photos.push(e);
     } else if (VOICE_MIME[ext] && e.uncompSize <= cfg.maxVoiceBytes) {
       candidates.voice.push(e);
     } else if (VIDEO_MIME[ext] && e.uncompSize <= cfg.maxVideoBytes) {
       candidates.videos.push(e);
     }
   }
+
+  // Capture true sticker total before any sampling/capping for accurate titles.
+  const totalStickerInstances = candidates.stickers.length;
 
   // Photos: sample evenly across the (~chronological) list when over the cap.
   candidates.photos.sort((a, b) => a.name.localeCompare(b.name));
@@ -271,8 +279,8 @@ export async function readZipBundle(file, opts = {}) {
   candidates.voice = candidates.voice.slice(0, cfg.maxVoice);
   candidates.videos.sort((a, b) => b.uncompSize - a.uncompSize);
   candidates.videos = candidates.videos.slice(0, cfg.maxVideos);
-  // Stickers: take up to maxStickers (we hash & dedup AFTER inflating).
-  candidates.stickers = candidates.stickers.slice(0, cfg.maxStickers);
+  // Stickers: no count cap — inflate every candidate (the maxStickersTotal
+  // byte guard below bounds memory). We hash & dedup AFTER inflating.
 
   async function pullList(items, mimeMap, totalCap) {
     const out = [];
@@ -305,5 +313,5 @@ export async function readZipBundle(file, opts = {}) {
   }
   const stickers = [...byHash.values()].sort((a, b) => b.count - a.count);
 
-  return { text, photos, voice, videos, stickers };
+  return { text, photos, voice, videos, stickers, totalPhotoCount, totalStickerInstances };
 }

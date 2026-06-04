@@ -6,10 +6,18 @@ const MAX_ROWS = 3;
 
 const SPEEDS = [1, 1.5, 2];
 
+function fmtDuration(secs) {
+  if (!secs || !isFinite(secs)) return null;
+  const m = Math.floor(secs / 60);
+  const s = Math.floor(secs % 60);
+  return m > 0 ? `${m}:${String(s).padStart(2, '0')}` : `0:${String(s).padStart(2, '0')}`;
+}
+
 function VoiceRow({ v, index }) {
   const [playing, setPlaying] = useState(false);
   const [speedIdx, setSpeedIdx] = useState(0);
   const [progress, setProgress] = useState(0);
+  const [duration, setDuration] = useState(null);
   const audioRef = useRef(null);
 
   const onTimeUpdate = () => {
@@ -58,7 +66,8 @@ function VoiceRow({ v, index }) {
       <audio
         ref={audioRef}
         src={v.url}
-        preload="none"
+        preload="metadata"
+        onLoadedMetadata={() => audioRef.current && setDuration(audioRef.current.duration)}
         onPlay={() => setPlaying(true)}
         onPause={() => setPlaying(false)}
         onEnded={() => { setPlaying(false); setProgress(0); }}
@@ -66,7 +75,12 @@ function VoiceRow({ v, index }) {
       />
       <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
         <div className="fs-display" style={{ width: 26, flexShrink: 0, fontSize: 17, fontWeight: 800, color: 'rgba(74,14,78,0.45)' }}>{index + 1}</div>
-        <div className="fs-sans" style={{ flex: 1, minWidth: 0, fontSize: 15, fontWeight: 800, color: '#4A0E4E', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{v.author}</div>
+        <div className="fs-sans" style={{ flex: 1, minWidth: 0, fontSize: 15, fontWeight: 800, color: '#4A0E4E', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{v.author || '—'}</div>
+        {fmtDuration(duration) && (
+          <div className="fs-mono" style={{ flexShrink: 0, fontSize: 12, fontWeight: 700, color: '#00BFFF', background: 'rgba(0,191,255,0.10)', borderRadius: 8, padding: '2px 7px' }}>
+            {fmtDuration(duration)}
+          </div>
+        )}
       </div>
       <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
         {/* Play / pause */}

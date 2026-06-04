@@ -14,7 +14,7 @@ const METRIC_DEFS = {
     rows: (a) => (a.users || [])
       .filter(u => u.nightPct > 0 && u.nightMessages >= 3)
       .sort((x, y) => y.nightPct - x.nightPct)
-      .map(u => ({ author: u.author, value: u.nightPct, displayValue: `${u.nightPct.toFixed(0)}%`, sub: `${u.nightMessages.toLocaleString()} msgs 0–6am` })),
+      .map(u => ({ author: u.author, value: u.nightPct, displayValue: `${u.nightPct.toFixed(0)}%`, sub: `${u.nightMessages.toLocaleString()} messages` })),
   },
   early_birds: {
     color: '#f9c74f',

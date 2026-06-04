@@ -42,7 +42,7 @@ export default {
   parsing_detail_read: 'تحليل الطوابع الزمنية',
   parsing_detail_analyze: 'كشف الدراما والحقب والذروات',
   parsing_detail_build: 'اقتربنا…',
-  intro_eyebrow: 'CHATWRAPPED',
+  intro_eyebrow: 'RECAPPED',
   intro_get: 'استعد.',
   intro_ready: '',
   intro_summary: '{msgs} رسالة. {people} أشخاص. {days} يوم. قصة واحدة.',

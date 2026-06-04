@@ -154,6 +154,8 @@ function RecappedApp() {
       a.voice    = media?.voice    || [];
       a.videos   = media?.videos   || [];
       a.stickers = media?.stickers || [];
+      a.totalPhotoCount       = media?.totalPhotoCount       ?? a.photos.length;
+      a.totalStickerInstances = media?.totalStickerInstances ?? 0;
       // Persist stats snapshot (without blob URLs — those die on reload).
       // Media blobs go to IndexedDB separately via mediaStore.
       const { photos: _photos, voice: _voice, videos: _videos, stickers: _stickers, ...stats } = a;
@@ -220,8 +222,11 @@ function RecappedApp() {
     if (includeMedia) {
       const dm = generateSampleMedia(a.users);
       a.photos = dm.photos; a.voice = dm.voice; a.videos = dm.videos; a.stickers = dm.stickers;
+      a.totalPhotoCount = dm.photos.length;
+      a.totalStickerInstances = dm.stickers.reduce((s, x) => s + (x.count || 1), 0);
     } else {
       a.photos = []; a.voice = []; a.videos = []; a.stickers = [];
+      a.totalPhotoCount = 0; a.totalStickerInstances = 0;
     }
     await new Promise(r => setTimeout(r, 500));
     setParsingStage(4);

@@ -76,17 +76,16 @@ export default function Wrapped({ analytics, diagnostics, selectedAuthor, setSel
         {/* Close — insetInlineEnd keeps the X on the trailing edge (top-right
             in LTR, top-left in RTL) so it doesn't collide with RTL slide
             titles/content that aligns to the right. */}
-        <button onClick={onExit} className="press" aria-label={t.a11y_close || 'Close'} style={{
+        <button onClick={onExit} className="press" aria-label={t.a11y_close || 'Home'} style={{
           position: 'absolute', top: 34, insetInlineEnd: 16, pointerEvents: 'auto',
           background: 'rgba(0,0,0,0.25)', backdropFilter: 'blur(12px)',
           color: '#fff', border: 'none', width: 40, height: 40,
           borderRadius: '50%', cursor: 'pointer',
           display: 'flex', alignItems: 'center', justifyContent: 'center',
         }}>
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-            strokeWidth="2.4" strokeLinecap="round" aria-hidden="true">
-            <line x1="18" y1="6" x2="6" y2="18"/>
-            <line x1="6" y1="6" x2="18" y2="18"/>
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+            strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+            <path d="M3 9.5L12 3l9 6.5V20a1 1 0 0 1-1 1H15v-5h-6v5H4a1 1 0 0 1-1-1V9.5z"/>
           </svg>
         </button>
 

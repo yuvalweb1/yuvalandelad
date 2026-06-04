@@ -42,7 +42,7 @@ export default {
   parsing_detail_read: 'Zeitstempel & Sender parsen',
   parsing_detail_analyze: 'Drama, Ären, Höhepunkte',
   parsing_detail_build: 'Fast fertig…',
-  intro_eyebrow: 'CHATWRAPPED',
+  intro_eyebrow: 'RECAPPED',
   intro_get: 'Mach dich',
   intro_ready: 'bereit.',
   intro_summary: '{msgs} Nachrichten. {people} Personen. {days} Tage. Eine Geschichte.',

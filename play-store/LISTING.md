@@ -12,11 +12,11 @@ questionnaire. Copy-paste from here.
 
 | Field | Value |
 |---|---|
-| **App name** | ChatWrapped |
+| **App name** | Recapped |
 | **Default language** | English (United States) |
 | **App or game** | App |
 | **Free or paid** | Free (with in-app purchase) |
-| **Package name** | `com.chatwrapped.app` |
+| **Package name** | `com.recapped.app` |
 | **Category** | Lifestyle (primary) · Entertainment (secondary) |
 | **Tags** | Lifestyle, Social, Year in Review, Stats |
 | **Contact email** | nahum@ella3g.com |
@@ -38,7 +38,7 @@ Your WhatsApp group, wrapped. Stats, roasts, drama — never leaves your phone.
 ```
 What if your WhatsApp group had a year-end Wrapped, like Spotify?
 
-ChatWrapped turns any WhatsApp chat export into a cinematic 13-slide recap:
+Recapped turns any WhatsApp chat export into a cinematic 13-slide recap:
 who talks the most, who replies fastest, when the drama peaks, what emojis
 define each person, and the awards nobody asked for but everyone deserves.
 
@@ -51,7 +51,7 @@ deterministic, defensible, devastating.
 
 🛡️ THE PROMISE: 100% ON YOUR DEVICE
 
-Your chat never leaves your phone. ChatWrapped has no server, no database,
+Your chat never leaves your phone. Recapped has no server, no database,
 no analytics, no LLM. Parsing, stats, and roasts run entirely in your
 browser. The only network call beyond loading the app is Google Fonts.
 
@@ -81,7 +81,7 @@ HOW IT WORKS
 
 1. In WhatsApp: open a chat → ⋮ menu → More → Export Chat
 2. Choose "Include media" (for photo / voice / video slides) or "Without media"
-3. Share the export with ChatWrapped
+3. Share the export with Recapped
 4. Watch your year unfold
 
 No login. No account. No backup. If you delete the app, your data is gone
@@ -115,7 +115,7 @@ Everything runs on your device.
 ```
 מה אם לקבוצת הוואטסאפ שלך היה Wrapped של סוף שנה, כמו לספוטיפיי?
 
-ChatWrapped הופך כל ייצוא של צ'אט וואטסאפ ל‑13 שקופיות קולנועיות: מי
+Recapped הופך כל ייצוא של צ'אט וואטסאפ ל‑13 שקופיות קולנועיות: מי
 מדבר הכי הרבה, מי עונה הכי מהר, מתי הדרמה מגיעה לשיא, אילו אימוג'ים
 מאפיינים כל אחד, והפרסים שאף אחד לא ביקש אבל כולם ראויים להם.
 
@@ -158,7 +158,7 @@ analytics, אין LLM. הכל — פרסור, סטטיסטיקות, רואסטי
 
 1. בוואטסאפ: פתח צ'אט → תפריט ⋮ → עוד → יצוא צ'אט
 2. בחר "כולל מדיה" (לסליידים של תמונות / קולי / וידאו) או "בלי מדיה"
-3. שתף את הייצוא עם ChatWrapped
+3. שתף את הייצוא עם Recapped
 4. צפה בשנה שלך נפרשת
 
 בלי הרשמה. בלי חשבון. בלי גיבוי. אם מוחקים את האפליקציה, הנתונים

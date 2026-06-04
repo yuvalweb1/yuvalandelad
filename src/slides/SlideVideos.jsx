@@ -3,7 +3,14 @@ import SlideShell from './SlideShell.jsx';
 import ListSlideDecor from '../components/ListSlideDecor.jsx';
 import { interp } from '../i18n';
 
-const fmtMB = (bytes) => (bytes / (1024 * 1024)).toFixed(1) + ' MB';
+function fmtDate(ts) {
+  if (!ts) return null;
+  try {
+    const d = new Date(ts);
+    const mon = d.toLocaleDateString(undefined, { month: 'short' });
+    return `${mon} ${String(d.getDate()).padStart(2, '0')}, ${d.getFullYear()}`;
+  } catch { return null; }
+}
 
 const MAX_ROWS = 1;
 
@@ -50,7 +57,7 @@ const SlideVideos = React.memo(function SlideVideos({ a, t }) {
               <div style={{ display: 'flex', alignItems: 'baseline', gap: 8, padding: '8px 4px 2px' }}>
                 <div className="fs-display" style={{ fontSize: 16, fontWeight: 800, color: 'rgba(74,14,78,0.45)' }}>#{i + 1}</div>
                 <div className="fs-sans" style={{ flex: 1, minWidth: 0, fontSize: 15, fontWeight: 800, color: '#4A0E4E', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{v.author || '—'}</div>
-                <div className="fs-mono" style={{ fontSize: 12, fontWeight: 700, color: '#FF8C00' }}>{fmtMB(v.size)}</div>
+                {fmtDate(v.ts) && <div className="fs-mono" style={{ fontSize: 12, fontWeight: 700, color: '#FF8C00' }}>{fmtDate(v.ts)}</div>}
               </div>
             </div>
           ))}

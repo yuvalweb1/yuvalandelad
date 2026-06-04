@@ -16,7 +16,7 @@ const SlideStickers = React.memo(function SlideStickers({ a, t }) {
   const shown = showOverflow ? all.slice(0, MAX_TILES) : all;
   const moreLabel = (t.lb_more || '+{n} more').replace('{n}', overflow);
   const tilts = [-4, 3, -2, 4, -3, 2, -4, 3, -1, 2, -3, 4];
-  const totalUses = all.reduce((s, x) => s + (x.count || 1), 0);
+  const totalUses = a.totalStickerInstances || all.reduce((s, x) => s + (x.count || 1), 0);
   return (
     <SlideShell bg="#577590" accent="#FF69B4">
       <ListSlideDecor emojis={['🤪', '😎', '🥹', '✨', '💫', '🎉']} />

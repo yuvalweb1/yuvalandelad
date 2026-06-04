@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useAnimatedNumber } from '../hooks/useAnimatedNumber.js';
 import SlideShell from './SlideShell.jsx';
 import ListSlideDecor from '../components/ListSlideDecor.jsx';
-import { interp, typedCopy } from '../i18n';
+import { typedCopy } from '../i18n';
 
 function RevealTile({ question, icon, color, numValue, strValue, label, sub, delay }) {
   const [flipped, setFlipped] = useState(false);
@@ -54,21 +54,19 @@ function RevealTile({ question, icon, color, numValue, strValue, label, sub, del
           }}>
             {question}
           </div>
-          <div className="a-pulse-glow" style={{
-            width: 28, height: 28, borderRadius: '50%',
+          <div style={{
+            display: 'flex', alignItems: 'center', gap: 7,
+            padding: '9px 16px', borderRadius: 24,
             background: color,
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            fontSize: 14, fontWeight: 900, color: '#fff',
-            boxShadow: `0 4px 14px ${color}55`,
-            flexShrink: 0,
+            boxShadow: `0 4px 12px ${color}55`,
           }}>
-            ?
-          </div>
-          <div className="fs-sans" style={{
-            fontSize: 9, color: 'rgba(42,6,69,0.28)',
-            letterSpacing: '0.12em', textTransform: 'uppercase', fontWeight: 600,
-          }}>
-            press
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.8" strokeLinecap="round" strokeLinejoin="round">
+              <polyline points="9 18 15 12 9 6" />
+            </svg>
+            <span className="fs-sans" style={{
+              fontSize: 11, fontWeight: 800, letterSpacing: '0.1em',
+              textTransform: 'uppercase', color: '#fff',
+            }}>Reveal</span>
           </div>
         </div>
 
@@ -116,14 +114,6 @@ const SlideGroupOverview = React.memo(function SlideGroupOverview({ a, t, profil
   const fmt = (d) => { try { return new Date(d).toLocaleDateString(undefined, { month: 'short', year: '2-digit' }); } catch { return ''; } };
   const range = `${fmt(a.start)} – ${fmt(a.end)}`;
 
-  let peakDayStr = null, peakDayCount = null;
-  if (a.peakDay) {
-    const [date, count] = a.peakDay;
-    const [yr, mo, dy] = date.split('-').map(Number);
-    peakDayStr = new Date(yr, mo - 1, dy).toLocaleDateString(undefined, { day: 'numeric', month: 'short' });
-    peakDayCount = count;
-  }
-
   const tiles = [
     { question: t.go_q_messages, numValue: a.totalMessages, label: t.go_messages, icon: '💬', color: '#8338ec', delay: '0.3s' },
     { question: t.go_q_people, numValue: a.totalParticipants, label: t.go_people, icon: '👥', color: '#f3722c', delay: '0.45s' },
@@ -134,7 +124,7 @@ const SlideGroupOverview = React.memo(function SlideGroupOverview({ a, t, profil
   return (
     <SlideShell bg="#8338ec" accent="#8338ec">
       <ListSlideDecor emojis={['💬', '📅', '⏰', '👥', '✨', '🔥']} />
-      <div style={{ position: 'relative', zIndex: 1, height: '100%', display: 'flex', flexDirection: 'column', padding: '36px 20px 18px' }}>
+      <div style={{ position: 'relative', zIndex: 1, height: '100%', display: 'flex', flexDirection: 'column', padding: '36px 20px calc(var(--safe-bottom) + 56px)' }}>
 
         <div className="fs-sans a-fade-up" style={{
           textAlign: 'center', fontSize: 12, color: '#573280',
@@ -156,22 +146,6 @@ const SlideGroupOverview = React.memo(function SlideGroupOverview({ a, t, profil
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, flex: 1 }}>
           {tiles.map((tile, i) => <RevealTile key={i} {...tile} />)}
         </div>
-
-        {peakDayStr && (
-          <div className="a-fade-up" style={{
-            animationDelay: '1.0s', marginTop: 12,
-            background: 'rgba(243,114,44,0.10)',
-            borderRadius: 20,
-            boxShadow: '0 8px 28px -6px rgba(243,114,44,0.28)',
-            padding: '14px 18px',
-            display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, flexWrap: 'wrap',
-          }}>
-            <span style={{ fontSize: 20 }}>🔥</span>
-            <span className="fs-sans" style={{ fontSize: 11, color: '#f3722c', letterSpacing: '0.1em', textTransform: 'uppercase', fontWeight: 700 }}>{t.go_busiest}</span>
-            <span className="fs-display" style={{ fontSize: 20, fontWeight: 800, color: '#2a0645' }}>{peakDayStr}</span>
-            <span className="fs-mono" style={{ fontSize: 13, color: 'rgba(42,6,69,0.55)' }}>· {interp(t.go_busiest_msgs, { n: peakDayCount.toLocaleString() })}</span>
-          </div>
-        )}
 
       </div>
     </SlideShell>

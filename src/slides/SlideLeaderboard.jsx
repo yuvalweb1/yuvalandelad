@@ -51,7 +51,7 @@ const SlideLeaderboard = React.memo(function SlideLeaderboard({ a, t, profile })
             {rankIdx < 3 ? medals[rankIdx] : displayRank}
           </div>
           <div className="fs-sans" style={{
-            flex: 1, minWidth: 0, fontSize: 16, fontWeight: 800, color: '#4A0E4E',
+            flexShrink: 1, minWidth: 0, fontSize: 16, fontWeight: 800, color: '#4A0E4E',
             overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
           }}>
             {usr.author}{isLast && <span style={{ fontSize: 11, color: '#577590', fontWeight: 600 }}> · {t.lb_least}</span>}
@@ -59,6 +59,7 @@ const SlideLeaderboard = React.memo(function SlideLeaderboard({ a, t, profile })
           <div className="fs-mono" style={{ flexShrink: 0, fontSize: 15, fontWeight: 800, color: '#f3722c' }}>
             {usr.messageCount.toLocaleString()}
           </div>
+          <div style={{ flex: 1 }} />
         </div>
       </div>
     );

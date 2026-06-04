@@ -1,4 +1,4 @@
-# ChatWrapped
+# Recapped
 
 A cinematic recap of your WhatsApp group chat year — Eras, Awards, Drama. Built like Spotify Wrapped, but for your group chat.
 
@@ -34,7 +34,7 @@ On your phone:
 4. Choose **Without Media** (smaller file).
 5. Save the `.zip` or `.txt`.
 
-Upload it to ChatWrapped — the file never leaves your browser.
+Upload it to Recapped — the file never leaves your browser.
 
 ## What you get
 
@@ -54,7 +54,7 @@ Upload it to ChatWrapped — the file never leaves your browser.
 ## Project structure
 
 ```
-chatwrapped/
+recapped/
 ├── index.html
 ├── package.json
 ├── vite.config.js

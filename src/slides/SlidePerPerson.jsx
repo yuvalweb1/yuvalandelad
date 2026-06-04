@@ -101,25 +101,22 @@ const SlidePerPerson = React.memo(function SlidePerPerson({ a, t, profile }) {
                       }}>
                         {label}
                       </span>
-                      <span className="fs-mono" style={{ fontSize: 10, color: 'rgba(74,14,78,0.4)', fontWeight: 500 }}>
-                        {usr.messageCount.toLocaleString()} {t.pp_msgs || 'messages'}
-                      </span>
                     </div>
-                  </div>
 
-                  <div style={{ textAlign: 'right', flexShrink: 0 }}>
-                    <div className="fs-display" style={{
-                      fontSize: numStr.length > 4 ? 28 : 34,
-                      fontWeight: 900, color,
-                      letterSpacing: '-0.04em', lineHeight: 1,
-                    }}>
-                      {numStr}
-                    </div>
-                    <div className="fs-mono" style={{
-                      fontSize: 9, color: 'rgba(74,14,78,0.4)',
-                      letterSpacing: '0.08em', textTransform: 'uppercase', fontWeight: 700,
-                    }}>
-                      {t.pp_words_per_msg || 'words per message'}
+                    <div style={{ marginTop: 6 }}>
+                      <div className="fs-display" style={{
+                        fontSize: numStr.length > 4 ? 28 : 34,
+                        fontWeight: 900, color,
+                        letterSpacing: '-0.04em', lineHeight: 1,
+                      }}>
+                        {numStr}
+                      </div>
+                      <div className="fs-mono" style={{
+                        fontSize: 9, color: 'rgba(74,14,78,0.4)',
+                        letterSpacing: '0.08em', textTransform: 'uppercase', fontWeight: 700,
+                      }}>
+                        {t.pp_words_per_msg || 'words per message'}
+                      </div>
                     </div>
                   </div>
                 </div>

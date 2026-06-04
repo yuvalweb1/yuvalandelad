@@ -42,7 +42,7 @@ export default {
   parsing_detail_read: 'Procesando timestamps y remitentes',
   parsing_detail_analyze: 'Detectando drama, eras, picos',
   parsing_detail_build: 'Ya casi…',
-  intro_eyebrow: 'CHATWRAPPED',
+  intro_eyebrow: 'RECAPPED',
   intro_get: 'Prepárate.',
   intro_ready: '',
   intro_summary: '{msgs} mensajes. {people} personas. {days} días. Una historia.',
