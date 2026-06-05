@@ -16,6 +16,8 @@
 // on every url when done.
 // ============================================================
 
+import { tagMediaAuthors } from './mediaMatch.js';
+
 let _idSeq = 0;
 
 // Materialize transferred bytes into <img>/<audio>/<video>-ready blob URLs.
@@ -111,7 +113,7 @@ async function parseOnMainThread({ file, text, includeMedia, onProgress }) {
         const { readZipBundle } = await import('./zip.js');
         const bundle = await readZipBundle(file);
         raw = bundle.text;
-        mediaRaw = { photos: bundle.photos, voice: bundle.voice, videos: bundle.videos, stickers: bundle.stickers, totalPhotoCount: bundle.totalPhotoCount, totalStickerInstances: bundle.totalStickerInstances };
+        mediaRaw = { photos: bundle.photos, voice: bundle.voice, videos: bundle.videos, stickers: bundle.stickers, voiceOrder: bundle.voiceOrder, totalPhotoCount: bundle.totalPhotoCount, totalStickerInstances: bundle.totalStickerInstances };
       } else {
         const { readZipText } = await import('./zip.js');
         raw = await readZipText(file);
@@ -122,17 +124,7 @@ async function parseOnMainThread({ file, text, includeMedia, onProgress }) {
   }
   onProgress && onProgress('parse');
   const { messages, diagnostics } = parseWhatsApp(raw);
-  if (mediaRaw) {
-    // Match transcript reference ↔ zip filename robustly (folder/case/whitespace
-    // + NFC; iOS stores NFD filenames that otherwise fail to match → '—').
-    const normName = (s) => String(s).split(/[\\/]/).pop().trim().toLowerCase().normalize('NFC');
-    const byName = {};
-    for (const m of messages) if (m.mediaFile) byName[normName(m.mediaFile)] = m;
-    const tag = (item) => { const ref = byName[normName(item.name)]; item.author = ref ? ref.author : null; item.ts = ref ? ref.timestamp : null; };
-    mediaRaw.photos.forEach(tag);
-    mediaRaw.voice.forEach(tag);
-    mediaRaw.videos.forEach(tag);
-    mediaRaw.stickers.forEach(tag);
-  }
+  // Tie each extracted media item to its sender (see parser/mediaMatch.js).
+  if (mediaRaw) tagMediaAuthors(messages, mediaRaw);
   return { messages, diagnostics, media: materializeMedia(mediaRaw) };
 }

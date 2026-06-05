@@ -267,6 +267,15 @@ export async function readZipBundle(file, opts = {}) {
   // Capture true sticker total before any sampling/capping for accurate titles.
   const totalStickerInstances = candidates.stickers.length;
 
+  // Every voice filename in the archive, in chat order (WhatsApp names voice
+  // files PTT-<date>-WA<seq> / <seq>-AUDIO-<date>, so a name sort is chronological).
+  // Captured before the size sort/cap below so it can drive position-based author
+  // attribution when filename matching fails (see parser/mediaMatch.js).
+  const voiceOrder = entries
+    .filter(e => e.uncompSize > 0 && VOICE_MIME[extOf(e.name)])
+    .map(e => basename(e.name))
+    .sort((a, b) => a.localeCompare(b));
+
   // Photos: sample evenly across the (~chronological) list when over the cap.
   candidates.photos.sort((a, b) => a.name.localeCompare(b.name));
   if (candidates.photos.length > cfg.maxImages) {
@@ -313,5 +322,5 @@ export async function readZipBundle(file, opts = {}) {
   }
   const stickers = [...byHash.values()].sort((a, b) => b.count - a.count);
 
-  return { text, photos, voice, videos, stickers, totalPhotoCount, totalStickerInstances };
+  return { text, photos, voice, videos, stickers, voiceOrder, totalPhotoCount, totalStickerInstances };
 }

@@ -1,3 +1,7 @@
+# Local WhatsApp exports used for manual/regression testing — real personal
+# chats (names, phone numbers, vcf contacts). Never commit this.
+testdata/
+
 # Logs
 logs
 *.log

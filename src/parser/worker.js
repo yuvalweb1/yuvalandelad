@@ -19,6 +19,7 @@
 
 import { parseWhatsApp } from './parse.js';
 import { readZipBundle, readZipText } from './zip.js';
+import { tagMediaAuthors } from './mediaMatch.js';
 
 const EMPTY_MEDIA = { photos: [], voice: [], videos: [], stickers: [], totalPhotoCount: 0, totalStickerInstances: 0 };
 
@@ -40,7 +41,7 @@ self.onmessage = async (e) => {
         if (includeMedia) {
           const bundle = await readZipBundle(file);
           text = bundle.text;
-          media = { photos: bundle.photos, voice: bundle.voice, videos: bundle.videos, stickers: bundle.stickers, totalPhotoCount: bundle.totalPhotoCount, totalStickerInstances: bundle.totalStickerInstances };
+          media = { photos: bundle.photos, voice: bundle.voice, videos: bundle.videos, stickers: bundle.stickers, voiceOrder: bundle.voiceOrder, totalPhotoCount: bundle.totalPhotoCount, totalStickerInstances: bundle.totalStickerInstances };
         } else {
           // Text-only path — lighter, no media extraction.
           text = await readZipText(file);
@@ -59,20 +60,8 @@ self.onmessage = async (e) => {
     post({ type: 'progress', phase: 'parse' });
     const { messages, diagnostics } = parseWhatsApp(text);
 
-    // Tie each extracted media item to its sender via the filename the chat
-    // references. Photos/voice/videos use filename match; stickers share a
-    // representative file so association is less reliable — left as null.
-    // Normalize both sides before matching: strip any folder, trim, lowercase,
-    // and NFC-normalize. iOS exports often store filenames as NFD while the
-    // transcript references them as NFC, which silently broke the match (→ '—').
-    const normName = (s) => String(s).split(/[\\/]/).pop().trim().toLowerCase().normalize('NFC');
-    const byName = {};
-    for (const m of messages) if (m.mediaFile) byName[normName(m.mediaFile)] = m;
-    const tag = (item) => { const ref = byName[normName(item.name)]; item.author = ref ? ref.author : null; item.ts = ref ? ref.timestamp : null; };
-    media.photos.forEach(tag);
-    media.voice.forEach(tag);
-    media.videos.forEach(tag);
-    media.stickers.forEach(tag);
+    // Tie each extracted media item to its sender (see parser/mediaMatch.js).
+    tagMediaAuthors(messages, media);
 
     const transfer = [
       ...media.photos.map(m => m.bytes.buffer),
