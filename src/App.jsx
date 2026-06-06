@@ -2,7 +2,7 @@
 import { parseChat } from './parser/client.js';
 import { computeAll } from './lib/analytics.js';
 import { generateSampleText, generateSampleMedia } from './lib/sample.js';
-import { loadHistory, saveRecap, removeRecap, clearHistory, deriveChatName } from './lib/history.js';
+import { loadHistory, saveRecap, removeRecap, clearHistory, deriveChatName, updateRecapProfile } from './lib/history.js';
 import { saveMedia, loadMedia, deleteMedia, clearAllMedia } from './lib/mediaStore.js';
 import { RTL_LANGS, detectLang, buildT } from './i18n';
 import ErrorBoundary from './components/ErrorBoundary.jsx';
@@ -14,12 +14,8 @@ import Landing from './views/Landing.jsx';
 import Parsing from './views/Parsing.jsx';
 import Onboarding from './views/Onboarding.jsx';
 import Wrapped from './views/Wrapped.jsx';
-import PostMenu from './views/PostMenu.jsx';
 import VerifyView from './views/VerifyView.jsx';
 import RoastMode from './views/RoastMode.jsx';
-import DuoAnalysis from './views/DuoAnalysis.jsx';
-import ChaosTimeline from './views/ChaosTimeline.jsx';
-import PersonalProfile from './views/PersonalProfile.jsx';
 import Settings from './views/Settings.jsx';
 import VideoAdSlot from './components/VideoAdSlot.jsx';
 import PremiumPromo, { shouldShowPromo, markPromoDismissed } from './components/PremiumPromo.jsx';
@@ -85,6 +81,7 @@ function RecappedApp() {
     tone: null,
     self: null,
   });
+  const [currentRecapId, setCurrentRecapId] = useState(null);
   const [history, setHistory] = useState(() => loadHistory());
   // Where Settings should return to. Set just before entering the settings stage.
   const [settingsReturn, setSettingsReturn] = useState('landing');
@@ -160,6 +157,7 @@ function RecappedApp() {
       // Media blobs go to IndexedDB separately via mediaStore.
       const { photos: _photos, voice: _voice, videos: _videos, stickers: _stickers, ...stats } = a;
       const entry = saveRecap({ chatName: deriveChatName({ diagnostics: diag, fileName: file.name }), stats });
+      setCurrentRecapId(entry.id);
       saveMedia(entry.id, { photos: a.photos, voice: a.voice, videos: a.videos, stickers: a.stickers });
       setHistory(loadHistory());
       setParsingStage(4);
@@ -171,10 +169,10 @@ function RecappedApp() {
         // VerifyView rather than crashing on a.users[0].author.
         throw new Error(t.err_no_msgs);
       }
-      setAnalytics(a);
-      setSelectedAuthor(a.users[0].author);
+      setAnalytics(null);
+      setSelectedAuthor('');
       setSlide(0);
-      setStage(adEnabled('post_parse') ? 'ad_post_parse' : 'onboard');
+      setStage('landing');
     } catch (e) {
       console.error(e);
       setParseError(e.message || t.err_format);
@@ -279,6 +277,7 @@ function RecappedApp() {
     }
     setAnalytics(null);
     setDiagnostics(null);
+    setCurrentRecapId(null);
     setStage('landing');
     setParseError(null);
     setSlide(0);
@@ -288,7 +287,9 @@ function RecappedApp() {
   useEffect(() => { analyticsRef.current = analytics; }, [analytics]);
 
   const handleLoadRecap = useCallback(async (id) => {
-    const entry = loadHistory().find(r => r.id === id);
+    // Always reload fresh from storage to get the latest profile
+    const freshHistory = loadHistory();
+    const entry = freshHistory.find(r => r.id === id);
     if (!entry) return;
     // Revoke blob URLs from whatever recap is currently active before swapping.
     const prev = analyticsRef.current;
@@ -299,12 +300,21 @@ function RecappedApp() {
     }
     const media = await loadMedia(id);
     const a = { ...entry.stats, ...media };
+    const savedProfile = entry.profile || { relationship: null, tone: null, self: null };
     setDiagnostics(null);
     setAnalytics(a);
     setSelectedAuthor(a.users?.[0]?.author || '');
-    setProfile({ relationship: null, tone: null, self: null });
+    setProfile(savedProfile);
+    setCurrentRecapId(id);
     setSlide(0);
-    setStage('wrapped');
+    // First time: relationship hasn't been chosen yet, show onboarding.
+    // Onboarding only collects `self` + `relationship` (not `tone`), so
+    // `relationship` is the signal that the user has been through it.
+    if (!savedProfile.relationship) {
+      setStage('onboard');
+    } else {
+      setStage('wrapped');
+    }
   }, []);
 
   const handleDeleteRecap = useCallback((id) => {
@@ -340,6 +350,10 @@ function RecappedApp() {
               t={t}
               lang={lang}
               setLang={setLang}
+              onHome={() => {
+                try { localStorage.setItem('cw_seen_guide', '1'); } catch {}
+                setStage('landing');
+              }}
               onStart={() => {
                 try { localStorage.setItem('cw_seen_guide', '1'); } catch {}
                 setStage('landing');
@@ -382,7 +396,7 @@ function RecappedApp() {
             <VideoAdSlot
               slot="post_parse"
               t={t}
-              onComplete={() => setStage('onboard')}
+              onComplete={() => setStage('landing')}
             />
           )}
           {stage === 'onboard' && analytics && (
@@ -393,12 +407,23 @@ function RecappedApp() {
               setProfile={setProfile}
               onComplete={(finalProfile) => {
                 setProfile(finalProfile);
+                // Always save the profile if we have a current recap ID
+                if (currentRecapId) {
+                  updateRecapProfile(currentRecapId, finalProfile);
+                }
+                // Reload history after saving profile
+                setHistory(loadHistory());
                 if (finalProfile.self && analytics.userMap[finalProfile.self]) {
                   setSelectedAuthor(finalProfile.self);
                 }
                 setStage(adEnabled('pre_wrapped') ? 'ad_pre_wrapped' : 'wrapped');
               }}
-              onSkip={() => setStage(adEnabled('pre_wrapped') ? 'ad_pre_wrapped' : 'wrapped')}
+              onSkip={() => {
+                if (currentRecapId) {
+                  updateRecapProfile(currentRecapId, profile);
+                }
+                setStage(adEnabled('pre_wrapped') ? 'ad_pre_wrapped' : 'wrapped');
+              }}
             />
           )}
           {stage === 'ad_pre_wrapped' && (
@@ -430,43 +455,12 @@ function RecappedApp() {
               setSlide={setSlide}
               profile={profile}
               t={t}
-              onExit={() => setStage('landing')}
-              onMenu={() => setStage(adEnabled('pre_menu') ? 'ad_pre_menu' : 'menu')}
+              onExit={() => {
+                setCurrentRecapId(null);
+                setStage('landing');
+              }}
               onRoastMode={() => setStage(adEnabled('pre_roast') ? 'ad_pre_roast' : 'roastmode')}
             />
-          )}
-          {stage === 'ad_pre_menu' && (
-            <VideoAdSlot
-              slot="pre_menu"
-              t={t}
-              onComplete={() => setStage('menu')}
-            />
-          )}
-          {stage === 'menu' && analytics && (
-            <PostMenu
-              analytics={analytics}
-              diagnostics={diagnostics}
-              selectedAuthor={selectedAuthor}
-              setSelectedAuthor={setSelectedAuthor}
-              t={t}
-              onReplay={() => { setSlide(0); setStage('wrapped'); }}
-              onReset={reset}
-              onDebug={() => setStage('verify')}
-              onOpenSettings={() => openSettings('menu')}
-              onRoastMode={() => setStage(adEnabled('pre_roast') ? 'ad_pre_roast' : 'roastmode')}
-              onDuo={() => setStage('duo')}
-              onChaos={() => setStage('chaos')}
-              onProfile={() => setStage('profile')}
-            />
-          )}
-          {stage === 'duo' && analytics && (
-            <DuoAnalysis t={t} onBack={() => setStage('menu')} />
-          )}
-          {stage === 'chaos' && analytics && (
-            <ChaosTimeline t={t} onBack={() => setStage('menu')} />
-          )}
-          {stage === 'profile' && analytics && (
-            <PersonalProfile t={t} onBack={() => setStage('menu')} />
           )}
           {stage === 'settings' && (
             <Settings

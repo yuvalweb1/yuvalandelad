@@ -23,13 +23,24 @@ const LANGUAGES = [
 
 // ── mini WhatsApp phone mockups ──────────────────────────────────────────────
 
+// Design dims of the mock; the whole thing is uniformly scaled up so every
+// child (bubbles, hand pointer, share sheet) grows together and stays aligned.
+const PHONE_W = 160, PHONE_H = 250, PHONE_SCALE = 1.5;
+
 function MiniPhone({ children }) {
   return (
     <div style={{
-      width: 160, height: 250, borderRadius: 22, background: '#ECE5DD',
-      border: '5px solid #15151d', overflow: 'hidden', flexShrink: 0,
-      position: 'relative', boxShadow: '0 16px 40px -10px rgba(74,14,78,0.45)',
-    }}>{children}</div>
+      width: PHONE_W * PHONE_SCALE, height: PHONE_H * PHONE_SCALE,
+      flexShrink: 0, position: 'relative',
+    }}>
+      <div style={{
+        width: PHONE_W, height: PHONE_H, borderRadius: 22, background: '#ECE5DD',
+        border: '5px solid #15151d', overflow: 'hidden',
+        position: 'absolute', top: 0, left: 0,
+        transformOrigin: 'top left', transform: `scale(${PHONE_SCALE})`,
+        boxShadow: '0 16px 40px -10px rgba(74,14,78,0.45)',
+      }}>{children}</div>
+    </div>
   );
 }
 
@@ -63,7 +74,7 @@ function WaHeader({ name, highlightName, highlightDots }) {
   );
 }
 
-function ChatBody() {
+function ChatBody({ t }) {
   const bubble = (txt, mine) => (
     <div style={{
       alignSelf: mine ? 'flex-end' : 'flex-start', maxWidth: '80%',
@@ -74,31 +85,61 @@ function ChatBody() {
   );
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 6, padding: 10 }}>
-      {bubble('היי מה קורה 😄', false)}
-      {bubble('סבבה, ואצלך?', true)}
-      {bubble('בואו ניפגש מחר 🔥', false)}
+      {bubble(t.howto_mock_msg1, false)}
+      {bubble(t.howto_mock_msg2, true)}
+      {bubble(t.howto_mock_msg3, false)}
     </div>
   );
 }
 
 function WaMock({ kind, t }) {
   if (kind === 'chat') return (
-    <MiniPhone><WaHeader name={t.howto_mock_group} /><ChatBody /></MiniPhone>
+    <MiniPhone><WaHeader name={t.howto_mock_group} /><ChatBody t={t} /></MiniPhone>
   );
   if (kind === 'name') return (
     <MiniPhone>
       <WaHeader name={t.howto_mock_group} highlightName />
-      <ChatBody />
+      <ChatBody t={t} />
       <HandPointer style={{ top: 26, insetInlineStart: 46 }} />
     </MiniPhone>
   );
   if (kind === 'dots') return (
     <MiniPhone>
       <WaHeader name={t.howto_mock_group} highlightDots />
-      <ChatBody />
+      <ChatBody t={t} />
       <HandPointer style={{ top: 26, insetInlineEnd: 4 }} />
     </MiniPhone>
   );
+  // Android: ⋮ dropdown is open — tap "More" to reveal the export option
+  if (kind === 'more') {
+    const rows = [
+      { label: t.howto_mock_row_media, hl: false },
+      { label: t.howto_mock_row_search, hl: false },
+      { label: t.howto_mock_row_mute, hl: false },
+      { label: t.howto_mock_more, hl: true },
+    ];
+    return (
+      <MiniPhone>
+        <WaHeader name={t.howto_mock_group} highlightDots />
+        <ChatBody t={t} />
+        {/* dropdown anchored under the ⋮ */}
+        <div style={{
+          position: 'absolute', top: 34, insetInlineEnd: 6,
+          width: 108, background: '#fff', borderRadius: 8,
+          boxShadow: '0 6px 20px rgba(0,0,0,0.28)', overflow: 'hidden',
+        }}>
+          {rows.map((r, i) => (
+            <div key={i} dir="auto" style={{
+              fontSize: 9.5, padding: '8px 10px',
+              color: r.hl ? '#15151d' : '#444', fontWeight: r.hl ? 800 : 500,
+              ...(r.hl ? { background: '#FFD700', boxShadow: 'inset 0 0 0 2px #FF69B4' } : {}),
+            }}>{r.label}</div>
+          ))}
+        </div>
+        <HandPointer style={{ top: 92, insetInlineEnd: 14 }} />
+      </MiniPhone>
+    );
+  }
   if (kind === 'export') {
     const rows = [
       { label: t.howto_mock_row_media, hl: false },
@@ -142,7 +183,7 @@ function WaMock({ kind, t }) {
       <MiniPhone>
         <div style={{ height: '100%', background: '#ECE5DD', display: 'flex', flexDirection: 'column' }}>
           <WaHeader name={t.howto_mock_group} />
-          <ChatBody />
+          <ChatBody t={t} />
           {/* bottom share sheet */}
           <div style={{
             position: 'absolute', bottom: 0, left: 0, right: 0,
@@ -151,24 +192,22 @@ function WaMock({ kind, t }) {
           }}>
             <div style={{ fontSize: 9, fontWeight: 700, color: '#888', marginBottom: 8, textAlign: 'center' }}>Share via…</div>
             <div style={{ display: 'flex', gap: 8, justifyContent: 'center' }}>
-              {/* Recapped icon — highlighted */}
+              {/* Recapped icon — highlighted (real app icon, zoomed to fill the square) */}
               <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 }}>
                 <div style={{
-                  width: 42, height: 42, borderRadius: 12,
-                  background: '#4A0E4E', display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  width: 42, height: 42, borderRadius: 12, overflow: 'hidden',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
                   boxShadow: '0 0 0 3px #FFD700, 0 0 0 5px #FF69B4',
                 }}>
-                  <svg width="22" height="22" viewBox="0 0 512 512" fill="none">
-                    <path d="M112 176a48 48 0 0 1 48-48h192a48 48 0 0 1 48 48v128a48 48 0 0 1-48 48h-96l-64 64-16-64H160a48 48 0 0 1-48-48V176z" fill="#FFD700"/>
-                    <circle cx="200" cy="240" r="18" fill="#4A0E4E"/>
-                    <circle cx="256" cy="240" r="18" fill="#4A0E4E"/>
-                    <circle cx="312" cy="240" r="18" fill="#4A0E4E"/>
-                  </svg>
+                  <img src="/icon-512.png" alt="Recapped" style={{
+                    width: 62, height: 62, flexShrink: 0, display: 'block', objectFit: 'cover',
+                    transform: 'translateY(4px)',
+                  }} />
                 </div>
                 <div style={{ fontSize: 7.5, fontWeight: 800, color: '#4A0E4E' }}>Recapped</div>
               </div>
               {/* other app icons (greyed out) */}
-              {['📧', '📁', '💬'].map((ic, i) => (
+              {['📧', '📁'].map((ic, i) => (
                 <div key={i} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4, opacity: 0.35 }}>
                   <div style={{ width: 42, height: 42, borderRadius: 12, background: '#eee', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 20 }}>{ic}</div>
                   <div style={{ fontSize: 7.5, color: '#aaa' }}>App</div>
@@ -187,7 +226,7 @@ function WaMock({ kind, t }) {
       <MiniPhone>
         <div style={{ height: '100%', background: '#ECE5DD', display: 'flex', flexDirection: 'column' }}>
           <WaHeader name={t.howto_mock_group} />
-          <ChatBody />
+          <ChatBody t={t} />
           <div style={{
             position: 'absolute', bottom: 0, left: 0, right: 0,
             background: '#fff', borderRadius: '16px 16px 0 0',
@@ -234,19 +273,21 @@ function getSteps(platform, t) {
   return [
     { k: 'chat',   label: t.howto_and_1 },
     { k: 'dots',   label: t.howto_and_2 },
-    { k: 'export', label: t.howto_and_3 },
-    { k: 'media',  label: t.howto_and_4 },
-    { k: 'share',  label: t.howto_and_5 },
+    { k: 'more',   label: t.howto_and_3 },
+    { k: 'export', label: t.howto_and_4 },
+    { k: 'media',  label: t.howto_and_5 },
+    { k: 'share',  label: t.howto_and_6 },
   ];
 }
 
 // ── main component ────────────────────────────────────────────────────────────
 
-export default function HowToGuide({ t, onStart, lang, setLang }) {
+export default function HowToGuide({ t, onStart, onHome, lang, setLang }) {
   const [platform, setPlatform] = useState('ios');
   const [stepIdx, setStepIdx] = useState(0);
   const [langOpen, setLangOpen] = useState(false);
   const currentLang = LANGUAGES.find(l => l.code === lang) || LANGUAGES[0];
+  const isRTL = lang === 'he' || lang === 'ar';
 
   const steps = getSteps(platform, t);
   const step = steps[stepIdx];
@@ -273,6 +314,12 @@ export default function HowToGuide({ t, onStart, lang, setLang }) {
     }
   };
 
+  // Back steps through the guide; from the first step it leaves to home.
+  const goBack = () => {
+    if (stepIdx > 0) setStepIdx(i => i - 1);
+    else onHome && onHome();
+  };
+
   const switchPlatform = (id) => { setPlatform(id); setStepIdx(0); };
 
   return (
@@ -290,12 +337,35 @@ export default function HowToGuide({ t, onStart, lang, setLang }) {
       {/* ── top bar: eyebrow + lang picker + platform toggle ── */}
       <div style={{ position: 'relative', zIndex: 10, flexShrink: 0, padding: '44px 20px 0' }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 10, marginBottom: 14 }}>
-          <div className="fs-mono" style={{
-            fontSize: 11, color: '#FF8C00', letterSpacing: '0.18em',
-            fontWeight: 700, textTransform: 'uppercase',
-            overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
-          }}>
-            ✦ {t.howto_eyebrow}
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            <button
+              onClick={goBack}
+              className="press"
+              aria-label={t.howto_back || 'Back'}
+              style={{
+                flexShrink: 0, width: 36, height: 36, borderRadius: 999,
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                background: '#FFF6E8', border: '1.5px solid rgba(255,255,255,0.9)',
+                color: '#4A0E4E', cursor: 'pointer', fontSize: 19, lineHeight: 1,
+                boxShadow: '0 3px 0 rgba(74,14,78,0.18), 0 8px 14px -6px rgba(74,14,78,0.25)',
+              }}>
+              <span aria-hidden="true">{isRTL ? '›' : '‹'}</span>
+            </button>
+            {onHome && (
+              <button
+                onClick={onHome}
+                className="press"
+                aria-label={t.howto_home || 'Home'}
+                style={{
+                  flexShrink: 0, width: 36, height: 36, borderRadius: 999,
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  background: '#FFF6E8', border: '1.5px solid rgba(255,255,255,0.9)',
+                  color: '#4A0E4E', cursor: 'pointer', fontSize: 17, lineHeight: 1,
+                  boxShadow: '0 3px 0 rgba(74,14,78,0.18), 0 8px 14px -6px rgba(74,14,78,0.25)',
+                }}>
+                🏠
+              </button>
+            )}
           </div>
           {setLang && (
             <button
@@ -347,14 +417,14 @@ export default function HowToGuide({ t, onStart, lang, setLang }) {
         <div style={{ width: '100%', textAlign: 'center' }}>
           <div className="fs-display" style={{
             display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
-            width: 36, height: 36, borderRadius: 999,
+            width: 42, height: 42, borderRadius: 999,
             background: '#FFD700', color: '#4A0E4E',
-            fontSize: 18, fontWeight: 800,
+            fontSize: 21, fontWeight: 800,
             boxShadow: '0 3px 0 #E0A800',
-            marginBottom: 10,
+            marginBottom: 12,
           }}>{stepIdx + 1}</div>
           <div className="fs-sans" dir="auto" style={{
-            fontSize: 18, lineHeight: 1.35, fontWeight: 700, color: '#4A0E4E',
+            fontSize: 21, lineHeight: 1.35, fontWeight: 700, color: '#4A0E4E',
           }}>{step.label}</div>
         </div>
       </div>

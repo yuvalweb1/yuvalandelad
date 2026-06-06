@@ -104,7 +104,7 @@ function VoiceRow({ v, index }) {
         <div onClick={seekTo} style={{
           flex: 1, height: 18, display: 'flex', alignItems: 'center', cursor: 'pointer',
         }}>
-          <div style={{ position: 'relative', width: '100%', height: 4, borderRadius: 999, background: 'rgba(0,137,196,0.18)' }}>
+          <div style={{ position: 'relative', width: '100%', height: 4, borderRadius: 999, background: 'rgba(0,137,196,0.18)', direction: 'ltr' }}>
             <div style={{
               height: '100%', borderRadius: 999, background: '#00BFFF',
               width: `${progress * 100}%`,
@@ -162,9 +162,6 @@ const SlideVoice = React.memo(function SlideVoice({ a, t }) {
         }}>
           <span style={{ fontStyle: 'italic', color: '#00BFFF' }}>{t.voice_title_a}</span>
           {t.voice_title_b ? ' ' + t.voice_title_b : ''}
-        </div>
-        <div className="fs-mono a-fade-up" style={{ textAlign: 'center', animationDelay: '0.22s', fontSize: 12, color: 'rgba(74,14,78,0.6)', marginBottom: 14, fontWeight: 600 }}>
-          {t.voice_sub}
         </div>
         <div className="no-sb" style={{ flex: 1, overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: 10 }}>
           {list.map((v, i) => (

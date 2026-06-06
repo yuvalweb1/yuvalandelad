@@ -13,6 +13,7 @@ import SlideStickers from './SlideStickers.jsx';
 import SlideAd from './SlideAd.jsx';
 import SlideTeaser from './SlideTeaser.jsx';
 import SlideMetric, { metricHasData } from './SlideMetric.jsx';
+import SlideMetricLeaderboard, { metricHasData as metricLeaderboardHasData } from './SlideMetricLeaderboard.jsx';
 import SlideLongestStreak from './SlideLongestStreak.jsx';
 import SlideBusiestWeekday from './SlideBusiestWeekday.jsx';
 import SlideSignatureEmoji from './SlideSignatureEmoji.jsx';
@@ -24,6 +25,13 @@ import SlideReady from './SlideReady.jsx';
 const metricSlide = (metricKey) => {
   const Wrapped = (props) => createElement(SlideMetric, { ...props, metricKey });
   Wrapped.displayName = `SlideMetric(${metricKey})`;
+  return Wrapped;
+};
+
+// Leaderboard-style metric slides (used for couple-specific metrics)
+const metricLeaderboardSlide = (metricKey) => {
+  const Wrapped = (props) => createElement(SlideMetricLeaderboard, { ...props, metricKey });
+  Wrapped.displayName = `SlideMetricLeaderboard(${metricKey})`;
   return Wrapped;
 };
 
@@ -50,12 +58,12 @@ export const SLIDE_COMPONENTS = {
   early_birds:         metricSlide('early_birds'),
   voice_notes_leader:  metricSlide('voice_notes_leader'),
   overtime:            metricSlide('overtime'),
-  response_times:      metricSlide('response_times'),
+  response_times:      metricLeaderboardSlide('response_times'),
   essay_writers:       metricSlide('essay_writers'),
   link_sharers:        metricSlide('link_sharers'),
-  double_texts:        metricSlide('double_texts'),
+  double_texts:        metricLeaderboardSlide('double_texts'),
   ignored_award:       metricSlide('ignored_award'),
-  night_messages:      metricSlide('night_messages'),
+  night_messages:      metricLeaderboardSlide('night_messages'),
   longest_streak:      SlideLongestStreak,
   busiest_weekday:     SlideBusiestWeekday,
   signature_emoji:     SlideSignatureEmoji,
@@ -83,7 +91,6 @@ export const SLIDES_BY_TYPE = {
     'videos',
     'awards',
     'drama_role',
-    'teaser',
   ],
   family: [
     'ready',
@@ -99,14 +106,13 @@ export const SLIDES_BY_TYPE = {
     'signature_words',
     'group_top',
     'awards',
-    'teaser',
   ],
   work: [
     'ready',
     'group_overview',
     'overtime',
     'response_times',
-    'essay_writers',
+    'per_person',
     'busiest_weekday',
     'link_sharers',
     'leaderboard',
@@ -116,7 +122,6 @@ export const SLIDES_BY_TYPE = {
     'videos',
     'signature_words',
     'awards',
-    'teaser',
   ],
   couple: [
     'ready',
@@ -133,7 +138,6 @@ export const SLIDES_BY_TYPE = {
     'videos',
     'night_messages',
     'awards',
-    'teaser',
   ],
   other: [
     'ready',
@@ -149,7 +153,6 @@ export const SLIDES_BY_TYPE = {
     'awards',
     'drama_role',
     'ad',
-    'teaser',
   ],
 };
 
@@ -185,13 +188,14 @@ export function slideHasData(id, analytics, user) {
     case 'early_birds':
     case 'voice_notes_leader':
     case 'overtime':
-    case 'response_times':
     case 'essay_writers':
     case 'link_sharers':
-    case 'double_texts':
     case 'ignored_award':
-    case 'night_messages':
       return metricHasData(id, analytics);
+    case 'response_times':
+    case 'double_texts':
+    case 'night_messages':
+      return metricLeaderboardHasData(id, analytics);
     default:
       return true;
   }

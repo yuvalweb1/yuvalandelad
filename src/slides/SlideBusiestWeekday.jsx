@@ -16,6 +16,7 @@ const SlideBusiestWeekday = React.memo(function SlideBusiestWeekday({ a, t, prof
   let peakIdx = 0;
   for (let i = 1; i < 7; i++) if (weekly[i] > weekly[peakIdx]) peakIdx = i;
   const peakDay = t[`day_${DAY_KEYS[peakIdx]}`] || DAY_KEYS[peakIdx];
+  const MAX_BAR_H = 118;
 
   return (
     <SlideShell bg="#577590" accent="#277da1">
@@ -34,25 +35,25 @@ const SlideBusiestWeekday = React.memo(function SlideBusiestWeekday({ a, t, prof
         }}>
           {title}
         </div>
-        <div style={{ flex: 1, display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', gap: 6, padding: '8px 4px 4px' }}>
+        <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', gap: 6, padding: '8px 4px 4px' }}>
           {weekly.map((count, i) => {
-            const pct = max > 0 ? Math.max(6, (count / max) * 100) : 6;
+            const barPx = max > 0 ? Math.max(10, Math.round((count / max) * MAX_BAR_H)) : 10;
             const isPeak = i === peakIdx;
-            const label = (t[`day_${DAY_KEYS[i]}_short`] || DAY_KEYS[i]).slice(0, 3);
+            const label = t[`day_${DAY_KEYS[i]}_short`] || DAY_KEYS[i].slice(0, 3);
             return (
               <div key={i} style={{
-                flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8,
+                flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 5,
                 minWidth: 0,
               }}>
                 <div className="fs-mono" style={{
                   fontSize: 11, fontWeight: 700,
-                  color: isPeak ? '#277da1' : 'rgba(42,6,69,0.5)',
-                  height: 14,
+                  color: isPeak ? '#277da1' : 'transparent',
+                  height: 14, lineHeight: '14px',
                 }}>
-                  {isPeak ? count.toLocaleString() : ''}
+                  {count.toLocaleString()}
                 </div>
                 <div className="a-bar" style={{
-                  width: '100%', height: `${pct}%`, minHeight: 12,
+                  width: '100%', height: barPx,
                   background: isPeak
                     ? 'linear-gradient(180deg, #277da1 0%, #4a99c0 100%)'
                     : 'rgba(42,6,69,0.16)',

@@ -39,9 +39,6 @@ const SlideVideos = React.memo(function SlideVideos({ a, t }) {
           <span style={{ fontStyle: 'italic', color: '#FF8C00' }}>{t.vid_title_a}</span>
           {t.vid_title_b ? ' ' + t.vid_title_b : ''}
         </div>
-        <div className="fs-mono a-fade-up" style={{ textAlign: 'center', animationDelay: '0.22s', fontSize: 12, color: 'rgba(74,14,78,0.6)', marginBottom: 14, fontWeight: 600 }}>
-          {t.vid_sub}
-        </div>
         <div className="no-sb" style={{ flex: 1, overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: 12 }}>
           {list.map((v, i) => (
             <div key={v.url} dir="auto" className="a-slide-up-far" style={{

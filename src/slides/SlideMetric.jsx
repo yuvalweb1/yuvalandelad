@@ -49,7 +49,7 @@ const METRIC_DEFS = {
         })
         .filter(x => x.off >= 5)
         .sort((x, y) => y.pct - x.pct)
-          .map(x => ({ author: x.u.author, value: x.pct, displayValue: `${x.pct.toFixed(0)}%`, sub: `${x.off.toLocaleString()} off-hours msgs` }));
+          .map(x => ({ author: x.u.author, value: x.pct, displayValue: `${x.pct.toFixed(0)}%`, sub: `${x.off.toLocaleString()} after-hours messages` }));
     },
   },
   response_times: {
@@ -65,7 +65,7 @@ const METRIC_DEFS = {
         author: u.author,
         value: slowest - u.avgRespMin + 0.5,
         displayValue: u.avgRespMin < 1 ? `${Math.round(u.avgRespMin * 60)}s` : `${u.avgRespMin.toFixed(1)}m`,
-        sub: `${u.respSampleSize.toLocaleString()} replies`,
+        sub: undefined,
       }));
     },
   },
@@ -85,7 +85,7 @@ const METRIC_DEFS = {
     rows: (a) => (a.users || [])
       .filter(u => u.linkCount > 0)
       .sort((x, y) => y.linkCount - x.linkCount)
-      .map(u => ({ author: u.author, value: u.linkCount, displayValue: u.linkCount.toLocaleString(), sub: 'links shared' })),
+      .map(u => ({ author: u.author, value: u.linkCount, displayValue: u.linkCount.toLocaleString(), sub: `${((u.linkCount / Math.max(u.messageCount, 1)) * 100).toFixed(1)}% of their messages` })),
   },
   double_texts: {
     color: '#f94144',

@@ -76,7 +76,7 @@ export function deriveChatName({ diagnostics, fileName }) {
   return chatNameFromFile(fileName);
 }
 
-export function saveRecap({ chatName, stats }) {
+export function saveRecap({ chatName, stats, profile }) {
   const list = loadHistory();
   const entry = {
     id: (crypto.randomUUID && crypto.randomUUID()) ||
@@ -84,10 +84,20 @@ export function saveRecap({ chatName, stats }) {
     date: Date.now(),
     chatName: chatName || 'Chat',
     stats,
+    profile: profile || { relationship: null, tone: null, self: null },
   };
   const next = [entry, ...list].slice(0, MAX_ENTRIES);
   persist(next);
   return entry;
+}
+
+export function updateRecapProfile(id, profile) {
+  const list = loadHistory();
+  const entry = list.find(r => r.id === id);
+  if (entry) {
+    entry.profile = profile;
+    persist(list);
+  }
 }
 
 export function removeRecap(id) {
