@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
 import SlideShell from './SlideShell.jsx';
 import ListSlideDecor from '../components/ListSlideDecor.jsx';
-import { typedCopy } from '../i18n';
+import { typedCopy, isRtlText } from '../i18n';
 
 const MAX_ROWS = 5;
+const ACCENT = '#f94144';
 
-const SlideSignatureEmoji = React.memo(function SlideSignatureEmoji({ a, t, profile }) {
+const SlideSignatureEmoji = React.memo(function SlideSignatureEmoji({ a, t, profile, lang }) {
   const allRows = (a.users || []).filter(u => u.topEmoji);
   if (allRows.length === 0) return null;
   const [expanded, setExpanded] = useState(false);
@@ -17,15 +18,55 @@ const SlideSignatureEmoji = React.memo(function SlideSignatureEmoji({ a, t, prof
   const type = profile?.relationship || 'other';
   const eyebrow = typedCopy(t, 'se_eyebrow', type);
   const title = typedCopy(t, 'se_title', type);
-
-  const medals = ['🥇', '🥈', '🥉'];
   const DEEP = '#C25516';
 
-  const renderRow = (u, i, opts = {}) => {
+  const renderRow = (u, i) => {
     const isWinner = i === 0;
+    // Layout is driven by the *name's* direction only — the app locale is
+    // irrelevant. LTR name → name on the left, count + emoji on the right.
+    // RTL name → name on the right, count + emoji on the left.
+    const nameLtr = !isRtlText(u.author);
+
+    const valueEl = (
+      <div className="fs-display" style={{ flexShrink: 0, fontSize: 28, fontWeight: 800, color: ACCENT }}>
+        {u.topEmojiCount.toLocaleString()}
+      </div>
+    );
+
+    const emojiEl = (
+      <div style={{ flexShrink: 0, fontSize: 30, lineHeight: 1, minWidth: 36, textAlign: 'center' }}>
+        {u.topEmoji}
+      </div>
+    );
+
+    // count + emoji kept together; emoji sits on the card's outer edge.
+    // direction:'ltr' forces row/row-reverse to be physical (left↔right),
+    // unaffected by the ambient RTL UI direction in Hebrew/Arabic decks.
+    const endGroup = (
+      <div style={{
+        flexShrink: 0, display: 'flex', alignItems: 'center', gap: 8,
+        direction: 'ltr',
+        flexDirection: nameLtr ? 'row' : 'row-reverse',
+      }}>
+        {valueEl}
+        {emojiEl}
+      </div>
+    );
+
+    const name = (
+      <div className="fs-sans" dir={nameLtr ? 'ltr' : 'rtl'} style={{
+        flex: 1, minWidth: 0, fontSize: 15, fontWeight: 700, color: '#4A0E4E',
+        overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+        textAlign: nameLtr ? 'left' : 'right',
+        paddingInline: 10,
+      }}>
+        {u.author}
+      </div>
+    );
+
     return (
-      <div key={u.author} dir="auto" className="a-slide-up-far" style={{
-        position: 'relative', padding: '14px 16px',
+      <div key={u.author} className="a-slide-up-far" style={{
+        position: 'relative', padding: '12px 16px',
         background: isWinner ? '#FFF8E0' : '#fff',
         borderRadius: 18,
         border: `2px solid ${isWinner ? '#FFD700' : 'rgba(255,255,255,0.85)'}`,
@@ -33,45 +74,22 @@ const SlideSignatureEmoji = React.memo(function SlideSignatureEmoji({ a, t, prof
         overflow: 'hidden', flexShrink: 0,
         animationDelay: `${0.4 + i * 0.08}s`,
       }}>
+        {/* bar fill anchored to the count/emoji side of the card */}
         <div className="a-slide-right" style={{
-          position: 'absolute', top: 0, bottom: 0, insetInlineStart: 0,
-          background: `linear-gradient(90deg, ${isWinner ? 'rgba(255,215,0,0.28)' : 'rgba(249,65,68,0.16)'} 0%, rgba(249,65,68,0.02) 100%)`,
+          position: 'absolute', top: 0, bottom: 0,
+          [nameLtr ? 'right' : 'left']: 0,
+          background: isWinner ? 'rgba(255,215,0,0.28)' : 'rgba(249,65,68,0.16)',
           width: `${Math.max(8, Math.round((u.topEmojiCount / (allRows[0]?.topEmojiCount || 1)) * 100))}%`,
           animationDelay: `${0.6 + i * 0.08}s`,
           pointerEvents: 'none',
         }} />
-        <div style={{ position: 'relative', display: 'flex', alignItems: 'center', gap: 12, justifyContent: 'space-between' }}>
-          {/* Count on left */}
-          <div className="fs-display" style={{
-            flexShrink: 0,
-            fontSize: 28,
-            fontWeight: 800,
-            color: '#f94144',
-            minWidth: 40,
-            textAlign: 'center',
-          }}>
-            {u.topEmojiCount.toLocaleString()}
-          </div>
-
-          {/* Name in middle */}
-          <div className="fs-sans" style={{
-            flex: 1, minWidth: 0, fontSize: 15, fontWeight: 700, color: '#4A0E4E',
-            overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
-            paddingRight: 8,
-          }}>
-            {u.author}
-          </div>
-
-          {/* Emoji on right */}
-          <div style={{
-            flexShrink: 0,
-            fontSize: 28,
-            lineHeight: 1,
-            textAlign: 'center',
-            minWidth: 32,
-          }}>
-            {u.topEmoji}
-          </div>
+        <div style={{
+          position: 'relative', display: 'flex', alignItems: 'center',
+          direction: 'ltr',
+          flexDirection: nameLtr ? 'row' : 'row-reverse',
+        }}>
+          {name}
+          {endGroup}
         </div>
       </div>
     );

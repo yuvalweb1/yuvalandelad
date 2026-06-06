@@ -18,6 +18,7 @@ import SlideLongestStreak from './SlideLongestStreak.jsx';
 import SlideBusiestWeekday from './SlideBusiestWeekday.jsx';
 import SlideSignatureEmoji from './SlideSignatureEmoji.jsx';
 import SlideReady from './SlideReady.jsx';
+import SlideShare from './SlideShare.jsx';
 
 // Tiny wrapper factory: each metric id renders the shared SlideMetric base
 // with a fixed metricKey. Lets the slide registry stay id → component.
@@ -64,9 +65,13 @@ export const SLIDE_COMPONENTS = {
   double_texts:        metricLeaderboardSlide('double_texts'),
   ignored_award:       metricSlide('ignored_award'),
   night_messages:      metricLeaderboardSlide('night_messages'),
+  messages_sent:          metricLeaderboardSlide('messages_sent'),
+  conversation_starters:  metricLeaderboardSlide('conversation_starters'),
+  love_you:               metricLeaderboardSlide('love_you'),
   longest_streak:      SlideLongestStreak,
   busiest_weekday:     SlideBusiestWeekday,
   signature_emoji:     SlideSignatureEmoji,
+  share:               SlideShare,
 };
 
 // Per chat-type ordered lineup. Wrapped filters this further at render time —
@@ -91,6 +96,7 @@ export const SLIDES_BY_TYPE = {
     'videos',
     'awards',
     'drama_role',
+    'share',
   ],
   family: [
     'ready',
@@ -106,6 +112,7 @@ export const SLIDES_BY_TYPE = {
     'signature_words',
     'group_top',
     'awards',
+    'share',
   ],
   work: [
     'ready',
@@ -122,11 +129,14 @@ export const SLIDES_BY_TYPE = {
     'videos',
     'signature_words',
     'awards',
+    'share',
   ],
   couple: [
     'ready',
     'group_overview',
     'per_person',
+    'messages_sent',
+    'conversation_starters',
     'double_texts',
     'response_times',
     'longest_streak',
@@ -137,7 +147,9 @@ export const SLIDES_BY_TYPE = {
     'voice',
     'videos',
     'night_messages',
+    'love_you',
     'awards',
+    'share',
   ],
   other: [
     'ready',
@@ -153,6 +165,7 @@ export const SLIDES_BY_TYPE = {
     'awards',
     'drama_role',
     'ad',
+    'share',
   ],
 };
 
@@ -195,6 +208,9 @@ export function slideHasData(id, analytics, user) {
     case 'response_times':
     case 'double_texts':
     case 'night_messages':
+    case 'messages_sent':
+    case 'conversation_starters':
+    case 'love_you':
       return metricLeaderboardHasData(id, analytics);
     default:
       return true;

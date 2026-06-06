@@ -13,6 +13,15 @@ export const I18N = { en, he, es, fr, de, pt, it, ru, ar, tr };
 
 export const RTL_LANGS = new Set(['he', 'ar']);
 
+// Detect whether a string reads right-to-left by looking for the first strong
+// directional character (Hebrew, Arabic, Syriac, Thaana, NKo, etc.). Used to
+// orient per-row layout off the *name itself*, independent of the app locale —
+// a Hebrew name in an English deck still wants RTL alignment.
+const RTL_CHAR = /[֐-׿؀-ۿ܀-ݏݐ-ݿހ-޿߀-߿ࢠ-ࣿיִ-﷿ﹰ-﻿]/;
+export function isRtlText(s) {
+  return typeof s === 'string' && RTL_CHAR.test(s);
+}
+
 export function detectLang() {
   if (typeof navigator === 'undefined') return 'en';
   const browserLang = (navigator.language || 'en').slice(0, 2).toLowerCase();

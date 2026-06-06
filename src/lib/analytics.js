@@ -1,5 +1,41 @@
 import { EMOJI_RE, LINK_RE } from '../parser/index.js';
 
+// "I love you" across the languages we ship UI for. Tested against the
+// lowercased message text; a message counts once no matter how many phrases
+// it contains. Object suffixes are kept second-person (you), so Hebrew
+// "אוהב אותך" matches but "אוהב אותו" (love HIM) does not.
+export const LOVE_PATTERNS = [
+  // English
+  /\bi\s*love\s*(?:you|u|ya)\b/i,
+  /\blove\s*(?:you|u|ya)\b/i,
+  /\bluv\s*(?:you|u|ya)\b/i,
+  /\bily\b/i,
+  // Hebrew — אוהב/אוהבת/אוהבים אותך/אותכם/אותכן
+  /אוהב(?:ת|ים|ות)?\s*אות(?:ך|כם|כן)/,
+  // Spanish / Portuguese
+  /\bte\s*amo\b/i,
+  /\bte\s*quiero\b/i,
+  /\bamo[\s-]*(?:você|voce|te)\b/i,
+  // French
+  /je\s*t['' ]?aime/i,
+  // Italian
+  /\bti\s*amo\b/i,
+  // German
+  /ich\s*liebe\s*dich/i,
+  // Russian
+  /люблю\s*тебя/i,
+  /тебя\s*люблю/i,
+  // Turkish
+  /seni\s*seviyorum/i,
+  // Arabic — بحبك / أحبك / احبك (with optional shadda)
+  /بحب[ّ]?ك|[أا]حب[ّ]?ك/,
+];
+
+function isLoveMessage(text) {
+  for (const re of LOVE_PATTERNS) if (re.test(text)) return true;
+  return false;
+}
+
 export const STOPWORDS = new Set([
   // Hebrew
   'אני','אתה','את','הוא','היא','אנחנו','אתם','הם','הן','זה','זאת','של','על','אל','עם','לא','כן','אם','או','גם','רק','כל','יש','אין','היה','כי','אבל','מה','מי','איך','איפה','מתי','למה','כמה','איזה','עוד','כבר','אז','פה','שם','ככה','אוקיי','אוקי','אהה','נו','טוב','הי','היי','שלום','תודה','סבבה','באמת','בטח','אולי','כאילו','יותר','פחות','הכי','מאוד','ממש','די','קצת','הרבה','בכלל','אחרי','לפני','בין','בלי','עד','אמר','אומר','יודע','חושב','רוצה','עושה','בא','באה','שלי','שלך','שלו','שלה','הזה','הזאת','כן','לאן','משהו','כלום','אחד','אחת','כאשר','עכשיו',
@@ -117,6 +153,7 @@ export function computeAll(messages) {
       longestAbsenceDays: 0,
       conversationsRevived: 0,
       conversationsKilled: 0,
+      loveYouCount: 0,          // SOURCE: count of msgs matching LOVE_PATTERNS
       finalMessagesOfDay: 0,
       gotReplyWithin30: 0,
       gotNoReplyWithin30: 0,
@@ -196,6 +233,9 @@ export function computeAll(messages) {
           groupWordFreq[clean] = (groupWordFreq[clean] || 0) + 1;
         }
       }
+
+      // "I love you" detection (couple slide). One message counts once.
+      if (isLoveMessage(m.content)) acc.loveYouCount++;
     }
 
     // Minute buckets for chaos detection
@@ -309,6 +349,7 @@ export function computeAll(messages) {
       maxBurst: acc.maxBurst,
       conversationsRevived: acc.conversationsRevived,
       conversationsKilled: acc.conversationsKilled,
+      loveYouCount: acc.loveYouCount,
       finalMessagesOfDay: acc.finalMessagesOfDay,
       gotReplyWithin30: acc.gotReplyWithin30,
       gotNoReplyWithin30: acc.gotNoReplyWithin30,

@@ -728,6 +728,27 @@ export default {
   m_night_messages_sub: '',
   m_night_messages_eyebrow_couple: 'הודעות לילה',
   m_night_messages_title_couple: 'מי עדיין ער/ה וחושב/ת עלינו?',
+  // messages_sent (couple)
+  m_messages_sent_eyebrow: 'כמות הודעות',
+  m_messages_sent_title: 'מי שלח/ה יותר הודעות',
+  m_messages_sent_sub: '',
+  m_messages_sent_eyebrow_couple: 'כמות הודעות',
+  m_messages_sent_title_couple: 'מי מתכתב/ת יותר?',
+  m_messages_sent_sub_couple: 'סך ההודעות שכל אחד מאיתנו שלח',
+  // conversation_starters (couple)
+  m_conversation_starters_eyebrow: 'מי שובר/ת את השתיקה',
+  m_conversation_starters_title: 'מי פותח/ת יותר שיחות',
+  m_conversation_starters_sub: '',
+  m_conversation_starters_eyebrow_couple: 'מי כותב/ת ראשון',
+  m_conversation_starters_title_couple: 'מי פותח/ת את השיחה?',
+  m_conversation_starters_sub_couple: 'הראשון/ה לכתוב אחרי שתיקה ארוכה',
+  // love_you (couple)
+  m_love_you_eyebrow: 'מילת האהבה',
+  m_love_you_title: 'מי אומר/ת ״אני אוהב/ת אותך״ יותר',
+  m_love_you_sub: '',
+  m_love_you_eyebrow_couple: 'מילת האהבה',
+  m_love_you_title_couple: 'מי אומר/ת ״אוהב/ת אותך״ יותר?',
+  m_love_you_sub_couple: 'כמה פעמים כל אחד אמר את זה, בכל שפה',
 
   // Longest streak
   ls_eyebrow: 'הרצף',
@@ -752,6 +773,7 @@ export default {
   // Signature emoji
   se_eyebrow: 'האימוג׳י של כל אחד',
   se_title: 'אימוג׳י אחד לכל אחד',
+  se_times: 'פעמים',
   se_eyebrow_friends: 'סימני זיהוי',
   se_title_friends: 'האימוג׳י הכי מזוהה עם כל אחד',
   se_eyebrow_couple: 'האימוג׳ים שלנו',
@@ -819,4 +841,28 @@ export default {
   awards_eyebrow_couple: '✦ פרסי הזוג',
   awards_title_couple: 'והזוכים',
   awards_are_couple: 'הם…',
+
+  // share (final slide — pick a card + send it)
+  share_eyebrow: 'דבר אחרון',
+  share_title_lead: 'שלחו את זה ל',
+  share_highlight: 'קבוצה',
+  share_highlight_friends: 'חבר\'ה',
+  share_highlight_family: 'משפחה',
+  share_highlight_work: 'צוות',
+  share_highlight_couple: 'בן/בת הזוג',
+  share_tap_to_swap: 'הקישו כדי להחליף',
+  share_cta_whatsapp: 'שיתוף לוואטסאפ',
+  share_cta_save: 'שמירת תמונה',
+  share_cta_elsewhere: 'שיתוף במקום אחר',
+  // share card style names
+  share_style_a: 'Banana Drop',
+  share_style_b: 'Sticker Zine',
+  share_style_c: 'The Receipt',
+  share_style_d: 'Y2K Chrome',
+  // group label shown on the share cards (relationship-aware)
+  card_group: 'הקבוצה',
+  card_group_friends: 'החבר\'ה',
+  card_group_family: 'המשפחה',
+  card_group_work: 'הצוות',
+  card_group_couple: 'שניכם',
 };

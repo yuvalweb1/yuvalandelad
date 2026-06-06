@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import SlideShell from './SlideShell.jsx';
 import ListSlideDecor from '../components/ListSlideDecor.jsx';
-import { typedCopy, interp } from '../i18n';
+import { typedCopy, isRtlText } from '../i18n';
 
 // Metric definitions (same as SlideMetric, but rendered in leaderboard style)
 const METRIC_DEFS = {
@@ -12,7 +12,7 @@ const METRIC_DEFS = {
     rows: (a) => (a.users || [])
       .filter(u => u.maxBurst >= 2)
       .sort((x, y) => y.maxBurst - x.maxBurst)
-      .map(u => ({ author: u.author, value: u.maxBurst, displayValue: `${u.maxBurst}`, sub: 'in a row', badge: '×' })),
+      .map(u => ({ author: u.author, value: u.maxBurst, displayValue: `${u.maxBurst}` })),
   },
   response_times: {
     color: '#277da1',
@@ -27,8 +27,6 @@ const METRIC_DEFS = {
         author: u.author,
         value: slowest - u.avgRespMin + 0.5,
         displayValue: u.avgRespMin < 1 ? `${Math.round(u.avgRespMin * 60)}s` : `${u.avgRespMin.toFixed(1)}m`,
-        sub: 'avg reply',
-        badge: '⚡',
       }));
     },
   },
@@ -39,7 +37,7 @@ const METRIC_DEFS = {
     rows: (a) => (a.users || [])
       .filter(u => u.nightPct > 0 && u.nightMessages >= 1)
       .sort((x, y) => y.nightPct - x.nightPct)
-      .map(u => ({ author: u.author, value: u.nightPct, displayValue: `${u.nightPct.toFixed(0)}%`, sub: 'after midnight', badge: '🌙' })),
+      .map(u => ({ author: u.author, value: u.nightPct, displayValue: `${u.nightPct.toFixed(0)}%` })),
   },
   signature_emoji: {
     color: '#f3722c',
@@ -47,7 +45,35 @@ const METRIC_DEFS = {
     decorEmojis: ['😊', '🎉', '💎', '✨', '🌟'],
     rows: (a) => (a.users || []).filter(u => u.topEmoji)
       .sort((x, y) => (y.topEmojiCount || 0) - (x.topEmojiCount || 0))
-      .map(u => ({ author: u.author, value: u.topEmojiCount || 1, displayValue: u.topEmoji, sub: `${(u.topEmojiCount || 1).toLocaleString()} times`, badge: '😊' })),
+      .map(u => ({ author: u.author, value: u.topEmojiCount || 1, displayValue: u.topEmoji })),
+  },
+  // Couple ("just us two") metrics
+  messages_sent: {
+    color: '#43aa8b',
+    icon: '💬',
+    decorEmojis: ['💬', '📊', '✍️', '✨', '📱'],
+    rows: (a) => (a.users || [])
+      .filter(u => u.messageCount > 0)
+      .sort((x, y) => y.messageCount - x.messageCount)
+      .map(u => ({ author: u.author, value: u.messageCount, displayValue: u.messageCount.toLocaleString() })),
+  },
+  conversation_starters: {
+    color: '#577590',
+    icon: '🚀',
+    decorEmojis: ['🚀', '💬', '👋', '✨', '🔔'],
+    rows: (a) => (a.users || [])
+      .filter(u => u.conversationsRevived > 0)
+      .sort((x, y) => y.conversationsRevived - x.conversationsRevived)
+      .map(u => ({ author: u.author, value: u.conversationsRevived, displayValue: u.conversationsRevived.toLocaleString() })),
+  },
+  love_you: {
+    color: '#f9456b',
+    icon: '❤️',
+    decorEmojis: ['❤️', '💕', '😍', '💞', '✨'],
+    rows: (a) => (a.users || [])
+      .filter(u => u.loveYouCount > 0)
+      .sort((x, y) => y.loveYouCount - x.loveYouCount)
+      .map(u => ({ author: u.author, value: u.loveYouCount, displayValue: u.loveYouCount.toLocaleString() })),
   },
 };
 
@@ -59,7 +85,7 @@ export function metricHasData(metricKey, a) {
 
 const MAX_ROWS = 5;
 
-const SlideMetricLeaderboard = React.memo(function SlideMetricLeaderboard({ a, t, profile, metricKey }) {
+const SlideMetricLeaderboard = React.memo(function SlideMetricLeaderboard({ a, t, profile, metricKey, lang }) {
   const def = METRIC_DEFS[metricKey];
   if (!def) return null;
   const allRows = def.rows(a);
@@ -73,18 +99,58 @@ const SlideMetricLeaderboard = React.memo(function SlideMetricLeaderboard({ a, t
   const type = profile?.relationship || 'other';
   const eyebrow = typedCopy(t, `m_${metricKey}_eyebrow`, type);
   const title = typedCopy(t, `m_${metricKey}_title`, type);
-  const sub = typedCopy(t, `m_${metricKey}_sub`, type);
 
   const medals = ['🥇', '🥈', '🥉'];
   const DEEP = '#C25516';
 
-  const renderRow = (row, i, opts = {}) => {
-    const { isLast = false } = opts;
+  const renderRow = (row, i) => {
     const isWinner = i === 0;
+    // Layout is driven by the *name's* direction only — the app locale is
+    // irrelevant. LTR name → name on the left, number + medal on the right.
+    // RTL name → name on the right, number + medal on the left.
+    const nameLtr = !isRtlText(row.author);
+    const medal = i < 3 ? medals[i] : '⭐';
+
+    const valueEl = (
+      <div className="fs-display" style={{ flexShrink: 0, fontSize: 28, fontWeight: 800, color: def.color }}>
+        {row.displayValue}
+      </div>
+    );
+
+    const medalEl = (
+      <div style={{ flexShrink: 0, fontSize: i < 3 ? 24 : 20, minWidth: 32, textAlign: 'center' }}>
+        {medal}
+      </div>
+    );
+
+    // number + medal kept together; medal sits on the card's outer edge.
+    // direction:'ltr' forces row/row-reverse to be physical (left↔right),
+    // unaffected by the ambient RTL UI direction in Hebrew/Arabic decks.
+    const endGroup = (
+      <div style={{
+        flexShrink: 0, display: 'flex', alignItems: 'center', gap: 8,
+        direction: 'ltr',
+        flexDirection: nameLtr ? 'row' : 'row-reverse',
+      }}>
+        {valueEl}
+        {medalEl}
+      </div>
+    );
+
+    const name = (
+      <div className="fs-sans" dir={nameLtr ? 'ltr' : 'rtl'} style={{
+        flex: 1, minWidth: 0, fontSize: 15, fontWeight: 700, color: '#4A0E4E',
+        overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+        textAlign: nameLtr ? 'left' : 'right',
+        paddingInline: 10,
+      }}>
+        {row.author}
+      </div>
+    );
 
     return (
-      <div key={row.author} dir="auto" className="a-slide-up-far" style={{
-        position: 'relative', padding: '14px 16px',
+      <div key={row.author} className="a-slide-up-far" style={{
+        position: 'relative', padding: '12px 16px',
         background: isWinner ? '#FFF8E0' : '#fff',
         borderRadius: 18,
         border: `2px solid ${isWinner ? '#FFD700' : 'rgba(255,255,255,0.85)'}`,
@@ -92,54 +158,26 @@ const SlideMetricLeaderboard = React.memo(function SlideMetricLeaderboard({ a, t
         overflow: 'hidden', flexShrink: 0,
         animationDelay: `${0.4 + i * 0.08}s`,
       }}>
-        {/* bar fill (over the white card) */}
+        {/* bar fill anchored to the number/medal side of the card */}
         <div className="a-slide-right" style={{
-          position: 'absolute', top: 0, bottom: 0, insetInlineStart: 0,
-          background: `linear-gradient(90deg, ${isWinner ? 'rgba(255,215,0,0.28)' : `rgba(${hexToRgb(def.color)},0.16)`} 0%, rgba(${hexToRgb(def.color)},0.02) 100%)`,
+          position: 'absolute', top: 0, bottom: 0,
+          [nameLtr ? 'right' : 'left']: 0,
+          background: isWinner ? 'rgba(255,215,0,0.28)' : 'rgba(243,114,44,0.16)',
           width: `${Math.max(8, Math.round((row.value / (allRows[0]?.value || 1)) * 100))}%`,
           animationDelay: `${0.6 + i * 0.08}s`,
           pointerEvents: 'none',
         }} />
-        <div style={{ position: 'relative', display: 'flex', alignItems: 'center', gap: 12, justifyContent: 'space-between' }}>
-          {/* Number on left */}
-          <div className="fs-display" style={{
-            flexShrink: 0,
-            fontSize: 28,
-            fontWeight: 800,
-            color: def.color,
-            minWidth: 40,
-            textAlign: 'center',
-          }}>
-            {row.displayValue}
-          </div>
-
-          {/* Name in middle */}
-          <div className="fs-sans" style={{
-            flex: 1, minWidth: 0, fontSize: 15, fontWeight: 700, color: '#4A0E4E',
-            overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
-            paddingRight: 8,
-          }}>
-            {row.author}
-          </div>
-
-          {/* Medal/icon on right */}
-          <div style={{
-            flexShrink: 0,
-            fontSize: i < 3 ? 24 : 20,
-            textAlign: 'center',
-            minWidth: 32,
-          }}>
-            {i < 3 ? medals[i] : '⭐'}
-          </div>
+        <div style={{
+          position: 'relative', display: 'flex', alignItems: 'center',
+          direction: 'ltr',
+          flexDirection: nameLtr ? 'row' : 'row-reverse',
+        }}>
+          {/* DOM order: name, endGroup. flexDirection mirrors it so the name
+              and the number/medal group land on opposite edges per direction.
+              direction:'ltr' keeps this physical regardless of the app locale. */}
+          {name}
+          {endGroup}
         </div>
-        {row.sub && (
-          <div className="fs-mono" style={{
-            marginTop: 4, fontSize: 11, color: 'rgba(74,14,78,0.55)',
-            marginInlineStart: 52,
-          }}>
-            {row.sub}
-          </div>
-        )}
       </div>
     );
   };
@@ -156,22 +194,14 @@ const SlideMetricLeaderboard = React.memo(function SlideMetricLeaderboard({ a, t
           fontSize: title && title.length > 28 ? 28 : 36,
           lineHeight: 1.08, letterSpacing: '-0.03em',
           fontWeight: 800, color: '#4A0E4E',
-          marginTop: 8, marginBottom: sub ? 6 : 16,
+          marginTop: 8, marginBottom: 16,
           textShadow: '0 2px 0 rgba(255,255,255,0.65), 0 1px 3px rgba(74,14,78,0.12)',
           overflowWrap: 'break-word', wordBreak: 'break-word', padding: '0 8px',
         }}>
           {title}
         </div>
-        {sub && (
-          <div className="fs-mono a-fade-up" style={{
-            textAlign: 'center', animationDelay: '0.2s',
-            fontSize: 12, color: 'rgba(74,14,78,0.6)', marginBottom: 12,
-          }}>
-            {sub}
-          </div>
-        )}
         <div className="no-sb" style={{ flex: 1, overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: 9, minHeight: 0 }}>
-          {rows.map((r, i) => renderRow(r, i, { isLast: !showOverflow && i === allRows.length - 1 && allRows.length > 1 }))}
+          {rows.map((r, i) => renderRow(r, i))}
           {showOverflow && !expanded && (
             <button onClick={() => setExpanded(true)} className="press" style={{
               background: 'none', border: 'none', cursor: 'pointer',
@@ -187,11 +217,5 @@ const SlideMetricLeaderboard = React.memo(function SlideMetricLeaderboard({ a, t
     </SlideShell>
   );
 });
-
-// Helper to convert hex color to RGB
-function hexToRgb(hex) {
-  const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-  return result ? `${parseInt(result[1], 16)},${parseInt(result[2], 16)},${parseInt(result[3], 16)}` : '0,0,0';
-}
 
 export default SlideMetricLeaderboard;

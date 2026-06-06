@@ -8,7 +8,7 @@ import { slideHasData } from '../slides';
 // buttons so the audio/video controls own the slide area uncontested.
 const MEDIA_SLIDES = new Set();
 
-export default function Wrapped({ analytics, diagnostics, selectedAuthor, setSelectedAuthor, slide, setSlide, profile, t, onExit, onMenu, onRoastMode, slidesDef, slideComponents }) {
+export default function Wrapped({ analytics, diagnostics, selectedAuthor, setSelectedAuthor, slide, setSlide, profile, t, lang, onExit, onMenu, onRoastMode, slidesDef, slideComponents }) {
   const user = analytics.userMap[selectedAuthor];
   if (!user) return null;
   const userAchievements = analytics.achievementsByUser[selectedAuthor] || [];
@@ -55,7 +55,7 @@ export default function Wrapped({ analytics, diagnostics, selectedAuthor, setSel
         onClick={isMediaSlide ? undefined : onSlideClick}
         className={dirRef.current >= 0 ? 'slide-in-right' : 'slide-in-left'}
         style={{ position: 'absolute', inset: 0, overflow: 'hidden', zIndex: 1 }}>
-        {SlideComp && <SlideComp a={analytics} u={user} t={t} profile={profile} achievements={userAchievements} onExit={onExit} onMenu={onMenu} onRoastMode={onRoastMode} />}
+        {SlideComp && <SlideComp a={analytics} u={user} t={t} lang={lang} profile={profile} achievements={userAchievements} diagnostics={diagnostics} onExit={onExit} onMenu={onMenu} onRoastMode={onRoastMode} />}
       </div>
 
       {/* Controls overlay — pointer-events: none so taps pass through to the

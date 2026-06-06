@@ -30,6 +30,7 @@ export default function GlobalStyles() {
       .fs-display { font-family: 'Bricolage Grotesque', 'Rubik Black', 'Comix CLM', serif; }
       .fs-mono { font-family: 'Inter Tight', 'DM Sans', 'Comix CLM', -apple-system, sans-serif; font-feature-settings: 'tnum' on; font-variant-numeric: tabular-nums; font-weight: 500; }
       .fs-sans { font-family: 'DM Sans', 'Comix CLM', -apple-system, sans-serif; }
+      .fs-serif { font-family: 'Instrument Serif', Georgia, serif; }
       @keyframes fadeUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
       @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
       @keyframes scaleSpring { 0% { opacity: 0; transform: scale(0.5); } 60% { transform: scale(1.08); } 100% { opacity: 1; transform: scale(1); } }

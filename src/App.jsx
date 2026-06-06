@@ -455,6 +455,7 @@ function RecappedApp() {
               setSlide={setSlide}
               profile={profile}
               t={t}
+              lang={lang}
               onExit={() => {
                 setCurrentRecapId(null);
                 setStage('landing');

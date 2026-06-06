@@ -743,24 +743,45 @@ export default {
   m_link_sharers_sub: '',
   m_link_sharers_eyebrow_work: 'LINK DROPPERS',
   m_link_sharers_title_work: 'Useful — or just distracting?',
-  // double_texts
+  // double_texts — number = max consecutive messages
   m_double_texts_eyebrow: 'DOUBLE-TEXTERS',
-  m_double_texts_title: 'Biggest message streaks in a row',
+  m_double_texts_title: 'Most texts in a row',
   m_double_texts_sub: '',
-  m_double_texts_eyebrow_couple: 'DOUBLE-TEXTERS',
-  m_double_texts_title_couple: 'Who\'s the clingy one?',
+  m_double_texts_eyebrow_couple: 'CLINGY METER',
+  m_double_texts_title_couple: 'Most texts sent in a row',
   // ignored_award
   m_ignored_award_eyebrow: 'WENT QUIET',
   m_ignored_award_title: 'Longest disappearing acts',
   m_ignored_award_sub: 'Longest they went without sending anything',
   m_ignored_award_eyebrow_friends: 'WHO GOES QUIET',
   m_ignored_award_title_friends: 'Longest time without a peep',
-  // night_messages
+  // night_messages — number = % of messages after midnight
   m_night_messages_eyebrow: 'AFTER HOURS',
-  m_night_messages_title: 'Who stays up later',
+  m_night_messages_title: 'Who texts after midnight?',
   m_night_messages_sub: '',
-  m_night_messages_eyebrow_couple: 'NIGHT MESSAGES',
-  m_night_messages_title_couple: 'Who\'s still up thinking about us?',
+  m_night_messages_eyebrow_couple: 'AFTER MIDNIGHT',
+  m_night_messages_title_couple: 'Who texts after midnight?',
+  // messages_sent — number = total message count
+  m_messages_sent_eyebrow: 'MESSAGES SENT',
+  m_messages_sent_title: 'Who sent more messages',
+  m_messages_sent_sub: '',
+  m_messages_sent_eyebrow_couple: 'MESSAGES SENT',
+  m_messages_sent_title_couple: 'Who texts more?',
+  m_messages_sent_sub_couple: '',
+  // conversation_starters — number = times broke the silence first
+  m_conversation_starters_eyebrow: 'WHO BREAKS THE SILENCE',
+  m_conversation_starters_title: 'Who starts more conversations',
+  m_conversation_starters_sub: '',
+  m_conversation_starters_eyebrow_couple: 'WHO TEXTS FIRST',
+  m_conversation_starters_title_couple: 'Who breaks the silence?',
+  m_conversation_starters_sub_couple: '',
+  // love_you — number = times "I love you" was said
+  m_love_you_eyebrow: 'THE L-WORD',
+  m_love_you_title: 'Who says "I love you" more',
+  m_love_you_sub: '',
+  m_love_you_eyebrow_couple: 'THE L-WORD',
+  m_love_you_title_couple: 'Who says "I love you" more?',
+  m_love_you_sub_couple: '',
 
   // ----- Longest streak slide -----
   ls_eyebrow: 'THE STREAK',
@@ -785,6 +806,7 @@ export default {
   // ----- Signature emoji slide -----
   se_eyebrow: 'SIGNATURE EMOJI',
   se_title: 'One emoji each',
+  se_times: 'times',
   se_eyebrow_friends: 'DEAD GIVEAWAYS',
   se_title_friends: 'Everyone\'s most-used emoji',
   se_eyebrow_couple: 'OUR EMOJIS',
@@ -853,4 +875,28 @@ export default {
   awards_eyebrow_couple: '✦ THE COUPLE AWARDS',
   awards_title_couple: 'And the winners',
   awards_are_couple: 'are…',
+
+  // share (final slide — pick a card + send it)
+  share_eyebrow: 'ONE LAST THING',
+  share_title_lead: 'Send it to',
+  share_highlight: 'the group',
+  share_highlight_friends: 'the squad',
+  share_highlight_family: 'the family',
+  share_highlight_work: 'the team',
+  share_highlight_couple: 'your person',
+  share_tap_to_swap: 'TAP TO SWAP',
+  share_cta_whatsapp: 'Share to WhatsApp',
+  share_cta_save: 'Save image',
+  share_cta_elsewhere: 'Share someplace else',
+  // share card style names
+  share_style_a: 'Banana Drop',
+  share_style_b: 'Sticker Zine',
+  share_style_c: 'The Receipt',
+  share_style_d: 'Y2K Chrome',
+  // group label shown on the share cards (relationship-aware)
+  card_group: 'The Group',
+  card_group_friends: 'The Squad',
+  card_group_family: 'The Family',
+  card_group_work: 'The Team',
+  card_group_couple: 'You Two',
 };
