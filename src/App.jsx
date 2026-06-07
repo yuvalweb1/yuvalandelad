@@ -492,7 +492,7 @@ function RecappedApp() {
               selectedAuthor={selectedAuthor}
               setSelectedAuthor={setSelectedAuthor}
               t={t}
-              onBack={() => setStage('menu')}
+              onBack={() => setStage('wrapped')}
             />
           )}
         </div>

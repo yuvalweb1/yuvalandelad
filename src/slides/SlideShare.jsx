@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
+import html2canvas from 'html2canvas';
 import { typedCopy } from '../i18n';
 import { CardBananaDrop, CardStickerZine, CardReceipt, CardY2KChrome, buildCardData } from './shareCards.jsx';
 
@@ -235,9 +236,10 @@ function HeroCarousel({ options, pickedId, setPickedId, cardData, headline, head
   );
 }
 
-const SlideShare = React.memo(function SlideShare({ a, t, profile, diagnostics, u }) {
+const SlideShare = React.memo(function SlideShare({ a, t, profile, diagnostics, u, onRoastMode }) {
   const type = profile?.relationship || 'other';
   const [pickedId, setPickedId] = useState('A');
+  const [busy, setBusy] = useState(null);
 
   const cardData = buildCardData(a, profile, t);
   const headline = nf(a?.totalMessages);
@@ -247,9 +249,86 @@ const SlideShare = React.memo(function SlideShare({ a, t, profile, diagnostics, 
   const chatName = getChatName(diagnostics) || otherParticipant || typedCopy(t, 'share_highlight', type);
   const titleSize = titleFontSize(t.share_title_lead, chatName);
 
-  const onShareWhatsApp = () => {/* TODO: generate card image + WhatsApp share */};
-  const onSaveImage     = () => {/* TODO: render selected card to PNG + download */};
-  const onShareElse     = () => {/* TODO: navigator.share with the generated card */};
+  // Hidden full-size (540×960) render of the active card. html2canvas
+  // captures THIS node — not the scaled-down preview — so the saved PNG
+  // is sharp at story dimensions. Kept in the DOM at all times so the
+  // capture is one synchronous step away when the user taps share.
+  const captureRef = useRef(null);
+  const activeOpt = OPTIONS.find(o => o.id === pickedId) || OPTIONS[0];
+  const ActiveComp = activeOpt.Comp;
+
+  async function captureBlob() {
+    if (!captureRef.current) return null;
+    const canvas = await html2canvas(captureRef.current, {
+      backgroundColor: null,
+      scale: 2,                       // 2× = retina-sharp 1080×1920
+      useCORS: true,
+      logging: false,
+      width: 540,
+      height: 960,
+    });
+    return new Promise(resolve => canvas.toBlob(resolve, 'image/png', 0.95));
+  }
+
+  const shareText = `${headline} ${headLabel}. ${t.share_caught || 'on ChatWrapped'} → ${location.origin}`;
+
+  const onShareWhatsApp = async () => {
+    if (busy) return;
+    setBusy('whatsapp');
+    try {
+      const blob = await captureBlob();
+      if (blob && navigator.share && navigator.canShare?.({ files: [new File([blob], 'recapped.png', { type: 'image/png' })] })) {
+        try {
+          await navigator.share({
+            files: [new File([blob], 'recapped.png', { type: 'image/png' })],
+            text: shareText,
+          });
+          return;
+        } catch (e) { if (e?.name === 'AbortError') return; /* fall through to wa.me */ }
+      }
+      // Fallback for desktop / browsers without file-share support: open
+      // WhatsApp's universal link with a text-only payload. The user can
+      // then attach the image manually if they saved it first.
+      const url = `https://wa.me/?text=${encodeURIComponent(shareText)}`;
+      window.open(url, '_blank', 'noopener');
+    } finally { setBusy(null); }
+  };
+
+  const onSaveImage = async () => {
+    if (busy) return;
+    setBusy('save');
+    try {
+      const blob = await captureBlob();
+      if (!blob) return;
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `recapped-${(chatName || 'chat').replace(/[^a-z0-9\-]/gi, '_')}.png`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      setTimeout(() => URL.revokeObjectURL(url), 2000);
+    } finally { setBusy(null); }
+  };
+
+  const onShareElse = async () => {
+    if (busy) return;
+    setBusy('else');
+    try {
+      const blob = await captureBlob();
+      const file = blob && new File([blob], 'recapped.png', { type: 'image/png' });
+      if (file && navigator.share && navigator.canShare?.({ files: [file] })) {
+        try { await navigator.share({ files: [file], text: shareText }); return; }
+        catch (e) { if (e?.name === 'AbortError') return; }
+      }
+      if (navigator.share) {
+        try { await navigator.share({ text: shareText, url: location.origin }); return; }
+        catch (e) { if (e?.name === 'AbortError') return; }
+      }
+      // No share sheet at all (older desktop browsers): copy link to clipboard.
+      try { await navigator.clipboard.writeText(shareText); } catch {}
+    } finally { setBusy(null); }
+  };
 
   return (
     <div style={{
@@ -298,9 +377,21 @@ const SlideShare = React.memo(function SlideShare({ a, t, profile, diagnostics, 
       {/* pushes CTAs to bottom */}
       <div style={{ flex: 1, minHeight: 8 }} />
 
+      {/* Hidden full-size capture target — sits offscreen, always rendered
+          so html2canvas can read the active card synchronously. aria-hidden
+          and pointer-events:none keep it out of the user's way. */}
+      <div aria-hidden="true" style={{
+        position: 'absolute', left: -99999, top: 0, width: 540, height: 960,
+        pointerEvents: 'none',
+      }}>
+        <div ref={captureRef} style={{ width: 540, height: 960, overflow: 'hidden' }}>
+          {ActiveComp && <ActiveComp format="story" data={cardData} />}
+        </div>
+      </div>
+
       {/* compact CTA stack */}
       <div style={{ position: 'relative', padding: '0 20px', display: 'flex', flexDirection: 'column', gap: 9 }}>
-        <button onClick={onShareWhatsApp} style={{
+        <button onClick={onShareWhatsApp} disabled={!!busy} style={{
           appearance: 'none', border: 'none', cursor: 'pointer', width: '100%', padding: '12px 18px',
           background: INK_DEEP, color: '#fff', borderRadius: 999,
           fontFamily: 'inherit', fontWeight: 800, fontSize: 14, letterSpacing: '-0.01em',
@@ -314,7 +405,7 @@ const SlideShare = React.memo(function SlideShare({ a, t, profile, diagnostics, 
           {t.share_cta_whatsapp}
         </button>
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 9 }}>
-          <button onClick={onSaveImage} style={{
+          <button onClick={onSaveImage} disabled={!!busy} style={{
             appearance: 'none', cursor: 'pointer', padding: '10px 12px',
             background: 'rgba(255,255,255,0.55)', backdropFilter: 'blur(10px)',
             border: `1.5px solid rgba(42,6,69,0.14)`, borderRadius: 999, color: INK_DEEP,
@@ -327,7 +418,7 @@ const SlideShare = React.memo(function SlideShare({ a, t, profile, diagnostics, 
             </svg>
             {t.share_cta_save}
           </button>
-          <button onClick={onShareElse} style={{
+          <button onClick={onShareElse} disabled={!!busy} style={{
             appearance: 'none', cursor: 'pointer', padding: '10px 12px',
             background: 'rgba(255,255,255,0.55)', backdropFilter: 'blur(10px)',
             border: `1.5px solid rgba(42,6,69,0.14)`, borderRadius: 999, color: INK_DEEP,
@@ -341,6 +432,20 @@ const SlideShare = React.memo(function SlideShare({ a, t, profile, diagnostics, 
             {t.share_cta_elsewhere}
           </button>
         </div>
+        {/* Roast Mode entry — secondary nav back to the roast view. Lives on
+            the share slide because PostMenu was retired; users need a way
+            to reach the full roast list from the deck. */}
+        {onRoastMode && (
+          <button onClick={onRoastMode} style={{
+            appearance: 'none', cursor: 'pointer', marginTop: 2, padding: '8px 12px',
+            background: 'transparent', border: 'none', color: CORAL,
+            fontFamily: 'inherit', fontWeight: 700, fontSize: 13,
+            display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
+            letterSpacing: '-0.01em',
+          }}>
+            🔥 {t.menu_roast_title || t.menu_roast_everyone || 'Roast everyone →'}
+          </button>
+        )}
       </div>
     </div>
   );
