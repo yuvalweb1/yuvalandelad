@@ -2,6 +2,7 @@ import { useMemo, useRef } from 'react';
 import SlidesBlobBackground from '../components/SlidesBlobBackground.jsx';
 import { adEnabled } from '../lib/ads.js';
 import { slideHasData } from '../slides';
+import { RTL_LANGS } from '../i18n';
 
 // Slides hosting playable audio/video — auto-advance pauses while the user
 // listens, and the smart tap-to-advance is replaced with explicit chevron
@@ -40,7 +41,9 @@ export default function Wrapped({ analytics, diagnostics, selectedAuthor, setSel
     if (e.target.closest('button, a, input, textarea, label, audio, video, [role="button"]')) return;
     const rect = e.currentTarget.getBoundingClientRect();
     const x = e.clientX - rect.left;
-    if (x < rect.width * 0.3) prev();
+    const isRTL = RTL_LANGS.has(lang);
+    const tapLeft = x < rect.width * 0.3;
+    if (isRTL ? !tapLeft : tapLeft) prev();
     else if (slide < total - 1) next();
   };
 

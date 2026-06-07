@@ -17,6 +17,17 @@ const LOGO = '/icon-512.png';
 // nice grouped number e.g. 12,847
 export const nf = (n) => (n ?? 0).toLocaleString('en-US');
 
+// Scale the hero number font down so it never overflows the card's content box.
+// Bricolage Grotesque 800-weight numerals: actual char width ≈ 0.82em (measured, wide weight).
+// `available` = content width in px at the card's native 540px scale.
+// `extraLetterSpacingEm` = letterSpacing value applied to the element (e.g. 0.04 for Y2K Chrome).
+function heroNumSize(numStr, available, base, extraLetterSpacingEm = 0) {
+  const charWidthFactor = 0.82 + extraLetterSpacingEm;
+  const needed = numStr.length * base * charWidthFactor;
+  if (needed <= available) return base;
+  return Math.max(Math.round(base * 0.50), Math.floor(base * available / needed));
+}
+
 // relationship → group label + emoji for the card header
 const GROUP_EMOJI = { friends: '🔥', family: '🏠', work: '💼', couple: '❤️', other: '💬' };
 
@@ -121,7 +132,7 @@ const dotTexture = {
   backgroundSize: '15px 15px',
 };
 
-function ACell({ value, label, accent = A_INK, tilt = 0, big, flair }) {
+function ACell({ value, label, sub, accent = A_INK, tilt = 0, big, flair }) {
   return (
     <div style={{
       background: '#FFFDF5', border: `3px solid ${A_INK}`, borderRadius: 16,
@@ -133,12 +144,16 @@ function ACell({ value, label, accent = A_INK, tilt = 0, big, flair }) {
       {flair && <div style={{ position: 'absolute', top: 8, right: 10, fontSize: 22, lineHeight: 1 }}>{flair}</div>}
       <div className="fs-mono" style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.14em', textTransform: 'uppercase', color: accent, marginBottom: 6 }}>{label}</div>
       <div className="fs-display" style={{ fontSize: big ? 40 : 30, fontWeight: 800, lineHeight: 0.95, color: A_INK, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{value}</div>
+      {sub && <div className="fs-mono" style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.08em', color: 'rgba(74,14,78,0.55)', marginTop: 4, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{sub}</div>}
     </div>
   );
 }
 
 export const CardBananaDrop = React.memo(function CardBananaDrop({ format = 'story', data }) {
   const G = data; const story = format === 'story';
+  const heroStr = nf(G.totalMessages);
+  // content width at native 540px: 540 - 34*2 = 472px
+  const heroSize = heroNumSize(heroStr, 472, story ? 142 : 92);
   return (
     <div style={{
       width: '100%', height: '100%', background: BANANA, color: A_INK,
@@ -163,13 +178,13 @@ export const CardBananaDrop = React.memo(function CardBananaDrop({ format = 'sto
         </div>
 
         <div style={{ flex: story ? 1 : '0 0 auto', display: 'flex', flexDirection: 'column', justifyContent: 'center', minHeight: 0, marginTop: story ? 0 : 16, marginBottom: story ? 0 : 14 }}>
-          <div className="fs-display" style={{ fontSize: story ? 142 : 92, fontWeight: 800, lineHeight: 0.84, color: A_INK, fontVariantNumeric: 'tabular-nums', textShadow: `4px 5px 0 #FF8C00` }}>{nf(G.totalMessages)}</div>
+          <div className="fs-display" style={{ fontSize: heroSize, fontWeight: 800, lineHeight: 0.84, color: A_INK, fontVariantNumeric: 'tabular-nums', textShadow: `4px 5px 0 #FF8C00`, whiteSpace: 'nowrap', overflow: 'hidden' }}>{heroStr}</div>
           <div className="fs-mono" style={{ marginTop: story ? 14 : 8, fontSize: 14, fontWeight: 700, letterSpacing: '0.2em', textTransform: 'uppercase' }}>messages sent this year</div>
         </div>
 
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: story ? 20 : 14 }}>
           <ACell label="Days active" value={G.daysActive} accent="#277da1" tilt={-1} />
-          <ACell label="Carried the chat" value={`${G.topChatter} · ${G.topChatterPct}%`} accent="#f3722c" tilt={1} />
+          <ACell label="Carried the chat" value={G.topChatter} sub={`${G.topChatterPct}% of all messages`} accent="#f3722c" tilt={1} />
           <ACell label="Most used word" value={`“${G.topWord}”`} accent="#8338ec" tilt={1} />
           <ACell label="Top emoji" value={`×${nf(G.topEmojiCount)}`} accent="#f94144" tilt={-1} flair={G.topEmoji} />
         </div>
@@ -210,17 +225,21 @@ function Sticker({ children, bg = '#fff', tilt = 0, pad = '17px 18px', tape, sty
   );
 }
 
-function CStat({ value, label, accent, valueSize = 30 }) {
+function CStat({ value, label, sub, accent, valueSize = 30 }) {
   return (
     <>
       <div className="fs-mono" style={{ fontSize: 10.5, fontWeight: 700, letterSpacing: '0.13em', textTransform: 'uppercase', color: accent, marginBottom: 5 }}>{label}</div>
       <div className="fs-display" style={{ fontSize: valueSize, fontWeight: 800, lineHeight: 0.95, color: C_INK, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{value}</div>
+      {sub && <div className="fs-mono" style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.08em', color: 'rgba(42,6,69,0.50)', marginTop: 4, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{sub}</div>}
     </>
   );
 }
 
 export const CardStickerZine = React.memo(function CardStickerZine({ format = 'story', data }) {
   const G = data; const story = format === 'story';
+  const heroStr = nf(G.totalMessages);
+  // Sticker pad 22px each side inside card pad 30px each side → 540-60-44=436px available
+  const heroSize = heroNumSize(heroStr, 436, story ? 116 : 58);
   return (
     <div style={{
       width: '100%', height: '100%', position: 'relative', overflow: 'hidden',
@@ -249,13 +268,13 @@ export const CardStickerZine = React.memo(function CardStickerZine({ format = 's
 
           <Sticker bg="#FFFFFF" tilt={1} tape={story} pad={story ? '20px 22px 18px' : '11px 14px'}>
             {story && <div className="fs-serif" style={{ fontSize: 18, fontStyle: 'italic', color: '#f06449', marginBottom: 2 }}>we sent a casual…</div>}
-            <div className="fs-display" style={{ fontSize: story ? 116 : 58, fontWeight: 800, lineHeight: 0.85, color: C_INK, fontVariantNumeric: 'tabular-nums' }}>{nf(G.totalMessages)}</div>
+            <div className="fs-display" style={{ fontSize: heroSize, fontWeight: 800, lineHeight: 0.85, color: C_INK, fontVariantNumeric: 'tabular-nums', whiteSpace: 'nowrap', overflow: 'hidden' }}>{heroStr}</div>
             <div className="fs-mono" style={{ marginTop: story ? 8 : 5, fontSize: story ? 13 : 11, fontWeight: 700, letterSpacing: '0.16em', textTransform: 'uppercase', color: 'rgba(42,6,69,0.6)' }}>messages · {G.daysActive} days</div>
           </Sticker>
         </div>
 
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: story ? 20 : 10, marginTop: story ? 22 : 10 }}>
-          <Sticker bg="#CDEBFF" tilt={-1.5} pad={story ? '17px 18px' : '10px 12px'}><CStat label="Carried the chat" value={`${G.topChatter} ${G.topChatterPct}%`} accent="#277da1" valueSize={story ? 28 : 19} /></Sticker>
+          <Sticker bg="#CDEBFF" tilt={-1.5} pad={story ? '17px 18px' : '10px 12px'}><CStat label="Carried the chat" value={G.topChatter} sub={`${G.topChatterPct}% of messages`} accent="#277da1" valueSize={story ? 28 : 19} /></Sticker>
           <Sticker bg="#FFFFFF" tilt={1.5} pad={story ? '17px 18px' : '10px 12px'}><CStat label="Most used word" value={`“${G.topWord}”`} accent="#8338ec" valueSize={story ? 28 : 19} /></Sticker>
           <Sticker bg="#FFE8A3" tilt={1} pad={story ? '17px 18px' : '10px 12px'}>
             <div className="fs-mono" style={{ fontSize: 10.5, fontWeight: 700, letterSpacing: '0.13em', textTransform: 'uppercase', color: '#f3722c', marginBottom: 4 }}>Top emoji</div>
@@ -291,10 +310,10 @@ function Dash() { return <div style={{ borderTop: `2px dashed rgba(42,6,69,0.35)
 function Row({ k, v, big, tight }) {
   const pad = big ? '7px 0' : (tight ? '3px 0' : '5px 0');
   return (
-    <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', gap: 12, padding: pad }}>
-      <span className="fs-mono" style={{ fontSize: big ? 15 : 13, fontWeight: 600, letterSpacing: '0.02em', color: 'rgba(42,6,69,0.78)', textTransform: 'uppercase', whiteSpace: 'nowrap' }}>{k}</span>
-      <span aria-hidden style={{ flex: 1, borderBottom: '1.5px dotted rgba(42,6,69,0.28)', transform: 'translateY(-4px)' }} />
-      <span className="fs-display" style={{ fontSize: big ? 22 : 18, fontWeight: 800, color: D_INK, whiteSpace: 'nowrap', fontVariantNumeric: 'tabular-nums' }}>{v}</span>
+    <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', gap: 8, padding: pad, minWidth: 0 }}>
+      <span className="fs-mono" style={{ fontSize: big ? 15 : 13, fontWeight: 600, letterSpacing: '0.02em', color: 'rgba(42,6,69,0.78)', textTransform: 'uppercase', whiteSpace: 'nowrap', flexShrink: 0 }}>{k}</span>
+      <span aria-hidden style={{ flex: 1, minWidth: 8, borderBottom: '1.5px dotted rgba(42,6,69,0.28)', transform: 'translateY(-4px)' }} />
+      <span className="fs-display" style={{ fontSize: big ? 22 : 18, fontWeight: 800, color: D_INK, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: '52%', fontVariantNumeric: 'tabular-nums' }}>{v}</span>
     </div>
   );
 }
@@ -310,6 +329,9 @@ function Barcode({ width = '100%', height = 46 }) {
 
 export const CardReceipt = React.memo(function CardReceipt({ format = 'story', data }) {
   const G = data; const story = format === 'story';
+  const heroStr = nf(G.totalMessages);
+  // receipt content width: paper maxWidth 420 - 60px padding = 360; "TOTAL MSGS" label ~130px + 12px gap → ~218px for number
+  const receiptTotalSize = heroNumSize(heroStr, 218, story ? 46 : 34);
   return (
     <div style={{
       width: '100%', height: '100%', position: 'relative', overflow: 'hidden',
@@ -350,7 +372,7 @@ export const CardReceipt = React.memo(function CardReceipt({ format = 'story', d
 
         <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', gap: 12 }}>
           <span className="fs-display" style={{ fontSize: story ? 20 : 17, fontWeight: 800, letterSpacing: '-0.02em', color: D_INK }}>TOTAL MSGS</span>
-          <span className="fs-display" style={{ fontSize: story ? 46 : 34, fontWeight: 800, color: D_INK, fontVariantNumeric: 'tabular-nums' }}>{nf(G.totalMessages)}</span>
+          <span className="fs-display" style={{ fontSize: receiptTotalSize, fontWeight: 800, color: D_INK, fontVariantNumeric: 'tabular-nums', whiteSpace: 'nowrap' }}>{heroStr}</span>
         </div>
 
         <div style={{ margin: story ? '14px 0' : '8px 0' }}><Dash /></div>
@@ -409,6 +431,9 @@ function Star({ style }) {
 
 export const CardY2KChrome = React.memo(function CardY2KChrome({ format = 'story', data }) {
   const G = data; const story = format === 'story';
+  const heroStr = nf(G.totalMessages);
+  // card pad 30px each side → 540-60=480px available; pass 0.04 for letterSpacing on the hero div
+  const heroSize = heroNumSize(heroStr, 480, story ? 132 : 92, 0.04);
   return (
     <div style={{
       width: '100%', height: '100%', position: 'relative', overflow: 'hidden',
@@ -436,17 +461,18 @@ export const CardY2KChrome = React.memo(function CardY2KChrome({ format = 'story
 
           <div style={{ textAlign: 'center' }}>
             <div className="fs-display" style={{
-              fontSize: story ? 132 : 92, fontWeight: 800, letterSpacing: '0.04em', lineHeight: 0.82, fontVariantNumeric: 'tabular-nums',
+              fontSize: heroSize, fontWeight: 800, letterSpacing: '0.04em', lineHeight: 0.82, fontVariantNumeric: 'tabular-nums',
               background: 'linear-gradient(180deg, #ffffff 0%, #ffffff 38%, #FFE08A 56%, #FF9CE0 88%)',
               WebkitBackgroundClip: 'text', backgroundClip: 'text', color: 'transparent',
               WebkitTextStroke: '1px rgba(255,255,255,0.6)', filter: 'drop-shadow(0 6px 14px rgba(74,14,78,0.45))',
-            }}>{nf(G.totalMessages)}</div>
+              whiteSpace: 'nowrap', overflow: 'hidden',
+            }}>{heroStr}</div>
             <div className="fs-mono" style={{ marginTop: 12, fontSize: 13, fontWeight: 700, letterSpacing: '0.22em', textTransform: 'uppercase', color: '#fff', textShadow: '0 1px 8px rgba(74,14,78,0.4)' }}>messages this year</div>
           </div>
         </div>
 
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: story ? 13 : 11, marginTop: story ? 'auto' : 16 }}>
-          <ECell label="Carried it" value={G.topChatter} sub={`${G.topChatterPct}% of msgs`} />
+          <ECell label="Carried it" value={G.topChatter} sub={`${G.topChatterPct}% of messages`} />
           <ECell label="Fave word" value={`“${G.topWord}”`} sub={`${G.topWordCount}× used`} />
           <ECell label="Top emoji" emojiIcon={G.topEmoji} value={`×${nf(G.topEmojiCount)}`} />
           <ECell label="Days active" value={G.daysActive} sub="no days off" />

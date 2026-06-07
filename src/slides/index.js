@@ -134,8 +134,8 @@ export const SLIDES_BY_TYPE = {
   couple: [
     'ready',
     'group_overview',
-    'per_person',
     'messages_sent',
+    'per_person',
     'conversation_starters',
     'double_texts',
     'response_times',

@@ -9,27 +9,9 @@ export default function GlobalStyles() {
         font-display: swap;
         unicode-range: U+0590-05FF, U+FB1D-FB4F, U+200F, U+200E;
       }
-      @font-face {
-        font-family: 'Comix CLM';
-        src: url('/fonts/comixno2clm_medium-webfont.woff') format('woff'),
-             url('/fonts/comixno2clm_medium-webfont.ttf') format('truetype');
-        font-weight: 300 600;
-        font-style: normal;
-        font-display: swap;
-        unicode-range: U+0590-05FF, U+FB1D-FB4F, U+200F, U+200E;
-      }
-      @font-face {
-        font-family: 'Comix CLM';
-        src: url('/fonts/comixno2clm_bold-webfont.woff') format('woff'),
-             url('/fonts/comixno2clm_bold-webfont.ttf') format('truetype');
-        font-weight: 700 900;
-        font-style: normal;
-        font-display: swap;
-        unicode-range: U+0590-05FF, U+FB1D-FB4F, U+200F, U+200E;
-      }
-      .fs-display { font-family: 'Bricolage Grotesque', 'Rubik Black', 'Comix CLM', serif; }
-      .fs-mono { font-family: 'Inter Tight', 'DM Sans', 'Comix CLM', -apple-system, sans-serif; font-feature-settings: 'tnum' on; font-variant-numeric: tabular-nums; font-weight: 500; }
-      .fs-sans { font-family: 'DM Sans', 'Comix CLM', -apple-system, sans-serif; }
+      .fs-display { font-family: 'Bricolage Grotesque', 'Rubik Black', sans-serif; }
+      .fs-mono { font-family: 'Inter Tight', 'DM Sans', -apple-system, sans-serif; font-feature-settings: 'tnum' on; font-variant-numeric: tabular-nums; font-weight: 500; }
+      .fs-sans { font-family: 'DM Sans', -apple-system, sans-serif; }
       .fs-serif { font-family: 'Instrument Serif', Georgia, serif; }
       @keyframes fadeUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
       @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
