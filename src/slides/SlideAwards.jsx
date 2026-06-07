@@ -1,90 +1,221 @@
-import React from 'react';
+import React, { useState, useRef, useCallback } from 'react';
 import SlideShell from './SlideShell.jsx';
-import ListSlideDecor from '../components/ListSlideDecor.jsx';
 import { interp, typedCopy } from '../i18n';
+
+const BADGE_META = {
+  fastest:  { accent: '#277da1', rarity: 'RARE',      rarityColor: '#00BFFF' },
+  yapper:   { accent: '#f3722c', rarity: 'LEGENDARY', rarityColor: '#f9c74f' },
+  nightowl: { accent: '#8338ec', rarity: 'RARE',      rarityColor: '#00BFFF' },
+  ghost:    { accent: '#573280', rarity: 'EPIC',       rarityColor: '#FF69B4' },
+  killer:   { accent: '#f06449', rarity: 'EPIC',       rarityColor: '#FF69B4' },
+  defib:    { accent: '#277da1', rarity: 'LEGENDARY', rarityColor: '#f9c74f' },
+};
+
+function ShareIcon({ size = 16 }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none"
+      stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"
+      aria-hidden="true">
+      <path d="M12 14.5V3.5" />
+      <path d="M8 7l4-4 4 4" />
+      <path d="M5 12.5v6a1.8 1.8 0 0 0 1.8 1.8h10.4a1.8 1.8 0 0 0 1.8-1.8v-6" />
+    </svg>
+  );
+}
+
+function Toast({ msg }) {
+  return (
+    <div style={{
+      position: 'absolute', left: '50%', bottom: 32,
+      transform: `translateX(-50%) translateY(${msg ? 0 : 14}px)`,
+      background: '#2a0645', color: '#fff',
+      fontSize: 12, fontWeight: 700, letterSpacing: '0.04em',
+      padding: '11px 18px', borderRadius: 999,
+      display: 'flex', alignItems: 'center', gap: 8,
+      boxShadow: '0 12px 30px -6px rgba(42,6,69,0.5)',
+      opacity: msg ? 1 : 0, pointerEvents: 'none',
+      transition: 'opacity 0.25s, transform 0.25s',
+      zIndex: 40, whiteSpace: 'nowrap',
+      textShadow: 'none',
+    }}>
+      <ShareIcon size={13} />
+      <span>{msg}</span>
+    </div>
+  );
+}
 
 const SlideAwards = React.memo(function SlideAwards({ a, t, profile }) {
   const type = profile?.relationship || 'other';
-  // Only include awards with valid winners
+  const [toastMsg, setToastMsg] = useState(null);
+  const toastTimer = useRef(null);
+
+  const fireToast = useCallback((text) => {
+    setToastMsg(text);
+    clearTimeout(toastTimer.current);
+    toastTimer.current = setTimeout(() => setToastMsg(null), 1700);
+  }, []);
+
+  async function shareBadge(label, winner, sub) {
+    const text = `🏆 ${label}\n${winner} — ${sub}`;
+    try {
+      if (navigator.share) {
+        await navigator.share({ title: label, text });
+        fireToast(`${label} → shared`);
+        return;
+      }
+      await navigator.clipboard.writeText(text);
+      fireToast(`${label} → copied`);
+    } catch { /* user cancelled */ }
+  }
+
   const awards = [
-    a.fastestResponder && { trophy: '⚡', label: t.awards_fastest, winner: a.fastestResponder.author,
-      sub: interp(t.awards_fastest_sub, { m: a.fastestResponder.avgRespMin.toFixed(1) }), color: '#00BFFF', deep: '#0089C4' },
-    a.yapper && { trophy: '🎤', label: t.awards_yapper, winner: a.yapper.author,
-      sub: interp(t.awards_yapper_sub, { n: a.yapper.messageCount.toLocaleString() }), color: '#FF8C00', deep: '#D17000' },
-    a.nightOwl && a.nightOwl.nightPct > 5 && { trophy: '🌙', label: t.awards_nightowl,
-      winner: a.nightOwl.author, sub: interp(t.awards_nightowl_sub, { pct: a.nightOwl.nightPct.toFixed(0) }), color: '#8338EC', deep: '#6624B0' },
-    a.ghost && a.ghost.longestAbsenceDays >= 7 && { trophy: '👻', label: t.awards_ghost,
-      winner: a.ghost.author, sub: interp(t.awards_ghost_sub, { n: a.ghost.longestAbsenceDays }), color: '#4A0E4E', deep: '#2A0645' },
-    a.killer && a.killer.conversationsKilled >= 3 && { trophy: '💀', label: t.awards_killer,
-      winner: a.killer.author, sub: interp(t.awards_killer_sub, { n: a.killer.conversationsKilled }), color: '#FF69B4', deep: '#D63384' },
-    a.reviver && a.reviver.conversationsRevived >= 3 && { trophy: '✨', label: t.awards_defib,
-      winner: a.reviver.author, sub: interp(t.awards_defib_sub, { n: a.reviver.conversationsRevived }), color: '#FFB800', deep: '#C28800' },
-  ].filter(Boolean).slice(0, 6);
+    a.fastestResponder && {
+      key: 'fastest', trophy: '⚡', label: t.awards_fastest,
+      winner: a.fastestResponder.author,
+      sub: interp(t.awards_fastest_sub, { m: a.fastestResponder.avgRespMin.toFixed(1) }),
+    },
+    a.yapper && {
+      key: 'yapper', trophy: '🎤', label: t.awards_yapper,
+      winner: a.yapper.author,
+      sub: interp(t.awards_yapper_sub, { n: a.yapper.messageCount.toLocaleString() }),
+    },
+    a.nightOwl && a.nightOwl.nightPct > 5 && {
+      key: 'nightowl', trophy: '🌙', label: t.awards_nightowl,
+      winner: a.nightOwl.author,
+      sub: interp(t.awards_nightowl_sub, { pct: a.nightOwl.nightPct.toFixed(0) }),
+    },
+    a.ghost && a.ghost.longestAbsenceDays >= 7 && {
+      key: 'ghost', trophy: '👻', label: t.awards_ghost,
+      winner: a.ghost.author,
+      sub: interp(t.awards_ghost_sub, { n: a.ghost.longestAbsenceDays }),
+    },
+    a.killer && a.killer.conversationsKilled >= 3 && {
+      key: 'killer', trophy: '💀', label: t.awards_killer,
+      winner: a.killer.author,
+      sub: interp(t.awards_killer_sub, { n: a.killer.conversationsKilled }),
+    },
+    a.reviver && a.reviver.conversationsRevived >= 3 && {
+      key: 'defib', trophy: '✨', label: t.awards_defib,
+      winner: a.reviver.author,
+      sub: interp(t.awards_defib_sub, { n: a.reviver.conversationsRevived }),
+    },
+  ].filter(Boolean).slice(0, 6).map(aw => ({ ...aw, ...BADGE_META[aw.key] }));
 
   return (
-    <SlideShell bg="#577590" accent="#FFD700">
-      <ListSlideDecor emojis={['🏆', '🥇', '🎉', '⭐', '✨', '🥈']} />
-      <div style={{ position: 'relative', zIndex: 1, height: '100%', display: 'flex', flexDirection: 'column', padding: '28px 20px 22px' }}>
-        <div className="fs-sans a-fade-up" style={{ textAlign: 'center', fontSize: 13, color: '#f3722c', letterSpacing: '0.18em', fontWeight: 800, textTransform: 'uppercase' }}>
-          🏆 {typedCopy(t, 'awards_eyebrow', type)}
+    <SlideShell accent="#f3722c">
+      <div style={{
+        position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column',
+        padding: '20px 20px 24px',
+      }}>
+        {/* Header */}
+        <div style={{ flexShrink: 0, marginBottom: 14 }}>
+          <div className="fs-mono" style={{
+            fontSize: 11, color: '#f3722c', letterSpacing: '0.22em',
+            textTransform: 'uppercase', fontWeight: 700,
+          }}>
+            {typedCopy(t, 'awards_eyebrow', type)}
+          </div>
+          <div className="fs-display a-fade-up" style={{
+            fontSize: 32, lineHeight: 1.02, marginTop: 8,
+            fontWeight: 800, letterSpacing: '-0.03em', color: '#2a0645',
+          }}>
+            {typedCopy(t, 'awards_title', type)}{' '}
+            <span className="fs-serif" style={{ fontStyle: 'italic', color: '#f3722c', fontWeight: 400 }}>
+              {typedCopy(t, 'awards_are', type)}
+            </span>
+          </div>
         </div>
-        <div className="fs-display a-fade-up" style={{
-          textAlign: 'center', animationDelay: '0.2s',
-          fontSize: 44, lineHeight: 1.04, letterSpacing: '-0.04em', fontWeight: 800, color: '#4A0E4E',
-          marginTop: 8, marginBottom: 18,
-          textShadow: '0 2px 0 rgba(255,255,255,0.65), 0 1px 3px rgba(74,14,78,0.12)',
+
+        {/* Badge cards */}
+        <div className="no-sb" style={{
+          flex: 1, overflowY: 'auto', display: 'flex', flexDirection: 'column',
+          gap: 10, paddingBottom: 4,
         }}>
-          {typedCopy(t, 'awards_title', type)}<br/>
-          <span style={{ fontStyle: 'italic', color: '#FF69B4' }}>{typedCopy(t, 'awards_are', type)}</span>
-        </div>
-        <div className="no-sb" style={{ flex: 1, overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: 10 }}>
           {awards.map((aw, i) => (
-            <div key={aw.label} className="a-slide-up-far" style={{
-              display: 'flex', alignItems: 'center', gap: 12,
-              padding: '13px 14px',
-              background: '#fff',
-              borderRadius: 22,
-              border: '2px solid rgba(255,255,255,0.85)',
-              boxShadow: `0 6px 0 ${aw.deep}33, 0 14px 24px -8px ${aw.deep}55`,
-              animationDelay: `${0.45 + i * 0.12}s`,
-            }}>
-              {/* trophy in a tilted white sticker badge */}
+            <div
+              key={aw.label}
+              className="a-slide-up-far"
+              style={{
+                animationDelay: `${0.35 + i * 0.08}s`,
+                display: 'flex', alignItems: 'center', gap: 12,
+                background: '#4A0E4E', borderRadius: 20,
+                padding: '12px 12px 12px 12px',
+                border: '2px solid rgba(255,255,255,0.07)',
+                boxShadow: '0 8px 0 rgba(74,14,78,0.22), 0 18px 36px -10px rgba(74,14,78,0.50)',
+                textShadow: 'none',
+              }}
+            >
+              {/* Emblem */}
               <div style={{
-                flexShrink: 0, width: 44, height: 44, borderRadius: 13,
-                background: `${aw.color}1f`,
+                flexShrink: 0, width: 52, height: 52, borderRadius: 15,
+                background: `radial-gradient(circle at 50% 35%, ${aw.accent}, ${aw.accent}99)`,
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
-                fontSize: 24, boxShadow: `0 3px 0 ${aw.deep}22`, transform: 'rotate(-4deg)',
+                boxShadow: `0 5px 14px -4px ${aw.accent}cc, inset 0 1px 0 rgba(255,255,255,0.30)`,
+                border: '1.5px solid rgba(255,255,255,0.22)',
               }}>
-                {aw.trophy}
+                <span style={{ fontSize: 25, lineHeight: 1, filter: 'none' }}>{aw.trophy}</span>
               </div>
+
+              {/* Text block */}
               <div style={{ flex: 1, minWidth: 0 }}>
-                <div className="fs-sans" style={{
-                  fontSize: 11, color: aw.deep, letterSpacing: '0.14em',
-                  fontWeight: 800, textTransform: 'uppercase', lineHeight: 1.25,
-                  overflowWrap: 'break-word', wordBreak: 'break-word', hyphens: 'auto',
+                <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 4 }}>
+                  <span className="fs-mono" style={{
+                    fontSize: 8.5, fontWeight: 800, letterSpacing: '0.12em',
+                    color: '#0A192F', background: aw.rarityColor,
+                    padding: '2px 6px', borderRadius: 5,
+                    textShadow: 'none',
+                  }}>
+                    {aw.rarity}
+                  </span>
+                  <span className="fs-mono" style={{
+                    fontSize: 8.5, fontWeight: 700, letterSpacing: '0.16em',
+                    color: 'rgba(255,255,255,0.38)', textTransform: 'uppercase',
+                    textShadow: 'none',
+                  }}>
+                    UNLOCKED
+                  </span>
+                </div>
+                <div className="fs-display" style={{
+                  fontSize: 15.5, color: '#fff', lineHeight: 1.06,
+                  whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
+                  letterSpacing: '-0.02em', textShadow: 'none',
                 }}>
                   {aw.label}
                 </div>
-                <div className="fs-sans" dir="auto" style={{
-                  fontSize: 17, fontWeight: 800, marginTop: 2, lineHeight: 1.15, color: '#4A0E4E',
-                  overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+                <div className="fs-mono" dir="auto" style={{
+                  fontSize: 11, color: 'rgba(255,255,255,0.58)', marginTop: 3,
+                  whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
+                  textShadow: 'none',
                 }}>
-                  {aw.winner}
+                  <span style={{ color: '#fff', fontWeight: 700 }}>{aw.winner}</span>
+                  {' · '}{aw.sub}
                 </div>
               </div>
-              <div className="fs-mono" style={{
-                fontSize: 12, color: 'rgba(74,14,78,0.65)', textAlign: 'end',
-                flexShrink: 0, lineHeight: 1.4, fontWeight: 600,
-                maxWidth: 90, overflowWrap: 'break-word',
-              }}>
-                {aw.sub}
-              </div>
+
+              {/* Gold share disc */}
+              <button
+                className="press"
+                onClick={() => shareBadge(aw.label, aw.winner, aw.sub)}
+                aria-label={`Share ${aw.label}`}
+                style={{
+                  flexShrink: 0, width: 40, height: 40, borderRadius: '50%',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  background: 'linear-gradient(135deg, #FFE45C, #FFD700 55%, #FFB800)',
+                  color: '#4A0E4E',
+                  boxShadow: '0 4px 0 #C28800, 0 8px 18px -4px rgba(224,168,0,0.65)',
+                  border: 'none', cursor: 'pointer',
+                  textShadow: 'none',
+                }}
+              >
+                <ShareIcon size={16} />
+              </button>
             </div>
           ))}
         </div>
       </div>
+      <Toast msg={toastMsg} />
     </SlideShell>
   );
-})
+});
 
 export default SlideAwards;
