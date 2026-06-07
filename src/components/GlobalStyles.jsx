@@ -83,6 +83,11 @@ export default function GlobalStyles() {
         0%, 100% { opacity: 1; }
         50% { opacity: 0.6; }
       }
+      @keyframes coinShine {
+        0% { transform: translateX(-130%) rotate(8deg); }
+        100% { transform: translateX(230%) rotate(8deg); }
+      }
+      .a-coin-shine { animation: coinShine 4s ease-in-out infinite; }
       @keyframes blobDrift1 {
         0%, 100% { transform: translate(0px, 0px) scale(1); }
         33% { transform: translate(40px, -30px) scale(1.08); }
@@ -224,7 +229,8 @@ export default function GlobalStyles() {
       @media (prefers-reduced-motion: reduce) {
         .a-pulse-glow, .a-spin, .a-shine, .a-shimmer-flash,
         .a-gradient-shift, .a-shake, .a-wobble, .a-float,
-        .a-cta-ping, .a-cta-bob, .a-tap-press, .a-tap-ripple {
+        .a-cta-ping, .a-cta-bob, .a-tap-press, .a-tap-ripple,
+        .a-coin-shine {
           animation: none !important;
         }
         .a-fade-up, .a-fade-in, .a-scale-in, .a-spring,

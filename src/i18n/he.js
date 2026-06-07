@@ -302,6 +302,7 @@ export default {
   awards_eyebrow: '✦ טקס הפרסים',
   awards_title: 'והזוכים',
   awards_are: 'הם…',
+  awards_subtitle: '{n} עיטורים · הקישו על מדליה לשיתוף',
   awards_fastest: 'אצבעות הברק',
   awards_fastest_sub: 'תגובה ממוצעת של {m} ד׳',
   awards_yapper: 'הפטפטן הגדול ביותר',
@@ -856,6 +857,7 @@ export default {
   share_highlight_couple: 'בן/בת הזוג',
   share_tap_to_swap: 'הקישו כדי להחליף',
   share_cta_whatsapp: 'שיתוף לוואטסאפ',
+  share_whatsapp_message: 'תשתמשו ב-Recap לקבוצה הבאה שלכם!',
   share_cta_save: 'שמירת תמונה',
   share_cta_elsewhere: 'שיתוף במקום אחר',
   // share card style names

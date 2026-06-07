@@ -1,14 +1,15 @@
 import React, { useState, useRef, useCallback } from 'react';
 import SlideShell from './SlideShell.jsx';
+import MedalCoin from '../components/MedalCoin.jsx';
 import { interp, typedCopy } from '../i18n';
 
 const BADGE_META = {
-  fastest:  { accent: '#277da1', rarity: 'RARE',      rarityColor: '#00BFFF' },
-  yapper:   { accent: '#f3722c', rarity: 'LEGENDARY', rarityColor: '#f9c74f' },
-  nightowl: { accent: '#8338ec', rarity: 'RARE',      rarityColor: '#00BFFF' },
-  ghost:    { accent: '#573280', rarity: 'EPIC',       rarityColor: '#FF69B4' },
-  killer:   { accent: '#f06449', rarity: 'EPIC',       rarityColor: '#FF69B4' },
-  defib:    { accent: '#277da1', rarity: 'LEGENDARY', rarityColor: '#f9c74f' },
+  fastest:  { accent: '#277da1' },
+  yapper:   { accent: '#f3722c' },
+  nightowl: { accent: '#8338ec' },
+  ghost:    { accent: '#573280' },
+  killer:   { accent: '#f06449' },
+  defib:    { accent: '#277da1' },
 };
 
 function ShareIcon({ size = 16 }) {
@@ -102,112 +103,68 @@ const SlideAwards = React.memo(function SlideAwards({ a, t, profile }) {
   ].filter(Boolean).slice(0, 6).map(aw => ({ ...aw, ...BADGE_META[aw.key] }));
 
   return (
-    <SlideShell accent="#f3722c">
+    <SlideShell accent="#f9c74f">
       <div style={{
         position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column',
-        padding: '20px 20px 24px',
+        padding: '20px 20px 14px',
       }}>
         {/* Header */}
-        <div style={{ flexShrink: 0, marginBottom: 14 }}>
-          <div className="fs-mono" style={{
-            fontSize: 11, color: '#f3722c', letterSpacing: '0.22em',
-            textTransform: 'uppercase', fontWeight: 700,
-          }}>
-            {typedCopy(t, 'awards_eyebrow', type)}
-          </div>
+        <div style={{ textAlign: 'center', flexShrink: 0 }}>
           <div className="fs-display a-fade-up" style={{
-            fontSize: 32, lineHeight: 1.02, marginTop: 8,
+            fontSize: 28, lineHeight: 1.04,
             fontWeight: 800, letterSpacing: '-0.03em', color: '#2a0645',
           }}>
             {typedCopy(t, 'awards_title', type)}{' '}
-            <span className="fs-serif" style={{ fontStyle: 'italic', color: '#f3722c', fontWeight: 400 }}>
+            <span className="fs-serif" style={{ fontStyle: 'italic', color: '#f06449', fontWeight: 400 }}>
               {typedCopy(t, 'awards_are', type)}
             </span>
           </div>
         </div>
 
-        {/* Badge cards */}
-        <div className="no-sb" style={{
-          flex: 1, overflowY: 'auto', display: 'flex', flexDirection: 'column',
-          gap: 10, paddingBottom: 4,
+        {/* Medal grid */}
+        <div style={{
+          marginTop: 16, flex: 1, alignContent: 'center',
+          display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10,
         }}>
           {awards.map((aw, i) => (
             <div
               key={aw.label}
-              className="a-slide-up-far"
+              className="a-pop-in"
               style={{
-                animationDelay: `${0.35 + i * 0.08}s`,
-                display: 'flex', alignItems: 'center', gap: 12,
-                background: '#4A0E4E', borderRadius: 20,
-                padding: '12px 12px 12px 12px',
-                border: '2px solid rgba(255,255,255,0.07)',
-                boxShadow: '0 8px 0 rgba(74,14,78,0.22), 0 18px 36px -10px rgba(74,14,78,0.50)',
-                textShadow: 'none',
+                animationDelay: `${0.32 + i * 0.06}s`,
+                display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center',
               }}
             >
-              {/* Emblem */}
-              <div style={{
-                flexShrink: 0, width: 52, height: 52, borderRadius: 15,
-                background: `radial-gradient(circle at 50% 35%, ${aw.accent}, ${aw.accent}99)`,
-                display: 'flex', alignItems: 'center', justifyContent: 'center',
-                boxShadow: `0 5px 14px -4px ${aw.accent}cc, inset 0 1px 0 rgba(255,255,255,0.30)`,
-                border: '1.5px solid rgba(255,255,255,0.22)',
+              <MedalCoin accent={aw.accent} emoji={aw.trophy} size={78} emojiSize={32} shineDur={4 + i * 0.4} shineDelay={i * 0.5} />
+              <div className="fs-mono" style={{
+                fontSize: 9, letterSpacing: '0.14em', textTransform: 'uppercase',
+                fontWeight: 700, color: aw.accent, marginTop: 10, lineHeight: 1.35,
+                overflowWrap: 'break-word', wordBreak: 'break-word', padding: '0 4px',
               }}>
-                <span style={{ fontSize: 25, lineHeight: 1, filter: 'none' }}>{aw.trophy}</span>
+                {aw.label}
               </div>
-
-              {/* Text block */}
-              <div style={{ flex: 1, minWidth: 0 }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 4 }}>
-                  <span className="fs-mono" style={{
-                    fontSize: 8.5, fontWeight: 800, letterSpacing: '0.12em',
-                    color: '#0A192F', background: aw.rarityColor,
-                    padding: '2px 6px', borderRadius: 5,
-                    textShadow: 'none',
-                  }}>
-                    {aw.rarity}
-                  </span>
-                  <span className="fs-mono" style={{
-                    fontSize: 8.5, fontWeight: 700, letterSpacing: '0.16em',
-                    color: 'rgba(255,255,255,0.38)', textTransform: 'uppercase',
-                    textShadow: 'none',
-                  }}>
-                    UNLOCKED
-                  </span>
-                </div>
-                <div className="fs-display" style={{
-                  fontSize: 15.5, color: '#fff', lineHeight: 1.06,
-                  whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
-                  letterSpacing: '-0.02em', textShadow: 'none',
-                }}>
-                  {aw.label}
-                </div>
-                <div className="fs-mono" dir="auto" style={{
-                  fontSize: 11, color: 'rgba(255,255,255,0.58)', marginTop: 3,
-                  whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
-                  textShadow: 'none',
-                }}>
-                  <span style={{ color: '#fff', fontWeight: 700 }}>{aw.winner}</span>
-                  {' · '}{aw.sub}
-                </div>
+              <div className="fs-display" dir="auto" style={{
+                fontSize: 15, marginTop: 2, color: '#2a0645', maxWidth: '100%',
+                overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+              }}>
+                {aw.winner}
               </div>
-
-              {/* Gold share disc */}
+              <div className="fs-mono" style={{ fontSize: 10, color: 'rgba(42,6,69,0.5)', marginTop: 1 }}>
+                {aw.sub}
+              </div>
               <button
                 className="press"
                 onClick={() => shareBadge(aw.label, aw.winner, aw.sub)}
                 aria-label={`Share ${aw.label}`}
                 style={{
-                  flexShrink: 0, width: 40, height: 40, borderRadius: '50%',
-                  display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  background: 'linear-gradient(135deg, #FFE45C, #FFD700 55%, #FFB800)',
-                  color: '#4A0E4E',
-                  boxShadow: '0 4px 0 #C28800, 0 8px 18px -4px rgba(224,168,0,0.65)',
-                  border: 'none', cursor: 'pointer',
-                  textShadow: 'none',
+                  marginTop: 7, display: 'inline-flex', alignItems: 'center', gap: 6,
+                  padding: '6px 13px', borderRadius: 999,
+                  border: '1.5px solid rgba(42,6,69,0.16)', color: '#2a0645',
+                  fontSize: 10, fontWeight: 700, cursor: 'pointer',
+                  letterSpacing: '0.1em', textTransform: 'uppercase', background: 'rgba(255,255,255,0.4)',
                 }}
               >
-                <ShareIcon size={16} />
+                <ShareIcon size={12} /> {t.share_title || 'Share'}
               </button>
             </div>
           ))}

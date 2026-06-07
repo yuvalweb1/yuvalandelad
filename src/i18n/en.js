@@ -324,6 +324,7 @@ export default {
   awards_eyebrow: '✦ AND THE AWARD GOES TO...',
   awards_title: "Tonight's honorees",
   awards_are: 'are…',
+  awards_subtitle: '{n} earned · tap a medal to share',
   awards_fastest: 'Fastest Fingers',
   awards_fastest_sub: '{m}m avg reply',
   awards_yapper: 'Biggest Yapper',
@@ -890,6 +891,7 @@ export default {
   share_highlight_couple: 'your person',
   share_tap_to_swap: 'TAP TO SWAP',
   share_cta_whatsapp: 'Share to WhatsApp',
+  share_whatsapp_message: 'Use Recap for your next group!',
   share_cta_save: 'Save image',
   share_cta_elsewhere: 'Share someplace else',
   // share card style names

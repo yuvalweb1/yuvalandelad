@@ -1,7 +1,34 @@
 import React, { useState, useRef, useEffect } from 'react';
 import html2canvas from 'html2canvas';
+import { Capacitor } from '@capacitor/core';
+import { Filesystem, Directory } from '@capacitor/filesystem';
+import { Share } from '@capacitor/share';
 import { typedCopy } from '../i18n';
 import { CardBananaDrop, CardStickerZine, CardReceipt, CardY2KChrome, buildCardData } from './shareCards.jsx';
+
+// Android/iOS WebViews don't reliably support attaching files via the Web
+// Share API (navigator.canShare often reports false for files), so on native
+// platforms we write the captured PNG to disk and hand it to Capacitor's
+// native Share plugin — that goes through the OS share sheet directly and
+// always carries the image into WhatsApp.
+function blobToBase64(blob) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onloadend = () => resolve(String(reader.result).split(',')[1] || '');
+    reader.onerror = () => reject(reader.error);
+    reader.readAsDataURL(blob);
+  });
+}
+
+async function shareFileNative(blob, text, dialogTitle) {
+  const base64 = await blobToBase64(blob);
+  const { uri } = await Filesystem.writeFile({
+    path: `recapped-share-${Date.now()}.png`,
+    data: base64,
+    directory: Directory.Cache,
+  });
+  await Share.share({ text, url: uri, dialogTitle });
+}
 
 // SlideShare — the final slide. Hero IS the carousel: active card centered large,
 // adjacent cards peek in from sides. Swipe or tap peeks to switch styles.
@@ -13,6 +40,10 @@ const GOLD     = '#FFD700';
 const ORANGE   = '#FF8C00';
 const CREAM    = '#FFF6D6';
 const PINK     = '#FDE6F1';
+
+// App isn't published yet — link to the Play Store front page as a placeholder
+// until there's a real listing to deep-link to.
+const GOOGLE_PLAY_URL = 'https://play.google.com/store';
 
 const OPTIONS = [
   { id: 'A', nameKey: 'share_style_a', glyph: '🍌', grad: ['#FFE259', '#FFA751'], ink: INK_PLUM, Comp: CardBananaDrop },
@@ -148,7 +179,11 @@ function HeroCarousel({ options, pickedId, setPickedId, cardData, headline, head
   };
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 14 }}>
+    // Forced LTR: the offset math below treats card index as a physical
+    // left-to-right position. Under dir="rtl" (he/ar), flex "row" reverses
+    // visually and the centering math goes haywire — cards spill off the
+    // right edge and get clipped by the slide's overflow:hidden.
+    <div dir="ltr" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 14 }}>
       {/* strip — overflow visible so slide edge does the clipping */}
       <div
         ref={containerRef}
@@ -245,7 +280,10 @@ const SlideShare = React.memo(function SlideShare({ a, t, profile, diagnostics, 
   const headline = nf(a?.totalMessages);
   const headLabel = t.go_messages || 'messages';
 
-  const otherParticipant = u && a?.users?.find(x => x.author !== u.author)?.author;
+  // Only resolve to a person's name in 1:1 chats — in groups this picked an
+  // arbitrary participant instead of the group, so "send it to" said "him".
+  const isOneOnOne = (a?.users?.length || 0) === 2;
+  const otherParticipant = isOneOnOne && u && a.users.find(x => x.author !== u.author)?.author;
   const chatName = getChatName(diagnostics) || otherParticipant || typedCopy(t, 'share_highlight', type);
   const titleSize = titleFontSize(t.share_title_lead, chatName);
 
@@ -271,17 +309,24 @@ const SlideShare = React.memo(function SlideShare({ a, t, profile, diagnostics, 
   }
 
   const shareText = `${headline} ${headLabel}. ${t.share_caught || 'on ChatWrapped'} → ${location.origin}`;
+  const whatsappShareText = `${t.share_whatsapp_message || 'Use Recap for your next group!'} ${GOOGLE_PLAY_URL}`;
 
   const onShareWhatsApp = async () => {
     if (busy) return;
     setBusy('whatsapp');
     try {
       const blob = await captureBlob();
+      if (blob && Capacitor.isNativePlatform()) {
+        try {
+          await shareFileNative(blob, whatsappShareText, t.share_cta_whatsapp);
+          return;
+        } catch (e) { if (e?.message === 'Share canceled') return; /* fall through */ }
+      }
       if (blob && navigator.share && navigator.canShare?.({ files: [new File([blob], 'recapped.png', { type: 'image/png' })] })) {
         try {
           await navigator.share({
             files: [new File([blob], 'recapped.png', { type: 'image/png' })],
-            text: shareText,
+            text: whatsappShareText,
           });
           return;
         } catch (e) { if (e?.name === 'AbortError') return; /* fall through to wa.me */ }
@@ -289,7 +334,7 @@ const SlideShare = React.memo(function SlideShare({ a, t, profile, diagnostics, 
       // Fallback for desktop / browsers without file-share support: open
       // WhatsApp's universal link with a text-only payload. The user can
       // then attach the image manually if they saved it first.
-      const url = `https://wa.me/?text=${encodeURIComponent(shareText)}`;
+      const url = `https://wa.me/?text=${encodeURIComponent(whatsappShareText)}`;
       window.open(url, '_blank', 'noopener');
     } finally { setBusy(null); }
   };
