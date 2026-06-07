@@ -236,7 +236,7 @@ function HeroCarousel({ options, pickedId, setPickedId, cardData, headline, head
   );
 }
 
-const SlideShare = React.memo(function SlideShare({ a, t, profile, diagnostics, u, onRoastMode }) {
+const SlideShare = React.memo(function SlideShare({ a, t, profile, diagnostics, u }) {
   const type = profile?.relationship || 'other';
   const [pickedId, setPickedId] = useState('A');
   const [busy, setBusy] = useState(null);
@@ -432,20 +432,6 @@ const SlideShare = React.memo(function SlideShare({ a, t, profile, diagnostics, 
             {t.share_cta_elsewhere}
           </button>
         </div>
-        {/* Roast Mode entry — secondary nav back to the roast view. Lives on
-            the share slide because PostMenu was retired; users need a way
-            to reach the full roast list from the deck. */}
-        {onRoastMode && (
-          <button onClick={onRoastMode} style={{
-            appearance: 'none', cursor: 'pointer', marginTop: 2, padding: '8px 12px',
-            background: 'transparent', border: 'none', color: CORAL,
-            fontFamily: 'inherit', fontWeight: 700, fontSize: 13,
-            display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
-            letterSpacing: '-0.01em',
-          }}>
-            🔥 {t.menu_roast_title || t.menu_roast_everyone || 'Roast everyone →'}
-          </button>
-        )}
       </div>
     </div>
   );

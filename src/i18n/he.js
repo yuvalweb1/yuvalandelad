@@ -30,6 +30,10 @@ export default {
   landing_history_viewed: 'נצפה {rel} · מאז {date}',
   a11y_previous: 'הקודם',
   a11y_next: 'הבא',
+  a11y_menu: 'תפריט',
+  menu_action_home: 'בית',
+  menu_action_roast: 'מצב רוסט',
+  menu_action_replay: 'הצג שוב מההתחלה',
   // ריקאפים קודמים
   past_recaps: 'ריקאפים קודמים',
   past_recaps_clear: 'נקה הכל',

@@ -30,6 +30,10 @@ export default {
   landing_history_viewed: 'Viewed {rel} · since {date}',
   a11y_previous: 'Previous',
   a11y_next: 'Next',
+  a11y_menu: 'Menu',
+  menu_action_home: 'Home',
+  menu_action_roast: 'Roast Mode',
+  menu_action_replay: 'Replay deck',
   // Past recaps
   past_recaps: 'past recaps',
   past_recaps_clear: 'clear all',
