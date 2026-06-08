@@ -50,8 +50,9 @@ export default function BottomNavBar({ active, onHome, onModes, t }) {
     <div role="tablist" aria-label={t.nav_home || 'Navigation'} style={{
       position: 'absolute', left: 0, right: 0, bottom: 0, zIndex: 45,
       display: 'flex', alignItems: 'stretch',
-      background: 'rgba(255,255,255,0.90)',
-      backdropFilter: 'blur(14px)',
+      background: 'rgba(255,255,255,0.13)',
+      backdropFilter: 'blur(22px)',
+      WebkitBackdropFilter: 'blur(22px)',
       borderTop: '1px solid rgba(74,14,78,0.07)',
       borderTopLeftRadius: 18, borderTopRightRadius: 18,
       boxShadow: '0 -2px 16px -4px rgba(74,14,78,0.10)',
