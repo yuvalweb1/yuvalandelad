@@ -99,7 +99,7 @@ export default function Landing({
     `}</style>
     <div style={{
       position: 'relative', display: 'flex', flexDirection: 'column',
-      padding: '44px 20px 80px', height: '100%',
+      padding: '44px 20px 92px', height: '100%',
       background: 'linear-gradient(180deg, #FFF6D6 0%, #FFF0E2 46%, #FDE6F1 100%)',
       overflow: 'hidden',
     }}>

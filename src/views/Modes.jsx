@@ -1,0 +1,143 @@
+// ── Mode tile (horizontal row) — mirrors PostMenu's ModeTile ───────────────
+function ModeTile({ label, title, emoji, gradient, fg = '#fff', shadowColor = '#3a0a3d', onClick }) {
+  return (
+    <button onClick={onClick} className="press lift" style={{
+      width: '100%', position: 'relative', overflow: 'hidden',
+      textAlign: 'left',
+      background: gradient,
+      border: 'none',
+      borderRadius: 20,
+      padding: '16px 18px',
+      cursor: 'pointer',
+      color: fg,
+      display: 'flex', alignItems: 'center', gap: 14,
+      boxShadow: `0 7px 0 ${shadowColor}44, 0 16px 30px -8px ${shadowColor}88`,
+    }}>
+      <div aria-hidden style={{
+        fontSize: 32, lineHeight: 1, flexShrink: 0,
+        filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.18))',
+      }}>{emoji}</div>
+      <div style={{ flex: 1, minWidth: 0 }}>
+        <div className="fs-mono" style={{
+          fontSize: 9, letterSpacing: '0.16em', textTransform: 'uppercase',
+          fontWeight: 800, opacity: 0.9,
+          textShadow: fg === '#fff' ? '0 1px 2px rgba(0,0,0,0.15)' : 'none',
+        }}>{label}</div>
+        <div className="fs-display" style={{
+          fontSize: 20, fontWeight: 800, lineHeight: 1.05, marginTop: 2,
+          letterSpacing: '-0.03em',
+          textShadow: fg === '#fff' ? '0 1px 3px rgba(0,0,0,0.18)' : 'none',
+        }}>{title}</div>
+      </div>
+      <div aria-hidden style={{ fontSize: 18, opacity: 0.7, flexShrink: 0 }}>→</div>
+    </button>
+  );
+}
+
+// ── Locked / empty state shown before any chat is uploaded ─────────────────
+function LockedState({ t, onUpload }) {
+  return (
+    <div style={{
+      flex: 1, display: 'flex', flexDirection: 'column',
+      alignItems: 'center', justifyContent: 'center', textAlign: 'center',
+      gap: 14, padding: '0 12px',
+    }}>
+      <div aria-hidden style={{
+        width: 84, height: 84, borderRadius: 999,
+        background: 'rgba(255,255,255,0.7)',
+        border: '1px solid rgba(255,255,255,0.9)',
+        display: 'flex', alignItems: 'center', justifyContent: 'center',
+        fontSize: 38,
+        boxShadow: '0 4px 0 rgba(74,14,78,0.10), 0 12px 24px -6px rgba(74,14,78,0.18)',
+      }}>🔒</div>
+      <div className="fs-display" style={{
+        fontSize: 24, fontWeight: 800, color: '#2a0645', letterSpacing: '-0.03em',
+      }}>
+        {t.modes_locked_title || 'Unlock your modes'}
+      </div>
+      <div className="fs-sans" style={{
+        fontSize: 14, lineHeight: 1.5, color: 'rgba(74,14,78,0.6)', maxWidth: 260,
+      }}>
+        {t.modes_locked_body || 'Upload a chat to access Roast, Duo & Chaos'}
+      </div>
+      <button onClick={onUpload} className="press" style={{
+        marginTop: 6, padding: '14px 26px',
+        background: 'linear-gradient(135deg, #FFD700 0%, #FFC200 100%)',
+        color: '#4A0E4E', border: '2px solid rgba(255,255,255,0.80)',
+        borderRadius: 18, fontSize: 16, fontWeight: 800, letterSpacing: '-0.01em',
+        cursor: 'pointer',
+        boxShadow: '0 6px 0 rgba(74,14,78,0.25), 0 14px 24px -6px rgba(74,14,78,0.30)',
+      }}>
+        {t.modes_locked_cta || 'Upload a chat →'}
+      </button>
+    </div>
+  );
+}
+
+export default function Modes({ analytics, history = [], t, onUpload, onRoastMode, onDuo, onChaos }) {
+  // A chat the user already imported or picked from history counts as
+  // "available" even before it's loaded into the active session — don't make
+  // them feel locked out of something they just brought in.
+  const unlocked = !!analytics || history.length > 0;
+  return (
+    <div style={{
+      position: 'relative', height: '100%', overflow: 'hidden',
+      background: 'linear-gradient(180deg, #FFF6D6 0%, #FFF0E2 46%, #FDE6F1 100%)',
+      display: 'flex', flexDirection: 'column',
+      padding: '44px 20px 92px',
+    }}>
+      {/* Warm blob background — matches PostMenu / Landing */}
+      <div aria-hidden style={{ position: 'absolute', inset: 0, pointerEvents: 'none', zIndex: 0, overflow: 'hidden' }}>
+        <div style={{ position: 'absolute', width: 280, height: 280, borderRadius: '50%', background: '#FFD700', opacity: 0.18, filter: 'blur(72px)', top: -80, left: -60 }} />
+        <div style={{ position: 'absolute', width: 220, height: 220, borderRadius: '50%', background: '#f06449', opacity: 0.14, filter: 'blur(60px)', top: '20%', right: -60 }} />
+        <div style={{ position: 'absolute', width: 260, height: 260, borderRadius: '50%', background: '#FF69B4', opacity: 0.12, filter: 'blur(72px)', bottom: -60, left: '10%' }} />
+      </div>
+
+      <div style={{ position: 'relative', zIndex: 10, textAlign: 'center', flexShrink: 0 }}>
+        <div className="fs-mono" style={{ fontSize: 10, letterSpacing: '0.24em', color: '#f06449', fontWeight: 800, textTransform: 'uppercase' }}>
+          ✦ {t.menu_choose_mode || 'Choose your mode'}
+        </div>
+        <div className="fs-display" style={{
+          fontSize: 28, fontWeight: 800, color: '#2a0645', letterSpacing: '-0.03em',
+          marginTop: 4,
+        }}>
+          {t.nav_modes || 'Modes'}
+        </div>
+      </div>
+
+      {unlocked ? (
+        <div style={{ position: 'relative', zIndex: 10, display: 'flex', flexDirection: 'column', gap: 12, marginTop: 28 }}>
+          <ModeTile
+            label={t.menu_roast_mode || 'Roast mode'}
+            title={t.menu_roast_title || 'Roast everyone'}
+            emoji="🔥"
+            gradient="linear-gradient(135deg, #FF69B4 0%, #f06449 100%)"
+            fg="#fff"
+            shadowColor="#a8284c"
+            onClick={onRoastMode}
+          />
+          <ModeTile
+            label={t.menu_duo_eyebrow || 'Duo mode'}
+            title={t.menu_duo_title || 'Compare two'}
+            emoji="👯"
+            gradient="linear-gradient(135deg, #FFD700 0%, #FF8C00 100%)"
+            fg="#4A0E4E"
+            shadowColor="#b56500"
+            onClick={onDuo}
+          />
+          <ModeTile
+            label={t.menu_chaos_eyebrow || 'Chaos mode'}
+            title={t.menu_chaos_title || 'Chaos timeline'}
+            emoji="🌀"
+            gradient="linear-gradient(135deg, #00BFFF 0%, #573280 100%)"
+            fg="#fff"
+            shadowColor="#2e1856"
+            onClick={onChaos}
+          />
+        </div>
+      ) : (
+        <LockedState t={t} onUpload={onUpload} />
+      )}
+    </div>
+  );
+}

@@ -7,15 +7,6 @@ import { typedCopy, interp } from '../i18n';
 // off rows[0].value so "biggest bar = winner of this metric" stays consistent
 // across stats where higher is better AND inverted stats (response_times).
 const METRIC_DEFS = {
-  night_owls: {
-    color: '#8338ec',
-    bg: '#577590',
-    icon: '🌙',
-    rows: (a) => (a.users || [])
-      .filter(u => u.nightPct > 0 && u.nightMessages >= 3)
-      .sort((x, y) => y.nightPct - x.nightPct)
-      .map(u => ({ author: u.author, value: u.nightPct, displayValue: `${u.nightPct.toFixed(0)}%`, sub: `${u.nightMessages.toLocaleString()} messages` })),
-  },
   early_birds: {
     color: '#f9c74f',
     bg: '#577590',
@@ -33,24 +24,6 @@ const METRIC_DEFS = {
       .filter(u => u.voiceCount > 0)
       .sort((x, y) => y.voiceCount - x.voiceCount)
       .map(u => ({ author: u.author, value: u.voiceCount, displayValue: u.voiceCount.toLocaleString(), sub: `${(u.voiceRate * 100).toFixed(0)}% of their msgs` })),
-  },
-  overtime: {
-    color: '#f94144',
-    bg: '#577590',
-    icon: '🕘',
-    rows: (a) => {
-      // Off-hours = before 9 + after 18 (approximation — joint (hour,weekday) not stored)
-      return (a.users || [])
-        .map(u => {
-          let off = 0;
-          for (let h = 0; h < 24; h++) if (h < 9 || h >= 18) off += u.hourCounts[h];
-          const pct = u.messageCount > 0 ? (off / u.messageCount) * 100 : 0;
-          return { u, off, pct };
-        })
-        .filter(x => x.off >= 5)
-        .sort((x, y) => y.pct - x.pct)
-          .map(x => ({ author: x.u.author, value: x.pct, displayValue: `${x.pct.toFixed(0)}%`, sub: `${x.off.toLocaleString()} after-hours messages` }));
-    },
   },
   response_times: {
     color: '#277da1',
@@ -78,15 +51,6 @@ const METRIC_DEFS = {
       .sort((x, y) => y.avgCharsPerMsg - x.avgCharsPerMsg)
       .map(u => ({ author: u.author, value: u.avgCharsPerMsg, displayValue: `${Math.round(u.avgCharsPerMsg)}c`, sub: `${u.avgWordsPerMsg.toFixed(1)} words/msg` })),
   },
-  link_sharers: {
-    color: '#277da1',
-    bg: '#577590',
-    icon: '🔗',
-    rows: (a) => (a.users || [])
-      .filter(u => u.linkCount > 0)
-      .sort((x, y) => y.linkCount - x.linkCount)
-      .map(u => ({ author: u.author, value: u.linkCount, displayValue: u.linkCount.toLocaleString(), sub: `${((u.linkCount / Math.max(u.messageCount, 1)) * 100).toFixed(1)}% of their messages` })),
-  },
   double_texts: {
     color: '#f94144',
     bg: '#577590',
@@ -95,15 +59,6 @@ const METRIC_DEFS = {
       .filter(u => u.maxBurst >= 2)
       .sort((x, y) => y.maxBurst - x.maxBurst)
       .map(u => ({ author: u.author, value: u.maxBurst, displayValue: `${u.maxBurst}×`, sub: 'in a row' })),
-  },
-  ignored_award: {
-    color: '#2a0645',
-    bg: '#577590',
-    icon: '👻',
-    rows: (a) => (a.users || [])
-      .filter(u => u.longestAbsenceDays >= 1)
-      .sort((x, y) => y.longestAbsenceDays - x.longestAbsenceDays)
-      .map(u => ({ author: u.author, value: u.longestAbsenceDays, displayValue: `${u.longestAbsenceDays}d`, sub: 'silent stretch' })),
   },
   night_messages: {
     color: '#8338ec',

@@ -30,6 +30,22 @@ const METRIC_DEFS = {
       }));
     },
   },
+  overtime: {
+    color: '#f94144',
+    icon: '🕘',
+    decorEmojis: ['🕘', '⏰', '💼', '😴', '✨'],
+    rows: (a) => (a.users || [])
+      .map(u => {
+        // Off-hours = before 9 + after 18 (approximation — joint (hour,weekday) not stored)
+        let off = 0;
+        for (let h = 0; h < 24; h++) if (h < 9 || h >= 18) off += u.hourCounts[h];
+        const pct = u.messageCount > 0 ? (off / u.messageCount) * 100 : 0;
+        return { u, off, pct };
+      })
+      .filter(x => x.off >= 5)
+      .sort((x, y) => y.pct - x.pct)
+      .map(x => ({ author: x.u.author, value: x.pct, displayValue: `${x.pct.toFixed(0)}%` })),
+  },
   night_messages: {
     color: '#8338ec',
     icon: '🌙',
@@ -46,6 +62,24 @@ const METRIC_DEFS = {
     rows: (a) => (a.users || []).filter(u => u.topEmoji)
       .sort((x, y) => (y.topEmojiCount || 0) - (x.topEmojiCount || 0))
       .map(u => ({ author: u.author, value: u.topEmojiCount || 1, displayValue: u.topEmoji })),
+  },
+  night_owls: {
+    color: '#8338ec',
+    icon: '🌙',
+    decorEmojis: ['🌙', '⭐', '😴', '🛏️', '✨'],
+    rows: (a) => (a.users || [])
+      .filter(u => u.nightPct > 0 && u.nightMessages >= 3)
+      .sort((x, y) => y.nightPct - x.nightPct)
+      .map(u => ({ author: u.author, value: u.nightPct, displayValue: `${u.nightPct.toFixed(0)}%` })),
+  },
+  ignored_award: {
+    color: '#577590',
+    icon: '👻',
+    decorEmojis: ['👻', '💤', '🌙', '🤫', '✨'],
+    rows: (a) => (a.users || [])
+      .filter(u => u.longestAbsenceDays >= 1)
+      .sort((x, y) => y.longestAbsenceDays - x.longestAbsenceDays)
+      .map(u => ({ author: u.author, value: u.longestAbsenceDays, displayValue: `${u.longestAbsenceDays}d` })),
   },
   // Couple ("just us two") metrics
   messages_sent: {
@@ -99,6 +133,7 @@ const SlideMetricLeaderboard = React.memo(function SlideMetricLeaderboard({ a, t
   const type = profile?.relationship || 'other';
   const eyebrow = typedCopy(t, `m_${metricKey}_eyebrow`, type);
   const title = typedCopy(t, `m_${metricKey}_title`, type);
+  const sub = typedCopy(t, `m_${metricKey}_sub`, type);
 
   const medals = ['🥇', '🥈', '🥉'];
   const DEEP = '#C25516';
@@ -194,12 +229,20 @@ const SlideMetricLeaderboard = React.memo(function SlideMetricLeaderboard({ a, t
           fontSize: title && title.length > 28 ? 28 : 36,
           lineHeight: 1.08, letterSpacing: '-0.03em',
           fontWeight: 800, color: '#4A0E4E',
-          marginTop: 8, marginBottom: 16,
+          marginTop: 8, marginBottom: sub ? 4 : 16,
           textShadow: '0 2px 0 rgba(255,255,255,0.65), 0 1px 3px rgba(74,14,78,0.12)',
           overflowWrap: 'break-word', wordBreak: 'break-word', padding: '0 8px',
         }}>
           {title}
         </div>
+        {sub && (
+          <div className="fs-mono a-fade-up" style={{
+            textAlign: 'center', animationDelay: '0.2s',
+            fontSize: 12, color: 'rgba(74,14,78,0.55)', marginBottom: 16,
+          }}>
+            {sub}
+          </div>
+        )}
         <div className="no-sb" style={{ flex: 1, overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: 9, minHeight: 0 }}>
           {rows.map((r, i) => renderRow(r, i))}
           {showOverflow && !expanded && (

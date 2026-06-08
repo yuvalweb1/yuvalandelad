@@ -9,6 +9,7 @@ import ErrorBoundary from './components/ErrorBoundary.jsx';
 import GlobalStyles from './components/GlobalStyles.jsx';
 import BlobBackground from './components/BlobBackground.jsx';
 import HomeIndicator from './components/HomeIndicator.jsx';
+import BottomNavBar from './components/BottomNavBar.jsx';
 import HowToGuide from './views/HowToGuide.jsx';
 import Landing from './views/Landing.jsx';
 import Parsing from './views/Parsing.jsx';
@@ -16,6 +17,9 @@ import Onboarding from './views/Onboarding.jsx';
 import Wrapped from './views/Wrapped.jsx';
 import VerifyView from './views/VerifyView.jsx';
 import RoastMode from './views/RoastMode.jsx';
+import Modes from './views/Modes.jsx';
+import DuoAnalysis from './views/DuoAnalysis.jsx';
+import ChaosTimeline from './views/ChaosTimeline.jsx';
 import Settings from './views/Settings.jsx';
 import VideoAdSlot from './components/VideoAdSlot.jsx';
 import PremiumPromo, { shouldShowPromo, markPromoDismissed } from './components/PremiumPromo.jsx';
@@ -88,6 +92,14 @@ function RecappedApp() {
   const openSettings = useCallback((from) => {
     setSettingsReturn(from);
     setStage('settings');
+  }, []);
+
+  // Where Roast Mode should return to — it's reachable from both the Wrapped
+  // deck and the bottom-nav Modes hub. Set just before entering (or its ad gate).
+  const [roastReturn, setRoastReturn] = useState('wrapped');
+  const enterRoastMode = useCallback((from) => {
+    setRoastReturn(from);
+    setStage(adEnabled('pre_roast') ? 'ad_pre_roast' : 'roastmode');
   }, []);
 
   // Premium plan flag — Phase 1: client-side only, no real payment yet.
@@ -286,7 +298,7 @@ function RecappedApp() {
   const analyticsRef = useRef(analytics);
   useEffect(() => { analyticsRef.current = analytics; }, [analytics]);
 
-  const handleLoadRecap = useCallback(async (id) => {
+  const handleLoadRecap = useCallback(async (id, destination) => {
     // Always reload fresh from storage to get the latest profile
     const freshHistory = loadHistory();
     const entry = freshHistory.find(r => r.id === id);
@@ -310,12 +322,36 @@ function RecappedApp() {
     // First time: relationship hasn't been chosen yet, show onboarding.
     // Onboarding only collects `self` + `relationship` (not `tone`), so
     // `relationship` is the signal that the user has been through it.
+    // `destination` lets callers (e.g. the Modes hub) skip straight past
+    // Wrapped into the mode they actually asked for — but onboarding can't
+    // be skipped, so it still wins when the chat hasn't been profiled yet.
     if (!savedProfile.relationship) {
       setStage('onboard');
     } else {
-      setStage('wrapped');
+      setStage(destination || 'wrapped');
     }
   }, []);
+
+  // Modes hub tiles need `analytics` to render — but a chat the user already
+  // imported or picked from history may not be loaded into the active session
+  // yet (Landing keeps the parsed result staged until the user confirms it).
+  // Rather than show "locked" for a chat that's plainly already there, load
+  // the most recent one on demand and continue straight into the requested mode.
+  const enterMode = useCallback((destination) => {
+    if (analytics) {
+      if (destination === 'roastmode') enterRoastMode('modes');
+      else setStage(destination);
+      return;
+    }
+    const mostRecent = history[0];
+    if (!mostRecent) return;
+    if (destination === 'roastmode') {
+      setRoastReturn('modes');
+      handleLoadRecap(mostRecent.id, adEnabled('pre_roast') ? 'ad_pre_roast' : 'roastmode');
+    } else {
+      handleLoadRecap(mostRecent.id, destination);
+    }
+  }, [analytics, history, enterRoastMode, handleLoadRecap]);
 
   const handleDeleteRecap = useCallback((id) => {
     deleteMedia(id);
@@ -460,7 +496,7 @@ function RecappedApp() {
                 setCurrentRecapId(null);
                 setStage('landing');
               }}
-              onRoastMode={() => setStage(adEnabled('pre_roast') ? 'ad_pre_roast' : 'roastmode')}
+              onRoastMode={() => enterRoastMode('wrapped')}
             />
           )}
           {stage === 'settings' && (
@@ -492,10 +528,35 @@ function RecappedApp() {
               selectedAuthor={selectedAuthor}
               setSelectedAuthor={setSelectedAuthor}
               t={t}
-              onBack={() => setStage('wrapped')}
+              onBack={() => setStage(roastReturn)}
             />
           )}
+          {stage === 'modes' && (
+            <Modes
+              analytics={analytics}
+              history={history}
+              t={t}
+              onUpload={() => setStage('landing')}
+              onRoastMode={() => enterMode('roastmode')}
+              onDuo={() => enterMode('duo')}
+              onChaos={() => enterMode('chaos')}
+            />
+          )}
+          {stage === 'duo' && (
+            <DuoAnalysis t={t} onBack={() => setStage('modes')} />
+          )}
+          {stage === 'chaos' && (
+            <ChaosTimeline t={t} onBack={() => setStage('modes')} />
+          )}
         </div>
+        {(stage === 'landing' || stage === 'modes') && (
+          <BottomNavBar
+            active={stage === 'modes' ? 'modes' : 'home'}
+            onHome={() => setStage('landing')}
+            onModes={() => setStage('modes')}
+            t={t}
+          />
+        )}
         <HomeIndicator />
       </div>
     </div>

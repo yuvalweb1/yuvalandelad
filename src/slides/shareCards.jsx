@@ -127,8 +127,14 @@ function Footer({ dark, accent = '#FF8C00' }) {
 // =======================================================================
 const A_INK = '#4A0E4E';
 const BANANA = '#FFD700';
+// Dot texture as a tiled SVG data-URI rather than a CSS radial-gradient:
+// html2canvas can't rasterize repeating radial-gradients (the dots vanished in
+// the exported PNG), but it renders url() image backgrounds fine. Same look,
+// export-safe.
+const DOT_TILE =
+  "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='15' height='15'%3E%3Ccircle cx='1.5' cy='1.5' r='1.4' fill='%234A0E4E' fill-opacity='0.13'/%3E%3C/svg%3E\")";
 const dotTexture = {
-  backgroundImage: 'radial-gradient(rgba(74,14,78,0.13) 1.4px, transparent 1.6px)',
+  backgroundImage: DOT_TILE,
   backgroundSize: '15px 15px',
 };
 
@@ -139,12 +145,12 @@ function ACell({ value, label, sub, accent = A_INK, tilt = 0, big, flair }) {
       boxShadow: `5px 6px 0 ${A_INK}`, transform: `rotate(${tilt}deg)`,
       padding: big ? '18px 20px' : '16px 18px',
       display: 'flex', flexDirection: 'column', justifyContent: 'center',
-      minWidth: 0, position: 'relative', overflow: 'hidden',
+      flex: 1, minWidth: 0, position: 'relative', overflow: 'hidden',
     }}>
       {flair && <div style={{ position: 'absolute', top: 8, right: 10, fontSize: 22, lineHeight: 1 }}>{flair}</div>}
       <div className="fs-mono" style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.14em', textTransform: 'uppercase', color: accent, marginBottom: 6 }}>{label}</div>
-      <div className="fs-display" style={{ fontSize: big ? 40 : 30, fontWeight: 800, lineHeight: 0.95, color: A_INK, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{value}</div>
-      {sub && <div className="fs-mono" style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.08em', color: 'rgba(74,14,78,0.55)', marginTop: 4, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{sub}</div>}
+      <div className="fs-display" style={{ fontSize: big ? 40 : 30, fontWeight: 800, lineHeight: 0.95, color: A_INK, whiteSpace: 'nowrap' }}>{value}</div>
+      {sub && <div className="fs-mono" style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.08em', color: 'rgba(74,14,78,0.55)', marginTop: 4, lineHeight: 1.5, whiteSpace: 'nowrap' }}>{sub}</div>}
     </div>
   );
 }
@@ -155,7 +161,12 @@ export const CardBananaDrop = React.memo(function CardBananaDrop({ format = 'sto
   // content width at native 540px: 540 - 34*2 = 472px
   const heroSize = heroNumSize(heroStr, 472, story ? 142 : 92);
   return (
+    // boxSizing explicit (not inherited from `.cw-frame *`): html2canvas's clone
+    // doesn't reliably carry that ancestor rule, so without it the padding adds
+    // 72px on top of the 960px height — the card overflows and the export crops
+    // its bottom (rounded corners + footer padding). All four card roots set it.
     <div style={{
+      boxSizing: 'border-box',
       width: '100%', height: '100%', background: BANANA, color: A_INK,
       position: 'relative', overflow: 'hidden',
       padding: story ? '38px 34px 34px' : '30px 30px 28px',
@@ -178,15 +189,23 @@ export const CardBananaDrop = React.memo(function CardBananaDrop({ format = 'sto
         </div>
 
         <div style={{ flex: story ? 1 : '0 0 auto', display: 'flex', flexDirection: 'column', justifyContent: 'center', minHeight: 0, marginTop: story ? 0 : 16, marginBottom: story ? 0 : 14 }}>
-          <div className="fs-display" style={{ fontSize: heroSize, fontWeight: 800, lineHeight: 0.84, color: A_INK, fontVariantNumeric: 'tabular-nums', textShadow: `4px 5px 0 #FF8C00`, whiteSpace: 'nowrap', overflow: 'hidden' }}>{heroStr}</div>
+          <div data-hero-num className="fs-display" style={{ fontSize: heroSize, fontWeight: 800, lineHeight: 0.84, color: A_INK, fontVariantNumeric: 'tabular-nums', textShadow: `4px 5px 0 #FF8C00`, whiteSpace: 'nowrap' }}>{heroStr}</div>
           <div className="fs-mono" style={{ marginTop: story ? 14 : 8, fontSize: 14, fontWeight: 700, letterSpacing: '0.2em', textTransform: 'uppercase' }}>messages sent this year</div>
         </div>
 
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: story ? 20 : 14 }}>
-          <ACell label="Days active" value={G.daysActive} accent="#277da1" tilt={-1} />
-          <ACell label="Carried the chat" value={G.topChatter} sub={`${G.topChatterPct}% of all messages`} accent="#f3722c" tilt={1} />
-          <ACell label="Most used word" value={`“${G.topWord}”`} accent="#8338ec" tilt={1} />
-          <ACell label="Top emoji" value={`×${nf(G.topEmojiCount)}`} accent="#f94144" tilt={-1} flair={G.topEmoji} />
+        {/* Two flex rows instead of a 2×2 CSS grid: html2canvas mis-sizes grid
+            cells (clipping the 3-line "carried the chat" cell on export), but
+            handles flexbox stretch reliably. align-items:stretch keeps each
+            row's two cells equal height. */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: story ? 20 : 14 }}>
+          <div style={{ display: 'flex', alignItems: 'stretch', gap: story ? 20 : 14 }}>
+            <ACell label="Days active" value={G.daysActive} accent="#277da1" tilt={-1} />
+            <ACell label="Carried the chat" value={G.topChatter} sub={`${G.topChatterPct}% of all messages`} accent="#f3722c" tilt={1} />
+          </div>
+          <div style={{ display: 'flex', alignItems: 'stretch', gap: story ? 20 : 14 }}>
+            <ACell label="Most used word" value={`“${G.topWord}”`} accent="#8338ec" tilt={1} />
+            <ACell label="Top emoji" value={`×${nf(G.topEmojiCount)}`} accent="#f94144" tilt={-1} flair={G.topEmoji} />
+          </div>
         </div>
 
         <div style={{
@@ -230,7 +249,7 @@ function CStat({ value, label, sub, accent, valueSize = 30 }) {
     <>
       <div className="fs-mono" style={{ fontSize: 10.5, fontWeight: 700, letterSpacing: '0.13em', textTransform: 'uppercase', color: accent, marginBottom: 5 }}>{label}</div>
       <div className="fs-display" style={{ fontSize: valueSize, fontWeight: 800, lineHeight: 0.95, color: C_INK, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{value}</div>
-      {sub && <div className="fs-mono" style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.08em', color: 'rgba(42,6,69,0.50)', marginTop: 4, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{sub}</div>}
+      {sub && <div className="fs-mono" style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.08em', color: 'rgba(42,6,69,0.50)', marginTop: 4, lineHeight: 1.5, whiteSpace: 'nowrap' }}>{sub}</div>}
     </>
   );
 }
@@ -242,6 +261,7 @@ export const CardStickerZine = React.memo(function CardStickerZine({ format = 's
   const heroSize = heroNumSize(heroStr, 436, story ? 116 : 58);
   return (
     <div style={{
+      boxSizing: 'border-box',
       width: '100%', height: '100%', position: 'relative', overflow: 'hidden',
       background: '#FBF3E4', color: C_INK,
       padding: story ? '36px 30px 40px' : '24px 26px 28px',
@@ -268,7 +288,7 @@ export const CardStickerZine = React.memo(function CardStickerZine({ format = 's
 
           <Sticker bg="#FFFFFF" tilt={1} tape={story} pad={story ? '20px 22px 18px' : '11px 14px'}>
             {story && <div className="fs-serif" style={{ fontSize: 18, fontStyle: 'italic', color: '#f06449', marginBottom: 2 }}>we sent a casual…</div>}
-            <div className="fs-display" style={{ fontSize: heroSize, fontWeight: 800, lineHeight: 0.85, color: C_INK, fontVariantNumeric: 'tabular-nums', whiteSpace: 'nowrap', overflow: 'hidden' }}>{heroStr}</div>
+            <div data-hero-num className="fs-display" style={{ fontSize: heroSize, fontWeight: 800, lineHeight: 0.85, color: C_INK, fontVariantNumeric: 'tabular-nums', whiteSpace: 'nowrap' }}>{heroStr}</div>
             <div className="fs-mono" style={{ marginTop: story ? 8 : 5, fontSize: story ? 13 : 11, fontWeight: 700, letterSpacing: '0.16em', textTransform: 'uppercase', color: 'rgba(42,6,69,0.6)' }}>messages · {G.daysActive} days</div>
           </Sticker>
         </div>
@@ -334,6 +354,7 @@ export const CardReceipt = React.memo(function CardReceipt({ format = 'story', d
   const receiptTotalSize = heroNumSize(heroStr, 218, story ? 46 : 34);
   return (
     <div style={{
+      boxSizing: 'border-box',
       width: '100%', height: '100%', position: 'relative', overflow: 'hidden',
       background: '#E8E2D4', padding: story ? '34px 30px' : '18px 24px',
       display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'var(--font-mono)',
@@ -436,6 +457,7 @@ export const CardY2KChrome = React.memo(function CardY2KChrome({ format = 'story
   const heroSize = heroNumSize(heroStr, 480, story ? 132 : 92, 0.04);
   return (
     <div style={{
+      boxSizing: 'border-box',
       width: '100%', height: '100%', position: 'relative', overflow: 'hidden',
       background: 'linear-gradient(160deg, #00BFFF 0%, #7A5CFF 38%, #FF69B4 68%, #FF8C00 100%)',
       color: '#fff', padding: story ? '36px 30px 30px' : '28px 28px 24px',
@@ -460,12 +482,12 @@ export const CardY2KChrome = React.memo(function CardY2KChrome({ format = 'story
           </div>
 
           <div style={{ textAlign: 'center' }}>
-            <div className="fs-display" style={{
+            <div data-hero-num className="fs-display" style={{
               fontSize: heroSize, fontWeight: 800, letterSpacing: '0.04em', lineHeight: 0.82, fontVariantNumeric: 'tabular-nums',
               background: 'linear-gradient(180deg, #ffffff 0%, #ffffff 38%, #FFE08A 56%, #FF9CE0 88%)',
               WebkitBackgroundClip: 'text', backgroundClip: 'text', color: 'transparent',
               WebkitTextStroke: '1px rgba(255,255,255,0.6)', filter: 'drop-shadow(0 6px 14px rgba(74,14,78,0.45))',
-              whiteSpace: 'nowrap', overflow: 'hidden',
+              whiteSpace: 'nowrap',
             }}>{heroStr}</div>
             <div className="fs-mono" style={{ marginTop: 12, fontSize: 13, fontWeight: 700, letterSpacing: '0.22em', textTransform: 'uppercase', color: '#fff', textShadow: '0 1px 8px rgba(74,14,78,0.4)' }}>messages this year</div>
           </div>

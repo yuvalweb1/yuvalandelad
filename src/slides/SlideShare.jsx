@@ -304,6 +304,20 @@ const SlideShare = React.memo(function SlideShare({ a, t, profile, diagnostics, 
       logging: false,
       width: 540,
       height: 960,
+      onclone: (doc, clonedWrap) => {
+        const scope = clonedWrap || doc;
+        // Y2K Chrome hero uses a background-clip:text gradient html2canvas can't
+        // rasterize (it paints an opaque band over the text); fall back to a
+        // solid fill so the number stays legible in the export.
+        scope.querySelectorAll('[data-hero-num]').forEach((el) => {
+          const clip = el.style.webkitBackgroundClip || getComputedStyle(el).webkitBackgroundClip;
+          if (clip === 'text') {
+            el.style.background = 'none';
+            el.style.webkitTextFillColor = '#fff';
+            el.style.color = '#fff';
+          }
+        });
+      },
     });
     return new Promise(resolve => canvas.toBlob(resolve, 'image/png', 0.95));
   }

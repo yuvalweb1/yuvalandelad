@@ -55,15 +55,14 @@ export const SLIDE_COMPONENTS = {
   ad:              SlideAd,
   teaser:          SlideTeaser,
   // New typed slides
-  night_owls:          metricSlide('night_owls'),
+  night_owls:          metricLeaderboardSlide('night_owls'),
   early_birds:         metricSlide('early_birds'),
   voice_notes_leader:  metricSlide('voice_notes_leader'),
-  overtime:            metricSlide('overtime'),
+  overtime:            metricLeaderboardSlide('overtime'),
   response_times:      metricLeaderboardSlide('response_times'),
   essay_writers:       metricSlide('essay_writers'),
-  link_sharers:        metricSlide('link_sharers'),
   double_texts:        metricLeaderboardSlide('double_texts'),
-  ignored_award:       metricSlide('ignored_award'),
+  ignored_award:       metricLeaderboardSlide('ignored_award'),
   night_messages:      metricLeaderboardSlide('night_messages'),
   messages_sent:          metricLeaderboardSlide('messages_sent'),
   conversation_starters:  metricLeaderboardSlide('conversation_starters'),
@@ -121,7 +120,6 @@ export const SLIDES_BY_TYPE = {
     'response_times',
     'per_person',
     'busiest_weekday',
-    'link_sharers',
     'leaderboard',
     'photos',
     'stickers',
@@ -197,14 +195,13 @@ export function slideHasData(id, analytics, user) {
       return analytics.users.some(x => x.longestStreak >= 2);
     case 'busiest_weekday':
       return (analytics.groupWeekly || []).some(v => v > 0);
-    case 'night_owls':
     case 'early_birds':
     case 'voice_notes_leader':
-    case 'overtime':
     case 'essay_writers':
-    case 'link_sharers':
-    case 'ignored_award':
       return metricHasData(id, analytics);
+    case 'night_owls':
+    case 'ignored_award':
+    case 'overtime':
     case 'response_times':
     case 'double_texts':
     case 'night_messages':

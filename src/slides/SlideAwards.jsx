@@ -105,8 +105,8 @@ const SlideAwards = React.memo(function SlideAwards({ a, t, profile }) {
   return (
     <SlideShell accent="#f9c74f">
       <div style={{
-        position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column',
-        padding: '20px 20px 14px',
+        position: 'relative', height: '100%', display: 'flex', flexDirection: 'column',
+        padding: '28px 20px 14px',
       }}>
         {/* Header */}
         <div style={{ textAlign: 'center', flexShrink: 0 }}>
@@ -149,7 +149,7 @@ const SlideAwards = React.memo(function SlideAwards({ a, t, profile }) {
               }}>
                 {aw.winner}
               </div>
-              <div className="fs-mono" style={{ fontSize: 10, color: 'rgba(42,6,69,0.5)', marginTop: 1 }}>
+              <div className="fs-mono" style={{ fontSize: 10, color: 'rgba(42,6,69,0.7)', marginTop: 1 }}>
                 {aw.sub}
               </div>
               <button
