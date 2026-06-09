@@ -354,14 +354,16 @@ function RecappedApp() {
 
   return (
     <div style={{
-      minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center',
+      minHeight: '100dvh', display: 'flex', alignItems: 'center', justifyContent: 'center',
       backgroundImage: 'radial-gradient(ellipse at top, #1a1228 0%, #050505 70%)',
     }}>
       <GlobalStyles />
+      {/* height is set by the .cw-frame class (100vh fallback → 100dvh)
+          so we don't inline it here; an inline value would shadow the
+          fallback chain and lose the mobile-URL-bar fix. */}
       <div className="cw-frame" style={{
         position: 'relative', overflow: 'hidden', display: 'flex', flexDirection: 'column',
         width: '100vw',
-        height: '100vh',
         background: '#0a0a0f',
         color: '#f4f4f8',
         fontFamily: '"DM Sans", "Comix CLM", -apple-system, sans-serif',

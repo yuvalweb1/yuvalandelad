@@ -176,6 +176,12 @@ export default function GlobalStyles() {
         --safe-bottom: env(safe-area-inset-bottom, 0px);
         --safe-left: env(safe-area-inset-left, 0px);
         --safe-right: env(safe-area-inset-right, 0px);
+        /* Mobile browsers count the URL bar in 100vh, so when it
+           collapses on scroll the frame overflows and the user has
+           to scroll. 100dvh tracks the actual visible viewport.
+           100vh is the fallback for browsers that don't support dvh. */
+        height: 100vh;
+        height: 100dvh;
       }
 
       /* ===== Ultra-Pop "Roast Cards" — high-contrast, rounded, floating ===== */
