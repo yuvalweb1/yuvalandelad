@@ -9,19 +9,23 @@
 // ============================================================
 
 export const PRICING = {
-  he: { amount: 20,  symbol: '₪', placement: 'prefix' },
-  ar: { amount: 20,  symbol: '₪', placement: 'prefix' },
-  en: { amount: 5,   symbol: '$', placement: 'prefix' },
-  es: { amount: 5,   symbol: '€', placement: 'suffix' },
-  fr: { amount: 5,   symbol: '€', placement: 'suffix' },
-  de: { amount: 5,   symbol: '€', placement: 'suffix' },
-  pt: { amount: 5,   symbol: '€', placement: 'suffix' },
-  it: { amount: 5,   symbol: '€', placement: 'suffix' },
-  ru: { amount: 500, symbol: '₽', placement: 'suffix' },
-  tr: { amount: 170, symbol: '₺', placement: 'prefix' },
+  he: { amount: 20,   symbol: '₪', placement: 'prefix' },
+  ar: { amount: 20,   symbol: '₪', placement: 'prefix' },
+  en: { amount: 7,    symbol: '$', placement: 'prefix' },
+  es: { amount: 7,    symbol: '€', placement: 'suffix' },
+  fr: { amount: 7,    symbol: '€', placement: 'suffix' },
+  de: { amount: 7,    symbol: '€', placement: 'suffix' },
+  pt: { amount: 7,    symbol: '€', placement: 'suffix' },
+  it: { amount: 7,    symbol: '€', placement: 'suffix' },
+  ru: { amount: 650,  symbol: '₽', placement: 'suffix' },
+  tr: { amount: 250,  symbol: '₺', placement: 'prefix' },
+  hi: { amount: 600,  symbol: '₹', placement: 'prefix' },
+  zh: { amount: 50,   symbol: '¥', placement: 'prefix' },
+  ja: { amount: 1100, symbol: '¥', placement: 'prefix' },
+  ko: { amount: 9500, symbol: '₩', placement: 'prefix' },
 };
 
-const FALLBACK = { amount: 5, symbol: '$', placement: 'prefix' };
+const FALLBACK = { amount: 7, symbol: '$', placement: 'prefix' };
 
 /** Return the pricing entry for a locale; falls back to USD when unknown. */
 export function getPricing(lang) {
