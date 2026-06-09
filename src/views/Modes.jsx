@@ -1,8 +1,9 @@
-// ── Mode tile — fixed mid-size; comfortable on tall screens, doesn't crowd
-//    on short ones. Stacked, not flex-grown.
+// ── Mode tile — flex-grows inside the tile container, which is capped at
+//    ~50vh, so the three tiles together fill half the viewport.
 function ModeTile({ label, title, emoji, gradient, fg = '#fff', shadowColor = '#3a0a3d', onClick }) {
   return (
     <button onClick={onClick} className="press lift" style={{
+      flex: 1, minHeight: 0,
       width: '100%', position: 'relative', overflow: 'hidden',
       textAlign: 'start',
       background: gradient,
@@ -110,6 +111,9 @@ export default function Modes({ analytics, history = [], t, onUpload, onRoastMod
         <div style={{
           position: 'relative', zIndex: 10,
           display: 'flex', flexDirection: 'column', gap: 12, marginTop: 24,
+          // 50vh keeps the three tiles to roughly half the screen; each
+          // tile is flex:1 inside so they split that height evenly.
+          height: '50vh',
         }}>
           <ModeTile
             label={t.menu_roast_mode || 'Roast mode'}
