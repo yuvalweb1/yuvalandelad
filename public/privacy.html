@@ -28,14 +28,6 @@
       pointer-events: none; z-index: -1; }
     .brand { display: inline-flex; align-items: baseline; text-decoration: none; color: inherit; font-weight: 800; font-size: 22px; letter-spacing: -0.03em; }
     .brand i { color: var(--mango); font-style: italic; }
-    .lang-switch { display: flex; gap: 6px; margin-top: 18px; }
-    .lang-switch a {
-      padding: 5px 12px; border-radius: 999px; background: #fff;
-      border: 1.5px solid rgba(255,255,255,0.95); color: var(--ink);
-      box-shadow: 0 3px 0 rgba(74,14,78,0.12), 0 8px 14px -6px rgba(74,14,78,0.22);
-      text-decoration: none; font-size: 13px; font-weight: 700;
-    }
-    .lang-switch a.active { background: var(--eggplant); color: #fff; box-shadow: 0 3px 0 #2a0645, 0 8px 16px -4px rgba(74,14,78,0.5); }
     h1 { font-size: clamp(28px, 5vw, 40px); margin: 30px 0 6px; letter-spacing: -0.035em; line-height: 1.1; color: var(--eggplant); }
     .updated { font-size: 12px; color: var(--ink-faint); letter-spacing: 0.12em; text-transform: uppercase; font-weight: 700; }
     .tldr {
@@ -60,125 +52,71 @@
       border: 2px solid rgba(255,255,255,0.85);
       box-shadow: 0 6px 0 rgba(209,112,0,0.35), 0 14px 24px -6px rgba(209,112,0,0.5);
     }
-    section.lang { display: none; }
-    section.lang.active { display: block; }
-    [dir="rtl"] ul { padding-right: 22px; padding-left: 0; }
-    .lang-he h1, .lang-he h2, .lang-he h3, .lang-he p, .lang-he li { text-align: right; }
+    /* Floating home button — top-right, follows scroll. */
+    .home-btn {
+      position: fixed; top: 20px; right: 20px; z-index: 10;
+      width: 44px; height: 44px; border-radius: 50%;
+      background: linear-gradient(135deg, var(--banana) 0%, var(--mango) 100%);
+      color: var(--eggplant); text-decoration: none;
+      border: 2px solid rgba(255,255,255,0.85);
+      display: flex; align-items: center; justify-content: center;
+      box-shadow: 0 6px 0 rgba(209,112,0,0.35), 0 14px 24px -6px rgba(209,112,0,0.5);
+      transition: transform 0.15s ease-out;
+    }
+    .home-btn:hover { transform: translateY(-2px); color: var(--eggplant); }
+    .home-btn:active { transform: translateY(1px); box-shadow: 0 3px 0 rgba(209,112,0,0.35), 0 8px 16px -6px rgba(209,112,0,0.5); }
   </style>
 </head>
 <body>
+  <a class="home-btn" href="/" aria-label="Home">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+         stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <path d="M3 9.5L12 3l9 6.5V20a1 1 0 0 1-1 1H15v-5h-6v5H4a1 1 0 0 1-1-1V9.5z"/>
+    </svg>
+  </a>
   <div class="wrap">
     <a class="brand" href="/" dir="ltr">re<i>capped</i></a>
 
-    <div class="lang-switch" role="navigation" aria-label="Language">
-      <a href="#en" data-lang="en" class="active">English</a>
-      <a href="#he" data-lang="he">עברית</a>
+    <h1>Privacy Policy</h1>
+    <div class="updated">Last updated: 9 June 2026</div>
+
+    <div class="tldr">
+      <h2>✦ TL;DR</h2>
+      <p>Recapped processes your WhatsApp export entirely on your device. We don't collect, store, or transmit your chat data, and there is no server-side database. Your chat never leaves your device.</p>
     </div>
 
-    <!-- ===== English ===== -->
-    <section class="lang lang-en active" id="en">
-      <h1>Privacy Policy</h1>
-      <div class="updated">Last updated: 9 June 2026</div>
+    <h2>Data we collect</h2>
+    <p><strong>None.</strong> The app reads and analyzes your WhatsApp export locally on your device. The parsed messages, statistics, and any extracted media (photos, voice notes, videos, stickers) stay on your device only and are never uploaded to us or anyone else.</p>
 
-      <div class="tldr">
-        <h2>✦ TL;DR</h2>
-        <p>Recapped processes your WhatsApp export entirely on your device. We don't collect, store, or transmit your chat data, and there is no server-side database. Your chat never leaves your device.</p>
-      </div>
+    <h2>Data stored on your device</h2>
+    <p>For the app to work, we save a small amount of data locally on your device (never on a server):</p>
+    <ul>
+      <li>Your past recap summaries, so you can re-open them without importing again</li>
+      <li>Your settings (selected language and media-analysis preference)</li>
+    </ul>
+    <p>This data stays on your device and you can delete it at any time from Settings → Data, or by clearing the app's data / uninstalling the app.</p>
 
-      <h2>Data we collect</h2>
-      <p><strong>None.</strong> The app reads and analyzes your WhatsApp export locally on your device. The parsed messages, statistics, and any extracted media (photos, voice notes, videos, stickers) stay on your device only and are never uploaded to us or anyone else.</p>
+    <h2>Third parties</h2>
+    <p>The app loads <strong>Google Fonts</strong> for typography; Google may log this request as it does for any app or site that uses Google Fonts. No chat content is ever included in this request.</p>
+    <p>The free tier of the app displays ads served by <strong>Google AdMob</strong>. AdMob may collect and use your device's <strong>Advertising ID</strong> to serve relevant ads and measure ad performance. This data is collected by Google, not by us, and is governed by <a href="https://policies.google.com/privacy" target="_blank" rel="noopener">Google's Privacy Policy</a>. You can opt out of interest-based ads at any time in your device settings (Android: Settings → Privacy → Ads; iOS: Settings → Privacy → Tracking). Upgrading to Premium removes all ads and stops AdMob from running.</p>
+    <p>We do not use any other analytics, tracking, or third-party SDKs that collect personal data.</p>
 
-      <h2>Data stored on your device</h2>
-      <p>For the app to work, we save a small amount of data locally on your device (never on a server):</p>
-      <ul>
-        <li>Your past recap summaries, so you can re-open them without importing again</li>
-        <li>Your settings (selected language and media-analysis preference)</li>
-      </ul>
-      <p>This data stays on your device and you can delete it at any time from Settings → Data, or by clearing the app's data / uninstalling the app.</p>
+    <h2>Sharing</h2>
+    <p>When you choose to share a result, the app opens your device's standard share sheet (or apps such as WhatsApp, Telegram, email, or SMS) with the content pre-filled. You decide what to send and to whom. We are not involved in the transmission.</p>
 
-      <h2>Third parties</h2>
-      <p>The app loads <strong>Google Fonts</strong> for typography; Google may log this request as it does for any app or site that uses Google Fonts. No chat content is ever included in this request.</p>
-      <p>The free tier of the app displays ads served by <strong>Google AdMob</strong>. AdMob may collect and use your device's <strong>Advertising ID</strong> to serve relevant ads and measure ad performance. This data is collected by Google, not by us, and is governed by <a href="https://policies.google.com/privacy" target="_blank" rel="noopener">Google's Privacy Policy</a>. You can opt out of interest-based ads at any time in your device settings (Android: Settings → Privacy → Ads; iOS: Settings → Privacy → Tracking). Upgrading to Premium removes all ads and stops AdMob from running.</p>
-      <p>We do not use any other analytics, tracking, or third-party SDKs that collect personal data.</p>
+    <h2>Data deletion</h2>
+    <p>Because we do not collect or store your personal data, there is nothing for us to delete on our side. All data is on your device and under your control. To remove it, use Settings → Data → Clear saved recaps, clear the app's storage, or uninstall the app.</p>
 
-      <h2>Sharing</h2>
-      <p>When you choose to share a result, the app opens your device's standard share sheet (or apps such as WhatsApp, Telegram, email, or SMS) with the content pre-filled. You decide what to send and to whom. We are not involved in the transmission.</p>
+    <h2>Children</h2>
+    <p>Recapped is not directed at children under 13, and we do not knowingly collect data from anyone.</p>
 
-      <h2>Data deletion</h2>
-      <p>Because we do not collect or store your personal data, there is nothing for us to delete on our side. All data is on your device and under your control. To remove it, use Settings → Data → Clear saved recaps, clear the app's storage, or uninstall the app.</p>
+    <h2>Changes to this policy</h2>
+    <p>If we update this policy, the "Last updated" date above will change and the new version will replace this one at the same address.</p>
 
-      <h2>Children</h2>
-      <p>Recapped is not directed at children under 13, and we do not knowingly collect data from anyone.</p>
-
-      <h2>Changes to this policy</h2>
-      <p>If we update this policy, the "Last updated" date above will change and the new version will replace this one at the same address.</p>
-
-      <h2>Contact</h2>
-      <p>Questions about this policy? Email <a href="mailto:nahum@ella3g.com">nahum@ella3g.com</a>.</p>
-    </section>
-
-    <!-- ===== עברית ===== -->
-    <section class="lang lang-he" id="he" dir="rtl" lang="he">
-      <h1>מדיניות פרטיות</h1>
-      <div class="updated">עודכן לאחרונה: 9 ביוני 2026</div>
-
-      <div class="tldr">
-        <h2>✦ בקצרה</h2>
-        <p>Recapped מעבד את יצוא הוואטסאפ שלך כולו על המכשיר שלך. אנחנו לא אוספים, שומרים או שולחים את נתוני הצ'אט שלך, ואין מסד נתונים בשרת. הצ'אט שלך לא יוצא מהמכשיר שלך.</p>
-      </div>
-
-      <h2>נתונים שאנחנו אוספים</h2>
-      <p><strong>כלום.</strong> האפליקציה קוראת ומנתחת את יצוא הוואטסאפ שלך באופן מקומי על המכשיר שלך. ההודעות המנותחות, הסטטיסטיקות, וכל מדיה שחולצה (תמונות, הודעות קוליות, סרטונים, סטיקרים) נשארים על המכשיר שלך בלבד ולעולם לא נשלחים אלינו או לאף גורם אחר.</p>
-
-      <h2>נתונים שנשמרים על המכשיר שלך</h2>
-      <p>כדי שהאפליקציה תעבוד, אנחנו שומרים כמות קטנה של נתונים באופן מקומי על המכשיר שלך (אף פעם לא בשרת):</p>
-      <ul>
-        <li>סיכומי הריקפים הקודמים שלך, כדי שתוכל לפתוח אותם שוב בלי לייבא מחדש</li>
-        <li>ההגדרות שלך (השפה שבחרת והעדפת ניתוח המדיה)</li>
-      </ul>
-      <p>הנתונים האלה נשארים על המכשיר שלך, ואתה יכול למחוק אותם בכל רגע דרך הגדרות → נתונים, או על ידי מחיקת נתוני האפליקציה / הסרת האפליקציה.</p>
-
-      <h2>צדדים שלישיים</h2>
-      <p>האפליקציה טוענת <strong>Google Fonts</strong> לצורך טיפוגרפיה; Google עשויה לרשום את הבקשה הזו כפי שהיא עושה לכל אפליקציה או אתר שמשתמש ב-Google Fonts. תוכן הצ'אט אף פעם לא כלול בבקשה הזו.</p>
-      <p>הגרסה החינמית של האפליקציה מציגה פרסומות המוגשות על ידי <strong>Google AdMob</strong>. AdMob עשוי לאסוף ולהשתמש ב<strong>מזהה הפרסום</strong> של המכשיר שלך כדי להציג פרסומות רלוונטיות ולמדוד ביצועי פרסום. הנתונים האלה נאספים על ידי Google ולא על ידינו, ומוסדרים על ידי <a href="https://policies.google.com/privacy" target="_blank" rel="noopener">מדיניות הפרטיות של Google</a>. אתה יכול לבטל את הסכמתך לפרסומות מבוססות עניין בכל עת בהגדרות המכשיר (Android: הגדרות ← פרטיות ← מודעות; iOS: הגדרות ← פרטיות ← מעקב). שדרוג לפרימיום מסיר את כל הפרסומות ומפסיק את פעולת AdMob.</p>
-      <p>אנחנו לא משתמשים ב-analytics, מעקב, או כל SDK אחר של צד שלישי שאוסף נתונים אישיים.</p>
-
-      <h2>שיתוף</h2>
-      <p>כשתבחר לשתף תוצאה, האפליקציה פותחת את תפריט השיתוף הסטנדרטי של המכשיר (או אפליקציות כמו וואטסאפ, טלגרם, מייל או SMS) עם התוכן ממולא מראש. אתה מחליט מה לשלוח ולמי. אנחנו לא מעורבים בשידור.</p>
-
-      <h2>מחיקת נתונים</h2>
-      <p>מכיוון שאנחנו לא אוספים ולא שומרים את הנתונים האישיים שלך, אין מה למחוק אצלנו. כל הנתונים נמצאים על המכשיר שלך ובשליטתך. כדי להסיר אותם, השתמש בהגדרות → נתונים → מחק ריקפים שמורים, מחק את אחסון האפליקציה, או הסר את האפליקציה.</p>
-
-      <h2>ילדים</h2>
-      <p>Recapped לא מיועד לילדים מתחת לגיל 13, ואנחנו לא אוספים נתונים מאף אחד ביודעין.</p>
-
-      <h2>שינויים במדיניות</h2>
-      <p>אם נעדכן את המדיניות הזו, תאריך ה"עודכן לאחרונה" למעלה יתעדכן, והגרסה החדשה תחליף את הקיימת באותה כתובת.</p>
-
-      <h2>יצירת קשר</h2>
-      <p>שאלות על המדיניות הזו? כתוב ל-<a href="mailto:nahum@ella3g.com">nahum@ella3g.com</a>.</p>
-    </section>
+    <h2>Contact</h2>
+    <p>Questions about this policy? Email <a href="mailto:nahum@ella3g.com">nahum@ella3g.com</a>.</p>
 
     <a class="back" href="/" dir="ltr">← Back to app</a>
   </div>
-
-  <script>
-    // Language switcher — toggles between #en and #he sections.
-    // Defaults to URL hash if present, otherwise browser language.
-    (function () {
-      const sections = document.querySelectorAll('section.lang');
-      const links = document.querySelectorAll('.lang-switch a');
-      function activate(code) {
-        sections.forEach(s => s.classList.toggle('active', s.id === code));
-        links.forEach(a => a.classList.toggle('active', a.dataset.lang === code));
-        document.documentElement.lang = code;
-        history.replaceState(null, '', '#' + code);
-      }
-      const initial = location.hash.replace('#', '') ||
-        (navigator.language && navigator.language.toLowerCase().startsWith('he') ? 'he' : 'en');
-      activate(initial === 'he' ? 'he' : 'en');
-      links.forEach(a => a.addEventListener('click', e => { e.preventDefault(); activate(a.dataset.lang); }));
-    })();
-  </script>
 </body>
 </html>
