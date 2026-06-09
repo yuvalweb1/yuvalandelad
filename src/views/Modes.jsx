@@ -1,36 +1,36 @@
-// ── Mode tile — fills its flex slot, so 3 tiles split the column evenly ────
+// ── Mode tile — fixed mid-size; comfortable on tall screens, doesn't crowd
+//    on short ones. Stacked, not flex-grown.
 function ModeTile({ label, title, emoji, gradient, fg = '#fff', shadowColor = '#3a0a3d', onClick }) {
   return (
     <button onClick={onClick} className="press lift" style={{
-      flex: 1, minHeight: 0,
       width: '100%', position: 'relative', overflow: 'hidden',
       textAlign: 'start',
       background: gradient,
       border: 'none',
-      borderRadius: 24,
-      padding: '20px 22px',
+      borderRadius: 22,
+      padding: '18px 20px',
       cursor: 'pointer',
       color: fg,
-      display: 'flex', alignItems: 'center', gap: 18,
-      boxShadow: `0 8px 0 ${shadowColor}44, 0 22px 36px -10px ${shadowColor}88`,
+      display: 'flex', alignItems: 'center', gap: 16,
+      boxShadow: `0 7px 0 ${shadowColor}44, 0 18px 32px -10px ${shadowColor}88`,
     }}>
       <div aria-hidden style={{
-        fontSize: 58, lineHeight: 1, flexShrink: 0,
-        filter: 'drop-shadow(0 3px 6px rgba(0,0,0,0.22))',
+        fontSize: 46, lineHeight: 1, flexShrink: 0,
+        filter: 'drop-shadow(0 2px 5px rgba(0,0,0,0.20))',
       }}>{emoji}</div>
       <div style={{ flex: 1, minWidth: 0 }}>
         <div className="fs-mono" style={{
-          fontSize: 11, letterSpacing: '0.20em', textTransform: 'uppercase',
+          fontSize: 10, letterSpacing: '0.18em', textTransform: 'uppercase',
           fontWeight: 800, opacity: 0.92,
-          textShadow: fg === '#fff' ? '0 1px 2px rgba(0,0,0,0.18)' : 'none',
+          textShadow: fg === '#fff' ? '0 1px 2px rgba(0,0,0,0.16)' : 'none',
         }}>{label}</div>
         <div className="fs-display" style={{
-          fontSize: 30, fontWeight: 800, lineHeight: 1.05, marginTop: 4,
+          fontSize: 26, fontWeight: 800, lineHeight: 1.05, marginTop: 3,
           letterSpacing: '-0.035em',
-          textShadow: fg === '#fff' ? '0 1px 3px rgba(0,0,0,0.22)' : 'none',
+          textShadow: fg === '#fff' ? '0 1px 3px rgba(0,0,0,0.20)' : 'none',
         }}>{title}</div>
       </div>
-      <div aria-hidden style={{ fontSize: 24, opacity: 0.75, flexShrink: 0 }}>→</div>
+      <div aria-hidden style={{ fontSize: 20, opacity: 0.75, flexShrink: 0 }}>→</div>
     </button>
   );
 }
@@ -108,8 +108,8 @@ export default function Modes({ analytics, history = [], t, onUpload, onRoastMod
 
       {unlocked ? (
         <div style={{
-          position: 'relative', zIndex: 10, flex: 1, minHeight: 0,
-          display: 'flex', flexDirection: 'column', gap: 14, marginTop: 24,
+          position: 'relative', zIndex: 10,
+          display: 'flex', flexDirection: 'column', gap: 12, marginTop: 24,
         }}>
           <ModeTile
             label={t.menu_roast_mode || 'Roast mode'}
