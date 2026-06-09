@@ -1,7 +1,8 @@
 // ============================================================
-// PremiumPromo — entry-time upsell modal. Slides up over Landing on
-// app open for non-premium users. "Maybe later" remembers a 24h
-// cooldown so we're not nagging on every refresh.
+// PremiumPromo — entry-time upsell modal. Shows on every app load for
+// non-premium users (per product call: reminder, not cooldown). Within
+// the same React session, dismissing keeps it closed; a refresh brings
+// it back.
 // ============================================================
 import { useEffect } from 'react';
 
@@ -13,22 +14,14 @@ const PINK     = '#FF69B4';
 const ROSE     = '#F94144';
 const DEEP_PINK = '#D63384';
 
-const DISMISS_KEY = 'cw_premium_promo_dismissed';
-const DISMISS_MS  = 24 * 60 * 60 * 1000; // 24h
-
 /** Whether the entry promo should render for this user right now. */
 export function shouldShowPromo(isPremium) {
-  if (isPremium) return false;
-  try {
-    const last = parseInt(localStorage.getItem(DISMISS_KEY) || '0', 10);
-    return Date.now() - last >= DISMISS_MS;
-  } catch { return true; }
+  return !isPremium;
 }
 
-/** Stamp "now" as the last-dismissed time so the promo hides for 24h. */
-export function markPromoDismissed() {
-  try { localStorage.setItem(DISMISS_KEY, String(Date.now())); } catch {}
-}
+/** No-op kept for API parity with callers. The promo no longer persists
+    a dismissal — we deliberately show it every entry. */
+export function markPromoDismissed() {}
 
 export default function PremiumPromo({ t, onUpgrade, onDismiss }) {
   // ESC closes — keyboard parity with the X button.

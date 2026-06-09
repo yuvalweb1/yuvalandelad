@@ -23,6 +23,7 @@ import ChaosTimeline from './views/ChaosTimeline.jsx';
 import Settings from './views/Settings.jsx';
 import VideoAdSlot from './components/VideoAdSlot.jsx';
 import PremiumPromo, { shouldShowPromo, markPromoDismissed } from './components/PremiumPromo.jsx';
+import PaymentSheet from './components/PaymentSheet.jsx';
 import { ADS, adEnabled } from './lib/ads.js';
 import { SLIDES_BY_TYPE, SLIDE_COMPONENTS } from './slides';
 
@@ -114,17 +115,25 @@ function RecappedApp() {
     try { localStorage.setItem('cw_premium', v ? '1' : '0'); } catch {}
   }, []);
 
-  // Entry-time premium promo — opens once on app mount for non-premium users
-  // who haven't dismissed it in the last 24h. Closed for the rest of the
-  // session even if user comes back to Landing (e.g., after Reset).
+  // Entry-time premium promo — opens on every app mount for non-premium
+  // users. Within a session, dismissing keeps it closed (no nag loop);
+  // a refresh shows it again so we don't lose the reminder hook.
   const [promoOpen, setPromoOpen] = useState(() => shouldShowPromo(isPremium));
+  const [paymentOpen, setPaymentOpen] = useState(false);
   const dismissPromo = useCallback(() => {
     markPromoDismissed();
     setPromoOpen(false);
   }, []);
+  // "Upgrade" on the promo now opens the payment sheet instead of
+  // immediately flipping the premium flag — the flag flips when payment
+  // succeeds (stubbed) in onPaymentSuccess.
   const acceptPromo = useCallback(() => {
-    updatePremium(true);
     setPromoOpen(false);
+    setPaymentOpen(true);
+  }, []);
+  const onPaymentSuccess = useCallback(() => {
+    updatePremium(true);
+    setPaymentOpen(false);
   }, [updatePremium]);
   const t = useMemo(() => buildT(lang), [lang]);
   const isRTL = RTL_LANGS.has(lang);
@@ -421,6 +430,13 @@ function RecappedApp() {
                   t={t}
                   onUpgrade={acceptPromo}
                   onDismiss={dismissPromo}
+                />
+              )}
+              {paymentOpen && (
+                <PaymentSheet
+                  t={t}
+                  onClose={() => setPaymentOpen(false)}
+                  onSuccess={onPaymentSuccess}
                 />
               )}
             </>
