@@ -66,6 +66,8 @@ export default {
   welcome_continue: 'Continue →',
   welcome_skip: 'Skip',
   welcome_greeting: 'Hey {name} 👋',
+  welcome_country_search: 'Search…',
+  welcome_no_results: 'No countries match.',
   // Past recaps
   past_recaps: 'past recaps',
   past_recaps_clear: 'clear all',

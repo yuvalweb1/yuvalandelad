@@ -66,6 +66,8 @@ export default {
   welcome_continue: 'המשך →',
   welcome_skip: 'דלג',
   welcome_greeting: 'היי {name} 👋',
+  welcome_country_search: 'חפש…',
+  welcome_no_results: 'אין מדינות תואמות.',
   // ריקאפים קודמים
   past_recaps: 'ריקאפים קודמים',
   past_recaps_clear: 'נקה הכל',

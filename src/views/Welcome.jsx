@@ -7,7 +7,9 @@
 // these fields). Either way we set cw_seen_welcome so the user
 // doesn't hit the questionnaire again on the next visit.
 // ============================================================
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
+import BottomSheet from '../components/BottomSheet.jsx';
+import { getCountries } from '../lib/countries.js';
 
 const CREAM     = '#FFF6D6';
 const PINK      = '#FDE6F1';
@@ -19,14 +21,24 @@ const MANGO     = '#FFC200';
 const MUTED     = 'rgba(74,14,78,0.55)';
 const BORDER    = 'rgba(74,14,78,0.12)';
 
-export default function Welcome({ t, onComplete }) {
+export default function Welcome({ t, lang = 'en', onComplete }) {
   const [name, setName] = useState('');
-  const [country, setCountry] = useState('');
+  const [country, setCountry] = useState(null); // selected { code, name, flag } or null
+  const [countryOpen, setCountryOpen] = useState(false);
+  const [filter, setFilter] = useState('');
+
+  // Built per-render but cheap enough; the list is ~200 items and
+  // useMemo'd against the current locale.
+  const countries = useMemo(() => getCountries(lang), [lang]);
+  const filteredCountries = filter.trim()
+    ? countries.filter(c => c.name.toLowerCase().includes(filter.trim().toLowerCase()))
+    : countries;
 
   const submit = (skipped) => {
     onComplete({
       name: skipped ? '' : name.trim(),
-      country: skipped ? '' : country.trim(),
+      country: skipped ? '' : (country ? `${country.name} (${country.code})` : ''),
+      countryCode: skipped ? '' : (country?.code || ''),
       skipped,
     });
   };
@@ -100,31 +112,38 @@ export default function Welcome({ t, onComplete }) {
             />
           </label>
 
-          <label className="a-fade-up" style={{ display: 'flex', flexDirection: 'column', gap: 7, animationDelay: '0.16s' }}>
+          <div className="a-fade-up" style={{ display: 'flex', flexDirection: 'column', gap: 7, animationDelay: '0.16s' }}>
             <span className="fs-mono" style={{
               fontSize: 11, letterSpacing: '0.16em', textTransform: 'uppercase',
               color: CORAL, fontWeight: 800,
             }}>
               {t.welcome_country_label || 'Where are you from?'}
             </span>
-            <input
-              type="text"
-              value={country}
-              onChange={(e) => setCountry(e.target.value)}
-              placeholder={t.welcome_country_placeholder || 'Country / City'}
-              autoComplete="country-name"
+            <button
+              type="button"
+              onClick={() => setCountryOpen(true)}
+              className="press"
               style={{
                 appearance: 'none', width: '100%', padding: '14px 16px',
                 background: '#fff', border: `2px solid ${BORDER}`,
-                borderRadius: 14, color: EGGPLANT,
+                borderRadius: 14, color: country ? EGGPLANT : 'rgba(74,14,78,0.38)',
                 fontSize: 17, fontFamily: 'inherit', fontWeight: 600,
-                outline: 'none',
+                cursor: 'pointer', textAlign: 'start',
+                display: 'flex', alignItems: 'center', gap: 10,
                 boxShadow: '0 3px 0 rgba(74,14,78,0.06)',
               }}
-              onFocus={(e) => { e.target.style.borderColor = CORAL; }}
-              onBlur={(e)  => { e.target.style.borderColor = BORDER; }}
-            />
-          </label>
+            >
+              {country ? (
+                <>
+                  <span style={{ fontSize: 22, lineHeight: 1, flexShrink: 0 }}>{country.flag}</span>
+                  <span style={{ flex: 1, minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{country.name}</span>
+                </>
+              ) : (
+                <span style={{ flex: 1 }}>{t.welcome_country_placeholder || 'Country / City'}</span>
+              )}
+              <span aria-hidden style={{ fontSize: 16, color: MUTED, flexShrink: 0 }}>▾</span>
+            </button>
+          </div>
         </div>
 
         {/* spacer pushes CTA to bottom on tall screens */}
@@ -170,6 +189,74 @@ export default function Welcome({ t, onComplete }) {
           </button>
         </div>
       </div>
+
+      {countryOpen && (
+        <BottomSheet
+          light
+          onClose={() => { setCountryOpen(false); setFilter(''); }}
+          title={t.welcome_country_label || 'Where are you from?'}
+        >
+          {/* search filter */}
+          <input
+            type="search"
+            value={filter}
+            onChange={(e) => setFilter(e.target.value)}
+            placeholder={t.welcome_country_search || 'Search…'}
+            autoFocus
+            style={{
+              appearance: 'none', width: '100%', padding: '11px 14px',
+              background: '#fff', border: `1.5px solid ${BORDER}`,
+              borderRadius: 12, color: EGGPLANT,
+              fontSize: 15, fontFamily: 'inherit', fontWeight: 600,
+              outline: 'none', marginBottom: 10,
+            }}
+            onFocus={(e) => { e.target.style.borderColor = CORAL; }}
+            onBlur={(e)  => { e.target.style.borderColor = BORDER; }}
+          />
+          {filteredCountries.length === 0 ? (
+            <div className="fs-sans" style={{
+              padding: '24px 8px', textAlign: 'center', color: MUTED,
+              fontSize: 14,
+            }}>
+              {t.welcome_no_results || 'No countries match.'}
+            </div>
+          ) : (
+            <div role="listbox" style={{ display: 'flex', flexDirection: 'column' }}>
+              {filteredCountries.map(c => {
+                const selected = country?.code === c.code;
+                return (
+                  <button
+                    key={c.code}
+                    role="option"
+                    aria-selected={selected}
+                    onClick={() => {
+                      setCountry(c);
+                      setCountryOpen(false);
+                      setFilter('');
+                    }}
+                    className="press"
+                    style={{
+                      display: 'flex', alignItems: 'center', gap: 12,
+                      width: '100%', padding: '12px 8px',
+                      background: selected ? 'rgba(240,100,73,0.10)' : 'transparent',
+                      border: 'none', borderRadius: 10,
+                      color: EGGPLANT, cursor: 'pointer',
+                      fontSize: 16, fontFamily: 'inherit', fontWeight: 600,
+                      textAlign: 'start',
+                    }}
+                  >
+                    <span style={{ fontSize: 24, lineHeight: 1, flexShrink: 0 }}>{c.flag}</span>
+                    <span style={{ flex: 1, minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{c.name}</span>
+                    {selected && (
+                      <span aria-hidden style={{ color: CORAL, fontSize: 18, flexShrink: 0 }}>✓</span>
+                    )}
+                  </button>
+                );
+              })}
+            </div>
+          )}
+        </BottomSheet>
+      )}
     </div>
   );
 }

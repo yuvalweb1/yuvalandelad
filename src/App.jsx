@@ -406,6 +406,7 @@ function RecappedApp() {
           {stage === 'welcome' && (
             <Welcome
               t={t}
+              lang={lang}
               onComplete={({ name, country }) => {
                 setUserName(name);
                 setUserCountry(country);
