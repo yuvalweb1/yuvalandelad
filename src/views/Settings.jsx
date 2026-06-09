@@ -31,7 +31,7 @@ export default function Settings({
   t, lang, setLang,
   includeMedia, setIncludeMedia,
   showDemo, setShowDemo,
-  isPremium, setPremium,
+  isPremium, setPremium, onUpgrade,
   history = [], onClearHistory,
   onBack,
 }) {
@@ -140,7 +140,7 @@ export default function Settings({
               </button>
             </div>
           ) : (
-            <button onClick={() => setPremium(true)} className="press lift a-fade-up" style={{
+            <button onClick={() => (onUpgrade ? onUpgrade() : setPremium(true))} className="press lift a-fade-up" style={{
               width: '100%', position: 'relative', overflow: 'hidden', textAlign: 'start',
               background: `linear-gradient(135deg, ${BANANA} 0%, ${MANGO} 100%)`,
               border: '2px solid rgba(255,255,255,0.85)',

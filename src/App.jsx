@@ -432,13 +432,6 @@ function RecappedApp() {
                   onDismiss={dismissPromo}
                 />
               )}
-              {paymentOpen && (
-                <PaymentSheet
-                  t={t}
-                  onClose={() => setPaymentOpen(false)}
-                  onSuccess={onPaymentSuccess}
-                />
-              )}
             </>
           )}
           {stage === 'parsing' && (
@@ -526,6 +519,7 @@ function RecappedApp() {
               setShowDemo={updateShowDemo}
               isPremium={isPremium}
               setPremium={updatePremium}
+              onUpgrade={() => setPaymentOpen(true)}
               history={history}
               onClearHistory={handleClearHistory}
               onBack={() => setStage(settingsReturn)}
@@ -574,6 +568,16 @@ function RecappedApp() {
           />
         )}
         <HomeIndicator />
+        {/* Payment sheet — rendered at App level so any surface (entry
+            promo, Settings upsell, future inline CTAs) can open it via
+            the shared `paymentOpen` flag. */}
+        {paymentOpen && (
+          <PaymentSheet
+            t={t}
+            onClose={() => setPaymentOpen(false)}
+            onSuccess={onPaymentSuccess}
+          />
+        )}
       </div>
     </div>
   );
