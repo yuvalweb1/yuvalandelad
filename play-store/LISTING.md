@@ -21,7 +21,7 @@ questionnaire. Copy-paste from here.
 | **Tags** | Social, Year in Review, Stats |
 | **Contact email** | team.recapped1@gmail.com |
 | **Website** | none |
-| **Privacy Policy URL** | TBD |
+| **Privacy Policy URL** | https://yuvalweb1.github.io/yuvalandelad/privacy.html |
 
 ---
 
