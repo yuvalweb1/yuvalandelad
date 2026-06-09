@@ -474,7 +474,7 @@ export default function HowToGuide({ t, onStart, onHome, lang, setLang }) {
               display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 12,
             }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-                <span style={{ fontSize: 22 }}>{l.flag}</span>
+                <span className="cw-flag" style={{ fontSize: 22 }}>{l.flag}</span>
                 <span style={{ fontSize: 23, fontWeight: 600 }}>{l.name}</span>
               </div>
               {l.code === lang && (

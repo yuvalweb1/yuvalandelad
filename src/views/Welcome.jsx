@@ -135,7 +135,7 @@ export default function Welcome({ t, lang = 'en', onComplete }) {
             >
               {country ? (
                 <>
-                  <span style={{ fontSize: 22, lineHeight: 1, flexShrink: 0 }}>{country.flag}</span>
+                  <span className="cw-flag" style={{ fontSize: 22, lineHeight: 1, flexShrink: 0 }}>{country.flag}</span>
                   <span style={{ flex: 1, minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{country.name}</span>
                 </>
               ) : (
@@ -245,7 +245,7 @@ export default function Welcome({ t, lang = 'en', onComplete }) {
                       textAlign: 'start',
                     }}
                   >
-                    <span style={{ fontSize: 24, lineHeight: 1, flexShrink: 0 }}>{c.flag}</span>
+                    <span className="cw-flag" style={{ fontSize: 24, lineHeight: 1, flexShrink: 0 }}>{c.flag}</span>
                     <span style={{ flex: 1, minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{c.name}</span>
                     {selected && (
                       <span aria-hidden style={{ color: CORAL, fontSize: 18, flexShrink: 0 }}>✓</span>

@@ -188,7 +188,7 @@ export default function Settings({
             padding: '12px 14px', background: 'transparent', border: 'none',
             cursor: 'pointer', textAlign: 'start',
           }}>
-            <span style={{ fontSize: 28, flexShrink: 0 }}>{currentLang.flag}</span>
+            <span className="cw-flag" style={{ fontSize: 28, flexShrink: 0 }}>{currentLang.flag}</span>
             <div style={{ flex: 1, minWidth: 0 }}>
               <div className="fs-sans" style={{
                 fontSize: 16, fontWeight: 800, color: EGGPLANT, letterSpacing: '-0.01em',
@@ -362,7 +362,7 @@ export default function Settings({
               display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 12,
             }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-                <span style={{ fontSize: 22 }}>{l.flag}</span>
+                <span className="cw-flag" style={{ fontSize: 22 }}>{l.flag}</span>
                 <span style={{ fontSize: 23, fontWeight: 600 }}>{l.name}</span>
               </div>
               {l.code === lang && (
