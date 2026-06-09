@@ -34,6 +34,9 @@ export default {
   menu_action_home: 'Home',
   menu_action_roast: 'Roast Mode',
   menu_action_replay: 'Replay deck',
+  coming_soon_title: 'Coming soon',
+  coming_soon_body: 'We\'re cooking this one. Hang tight — it\'ll land in a future update.',
+  coming_soon_ok: 'Got it',
   // Past recaps
   past_recaps: 'past recaps',
   past_recaps_clear: 'clear all',

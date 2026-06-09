@@ -34,6 +34,9 @@ export default {
   menu_action_home: 'בית',
   menu_action_roast: 'מצב רוסט',
   menu_action_replay: 'הצג שוב מההתחלה',
+  coming_soon_title: 'בקרוב',
+  coming_soon_body: 'אנחנו עובדים על זה. נחתח בעדכון הקרוב — שווה לחזור.',
+  coming_soon_ok: 'הבנתי',
   // ריקאפים קודמים
   past_recaps: 'ריקאפים קודמים',
   past_recaps_clear: 'נקה הכל',

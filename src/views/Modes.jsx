@@ -1,3 +1,5 @@
+import { useState } from 'react';
+
 // ── Mode tile — flex-grows inside the tile container, which is capped at
 //    ~50vh, so the three tiles together fill half the viewport.
 function ModeTile({ label, title, emoji, gradient, fg = '#fff', shadowColor = '#3a0a3d', onClick }) {
@@ -81,6 +83,12 @@ export default function Modes({ analytics, history = [], t, onUpload, onRoastMod
   // "available" even before it's loaded into the active session — don't make
   // them feel locked out of something they just brought in.
   const unlocked = !!analytics || history.length > 0;
+
+  // Duo + Chaos are placeholders right now; intercept their taps with a
+  // "Coming soon" modal instead of routing to the empty stub views.
+  const [comingSoonOpen, setComingSoonOpen] = useState(false);
+  const showComingSoon = () => setComingSoonOpen(true);
+
   return (
     <div style={{
       position: 'relative', height: '100%', overflow: 'hidden',
@@ -131,7 +139,7 @@ export default function Modes({ analytics, history = [], t, onUpload, onRoastMod
             gradient="linear-gradient(135deg, #FFD700 0%, #FF8C00 100%)"
             fg="#4A0E4E"
             shadowColor="#b56500"
-            onClick={onDuo}
+            onClick={showComingSoon}
           />
           <ModeTile
             label={t.menu_chaos_eyebrow || 'Chaos mode'}
@@ -140,11 +148,77 @@ export default function Modes({ analytics, history = [], t, onUpload, onRoastMod
             gradient="linear-gradient(135deg, #00BFFF 0%, #573280 100%)"
             fg="#fff"
             shadowColor="#2e1856"
-            onClick={onChaos}
+            onClick={showComingSoon}
           />
         </div>
       ) : (
         <LockedState t={t} onUpload={onUpload} />
+      )}
+
+      {/* Coming-soon modal for Duo + Chaos placeholder modes. Backdrop +
+          centered card; tap backdrop or CTA to dismiss. */}
+      {comingSoonOpen && (
+        <>
+          <style>{`
+            @keyframes cw-cs-fade { from { opacity: 0; } to { opacity: 1; } }
+            @keyframes cw-cs-pop  {
+              from { opacity: 0; transform: scale(0.92) translateY(8px); }
+              to   { opacity: 1; transform: scale(1) translateY(0); }
+            }
+          `}</style>
+          <div
+            onClick={() => setComingSoonOpen(false)}
+            style={{
+              position: 'absolute', inset: 0, zIndex: 90,
+              background: 'rgba(42,6,69,0.45)', backdropFilter: 'blur(4px)',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              padding: '24px',
+              animation: 'cw-cs-fade 0.18s ease-out',
+            }}
+          >
+            <div
+              onClick={(e) => e.stopPropagation()}
+              role="dialog" aria-modal="true"
+              style={{
+                width: '100%', maxWidth: 320,
+                background: '#fff', borderRadius: 24,
+                padding: '28px 24px 20px',
+                textAlign: 'center',
+                boxShadow: '0 24px 48px -12px rgba(42,6,69,0.45)',
+                animation: 'cw-cs-pop 0.22s cubic-bezier(0.34, 1.5, 0.64, 1)',
+              }}
+            >
+              <div aria-hidden style={{ fontSize: 56, lineHeight: 1, marginBottom: 8 }}>🚧</div>
+              <div className="fs-display" style={{
+                fontSize: 24, fontWeight: 800, color: '#2a0645',
+                letterSpacing: '-0.03em', marginBottom: 8,
+              }}>
+                {t.coming_soon_title || 'Coming soon'}
+              </div>
+              <div className="fs-sans" style={{
+                fontSize: 14, lineHeight: 1.5, color: 'rgba(74,14,78,0.62)',
+                marginBottom: 20, padding: '0 4px',
+              }}>
+                {t.coming_soon_body || "We're cooking this one. Hang tight — it'll land in a future update."}
+              </div>
+              <button
+                onClick={() => setComingSoonOpen(false)}
+                className="press"
+                style={{
+                  width: '100%', padding: '14px 18px',
+                  background: 'linear-gradient(135deg, #FFD700 0%, #FFC200 100%)',
+                  color: '#4A0E4E', border: '2px solid rgba(255,255,255,0.80)',
+                  borderRadius: 16, cursor: 'pointer',
+                  fontSize: 15, fontWeight: 800, letterSpacing: '-0.01em',
+                  fontFamily: 'inherit',
+                  boxShadow: '0 5px 0 rgba(74,14,78,0.22), 0 10px 18px -6px rgba(74,14,78,0.26)',
+                }}
+              >
+                {t.coming_soon_ok || 'Got it'}
+              </button>
+            </div>
+          </div>
+        </>
       )}
     </div>
   );
