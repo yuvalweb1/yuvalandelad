@@ -49,6 +49,52 @@ export const COUNTRY_CODES = [
   'ZM','ZW',
 ];
 
+// ── Country → UI language inference ─────────────────────────────────────
+// Only maps to locales we actually ship in src/i18n/. Multilingual
+// countries pick the most-likely default (e.g. CH → de, CA → en) — the
+// user can still flip the language manually in Settings afterwards.
+export const COUNTRY_TO_LANG = {
+  // Hebrew
+  IL: 'he',
+  // Arabic
+  SA: 'ar', AE: 'ar', EG: 'ar', JO: 'ar', IQ: 'ar', LB: 'ar', KW: 'ar',
+  QA: 'ar', OM: 'ar', BH: 'ar', YE: 'ar', SY: 'ar', LY: 'ar', TN: 'ar',
+  DZ: 'ar', MA: 'ar', SD: 'ar', SO: 'ar', DJ: 'ar', PS: 'ar',
+  // Spanish
+  ES: 'es', MX: 'es', AR: 'es', CO: 'es', CL: 'es', PE: 'es', VE: 'es',
+  EC: 'es', GT: 'es', BO: 'es', DO: 'es', HN: 'es', PY: 'es', SV: 'es',
+  NI: 'es', CR: 'es', PA: 'es', UY: 'es', PR: 'es', CU: 'es', GQ: 'es',
+  // French
+  FR: 'fr', BE: 'fr', LU: 'fr', MC: 'fr', SN: 'fr', CI: 'fr', CM: 'fr',
+  BF: 'fr', ML: 'fr', NE: 'fr', TG: 'fr', BJ: 'fr', GA: 'fr', CG: 'fr',
+  CD: 'fr', MG: 'fr', BI: 'fr', RW: 'fr', HT: 'fr',
+  // German
+  DE: 'de', AT: 'de', LI: 'de', CH: 'de',
+  // Portuguese
+  PT: 'pt', BR: 'pt', AO: 'pt', MZ: 'pt', CV: 'pt', GW: 'pt', ST: 'pt', TL: 'pt',
+  // Italian
+  IT: 'it', SM: 'it', VA: 'it',
+  // Russian
+  RU: 'ru', BY: 'ru', KZ: 'ru', KG: 'ru',
+  // Turkish
+  TR: 'tr',
+  // Hindi
+  IN: 'hi', NP: 'hi',
+  // Chinese
+  CN: 'zh', TW: 'zh', HK: 'zh', MO: 'zh', SG: 'zh',
+  // Japanese
+  JP: 'ja',
+  // Korean
+  KR: 'ko', KP: 'ko',
+};
+
+/** Look up a UI locale for a country code; returns 'en' when no
+    confident mapping is available (anglosphere + everywhere else). */
+export function langForCountry(code) {
+  if (!code) return null;
+  return COUNTRY_TO_LANG[code.toUpperCase()] || 'en';
+}
+
 /**
  * Build a [{ code, name, flag }] list sorted alphabetically by the
  * localized name. Uses `Intl.DisplayNames` so the picker reads in the

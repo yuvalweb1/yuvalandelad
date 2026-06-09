@@ -4,7 +4,8 @@ import { computeAll } from './lib/analytics.js';
 import { generateSampleText, generateSampleMedia } from './lib/sample.js';
 import { loadHistory, saveRecap, removeRecap, clearHistory, deriveChatName, updateRecapProfile } from './lib/history.js';
 import { saveMedia, loadMedia, deleteMedia, clearAllMedia } from './lib/mediaStore.js';
-import { RTL_LANGS, detectLang, buildT } from './i18n';
+import { RTL_LANGS, detectLang, buildT, I18N } from './i18n';
+import { langForCountry } from './lib/countries.js';
 import ErrorBoundary from './components/ErrorBoundary.jsx';
 import GlobalStyles from './components/GlobalStyles.jsx';
 import BlobBackground from './components/BlobBackground.jsx';
@@ -407,7 +408,7 @@ function RecappedApp() {
             <Welcome
               t={t}
               lang={lang}
-              onComplete={({ name, country }) => {
+              onComplete={({ name, country, countryCode }) => {
                 setUserName(name);
                 setUserCountry(country);
                 try {
@@ -415,6 +416,15 @@ function RecappedApp() {
                   if (country) localStorage.setItem('cw_user_country', country);
                   localStorage.setItem('cw_seen_welcome', '1');
                 } catch {}
+                // Auto-switch UI language to match the user's country —
+                // e.g. IL → he, JP → ja, FR → fr. Falls back to en for
+                // unmapped regions. Skipped if no country was picked.
+                if (countryCode) {
+                  const inferred = langForCountry(countryCode);
+                  if (inferred && I18N[inferred] && inferred !== lang) {
+                    setLang(inferred);
+                  }
+                }
                 setStage(localStorage.getItem('cw_seen_guide') ? 'landing' : 'howto');
               }}
             />
