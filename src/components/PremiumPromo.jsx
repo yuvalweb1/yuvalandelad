@@ -5,6 +5,8 @@
 // it back.
 // ============================================================
 import { useEffect } from 'react';
+import { formatPrice } from '../lib/pricing.js';
+import { interp } from '../i18n';
 
 const BANANA   = '#FFD700';
 const MANGO    = '#FF8C00';
@@ -23,7 +25,8 @@ export function shouldShowPromo(isPremium) {
     a dismissal — we deliberately show it every entry. */
 export function markPromoDismissed() {}
 
-export default function PremiumPromo({ t, onUpgrade, onDismiss }) {
+export default function PremiumPromo({ t, lang = 'en', onUpgrade, onDismiss }) {
+  const priceLabel = formatPrice(lang);
   // ESC closes — keyboard parity with the X button.
   useEffect(() => {
     const onKey = (e) => { if (e.key === 'Escape') onDismiss(); };
@@ -139,7 +142,7 @@ export default function PremiumPromo({ t, onUpgrade, onDismiss }) {
               <div className="fs-display" style={{
                 fontSize: 17, fontWeight: 800, letterSpacing: '-0.02em',
               }}>
-                {t.promo_cta || 'Upgrade · ₪15/mo'} →
+                {interp(t.promo_cta || 'Upgrade · {price}', { price: priceLabel })} →
               </div>
             </button>
 

@@ -428,6 +428,7 @@ function RecappedApp() {
               {promoOpen && (
                 <PremiumPromo
                   t={t}
+                  lang={lang}
                   onUpgrade={acceptPromo}
                   onDismiss={dismissPromo}
                 />
@@ -574,6 +575,7 @@ function RecappedApp() {
         {paymentOpen && (
           <PaymentSheet
             t={t}
+            lang={lang}
             onClose={() => setPaymentOpen(false)}
             onSuccess={onPaymentSuccess}
           />

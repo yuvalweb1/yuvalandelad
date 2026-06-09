@@ -16,6 +16,7 @@
 // ============================================================
 import { useState } from 'react';
 import { interp } from '../i18n';
+import { getPricing, formatPrice } from '../lib/pricing.js';
 
 const EGGPLANT = '#4A0E4E';
 const PLUM     = '#2a0645';
@@ -29,15 +30,6 @@ const BORDER   = 'rgba(74,14,78,0.12)';
 const DISCOUNT_CODES = {
   ELLA20: 20,
 };
-
-const BASE_PRICE_ILS = 15;
-
-function formatPrice(amount) {
-  // Always shows ₪ prefix — sign + price is parsed by the eye
-  // regardless of UI direction. Drops the .00 for round numbers.
-  const fixed = Number.isInteger(amount) ? amount.toString() : amount.toFixed(2);
-  return `₪${fixed}`;
-}
 
 function Tab({ id, label, emoji, active, onClick }) {
   return (
@@ -93,7 +85,7 @@ function Field({ label, value, onChange, placeholder, type = 'text', maxLength, 
   );
 }
 
-export default function PaymentSheet({ t, onClose, onSuccess }) {
+export default function PaymentSheet({ t, lang = 'en', onClose, onSuccess }) {
   const [method, setMethod] = useState('bit');
   const [code, setCode] = useState('');
   const [appliedDiscount, setAppliedDiscount] = useState(0);
@@ -105,8 +97,9 @@ export default function PaymentSheet({ t, onClose, onSuccess }) {
   const [cardName, setCardName] = useState('');
   const [success, setSuccess] = useState(false);
 
-  const price = BASE_PRICE_ILS * (1 - appliedDiscount / 100);
-  const priceLabel = formatPrice(price);
+  const basePrice = getPricing(lang).amount;
+  const price = basePrice * (1 - appliedDiscount / 100);
+  const priceLabel = formatPrice(lang, price);
 
   const applyCode = () => {
     const normalized = code.trim().toUpperCase();

@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import BottomSheet from '../components/BottomSheet.jsx';
-import { RTL_LANGS } from '../i18n';
+import { RTL_LANGS, interp } from '../i18n';
+import { formatPrice } from '../lib/pricing.js';
 
 // Ultra-Pop palette — same vocabulary as the slides + PostMenu.
 const BANANA   = '#FFD700';
@@ -38,6 +39,7 @@ export default function Settings({
   const [langOpen, setLangOpen] = useState(false);
   const [confirmClear, setConfirmClear] = useState(false);
   const currentLang = LANGUAGES.find(l => l.code === lang) || LANGUAGES[0];
+  const priceLabel = formatPrice(lang);
 
   return (
     <div className="no-sb" style={{
@@ -163,7 +165,7 @@ export default function Settings({
                 fontSize: 24, lineHeight: 1.05, letterSpacing: '-0.03em', marginTop: 4,
                 fontWeight: 800, position: 'relative',
               }}>
-                {t.settings_premium_upsell_title || 'Skip every ad · ₪15/mo'}
+                {interp(t.settings_premium_upsell_title || 'Skip every ad · {price} for life', { price: priceLabel })}
               </div>
               <div className="fs-mono" style={{
                 fontSize: 11, color: 'rgba(74,14,78,0.65)', marginTop: 8, fontWeight: 600,
