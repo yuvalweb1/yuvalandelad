@@ -13,6 +13,11 @@ export default function GlobalStyles() {
       .fs-mono { font-family: 'Inter Tight', 'DM Sans', -apple-system, sans-serif; font-feature-settings: 'tnum' on; font-variant-numeric: tabular-nums; font-weight: 500; }
       .fs-sans { font-family: 'DM Sans', -apple-system, sans-serif; }
       .fs-serif { font-family: 'Instrument Serif', Georgia, serif; }
+      /* Country flag emoji fallback — Windows ships without the regional
+         indicator font, so 🇮🇱 renders as "IL". main.jsx loads the
+         "Twemoji Country Flags" webfont via polyfill; this class opts
+         a span into it. Other systems render natively (zero bytes). */
+      .cw-flag { font-family: 'Twemoji Country Flags', 'Apple Color Emoji', 'Segoe UI Emoji', 'Noto Color Emoji', sans-serif; font-style: normal; }
       @keyframes fadeUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
       @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
       @keyframes scaleSpring { 0% { opacity: 0; transform: scale(0.5); } 60% { transform: scale(1.08); } 100% { opacity: 1; transform: scale(1); } }

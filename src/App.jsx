@@ -4,13 +4,15 @@ import { computeAll } from './lib/analytics.js';
 import { generateSampleText, generateSampleMedia } from './lib/sample.js';
 import { loadHistory, saveRecap, removeRecap, clearHistory, deriveChatName, updateRecapProfile } from './lib/history.js';
 import { saveMedia, loadMedia, deleteMedia, clearAllMedia } from './lib/mediaStore.js';
-import { RTL_LANGS, detectLang, buildT } from './i18n';
+import { RTL_LANGS, detectLang, buildT, I18N } from './i18n';
+import { langForCountry } from './lib/countries.js';
 import ErrorBoundary from './components/ErrorBoundary.jsx';
 import GlobalStyles from './components/GlobalStyles.jsx';
 import BlobBackground from './components/BlobBackground.jsx';
 import HomeIndicator from './components/HomeIndicator.jsx';
 import BottomNavBar from './components/BottomNavBar.jsx';
 import HowToGuide from './views/HowToGuide.jsx';
+import Welcome from './views/Welcome.jsx';
 import Landing from './views/Landing.jsx';
 import Parsing from './views/Parsing.jsx';
 import Onboarding from './views/Onboarding.jsx';
@@ -23,6 +25,7 @@ import ChaosTimeline from './views/ChaosTimeline.jsx';
 import Settings from './views/Settings.jsx';
 import VideoAdSlot from './components/VideoAdSlot.jsx';
 import PremiumPromo, { shouldShowPromo, markPromoDismissed } from './components/PremiumPromo.jsx';
+import PaymentSheet from './components/PaymentSheet.jsx';
 import { ADS, adEnabled } from './lib/ads.js';
 import { SLIDES_BY_TYPE, SLIDE_COMPONENTS } from './slides';
 
@@ -39,10 +42,22 @@ export default function App() {
 }
 
 function RecappedApp() {
-  // First visit shows the how-to-export guide before the home screen; returning
-  // visitors skip straight to home (the guide stays reachable from the home link).
+  // First-run flow: welcome questionnaire → how-to-export → home.
+  // Returning visitors skip both gates and land on Landing directly.
   const [stage, setStage] = useState(() => {
-    try { return localStorage.getItem('cw_seen_guide') ? 'landing' : 'howto'; } catch { return 'howto'; }
+    try {
+      if (!localStorage.getItem('cw_seen_welcome')) return 'welcome';
+      if (!localStorage.getItem('cw_seen_guide'))   return 'howto';
+      return 'landing';
+    } catch { return 'welcome'; }
+  });
+  // Name + country captured by the Welcome questionnaire on first run.
+  // Persisted to localStorage; used for personalized greetings later.
+  const [userName, setUserName] = useState(() => {
+    try { return localStorage.getItem('cw_user_name') || ''; } catch { return ''; }
+  });
+  const [userCountry, setUserCountry] = useState(() => {
+    try { return localStorage.getItem('cw_user_country') || ''; } catch { return ''; }
   });
   const [analytics, setAnalytics] = useState(null);
   const [diagnostics, setDiagnostics] = useState(null);
@@ -114,17 +129,25 @@ function RecappedApp() {
     try { localStorage.setItem('cw_premium', v ? '1' : '0'); } catch {}
   }, []);
 
-  // Entry-time premium promo — opens once on app mount for non-premium users
-  // who haven't dismissed it in the last 24h. Closed for the rest of the
-  // session even if user comes back to Landing (e.g., after Reset).
+  // Entry-time premium promo — opens on every app mount for non-premium
+  // users. Within a session, dismissing keeps it closed (no nag loop);
+  // a refresh shows it again so we don't lose the reminder hook.
   const [promoOpen, setPromoOpen] = useState(() => shouldShowPromo(isPremium));
+  const [paymentOpen, setPaymentOpen] = useState(false);
   const dismissPromo = useCallback(() => {
     markPromoDismissed();
     setPromoOpen(false);
   }, []);
+  // "Upgrade" on the promo now opens the payment sheet instead of
+  // immediately flipping the premium flag — the flag flips when payment
+  // succeeds (stubbed) in onPaymentSuccess.
   const acceptPromo = useCallback(() => {
-    updatePremium(true);
     setPromoOpen(false);
+    setPaymentOpen(true);
+  }, []);
+  const onPaymentSuccess = useCallback(() => {
+    updatePremium(true);
+    setPaymentOpen(false);
   }, [updatePremium]);
   const t = useMemo(() => buildT(lang), [lang]);
   const isRTL = RTL_LANGS.has(lang);
@@ -381,6 +404,31 @@ function RecappedApp() {
       }}>
         <BlobBackground />
         <div style={{ position: 'absolute', inset: 0, overflow: 'hidden' }} dir={isRTL ? 'rtl' : 'auto'}>
+          {stage === 'welcome' && (
+            <Welcome
+              t={t}
+              lang={lang}
+              onComplete={({ name, country, countryCode }) => {
+                setUserName(name);
+                setUserCountry(country);
+                try {
+                  if (name)    localStorage.setItem('cw_user_name', name);
+                  if (country) localStorage.setItem('cw_user_country', country);
+                  localStorage.setItem('cw_seen_welcome', '1');
+                } catch {}
+                // Auto-switch UI language to match the user's country —
+                // e.g. IL → he, JP → ja, FR → fr. Falls back to en for
+                // unmapped regions. Skipped if no country was picked.
+                if (countryCode) {
+                  const inferred = langForCountry(countryCode);
+                  if (inferred && I18N[inferred] && inferred !== lang) {
+                    setLang(inferred);
+                  }
+                }
+                setStage(localStorage.getItem('cw_seen_guide') ? 'landing' : 'howto');
+              }}
+            />
+          )}
           {stage === 'howto' && (
             <HowToGuide
               t={t}
@@ -419,6 +467,7 @@ function RecappedApp() {
               {promoOpen && (
                 <PremiumPromo
                   t={t}
+                  lang={lang}
                   onUpgrade={acceptPromo}
                   onDismiss={dismissPromo}
                 />
@@ -510,6 +559,7 @@ function RecappedApp() {
               setShowDemo={updateShowDemo}
               isPremium={isPremium}
               setPremium={updatePremium}
+              onUpgrade={() => setPaymentOpen(true)}
               history={history}
               onClearHistory={handleClearHistory}
               onBack={() => setStage(settingsReturn)}
@@ -558,6 +608,17 @@ function RecappedApp() {
           />
         )}
         <HomeIndicator />
+        {/* Payment sheet — rendered at App level so any surface (entry
+            promo, Settings upsell, future inline CTAs) can open it via
+            the shared `paymentOpen` flag. */}
+        {paymentOpen && (
+          <PaymentSheet
+            t={t}
+            lang={lang}
+            onClose={() => setPaymentOpen(false)}
+            onSuccess={onPaymentSuccess}
+          />
+        )}
       </div>
     </div>
   );

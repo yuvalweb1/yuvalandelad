@@ -8,8 +8,12 @@ import it from './it.js';
 import ru from './ru.js';
 import ar from './ar.js';
 import tr from './tr.js';
+import hi from './hi.js';
+import zh from './zh.js';
+import ja from './ja.js';
+import ko from './ko.js';
 
-export const I18N = { en, he, es, fr, de, pt, it, ru, ar, tr };
+export const I18N = { en, he, es, fr, de, pt, it, ru, ar, tr, hi, zh, ja, ko };
 
 export const RTL_LANGS = new Set(['he', 'ar']);
 

@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import BottomSheet from '../components/BottomSheet.jsx';
-import { RTL_LANGS } from '../i18n';
+import { RTL_LANGS, interp } from '../i18n';
+import { formatPrice } from '../lib/pricing.js';
 
 // Ultra-Pop palette — same vocabulary as the slides + PostMenu.
 const BANANA   = '#FFD700';
@@ -25,19 +26,24 @@ const LANGUAGES = [
   { code: 'ru', name: 'Русский', flag: '🇷🇺' },
   { code: 'ar', name: 'العربية', flag: '🇸🇦' },
   { code: 'tr', name: 'Türkçe', flag: '🇹🇷' },
+  { code: 'hi', name: 'हिन्दी', flag: '🇮🇳' },
+  { code: 'zh', name: '中文', flag: '🇨🇳' },
+  { code: 'ja', name: '日本語', flag: '🇯🇵' },
+  { code: 'ko', name: '한국어', flag: '🇰🇷' },
 ];
 
 export default function Settings({
   t, lang, setLang,
   includeMedia, setIncludeMedia,
   showDemo, setShowDemo,
-  isPremium, setPremium,
+  isPremium, setPremium, onUpgrade,
   history = [], onClearHistory,
   onBack,
 }) {
   const [langOpen, setLangOpen] = useState(false);
   const [confirmClear, setConfirmClear] = useState(false);
   const currentLang = LANGUAGES.find(l => l.code === lang) || LANGUAGES[0];
+  const priceLabel = formatPrice(lang);
 
   return (
     <div className="no-sb" style={{
@@ -140,7 +146,7 @@ export default function Settings({
               </button>
             </div>
           ) : (
-            <button onClick={() => setPremium(true)} className="press lift a-fade-up" style={{
+            <button onClick={() => (onUpgrade ? onUpgrade() : setPremium(true))} className="press lift a-fade-up" style={{
               width: '100%', position: 'relative', overflow: 'hidden', textAlign: 'start',
               background: `linear-gradient(135deg, ${BANANA} 0%, ${MANGO} 100%)`,
               border: '2px solid rgba(255,255,255,0.85)',
@@ -163,7 +169,7 @@ export default function Settings({
                 fontSize: 24, lineHeight: 1.05, letterSpacing: '-0.03em', marginTop: 4,
                 fontWeight: 800, position: 'relative',
               }}>
-                {t.settings_premium_upsell_title || 'Skip every ad · ₪15/mo'}
+                {interp(t.settings_premium_upsell_title || 'Skip every ad · {price} for life', { price: priceLabel })}
               </div>
               <div className="fs-mono" style={{
                 fontSize: 11, color: 'rgba(74,14,78,0.65)', marginTop: 8, fontWeight: 600,
@@ -182,7 +188,7 @@ export default function Settings({
             padding: '12px 14px', background: 'transparent', border: 'none',
             cursor: 'pointer', textAlign: 'start',
           }}>
-            <span style={{ fontSize: 28, flexShrink: 0 }}>{currentLang.flag}</span>
+            <span className="cw-flag" style={{ fontSize: 28, flexShrink: 0 }}>{currentLang.flag}</span>
             <div style={{ flex: 1, minWidth: 0 }}>
               <div className="fs-sans" style={{
                 fontSize: 16, fontWeight: 800, color: EGGPLANT, letterSpacing: '-0.01em',
@@ -356,7 +362,7 @@ export default function Settings({
               display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 12,
             }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-                <span style={{ fontSize: 22 }}>{l.flag}</span>
+                <span className="cw-flag" style={{ fontSize: 22 }}>{l.flag}</span>
                 <span style={{ fontSize: 23, fontWeight: 600 }}>{l.name}</span>
               </div>
               {l.code === lang && (

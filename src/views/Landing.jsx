@@ -14,6 +14,10 @@ const LANGUAGES = [
   { code: 'ru', name: 'Русский', flag: '🇷🇺' },
   { code: 'ar', name: 'العربية', flag: '🇸🇦' },
   { code: 'tr', name: 'Türkçe', flag: '🇹🇷' },
+  { code: 'hi', name: 'हिन्दी', flag: '🇮🇳' },
+  { code: 'zh', name: '中文', flag: '🇨🇳' },
+  { code: 'ja', name: '日本語', flag: '🇯🇵' },
+  { code: 'ko', name: '한국어', flag: '🇰🇷' },
 ];
 
 export default function Landing({
@@ -458,7 +462,7 @@ export default function Landing({
               display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 12,
             }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-                <span style={{ fontSize: 22 }}>{l.flag}</span>
+                <span className="cw-flag" style={{ fontSize: 22 }}>{l.flag}</span>
                 <span style={{ fontSize: 23, fontWeight: 600 }}>{l.name}</span>
               </div>
               {l.code === lang && (
