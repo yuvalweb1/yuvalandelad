@@ -17,8 +17,8 @@ const ROSE     = '#F94144';
 const DEEP_PINK = '#D63384';
 
 /** Whether the entry promo should render for this user right now. */
-export function shouldShowPromo(isPremium) {
-  return !isPremium;
+export function shouldShowPromo(_isPremium) {
+  return false; // hidden temporarily
 }
 
 /** No-op kept for API parity with callers. The promo no longer persists

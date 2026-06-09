@@ -1,7 +1,7 @@
 ﻿import { useState, useMemo, useCallback, useEffect, useRef } from 'react';
 import { parseChat } from './parser/client.js';
 import { computeAll } from './lib/analytics.js';
-import { generateSampleText, generateSampleMedia } from './lib/sample.js';
+import { generateSampleMedia } from './lib/sample.js';
 import { loadHistory, saveRecap, removeRecap, clearHistory, deriveChatName, updateRecapProfile } from './lib/history.js';
 import { saveMedia, loadMedia, deleteMedia, clearAllMedia } from './lib/mediaStore.js';
 import { RTL_LANGS, detectLang, buildT, I18N } from './i18n';
@@ -182,12 +182,21 @@ function RecappedApp() {
       const a = computeAll(parsed);
       // Real media (blob URLs) extracted on-device — empty when toggle is off
       // or when uploading a .txt. Each category is independent.
-      a.photos   = media?.photos   || [];
-      a.voice    = media?.voice    || [];
-      a.videos   = media?.videos   || [];
-      a.stickers = media?.stickers || [];
-      a.totalPhotoCount       = media?.totalPhotoCount       ?? a.photos.length;
-      a.totalStickerInstances = media?.totalStickerInstances ?? 0;
+      // Demo file gets synthetic media injected so all media slides are populated.
+      const isDemo = file.name === 'WhatsApp Chat with The Squad.txt';
+      if (isDemo && includeMedia) {
+        const dm = generateSampleMedia(a.users);
+        a.photos = dm.photos; a.voice = dm.voice; a.videos = dm.videos; a.stickers = dm.stickers;
+        a.totalPhotoCount = dm.photos.length;
+        a.totalStickerInstances = dm.stickers.reduce((s, x) => s + (x.count || 1), 0);
+      } else {
+        a.photos   = media?.photos   || [];
+        a.voice    = media?.voice    || [];
+        a.videos   = media?.videos   || [];
+        a.stickers = media?.stickers || [];
+        a.totalPhotoCount       = media?.totalPhotoCount       ?? a.photos.length;
+        a.totalStickerInstances = media?.totalStickerInstances ?? 0;
+      }
       // Persist stats snapshot (without blob URLs — those die on reload).
       // Media blobs go to IndexedDB separately via mediaStore.
       const { photos: _photos, voice: _voice, videos: _videos, stickers: _stickers, ...stats } = a;
@@ -234,50 +243,6 @@ function RecappedApp() {
     return () => navigator.serviceWorker.removeEventListener('message', onMessage);
   }, [handleFile]);
 
-  const loadDemo = useCallback(async () => {
-    setFileName('demo-chat.txt');
-    setParseError(null);
-    setStage('parsing');
-    setParsingStage(0);
-    await new Promise(r => setTimeout(r, 400));
-    const text = generateSampleText();
-    const { messages: parsed, diagnostics: diag } = await parseChat({
-      text,
-      onProgress: () => setParsingStage(2),
-    });
-    setDiagnostics(diag);
-    await new Promise(r => setTimeout(r, 600));
-    setParsingStage(3);
-    const a = computeAll(parsed);
-    // Synthetic media so the demo previews the photos/voice/stickers slides
-    // (videos skipped — minimal playable MP4 is hard to generate). Respects
-    // the same toggle as a real upload: off → demo stays text-only too.
-    if (includeMedia) {
-      const dm = generateSampleMedia(a.users);
-      a.photos = dm.photos; a.voice = dm.voice; a.videos = dm.videos; a.stickers = dm.stickers;
-      a.totalPhotoCount = dm.photos.length;
-      a.totalStickerInstances = dm.stickers.reduce((s, x) => s + (x.count || 1), 0);
-    } else {
-      a.photos = []; a.voice = []; a.videos = []; a.stickers = [];
-      a.totalPhotoCount = 0; a.totalStickerInstances = 0;
-    }
-    await new Promise(r => setTimeout(r, 500));
-    setParsingStage(4);
-    await new Promise(r => setTimeout(r, 400));
-    if (!a.users || a.users.length === 0) {
-      // The bundled sample text always has multiple users, so reaching
-      // here means generateSampleText() got corrupted somehow — fail loud
-      // rather than crashing on undefined.author.
-      console.error('Demo produced no users — sample text is broken');
-      setParseError(t.err_no_msgs);
-      setStage('landing');
-      return;
-    }
-    setAnalytics(a);
-    setSelectedAuthor(a.users[0].author);
-    setSlide(0);
-    setStage(adEnabled('post_parse') ? 'ad_post_parse' : 'onboard');
-  }, [includeMedia, t]);
 
   // Capacitor Android: MainActivity copies the shared file into the app's cache
   // dir and hands us the *path* (not the bytes). We fetch it via Capacitor's
@@ -453,7 +418,7 @@ function RecappedApp() {
                 lang={lang}
                 setLang={setLang}
                 onHowTo={() => setStage('howto')}
-                onDemo={showDemo ? loadDemo : null}
+                onDemo={showDemo ? true : null}
                 onOpenSettings={() => openSettings('landing')}
                 includeMedia={includeMedia}
                 setIncludeMedia={updateIncludeMedia}

@@ -77,6 +77,14 @@ export default function Landing({
     setHistoryOpen(false);
   }, []);
 
+  const handleDemo = useCallback(async () => {
+    const res = await fetch('demo_chat.txt');
+    const text = await res.text();
+    const file = new File([text], 'WhatsApp Chat with The Squad.txt', { type: 'text/plain' });
+    setPendingFile(file);
+    setSelectedHistoryId(null);
+  }, []);
+
   return (
     <>
     <style>{`
@@ -438,7 +446,7 @@ export default function Landing({
         {/* Secondary: demo only — how-to is now surfaced in the prereq card above */}
         {onDemo && (
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', marginTop: 12 }}>
-            <button onClick={onDemo} className="press fs-sans" style={{
+            <button onClick={handleDemo} className="press fs-sans" style={{
               padding: '8px 4px', background: 'transparent', border: 'none',
               color: 'rgba(74,14,78,0.55)', fontSize: 14, fontWeight: 600,
               cursor: 'pointer', textDecoration: 'underline', textUnderlineOffset: 3,

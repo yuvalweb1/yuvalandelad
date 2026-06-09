@@ -97,10 +97,8 @@ export default function Settings({
           </div>
         </div>
 
-        {/* Premium — first so it's the most prominent. Phase 1 is a UI stub:
-            no real payment yet, just a button that flips the localStorage flag
-            so the ad-free experience can be tested. */}
-        <div style={{ marginBottom: 20 }}>
+        {/* Premium — hidden temporarily until new requests are ready. */}
+        {false && <div style={{ marginBottom: 20 }}>
           <div className="fs-sans a-fade-up" style={{
             fontSize: 12, color: isPremium ? MINT : MANGO, letterSpacing: '0.20em',
             marginBottom: 9, fontWeight: 800, textTransform: 'uppercase',
@@ -179,7 +177,7 @@ export default function Settings({
               </div>
             </button>
           )}
-        </div>
+        </div>}
 
         {/* Language */}
         <Section icon="🌐" title={t.settings_language || 'Language'} accent={SKY}>

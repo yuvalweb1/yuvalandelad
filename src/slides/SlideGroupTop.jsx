@@ -61,9 +61,10 @@ const SlideGroupTop = React.memo(function SlideGroupTop({ a, t, profile }) {
               maxWidth: '92%',
             }}>
               <div className="fs-display" style={{
-                fontSize: word.word.length > 10 ? 32 : 44,
+                fontSize: `clamp(16px, ${Math.max(16, Math.min(44, Math.floor(340 / (word.word.length + 2))))}px, 44px)`,
                 fontStyle: 'italic', fontWeight: 800, color: '#8338ec',
-                letterSpacing: '-0.03em', lineHeight: 1.05, wordBreak: 'break-word',
+                letterSpacing: '-0.03em', lineHeight: 1.05,
+                whiteSpace: 'nowrap',
               }}>
                 "{word.word}"
               </div>

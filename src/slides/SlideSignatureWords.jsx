@@ -37,8 +37,8 @@ const SlideSignatureWords = React.memo(function SlideSignatureWords({ a, t, prof
         <div className="no-sb" style={{ flex: 1, overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: 10 }}>
           {rows.map((usr, i) => (
             <div key={usr.author} dir="auto" className="a-slide-up-far" style={{
-              display: 'flex', alignItems: 'center', gap: 12,
-              padding: '13px 16px',
+              display: 'flex', alignItems: 'center', gap: 8,
+              padding: '11px 14px',
               background: '#fff',
               borderRadius: 22,
               border: '2px solid rgba(255,255,255,0.85)',
@@ -46,9 +46,9 @@ const SlideSignatureWords = React.memo(function SlideSignatureWords({ a, t, prof
               flexShrink: 0,
               animationDelay: `${0.4 + i * 0.1}s`,
             }}>
-              <div className="fs-sans" style={{ width: '34%', flexShrink: 0, fontSize: 14, fontWeight: 700, color: 'rgba(74,14,78,0.75)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{usr.author}</div>
-              <div style={{ flex: 1, minWidth: 0, overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                <span className="fs-display" dir="auto" style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', fontSize: usr.topWord.length > 10 ? 18 : 24, fontStyle: 'italic', fontWeight: 800, color: '#8338ec', padding: '2px 4px' }}>{`"${usr.topWord}"`}</span>
+              <div className="fs-sans" style={{ width: '26%', flexShrink: 0, fontSize: 13, fontWeight: 700, color: 'rgba(74,14,78,0.75)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{usr.author}</div>
+              <div style={{ flex: 1, minWidth: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
+                <span className="fs-display" dir="auto" style={{ fontSize: 22, fontStyle: 'italic', fontWeight: 800, color: '#8338ec', padding: '0 2px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: '100%' }}>{`"${usr.topWord}"`}</span>
               </div>
               <div className="fs-mono" style={{ flexShrink: 0, fontSize: 12, color: 'rgba(74,14,78,0.55)', fontWeight: 600 }}>{usr.topWordCount}×</div>
             </div>

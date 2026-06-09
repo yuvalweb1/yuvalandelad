@@ -17,11 +17,11 @@ questionnaire. Copy-paste from here.
 | **App or game** | App |
 | **Free or paid** | Free (with in-app purchase) |
 | **Package name** | `com.recapped.app` |
-| **Category** | Lifestyle (primary) · Entertainment (secondary) |
-| **Tags** | Lifestyle, Social, Year in Review, Stats |
-| **Contact email** | nahum@ella3g.com |
-| **Website** | https://yuval.ella.org.il/ |
-| **Privacy Policy URL** | https://yuval.ella.org.il/privacy.html |
+| **Category** | Entertainment (primary) · social (secondary) |
+| **Tags** | Social, Year in Review, Stats |
+| **Contact email** | team.recapped1@gmail.com |
+| **Website** | none |
+| **Privacy Policy URL** | TBD |
 
 ---
 
@@ -30,73 +30,59 @@ questionnaire. Copy-paste from here.
 ### Short description (80 characters max, currently 79)
 
 ```
-Your WhatsApp group, wrapped. Stats, roasts, drama — never leaves your phone.
+Turn chat exports into fun recaps with stats, awards and insights
 ```
 
 ### Long description (4000 characters max)
 
 ```
-What if your WhatsApp group had a year-end Wrapped, like Spotify?
+Turn exported group chats into fun recaps filled with statistics, trends, awards, and memorable moments.
 
-Recapped turns any WhatsApp chat export into a cinematic 13-slide recap:
-who talks the most, who replies fastest, when the drama peaks, what emojis
-define each person, and the awards nobody asked for but everyone deserves.
+Recapped analyzes your chat exports and transforms them into interactive stories about your conversations. Discover who talks the most, who replies the fastest, which emojis dominate the group, and how your community has evolved over time.
 
-Built for the way your group actually behaves. Eras. Bursts. Conversation
-killers and defibrillators. Night-owl rankings. Signature words. And a
-Roast Mode that turns the receipts into legally-actionable evidence —
-deterministic, defensible, devastating.
+FEATURES
 
-═══════════════════════════════════
+• Detailed group statistics
+• Activity trends and participation insights
+• Member rankings and leaderboards
+• Response time analysis
+• Emoji and word usage breakdowns
+• Timeline highlights and chat eras
+• Fun awards and achievements
+• Personalized member summaries
+• Shareable recap cards and slides
 
-🛡️ THE PROMISE: 100% ON YOUR DEVICE
+PRIVACY FIRST
 
-Your chat never leaves your phone. Recapped has no server, no database,
-no analytics, no LLM. Parsing, stats, and roasts run entirely in your
-browser. The only network call beyond loading the app is Google Fonts.
-
-═══════════════════════════════════
-
-WHAT'S INSIDE
-
-• Group overview — messages, days, peak chaos
-• Leaderboard — who carried the chat, who lurked
-• Eras — the chapters your group lived through
-• Per-person stats — message counts, peak hours, signature words
-• Sticker obsessions, voice-note monologues, top videos
-• Awards — fastest responder, the yapper, night owl, ghost, killer, defibrillator
-• Drama roles — who revives conversations, who buries them
-• Roast Mode — a private lawyer turning your group's stats into roasts you can
-  share on WhatsApp, Telegram, X, email or SMS
-
-═══════════════════════════════════
-
-PREMIUM (₪15 / month)
-
-Remove every ad — no pre-roll videos, no banners. Same data, just calmer.
-
-═══════════════════════════════════
+Recapped is designed with privacy in mind. Your exported chat data is analyzed directly on your device, giving you control over your information.
 
 HOW IT WORKS
 
-1. In WhatsApp: open a chat → ⋮ menu → More → Export Chat
-2. Choose "Include media" (for photo / voice / video slides) or "Without media"
-3. Share the export with Recapped
-4. Watch your year unfold
+1. Export a chat from your messaging app
+2. Open the export in Recapped
+3. Generate your recap
+4. Explore insights, statistics, and trends
+5. Share your favorite moments
 
-No login. No account. No backup. If you delete the app, your data is gone
-with it — because it was only ever on your phone.
+PERFECT FOR
 
-═══════════════════════════════════
+• Friend groups
+• Families
+• School communities
+• Clubs and teams
+• Long-running group conversations
 
-Made for groups that talk too much. Use responsibly.
+Whether you want to settle debates, revisit memories, or simply see your conversations from a new perspective, Recapped helps uncover the stories hidden inside your chats.
+
+Recapped is an independent application and is not affiliated with, endorsed by, or sponsored by any messaging platform.
+
 ```
 
 ### What's New (release notes — initial release)
 
 ```
 1.0 — First release. Cinematic Wrapped for your WhatsApp groups.
-13 slides of stats, roasts, eras and drama. Premium plan removes ads.
+Stats, roasts, eras and drama. Premium plan removes ads.
 Everything runs on your device.
 ```
 
@@ -107,73 +93,59 @@ Everything runs on your device.
 ### Short description (80 chars max)
 
 ```
-ה‑WhatsApp שלך, עטוף. סטטיסטיקות, רואסטים ודרמה — לא יוצא מהמכשיר.
+הפכו ייצואי צ'אט לסיכום מהנה עם סטטיסטיקות, תובנות ופרסים
 ```
 
 ### Long description (4000 chars max)
 
 ```
-מה אם לקבוצת הוואטסאפ שלך היה Wrapped של סוף שנה, כמו לספוטיפיי?
+הפכו ייצואי צ'אטים לסיכומים מהנים עם סטטיסטיקות, תובנות ורגעים בלתי נשכחים.
 
-Recapped הופך כל ייצוא של צ'אט וואטסאפ ל‑13 שקופיות קולנועיות: מי
-מדבר הכי הרבה, מי עונה הכי מהר, מתי הדרמה מגיעה לשיא, אילו אימוג'ים
-מאפיינים כל אחד, והפרסים שאף אחד לא ביקש אבל כולם ראויים להם.
+Recapped מנתחת את ייצואי הצ'אטים שלכם והופכת אותם לסיכום אינטראקטיבי של הקבוצה. גלו מי שולח הכי הרבה הודעות, מי מגיב הכי מהר, אילו אימוג'ים שולטים בשיחה ואיך הקבוצה השתנתה לאורך הזמן.
 
-נבנה לפי איך שהקבוצה שלך באמת מתנהגת. עידנים. פרצים. הורגי שיחה
-ומחיים. דירוגי ינשופי לילה. מילים אישיות. ומצב Roast שהופך את הנתונים
-לעדויות קבילות — דטרמיניסטי, מבוסס, הרסני.
+תכונות עיקריות
 
-═══════════════════════════════════
+• סטטיסטיקות מפורטות על הפעילות בקבוצה
+• מגמות ותובנות לאורך זמן
+• דירוגי משתתפים וטבלאות מובילים
+• ניתוח זמני תגובה
+• ניתוח אימוג'ים ומילים נפוצות
+• צירי זמן ורגעים בולטים
+• פרסים ותארים משעשעים
+• סיכומים אישיים לכל משתתף
+• תוצאות נוחות לשיתוף
 
-🛡️ ההבטחה: 100% במכשיר שלך
+פרטיות לפני הכול
 
-הצ'אט שלך אף פעם לא יוצא מהטלפון. אין שרת, אין מסד נתונים, אין
-analytics, אין LLM. הכל — פרסור, סטטיסטיקות, רואסטים — רץ בדפדפן.
-הקריאה היחידה לרשת מעבר לטעינת האפליקציה היא Google Fonts.
+Recapped תוכננה מתוך מחשבה על פרטיות. נתוני הצ'אט המיוצאים מנותחים ישירות במכשיר שלכם, כך שהמידע נשאר בשליטתכם.
 
-═══════════════════════════════════
+איך זה עובד?
 
-מה בפנים
+1. מייצאים צ'אט מאפליקציית ההודעות
+2. פותחים את הקובץ ב־Recapped
+3. יוצרים את הסיכום
+4. חוקרים את הנתונים והתובנות
+5. משתפים את הרגעים האהובים עליכם
 
-• סקירת קבוצה — הודעות, ימים, שיא הכאוס
-• לוח מובילים — מי נשא את הצ'אט, מי הסתתר
-• עידנים — הפרקים שעברתם
-• סטטיסטיקות פר אדם — מספרי הודעות, שעות שיא, מילים אישיות
-• אובססיות סטיקרים, מונולוגי הודעות קוליות, סרטונים מובילים
-• פרסים — המגיב המהיר, היפהיפה, ינשוף לילה, רוח רפאים, רוצח, מחייה
-• תפקידי דרמה — מי מחיה שיחות, מי קובר אותן
-• מצב Roast — עורך דין פרטי שהופך את הנתונים לרואסטים שאפשר לשתף
-  בוואטסאפ, טלגרם, X, מייל או SMS
+מתאים במיוחד ל
 
-═══════════════════════════════════
+• קבוצות חברים
+• משפחות
+• כיתות ובתי ספר
+• תנועות נוער ומועדונים
+• קבוצות פעילות ארוכות טווח
 
-פרימיום (₪15 לחודש)
+בין אם אתם רוצים להיזכר ברגעים מצחיקים, לגלות עובדות מפתיעות על הקבוצה או פשוט לראות את השיחות שלכם מזווית חדשה, Recapped עוזרת לחשוף את הסיפור שמסתתר מאחורי ההודעות.
 
-הסר כל פרסומת — בלי וידאו לפני התחלה, בלי באנרים. אותם נתונים, רק רגוע
-יותר.
+Recapped היא אפליקציה עצמאית ואינה קשורה, ממומנת או מאושרת על ידי אף פלטפורמת הודעות.
 
-═══════════════════════════════════
-
-איך זה עובד
-
-1. בוואטסאפ: פתח צ'אט → תפריט ⋮ → עוד → יצוא צ'אט
-2. בחר "כולל מדיה" (לסליידים של תמונות / קולי / וידאו) או "בלי מדיה"
-3. שתף את הייצוא עם Recapped
-4. צפה בשנה שלך נפרשת
-
-בלי הרשמה. בלי חשבון. בלי גיבוי. אם מוחקים את האפליקציה, הנתונים
-נמחקים איתה — כי הם אף פעם לא היו במקום אחר.
-
-═══════════════════════════════════
-
-נבנה לקבוצות שמדברות יותר מדי. השתמשו באחריות.
 ```
 
 ### What's New (Hebrew)
 
 ```
-1.0 — שחרור ראשון. Wrapped קולנועי לקבוצות הוואטסאפ שלך. 13 שקופיות
-של סטטיסטיקות, רואסטים, עידנים ודרמה. פרימיום מסיר פרסומות. הכל רץ
+1.0 — שחרור ראשון. Wrapped קולנועי לקבוצות הוואטסאפ שלך.
+סטטיסטיקות, רואסטים, עידנים ודרמה. פרימיום מסיר פרסומות. הכל רץ
 במכשיר שלך.
 ```
 
@@ -183,7 +155,7 @@ analytics, אין LLM. הכל — פרסור, סטטיסטיקות, רואסטי
 
 | Asset | Required size | Status | Source |
 |---|---|---|---|
-| App icon | 377×377 PNG, < 1 MB | ✅ Ready | `play-store/icon-377.png` |
+| App icon | 377×377 PNG, < 1 MB | ✅ Ready | `play-store/icon-512.png` |
 | Hi-res icon (also used for upload) | 1024×1024 | ✅ Ready | `play-store/icon-1024.png` |
 | Feature graphic | 1024×500 JPG/PNG | ⚠️ NOT GENERATED | needs design — see notes |
 | Phone screenshots (min 2, max 8) | 16:9 or 9:16, min 320 px | ❌ NOT TAKEN | capture from real device |
@@ -213,15 +185,15 @@ Play Console → Policy → App content → Data safety.
 
 ### Does your app collect or share any of the required user data types?
 
-> **No.**
+> **Yes.** AdMob collects the device Advertising ID on the free tier.
 
 ### Is all of the user data collected by your app encrypted in transit?
 
-> **Yes.** All app traffic (loading the app from the web, Google Fonts) is HTTPS.
+> **Yes.** All app traffic (loading the app from the web, Google Fonts, AdMob) is HTTPS.
 
 ### Do you provide a way for users to request that their data be deleted?
 
-> **N/A.** No data is collected.
+> **N/A for our data.** We collect nothing ourselves. For AdMob data, direct users to Google's privacy controls.
 
 ### Are you committed to following the Play Families Policy?
 
@@ -243,11 +215,16 @@ For each category below, the answer is **"Data type not collected"**:
 - App activity (interactions, search history, etc.)
 - Web browsing
 - App info and performance (crash logs, diagnostics)
-- Device or other IDs
+- Device or other IDs — **⚠️ EXCEPTION: AdMob collects Advertising ID on the free tier.**
+  - Data type: **Device or other IDs → Advertising ID**
+  - Purpose: **Advertising or marketing**
+  - Collected by: Google AdMob (third party), not by us
+  - Shared with: Google
+  - Users can opt out via device settings; Premium removes AdMob entirely
 
 ### "Why is your app collecting data?"
 
-> Not applicable. The app does not collect data.
+> AdMob (third-party SDK) collects the Advertising ID to serve and measure ads on the free tier. We collect no data ourselves.
 
 ### Account creation / sign-in?
 
@@ -255,7 +232,7 @@ For each category below, the answer is **"Data type not collected"**:
 
 ### Third-party libraries collecting data?
 
-> Disclose **Google Fonts** (loads fonts on app open). No tracking SDKs.
+> Disclose **Google Fonts** (loads fonts on app open) and **Google AdMob** (serves ads on free tier; collects Advertising ID).
 
 ---
 
@@ -271,7 +248,7 @@ For each category below, the answer is **"Data type not collected"**:
 | Health features | No |
 | Real-money gambling | No |
 | Ads inclusion | **Yes** — placeholder ads + future Google AdMob (free tier) |
-| In-app purchases | **Yes** — single subscription product, ₪15 / month |
+| In-app purchases | **Yes** — single subscription product, ₪20 / month |
 | Permissions justification | INTERNET only (load app + Google Fonts). FileProvider for share-target. |
 
 ### Content rating questionnaire
@@ -314,3 +291,14 @@ counter clean.
 - [ ] Content rating questionnaire completed
 - [ ] Pricing set: Free with IAP
 - [ ] Target countries selected (start with Israel only to gauge reception)
+
+---
+
+## Play Policy Compliance — Risk Register
+
+| Risk | Status | Notes |
+|---|---|---|
+| 🟢 AdMob Data Safety disclosure | **Fixed** | Privacy Policy updated (9 Jun 2026); Data Safety form answers corrected above. Declare Advertising ID in Play Console. |
+| 🟢 "WhatsApp" in short description | **Fixed** | Removed from both English and Hebrew short descriptions. Current copy uses "chat exports" / "ייצואי צ'אט" — no Meta IP exposure. |
+| 🟢 "Legally-actionable evidence" in listing | **Fixed** | Phrase removed in description rewrite — current copy contains no misleading legal language. |
+| 🟢 Messages data category | **Covered** | Chat data is local-only. Privacy Policy now explicitly states it is never transmitted. |
