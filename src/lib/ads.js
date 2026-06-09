@@ -16,7 +16,10 @@
 // ============================================================
 
 export const ADS = {
-  enabled: true,
+  // Temporarily disabled per product call — the PizzaPop demo ad shouldn't
+  // run until a real ad provider (or replacement creative) is in place.
+  // Flip back to true to bring the slots online again.
+  enabled: false,
   slots: {
     menu: true,           // banner on the post-Wrapped menu (visible by default)
     landing: false,       // banner on the home screen
