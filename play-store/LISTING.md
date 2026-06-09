@@ -183,7 +183,7 @@ analytics, אין LLM. הכל — פרסור, סטטיסטיקות, רואסטי
 
 | Asset | Required size | Status | Source |
 |---|---|---|---|
-| App icon | 512×512 PNG, < 1 MB | ✅ Ready | `play-store/icon-512.png` |
+| App icon | 377×377 PNG, < 1 MB | ✅ Ready | `play-store/icon-377.png` |
 | Hi-res icon (also used for upload) | 1024×1024 | ✅ Ready | `play-store/icon-1024.png` |
 | Feature graphic | 1024×500 JPG/PNG | ⚠️ NOT GENERATED | needs design — see notes |
 | Phone screenshots (min 2, max 8) | 16:9 or 9:16, min 320 px | ❌ NOT TAKEN | capture from real device |

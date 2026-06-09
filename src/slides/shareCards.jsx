@@ -12,7 +12,7 @@
 import React from 'react';
 import { typedCopy } from '../i18n';
 
-const LOGO = '/icon-512.png';
+const LOGO = '/icon-377.png';
 
 // nice grouped number e.g. 12,847
 export const nf = (n) => (n ?? 0).toLocaleString('en-US');

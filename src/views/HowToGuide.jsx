@@ -199,7 +199,7 @@ function WaMock({ kind, t }) {
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
                   boxShadow: '0 0 0 3px #FFD700, 0 0 0 5px #FF69B4',
                 }}>
-                  <img src="/icon-512.png" alt="Recapped" style={{
+                  <img src="/icon-377.png" alt="Recapped" style={{
                     width: 62, height: 62, flexShrink: 0, display: 'block', objectFit: 'cover',
                     transform: 'translateY(4px)',
                   }} />

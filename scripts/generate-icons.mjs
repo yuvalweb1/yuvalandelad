@@ -3,10 +3,9 @@
 //   node scripts/generate-icons.mjs
 //
 // Source: public/recapped_logo_clean_only_bubbles.png (the "mark", no wordmark).
-// Output: Android mipmaps (mdpi → xxxhdpi), PWA icons (192/512), Play Store
-// listing icon (512), hi-res master (1024). Each is a square PNG with the
-// logo centered on a banana background and ~14% safe-area padding so the
-// mark survives Android's adaptive-icon mask crop.
+// Output: Android mipmaps (mdpi → xxxhdpi), PWA icons (192/377), Play Store
+// listing icon (377), hi-res master (1024). Each is a square PNG resized from
+// the source — colors and background are preserved exactly as-is.
 //
 // Re-runnable: replace SOURCE and re-execute to refresh every output.
 
@@ -16,29 +15,11 @@ import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
-const SOURCE = resolve(ROOT, 'public/recapped_logo_clean_only_bubbles.png');
-
-// Banana (#FFD700) background — same accent the in-app deep gradient uses.
-const BG = { r: 0xFF, g: 0xD7, b: 0x00, alpha: 1 };
-// Safe-area: keep the logo inside this fraction of the canvas so Android's
-// adaptive-icon mask (which crops corners to circles/squircles) doesn't eat
-// the bubbles.
-const PADDING = 0.14;
+const SOURCE = resolve(ROOT, 'public/icon-512.png');
 
 async function makeSquare(size) {
-  const inset = Math.round(size * PADDING);
-  const logoSize = size - inset * 2;
-  const logoBuf = await sharp(SOURCE)
-    .resize({
-      width: logoSize, height: logoSize,
-      fit: 'contain',
-      background: { r: 0, g: 0, b: 0, alpha: 0 },
-    })
-    .toBuffer();
-  return await sharp({
-    create: { width: size, height: size, channels: 4, background: BG },
-  })
-    .composite([{ input: logoBuf, gravity: 'center' }])
+  return await sharp(SOURCE)
+    .resize({ width: size, height: size, fit: 'fill' })
     .png({ compressionLevel: 9 })
     .toBuffer();
 }
@@ -69,14 +50,13 @@ const TARGETS = [
   { path: 'android/app/src/main/res/mipmap-xxxhdpi/ic_launcher_round.png',size: 192 },
   // PWA / manifest
   { path: 'public/icon-192.png', size: 192 },
-  { path: 'public/icon-512.png', size: 512 },
+  { path: 'public/icon-377.png', size: 377 },
   // Play Store listing graphic (hi-res master also lives here)
-  { path: 'play-store/icon-512.png',  size: 512  },
+  { path: 'play-store/icon-377.png',  size: 377  },
   { path: 'play-store/icon-1024.png', size: 1024 },
 ];
 
 console.log(`Source: ${SOURCE}`);
-console.log(`Background: banana ${`#${BG.r.toString(16)}${BG.g.toString(16)}${BG.b.toString(16)}`.toUpperCase()}`);
 console.log(`Generating ${TARGETS.length} icons...\n`);
 
 for (const t of TARGETS) {
