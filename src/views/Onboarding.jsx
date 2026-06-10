@@ -101,7 +101,9 @@ export default function Onboarding({ analytics, t, profile, setProfile, onComple
       <div style={{
         position: 'relative', zIndex: 1, flex: 1,
         maxWidth: 520, width: '100%', margin: '0 auto',
-        padding: '18px 22px 22px',
+        // Bottom padding clears the home indicator + adds breathing room so
+        // the Continue CTA isn't glued to the screen edge on phones.
+        padding: '18px 22px calc(env(safe-area-inset-bottom, 0px) + 28px)',
         display: 'flex', flexDirection: 'column',
         overflow: 'hidden',
         minHeight: 0,
@@ -168,7 +170,6 @@ export default function Onboarding({ analytics, t, profile, setProfile, onComple
               {analytics.users.map((u, i) => {
                 const selected = draft.self === u.author;
                 const initial = nameInitial(u.author);
-                const msgCount = u.messageCount || 0;
                 return (
                   <button key={u.author} dir="auto" onClick={() => setDraft({ ...draft, self: u.author })}
                     className="press lift" style={{
@@ -212,16 +213,6 @@ export default function Onboarding({ analytics, t, profile, setProfile, onComple
                       }}>
                         {u.author}
                       </div>
-                      {msgCount > 0 && (
-                        <div className="fs-mono" style={{
-                          fontSize: 12,
-                          color: selected ? '#f06449' : 'rgba(74,14,78,0.55)',
-                          marginTop: 3, letterSpacing: '0.02em',
-                          fontWeight: 600,
-                        }}>
-                          {msgCount.toLocaleString()} {t.go_messages || 'messages'}
-                        </div>
-                      )}
                     </div>
 
                     {/* Checkmark */}

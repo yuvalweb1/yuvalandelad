@@ -12,6 +12,15 @@ import App from './App.jsx';
 // `font-family: "Twemoji Country Flags", system-ui, ...`.
 polyfillCountryFlagEmojis();
 
+// Lock orientation to portrait when the browser allows it (works in
+// installed PWAs / fullscreen mode; ignored in normal browser tabs).
+// Catches any rejection so the app keeps booting on unsupported devices.
+try {
+  if (screen.orientation?.lock) {
+    screen.orientation.lock('portrait').catch(() => {});
+  }
+} catch {}
+
 if ('serviceWorker' in navigator) {
   navigator.serviceWorker.register('/sw.js').catch(() => {});
 }

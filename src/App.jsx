@@ -506,6 +506,7 @@ function RecappedApp() {
               slide={slide}
               setSlide={setSlide}
               profile={profile}
+              setProfile={setProfile}
               t={t}
               lang={lang}
               onExit={() => {

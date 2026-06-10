@@ -64,6 +64,7 @@ export const SLIDE_COMPONENTS = {
   double_texts:        metricLeaderboardSlide('double_texts'),
   ignored_award:       metricLeaderboardSlide('ignored_award'),
   night_messages:      metricLeaderboardSlide('night_messages'),
+  quiet_emojis:        metricSlide('quiet_emojis'),
   messages_sent:          metricLeaderboardSlide('messages_sent'),
   conversation_starters:  metricLeaderboardSlide('conversation_starters'),
   love_you:               metricLeaderboardSlide('love_you'),
@@ -88,6 +89,7 @@ export const SLIDES_BY_TYPE = {
     'signature_words',
     'group_top',
     'signature_emoji',
+    'quiet_emojis',
     'ignored_award',
     'photos',
     'stickers',
@@ -103,6 +105,7 @@ export const SLIDES_BY_TYPE = {
     'early_birds',
     'leaderboard',
     'voice_notes_leader',
+    'quiet_emojis',
     'photos',
     'stickers',
     'voice',
@@ -156,6 +159,7 @@ export const SLIDES_BY_TYPE = {
     'per_person',
     'signature_words',
     'group_top',
+    'quiet_emojis',
     'photos',
     'stickers',
     'voice',
@@ -198,6 +202,7 @@ export function slideHasData(id, analytics, user) {
     case 'early_birds':
     case 'voice_notes_leader':
     case 'essay_writers':
+    case 'quiet_emojis':
       return metricHasData(id, analytics);
     case 'night_owls':
     case 'ignored_award':
