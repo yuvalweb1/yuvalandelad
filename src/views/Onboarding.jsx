@@ -8,10 +8,42 @@ function nameInitial(name) {
   return first.toUpperCase();
 }
 
-export default function Onboarding({ analytics, t, profile, setProfile, onComplete, onSkip }) {
-  const [step, setStep] = useState(0); // 0: who_are_you, 1: relationship
+// Try to match the name the user entered in the Welcome questionnaire
+// against the chat participants. Case-insensitive substring match both
+// ways so "Yuval" matches "Yuval Himmel" and "ynh" doesn't false-match
+// long names. Returns the matched author or null.
+function matchUserByName(userName, users) {
+  if (!userName || !users?.length) return null;
+  const needle = userName.trim().toLowerCase();
+  if (needle.length < 2) return null;
+  // Prefer exact (case-insensitive) match first.
+  const exact = users.find(u => u.author?.toLowerCase() === needle);
+  if (exact) return exact.author;
+  // Then "author starts with name" — handles "Yuval" → "Yuval Himmel".
+  const startsWith = users.find(u => u.author?.toLowerCase().startsWith(needle));
+  if (startsWith) return startsWith.author;
+  // Then "name starts with author" — handles "Yuval Himmel" typed as
+  // welcome name vs. just "Yuval" in WhatsApp.
+  const reverse = users.find(u => u.author && needle.startsWith(u.author.toLowerCase()));
+  if (reverse) return reverse.author;
+  // Last resort: any substring containment in either direction. Only
+  // accept if the result is unique to avoid auto-picking the wrong
+  // person (e.g. "n" matching three users).
+  const contains = users.filter(u =>
+    u.author && (u.author.toLowerCase().includes(needle) || needle.includes(u.author.toLowerCase()))
+  );
+  return contains.length === 1 ? contains[0].author : null;
+}
+
+export default function Onboarding({ analytics, t, profile, setProfile, userName, onComplete, onSkip }) {
+  // If we can match the Welcome name to an actual participant, prefill
+  // `self` AND start at step 1 (relationship) — no need to ask who they
+  // are. Falls back to the picker when there's no confident match.
+  const autoMatchedSelf = profile.self || matchUserByName(userName, analytics.users);
+  const skipSelfStep = !profile.self && !!autoMatchedSelf;
+  const [step, setStep] = useState(skipSelfStep ? 1 : 0);
   const [draft, setDraft] = useState({
-    self: profile.self || analytics.users[0]?.author || null,
+    self: autoMatchedSelf || analytics.users[0]?.author || null,
     relationship: profile.relationship || null,
   });
 
