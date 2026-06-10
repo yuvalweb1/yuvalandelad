@@ -26,6 +26,11 @@ await ctx.addInitScript(() => {
 });
 const page = await ctx.newPage();
 page.on('pageerror', (e) => console.log('PAGEERR:', e.message));
+page.on('console', (m) => {
+  if (m.type() === 'error' || m.type() === 'warning') {
+    console.log(`[${m.type()}]`, m.text().slice(0, 300));
+  }
+});
 
 let n = 0;
 const shot = async (label) => {
@@ -36,18 +41,36 @@ await page.goto(URL, { waitUntil: 'domcontentloaded' });
 await page.waitForTimeout(2000);
 await shot('landing');
 
-// Click demo
-const demo = page.locator('button').filter({ hasText: /Try the demo/i }).first();
-console.log('demo button count:', await demo.count());
-await demo.click();
-await page.waitForTimeout(1500);
-await shot('after-demo-click');
+// Fetch demo chat text, write to local tmp, use setInputFiles
+import('node:fs').then(fs => {
+  fs.writeFileSync(join(SHOT_DIR, 'sample.txt'), 'placeholder', 'utf8');
+});
+const SAMPLE_PATH = join(SHOT_DIR, 'sample.txt');
+const demoResp = await page.evaluate(async () => {
+  const r = await fetch('demo_chat.txt');
+  return await r.text();
+});
+const fs = await import('node:fs');
+fs.writeFileSync(SAMPLE_PATH, demoResp, 'utf8');
+await page.locator('input[type="file"]').first().setInputFiles(SAMPLE_PATH);
+await page.waitForTimeout(800);
+await shot('after-file-set');
 
-// CTA
-const cta = page.locator('button').filter({ hasText: /Expose them/i }).first();
-console.log('cta count:', await cta.count());
-await cta.click();
-await page.waitForTimeout(4000);
+// CTA — use last() like smoke-test does
+const cta = page.locator('button').filter({ hasText: /Expose them/i }).last();
+console.log('cta count:', await page.locator('button').filter({ hasText: /Expose them/i }).count());
+// Use force click + scrollIntoView in case nav element overlays
+await cta.scrollIntoViewIfNeeded();
+await cta.click({ force: true });
+await page.waitForTimeout(2000);
+await shot('after-cta-click');
+// poll for stage change up to 30s
+for (let i = 0; i < 30; i++) {
+  const t = await page.evaluate(() => document.body.innerText || '');
+  if (/Which one are you|Friends.*Family.*Work|Just us|skip ad/i.test(t)) break;
+  if (/SCANNING|PARSING|loading|Reading/i.test(t)) console.log(`  parsing at ${i}s`);
+  await page.waitForTimeout(1000);
+}
 await shot('after-cta');
 
 // Onboarding: name matches Jordan so should skip to relationship
