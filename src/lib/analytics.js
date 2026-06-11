@@ -911,6 +911,9 @@ export function computeAll(messages) {
     groupHourly, groupWeekly,
     // Pairs
     topDuo, topDuoShare,
+    // Raw who-replied-to-whom matrix (a -> b -> count). Consumed by Duo
+    // mode to compute pairwise "who chases whom" head-to-head rounds.
+    replyMatrix,
     // Group personality
     groupPersonality, groupPersonalityReason,
     groupNightPct, groupMediaPct, groupVoicePct, groupQuestionPct,

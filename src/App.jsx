@@ -569,8 +569,13 @@ function RecappedApp() {
               onChaos={() => enterMode('chaos')}
             />
           )}
-          {stage === 'duo' && (
-            <DuoAnalysis t={t} onBack={() => setStage('modes')} />
+          {stage === 'duo' && analytics && (
+            <DuoAnalysis
+              analytics={analytics}
+              selectedAuthor={selectedAuthor}
+              t={t}
+              onBack={() => setStage('modes')}
+            />
           )}
           {stage === 'chaos' && (
             <ChaosTimeline analytics={analytics} t={t} lang={lang} onBack={() => setStage('modes')} />

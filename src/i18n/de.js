@@ -230,6 +230,14 @@ export default {
   intro_ready: 'kommt.',
   intro_summary: '{msgs} Nachrichten. {people} Personen. {days} Tage. Viel Glück.',
   // Ready slide
+  ready_eyebrow: 'Euer Gruppen-Recap',
+  ready_title: 'Bereit?',
+  ready_stats: 'Stats',
+  ready_awards: 'Preise',
+  ready_drama: 'Drama',
+  ready_photos: 'Fotos',
+  ready_tap_back: 'Tippe hier, um zurückzugehen',
+  ready_tap_forward: 'Tippe hier, um weiterzugehen',
   // Message count
   msg_eyebrow: 'ALS GRUPPE HABT IHR GESENDET',
   msg_word: 'Nachrichten.',

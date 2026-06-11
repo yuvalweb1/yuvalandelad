@@ -39,7 +39,15 @@ public class MainActivity extends BridgeActivity {
         }
 
         cleanupStaleCache();
-        handleShareIntent(getIntent());
+        // getIntent() keeps returning the ACTION_SEND intent for the life of this
+        // task, even after the OS kills and recreates the activity (e.g. the user
+        // backgrounds the app and Android reclaims memory). Only process it on a
+        // genuinely fresh start (savedInstanceState == null) — otherwise the same
+        // shared file gets re-imported on recreation, creating a duplicate recap.
+        // onNewIntent() still handles a real new share while the activity is alive.
+        if (savedInstanceState == null) {
+            handleShareIntent(getIntent());
+        }
     }
 
     @Override
