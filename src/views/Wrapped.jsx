@@ -155,13 +155,6 @@ export default function Wrapped({ analytics, diagnostics, selectedAuthor, setSel
                 color: '#4A0E4E',
               },
               {
-                icon: <span style={{ fontSize: 22, lineHeight: 1 }}>🔥</span>,
-                label: t.menu_action_roast || 'Roast Mode',
-                action: () => { setMenuOpen(false); onRoastMode?.(); },
-                color: '#f06449',
-                emphasize: true,
-              },
-              {
                 icon: (<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg>),
                 label: t.menu_action_replay || 'Replay deck',
                 action: () => { setMenuOpen(false); setSlide(0); },

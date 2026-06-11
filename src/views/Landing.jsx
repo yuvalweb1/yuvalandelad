@@ -111,7 +111,7 @@ export default function Landing({
     `}</style>
     <div style={{
       position: 'relative', display: 'flex', flexDirection: 'column',
-      padding: '44px 20px 92px', height: '100%',
+      padding: '44px 20px calc(92px + var(--safe-bottom, 0px))', height: '100%',
       background: 'linear-gradient(180deg, #FFF6D6 0%, #FFF0E2 46%, #FDE6F1 100%)',
       overflow: 'hidden',
     }}>
@@ -156,14 +156,20 @@ export default function Landing({
         ))}
       </div>
 
-      {/* Top row: eyebrow + language picker */}
-      <div style={{
+      {/* Top row: eyebrow + language picker — dir="ltr" keeps the brand and the
+          settings button from swapping sides under RTL languages. */}
+      <div dir="ltr" style={{
         position: 'relative', zIndex: 10,
         display: 'flex', justifyContent: 'space-between', alignItems: 'center',
       }}>
-        <div className="a-fade-up" dir="ltr" style={{ display: 'flex', alignItems: 'baseline', gap: 0 }}>
-          <span style={{ fontFamily: 'Georgia, serif', fontSize: 19, fontWeight: 700, letterSpacing: '-0.03em', color: '#4A0E4E' }}>re</span>
-          <span style={{ fontFamily: 'Georgia, serif', fontSize: 19, fontWeight: 700, letterSpacing: '-0.03em', color: '#FF1867' }}>capped</span>
+        <div className="a-fade-up" style={{ display: 'flex', alignItems: 'center', gap: 7 }}>
+          <img src="/icon-377.png" alt="" style={{
+            width: 26, height: 26, borderRadius: '50%', objectFit: 'cover', flexShrink: 0,
+            boxShadow: '0 2px 6px rgba(42,6,69,0.18)',
+          }} />
+          <div style={{ display: 'flex', alignItems: 'baseline', gap: 2 }}>
+            <span className="fs-display" style={{ fontSize: 19, fontWeight: 800, letterSpacing: '-0.04em', color: '#4A0E4E' }}>reccaped</span>
+          </div>
         </div>
         {onOpenSettings && (
           <button onClick={onOpenSettings} className="press" aria-label={t.settings_title || 'Settings'} style={{

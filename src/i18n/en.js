@@ -536,6 +536,9 @@ export default {
   modes_locked_cta: 'Upload a chat →',
   // Roast mode
   rm_back: '← Back',
+  rm_exhibit: 'Exhibit',
+  rm_exhibit_letters: 'A,B,C,D,E,F,G,H',
+  rm_index_prefix: 'N',
   rm_title: '🔥 ROAST MODE',
   rm_pick: 'Pick a',
   rm_victim: 'victim.',
