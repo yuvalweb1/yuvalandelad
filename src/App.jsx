@@ -450,6 +450,7 @@ function RecappedApp() {
               t={t}
               profile={profile}
               setProfile={setProfile}
+              userName={userName}
               onComplete={(finalProfile) => {
                 setProfile(finalProfile);
                 // Always save the profile if we have a current recap ID
@@ -499,6 +500,7 @@ function RecappedApp() {
               slide={slide}
               setSlide={setSlide}
               profile={profile}
+              setProfile={setProfile}
               t={t}
               lang={lang}
               onExit={() => {
