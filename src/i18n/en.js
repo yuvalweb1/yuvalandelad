@@ -831,16 +831,6 @@ export default {
   m_voice_notes_leader_sub: '',
   m_voice_notes_leader_eyebrow_family: 'VOICE NOTES',
   m_voice_notes_leader_title_family: 'Someone really loves voice messages',
-  // quiet_emojis — inverted ranking of who sends the fewest emojis
-  m_quiet_emojis_eyebrow: 'EMOJI-LESS',
-  m_quiet_emojis_title: 'Allergic to emojis',
-  m_quiet_emojis_sub: 'Lowest emoji counts in the chat',
-  m_quiet_emojis_eyebrow_friends: 'EMOJI-LESS',
-  m_quiet_emojis_title_friends: 'Who refuses to use emojis',
-  m_quiet_emojis_eyebrow_family: 'TEXT-ONLY',
-  m_quiet_emojis_title_family: 'The family\'s emoji minimalists',
-  m_quiet_emojis_eyebrow_work: 'STRICTLY WORDS',
-  m_quiet_emojis_title_work: 'Who keeps it text-only',
   // overtime
   m_overtime_eyebrow: 'OFF THE CLOCK',
   m_overtime_title: 'Who never clocks out',

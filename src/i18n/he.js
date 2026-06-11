@@ -797,16 +797,6 @@ export default {
   m_voice_notes_leader_sub: '',
   m_voice_notes_leader_eyebrow_family: 'הקלטות קוליות',
   m_voice_notes_leader_title_family: 'מישהו ממש אוהב הודעות קוליות',
-  // quiet_emojis — בעלי השימוש הנמוך ביותר באימוג'ים
-  m_quiet_emojis_eyebrow: 'בלי אימוג׳ים',
-  m_quiet_emojis_title: 'אלרגיים לאימוג׳ים',
-  m_quiet_emojis_sub: 'הכי מעט אימוג׳ים בקבוצה',
-  m_quiet_emojis_eyebrow_friends: 'בלי אימוג׳ים',
-  m_quiet_emojis_title_friends: 'מי לא משתמש באימוג׳ים',
-  m_quiet_emojis_eyebrow_family: 'רק טקסט',
-  m_quiet_emojis_title_family: 'המינימליסטים של המשפחה',
-  m_quiet_emojis_eyebrow_work: 'מילים בלבד',
-  m_quiet_emojis_title_work: 'מי שומר על טקסט יבש',
   // overtime
   m_overtime_eyebrow: 'שעות נוספות',
   m_overtime_title: 'הודעות מחוץ לשעות העבודה',
