@@ -59,6 +59,7 @@ export default {
   pay_success_cta: 'Continue',
   welcome_title: 'Welcome',
   welcome_subtitle: "Two quick questions — then we're rolling.",
+  welcome_lang_subtitle: 'Pick your language to get started.',
   welcome_name_label: "What's your name?",
   welcome_name_placeholder: 'Type your name',
   welcome_country_label: 'Where are you from?',

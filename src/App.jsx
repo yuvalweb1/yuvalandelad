@@ -5,7 +5,6 @@ import { generateSampleMedia } from './lib/sample.js';
 import { loadHistory, saveRecap, removeRecap, clearHistory, deriveChatName, updateRecapProfile } from './lib/history.js';
 import { saveMedia, loadMedia, deleteMedia, clearAllMedia } from './lib/mediaStore.js';
 import { RTL_LANGS, detectLang, buildT, I18N } from './i18n';
-import { langForCountry } from './lib/countries.js';
 import ErrorBoundary from './components/ErrorBoundary.jsx';
 import GlobalStyles from './components/GlobalStyles.jsx';
 import BlobBackground from './components/BlobBackground.jsx';
@@ -27,6 +26,7 @@ import VideoAdSlot from './components/VideoAdSlot.jsx';
 import PremiumPromo, { shouldShowPromo, markPromoDismissed } from './components/PremiumPromo.jsx';
 import PaymentSheet from './components/PaymentSheet.jsx';
 import { ADS, adEnabled } from './lib/ads.js';
+import { initAdMob, loadInterstitial } from './lib/admob.js';
 import { SLIDES_BY_TYPE, SLIDE_COMPONENTS } from './slides';
 
 // ============================================================
@@ -50,14 +50,6 @@ function RecappedApp() {
       if (!localStorage.getItem('cw_seen_guide'))   return 'howto';
       return 'landing';
     } catch { return 'welcome'; }
-  });
-  // Name + country captured by the Welcome questionnaire on first run.
-  // Persisted to localStorage; used for personalized greetings later.
-  const [userName, setUserName] = useState(() => {
-    try { return localStorage.getItem('cw_user_name') || ''; } catch { return ''; }
-  });
-  const [userCountry, setUserCountry] = useState(() => {
-    try { return localStorage.getItem('cw_user_country') || ''; } catch { return ''; }
   });
   const [analytics, setAnalytics] = useState(null);
   const [diagnostics, setDiagnostics] = useState(null);
@@ -124,6 +116,16 @@ function RecappedApp() {
     try { return localStorage.getItem('cw_premium') === '1'; } catch { return false; }
   });
   useEffect(() => { ADS.userPremium = isPremium; }, [isPremium]);
+
+  // Initialize AdMob once on mount, then preload the interstitials used by
+  // the ad gates so they're ready by the time the stage machine reaches them.
+  useEffect(() => {
+    initAdMob().then(() => {
+      loadInterstitial('post_parse');
+      loadInterstitial('pre_wrapped');
+      loadInterstitial('pre_roast');
+    });
+  }, []);
   const updatePremium = useCallback((v) => {
     setIsPremium(v);
     try { localStorage.setItem('cw_premium', v ? '1' : '0'); } catch {}
@@ -375,24 +377,15 @@ function RecappedApp() {
             <Welcome
               t={t}
               lang={lang}
-              onComplete={({ name, country, countryCode }) => {
-                setUserName(name);
-                setUserCountry(country);
-                try {
-                  if (name)    localStorage.setItem('cw_user_name', name);
-                  if (country) localStorage.setItem('cw_user_country', country);
-                  localStorage.setItem('cw_seen_welcome', '1');
-                } catch {}
-                // Auto-switch UI language to match the user's country —
-                // e.g. IL → he, JP → ja, FR → fr. Falls back to en for
-                // unmapped regions. Skipped if no country was picked.
-                if (countryCode) {
-                  const inferred = langForCountry(countryCode);
-                  if (inferred && I18N[inferred] && inferred !== lang) {
-                    setLang(inferred);
-                  }
+              onComplete={({ lang: chosenLang }) => {
+                if (chosenLang && I18N[chosenLang] && chosenLang !== lang) {
+                  setLang(chosenLang);
                 }
-                setStage(localStorage.getItem('cw_seen_guide') ? 'landing' : 'howto');
+                try {
+                  localStorage.setItem('cw_seen_welcome', '1');
+                  localStorage.setItem('cw_seen_guide', '1');
+                } catch {}
+                setStage('landing');
               }}
             />
           )}

@@ -13,16 +13,29 @@
 // short-circuit when the slot is off, so the parent must gate it.
 // ============================================================
 import { useState, useEffect } from 'react';
+import { Capacitor } from '@capacitor/core';
 import { ADS } from '../lib/ads.js';
 import { interp } from '../i18n';
-import SampleVideoAd from './SampleVideoAd.jsx';
+import { showInterstitial } from '../lib/admob.js';
+
+const IS_NATIVE = Capacitor.isNativePlatform();
 
 export default function VideoAdSlot({ slot, t, onComplete }) {
   const duration = (ADS.skipAfter && ADS.skipAfter[slot]) ?? 5;
   const [remaining, setRemaining] = useState(duration);
 
+  // On native platforms, show the real AdMob interstitial overlay instead
+  // of the bundled placeholder, then advance when the user dismisses it.
+  useEffect(() => {
+    if (IS_NATIVE) {
+      showInterstitial(slot, onComplete);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [slot]);
+
   // Countdown — ticks once per second until 0.
   useEffect(() => {
+    if (IS_NATIVE) return;
     if (remaining <= 0) return;
     const id = setTimeout(() => setRemaining(r => r - 1), 1000);
     return () => clearTimeout(id);
@@ -36,6 +49,9 @@ export default function VideoAdSlot({ slot, t, onComplete }) {
     : null;
 
   const canSkip = remaining <= 0;
+
+  // Native: AdMob renders its own full-screen overlay; nothing to draw here.
+  if (IS_NATIVE) return null;
 
   return (
     <div style={{
@@ -77,11 +93,14 @@ export default function VideoAdSlot({ slot, t, onComplete }) {
           : interp((t && t.ad_skip_in) || 'Skip in {s}s', { s: remaining })}
       </button>
 
-      {/* Content — real ad if provider returned one, otherwise the bundled
-          SampleVideoAd demo. The host SampleVideoAd will auto-call onComplete
-          after its simulated playback finishes. */}
-      <div style={{ flex: 1, position: 'relative' }}>
-        {real || <SampleVideoAd onEnded={onComplete} />}
+      {/* Content — real ad if provider returned one, otherwise a plain
+          placeholder. */}
+      <div style={{ flex: 1, position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        {real || (
+          <div className="fs-sans" style={{ color: 'rgba(255,255,255,0.5)', fontSize: 14, letterSpacing: '0.04em' }}>
+            {(t && t.ad_placeholder) || 'Your ad here'}
+          </div>
+        )}
       </div>
     </div>
   );

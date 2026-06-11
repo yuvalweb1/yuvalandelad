@@ -16,8 +16,8 @@
 // ============================================================
 
 export const ADS = {
-  // Temporarily disabled per product call — the PizzaPop demo ad shouldn't
-  // run until a real ad provider (or replacement creative) is in place.
+  // Temporarily disabled per product call — ad slots shouldn't run until a
+  // real ad provider (or replacement creative) is in place.
   // Flip back to true to bring the slots online again.
   enabled: false,
   slots: {

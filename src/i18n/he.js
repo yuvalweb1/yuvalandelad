@@ -59,6 +59,7 @@ export default {
   pay_success_cta: 'המשך',
   welcome_title: 'ברוך הבא',
   welcome_subtitle: 'שתי שאלות קצרות — ונצא לדרך.',
+  welcome_lang_subtitle: 'בחרו שפה כדי להתחיל.',
   welcome_name_label: 'איך קוראים לך?',
   welcome_name_placeholder: 'הכנס את שמך',
   welcome_country_label: 'מאיפה אתה?',
