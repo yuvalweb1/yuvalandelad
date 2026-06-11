@@ -88,33 +88,77 @@ function FloatingBlobs({ tint, dark = false }) {
 
 function SlideIntro({ t, chaos }) {
   const total = chaos.seismogram?.length || 0;
+  const peakCount = chaos.peaks?.length || 0;
+  const STORM = ['⚡', '🔥', '💥', '🌪️', '⚡', '🎤', '🌙', '🚨'];
+  const rots = [-12, 8, -6, 14, -10, 5, -3, 9];
+  const positions = [
+    { top: '8%',  left: '6%'  }, { top: '12%', right: '8%' },
+    { top: '28%', right: '14%' }, { top: '40%', left: '4%'  },
+    { bottom: '32%', right: '6%' }, { bottom: '20%', left: '10%' },
+    { bottom: '8%', right: '18%' }, { top: '60%', left: '46%' },
+  ];
   return (
     <SlideShell>
       <FloatingBlobs tint={MAGENTA} />
-      <div style={{ position: 'relative', flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+      {/* Sticker-rain — same sticker pattern as Landing but cranked. */}
+      {STORM.map((e, i) => (
+        <div key={i} className="a-float" aria-hidden style={{
+          position: 'absolute', ...positions[i],
+          width: 48, height: 48,
+          background: '#fff', borderRadius: 10,
+          boxShadow: '0 6px 16px rgba(74,14,78,0.20), 0 1px 3px rgba(74,14,78,0.10)',
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          transform: `rotate(${rots[i]}deg)`,
+          animationDelay: `${(i * 0.18) % 1.4}s`,
+          zIndex: 1,
+        }}>
+          <span style={{ fontSize: 26, lineHeight: 1 }}>{e}</span>
+        </div>
+      ))}
+      <div style={{ position: 'relative', zIndex: 2, flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
         <div className="fs-mono a-fade-up" style={{
           fontSize: 13, letterSpacing: '0.26em', textTransform: 'uppercase',
           color: CORAL, fontWeight: 800,
         }}>⚡ {t.menu_chaos_eyebrow || 'CHAOS MODE'}</div>
         <div className="fs-display a-fade-up" style={{
-          marginTop: 12, fontSize: 64, fontWeight: 800, color: EGGPLANT,
-          letterSpacing: '-0.045em', lineHeight: 0.95,
-          textShadow: '0 2px 0 rgba(255,255,255,0.65), 0 1px 3px rgba(74,14,78,0.12)',
+          marginTop: 12, fontSize: 'clamp(56px, 16vw, 84px)', fontWeight: 800, color: EGGPLANT,
+          letterSpacing: '-0.045em', lineHeight: 0.92,
+          textShadow: '0 3px 0 rgba(255,255,255,0.75), 0 2px 4px rgba(74,14,78,0.18), 0 8px 18px rgba(240,100,73,0.25)',
           animationDelay: '0.08s',
         }}>
           {t.chaos_intro_title || 'Buckle up.'}
         </div>
+        {/* big stat strip */}
+        <div className="a-fade-up" style={{ marginTop: 22, display: 'flex', gap: 10, animationDelay: '0.22s' }}>
+          <div style={{
+            flex: 1, background: 'rgba(255,255,255,0.85)', borderRadius: 16, padding: '12px 12px',
+            border: '2px solid rgba(255,255,255,0.95)',
+            boxShadow: '0 5px 0 rgba(74,14,78,0.10), 0 14px 24px -8px rgba(74,14,78,0.20)',
+          }}>
+            <div className="fs-display" style={{ fontSize: 30, fontWeight: 800, color: EGGPLANT, letterSpacing: '-0.04em', lineHeight: 1 }}>{peakCount}</div>
+            <div className="fs-mono" style={{ marginTop: 4, fontSize: 10, fontWeight: 700, color: MUTED, letterSpacing: '0.10em', textTransform: 'uppercase' }}>peaks</div>
+          </div>
+          <div style={{
+            flex: 1, background: 'rgba(255,255,255,0.85)', borderRadius: 16, padding: '12px 12px',
+            border: '2px solid rgba(255,255,255,0.95)',
+            boxShadow: '0 5px 0 rgba(74,14,78,0.10), 0 14px 24px -8px rgba(74,14,78,0.20)',
+          }}>
+            <div className="fs-display" style={{ fontSize: 30, fontWeight: 800, color: EGGPLANT, letterSpacing: '-0.04em', lineHeight: 1 }}>{total}</div>
+            <div className="fs-mono" style={{ marginTop: 4, fontSize: 10, fontWeight: 700, color: MUTED, letterSpacing: '0.10em', textTransform: 'uppercase' }}>days</div>
+          </div>
+        </div>
         <div className="fs-sans a-fade-up" style={{
-          marginTop: 16, fontSize: 17, lineHeight: 1.45,
-          color: 'rgba(74,14,78,0.65)', fontWeight: 600,
-          animationDelay: '0.18s',
+          marginTop: 20, fontSize: 16, lineHeight: 1.4,
+          color: 'rgba(74,14,78,0.70)', fontWeight: 600,
+          animationDelay: '0.34s',
         }}>
-          {(t.chaos_intro_sub || 'Every wild minute, every silence, every shouting match.\n{n} days in.').replace('{n}', total)}
+          {t.chaos_intro_sub_short || 'Every wild minute. Every silence. Every shouting match.'}
         </div>
       </div>
       <div className="fs-mono a-fade-up" style={{
-        fontSize: 10, textAlign: 'center', color: MUTED, letterSpacing: '0.16em',
-        animationDelay: '0.4s',
+        position: 'relative', zIndex: 2,
+        fontSize: 11, textAlign: 'center', color: MUTED, letterSpacing: '0.18em',
+        animationDelay: '0.5s',
       }}>{t.chaos_tap || 'TAP TO START →'}</div>
     </SlideShell>
   );
@@ -198,6 +242,98 @@ function SlideSeismogram({ t, chaos }) {
   );
 }
 
+// Visualization row beneath the big number — gives the slide texture.
+// Each award gets a different visual that matches its theme.
+function AwardVisual({ awardKey, award, theme, t }) {
+  if (awardKey === 'loudest') {
+    // Wall of emojis — uses the count so it scales with intensity.
+    const emojis = ['🔥', '😂', '💀', '🎉', '⚡', '🚨', '💥', '👀'];
+    const n = Math.min(award.emojiCount || 0, 16);
+    return (
+      <div className="a-fade-up" style={{
+        marginTop: 18, display: 'flex', flexWrap: 'wrap', gap: 6,
+        animationDelay: '0.4s', maxWidth: 320,
+      }}>
+        {Array.from({ length: n }).map((_, i) => (
+          <span key={i} style={{ fontSize: 24, lineHeight: 1, opacity: 0.9 + (i % 3) * 0.03 }}>
+            {emojis[i % emojis.length]}
+          </span>
+        ))}
+      </div>
+    );
+  }
+  if (awardKey === 'speedRun') {
+    // Stack of mini chat bubbles representing the message flurry.
+    const n = Math.min(award.count || 0, 14);
+    return (
+      <div className="a-fade-up" style={{
+        marginTop: 18, display: 'flex', flexDirection: 'column', gap: 4,
+        animationDelay: '0.4s', alignItems: 'flex-start',
+      }}>
+        {Array.from({ length: Math.min(5, Math.ceil(n / 3)) }).map((_, row) => (
+          <div key={row} style={{ display: 'flex', gap: 4 }}>
+            {Array.from({ length: 3 }).map((_, c) => (
+              <div key={c} style={{
+                width: 18 + (c % 2) * 8, height: 10,
+                background: theme.fg, opacity: 0.5 + (c % 2) * 0.3,
+                borderRadius: 6,
+              }} />
+            ))}
+          </div>
+        ))}
+      </div>
+    );
+  }
+  if (awardKey === 'groupRiot') {
+    // Avatar circles representing the participants.
+    const n = Math.min(award.uniqueSenders || 0, 8);
+    const colors = ['#FFD700', '#FF1867', '#00BFFF', '#43AA8B', '#f06449', '#FF8C00', '#FF69B4', '#573280'];
+    return (
+      <div className="a-fade-up" style={{
+        marginTop: 18, display: 'flex', gap: -8, animationDelay: '0.4s', flexWrap: 'wrap',
+      }}>
+        {Array.from({ length: n }).map((_, i) => (
+          <div key={i} style={{
+            width: 36, height: 36, borderRadius: '50%',
+            background: colors[i % colors.length],
+            border: '3px solid rgba(255,255,255,0.95)',
+            marginInlineStart: i === 0 ? 0 : -10,
+            boxShadow: '0 4px 10px rgba(0,0,0,0.25)',
+          }} />
+        ))}
+      </div>
+    );
+  }
+  if (awardKey === 'latest') {
+    // Stars + moon arrangement.
+    return (
+      <div className="a-fade-up" style={{ marginTop: 18, display: 'flex', gap: 8, animationDelay: '0.4s' }}>
+        {['✦', '✧', '✦', '★', '✧'].map((s, i) => (
+          <span key={i} style={{ fontSize: 22 + (i % 2) * 6, color: theme.accent, opacity: 0.8 - i * 0.08 }}>{s}</span>
+        ))}
+      </div>
+    );
+  }
+  if (awardKey === 'capsRiot') {
+    return (
+      <div className="fs-display a-fade-up" style={{
+        marginTop: 16, fontSize: 22, fontWeight: 800, color: theme.fg,
+        letterSpacing: '0.04em', lineHeight: 1.1, opacity: 0.85,
+        animationDelay: '0.4s',
+      }}>STOP SHOUTING!!</div>
+    );
+  }
+  if (awardKey === 'deadZone') {
+    return (
+      <div className="fs-mono a-fade-up" style={{
+        marginTop: 16, fontSize: 36, color: theme.fg, opacity: 0.5,
+        letterSpacing: '0.4em', animationDelay: '0.4s',
+      }}>· · · · ·</div>
+    );
+  }
+  return null;
+}
+
 function SlideAward({ t, awardKey, award }) {
   const theme = AWARD_THEMES[awardKey];
   const label = t[`chaos_award_${awardKey}_label`] || awardKey.toUpperCase();
@@ -225,23 +361,30 @@ function SlideAward({ t, awardKey, award }) {
     small = t.chaos_award_deadZone_unit || 'days of pure silence';
   }
   const dark = theme.bg !== GOLD;
+  // Responsive font: shorter strings get bigger.
+  const bigLen = String(big).length;
+  const bigSize = bigLen <= 2 ? 'clamp(110px, 36vw, 180px)'
+                : bigLen <= 3 ? 'clamp(90px, 28vw, 150px)'
+                : bigLen <= 4 ? 'clamp(72px, 22vw, 120px)'
+                :              'clamp(56px, 18vw, 96px)';
   return (
     <SlideShell bg={theme.bg} dark={dark}>
       <FloatingBlobs tint={theme.accent} dark={dark} />
-      {/* huge background emoji */}
+      {/* huge background emoji — bigger + brighter so it reads. */}
       <div aria-hidden style={{
-        position: 'absolute', insetInlineEnd: -40, top: -60,
-        fontSize: 380, lineHeight: 1, opacity: 0.10,
+        position: 'absolute', insetInlineEnd: -50, top: -50,
+        fontSize: 360, lineHeight: 1, opacity: 0.18,
         pointerEvents: 'none', color: theme.fg,
+        transform: 'rotate(-10deg)',
       }}>{theme.emoji}</div>
 
-      <div style={{ position: 'relative', flex: 1, display: 'flex', flexDirection: 'column' }}>
+      <div style={{ position: 'relative', flex: 1, display: 'flex', flexDirection: 'column', minHeight: 0 }}>
         <div className="fs-mono a-fade-up" style={{
           fontSize: 12, letterSpacing: '0.26em', textTransform: 'uppercase',
           color: theme.fg, opacity: 0.85, fontWeight: 800,
         }}>🏆 {t.chaos_awards_eyebrow || 'CHAOS AWARD'}</div>
-        <div className="fs-display a-fade-up" style={{
-          marginTop: 12, fontSize: 34, fontWeight: 800, color: theme.fg,
+        <div className="fs-display a-fade-up" dir="auto" style={{
+          marginTop: 12, fontSize: 'clamp(26px, 8vw, 40px)', fontWeight: 800, color: theme.fg,
           letterSpacing: '-0.035em', lineHeight: 1.02,
           textShadow: dark ? '0 2px 4px rgba(0,0,0,0.25)' : '0 1px 0 rgba(255,255,255,0.55)',
           animationDelay: '0.08s',
@@ -251,24 +394,32 @@ function SlideAward({ t, awardKey, award }) {
 
         <div style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'flex-start' }}>
           <div className="fs-display a-fade-up" style={{
-            fontSize: 140, fontWeight: 800, color: theme.accent,
+            fontSize: bigSize, fontWeight: 800, color: theme.accent,
             letterSpacing: '-0.05em', lineHeight: 0.85,
-            textShadow: dark ? '0 6px 0 rgba(0,0,0,0.30), 0 10px 28px rgba(0,0,0,0.40)' : '0 4px 0 rgba(74,14,78,0.18), 0 10px 24px rgba(74,14,78,0.30)',
-            animationDelay: '0.2s',
+            textShadow: dark
+              ? '0 6px 0 rgba(0,0,0,0.30), 0 10px 28px rgba(0,0,0,0.45)'
+              : '0 4px 0 rgba(74,14,78,0.20), 0 10px 24px rgba(74,14,78,0.30)',
+            animationDelay: '0.18s',
+            // Don't let the number push out horizontally.
+            maxWidth: '100%',
           }}>{big}</div>
           <div className="fs-sans a-fade-up" style={{
-            marginTop: 14, fontSize: 19, fontWeight: 700,
-            color: theme.fg, opacity: 0.92, lineHeight: 1.25,
-            animationDelay: '0.32s',
+            marginTop: 12, fontSize: 18, fontWeight: 700,
+            color: theme.fg, opacity: 0.92, lineHeight: 1.3, maxWidth: '95%',
+            animationDelay: '0.30s',
           }}>{small}</div>
+
+          {/* The visualization row — turns each award into something
+              you can SEE, not just read. */}
+          <AwardVisual awardKey={awardKey} award={award} theme={theme} t={t} />
         </div>
 
         {award.ts && (
           <div className="fs-mono a-fade-up" style={{
             fontSize: 11, fontWeight: 700, opacity: 0.78,
             color: theme.fg, letterSpacing: '0.10em',
-            animationDelay: '0.5s',
-          }}>{formatPeakTime(award.ts)}</div>
+            animationDelay: '0.55s',
+          }}>📅 {formatPeakTime(award.ts)}</div>
         )}
       </div>
     </SlideShell>
