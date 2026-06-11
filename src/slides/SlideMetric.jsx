@@ -69,28 +69,6 @@ const METRIC_DEFS = {
       .sort((x, y) => y.nightPct - x.nightPct)
       .map(u => ({ author: u.author, value: u.nightPct, displayValue: `${u.nightPct.toFixed(0)}%`, sub: `${u.nightMessages.toLocaleString()} late msgs` })),
   },
-  // Inverted leaderboard — "who barely uses emojis". Sort ascending by
-  // emojiCount; invert value so the quietest gets the biggest bar. Filter
-  // to users with >=20 messages so we're comparing apples to apples.
-  quiet_emojis: {
-    color: '#43AA8B',
-    bg: '#577590',
-    icon: '😐',
-    rows: (a) => {
-      const eligible = (a.users || []).filter(u => u.messageCount >= 20);
-      if (eligible.length === 0) return [];
-      const sorted = [...eligible].sort((x, y) => x.emojiCount - y.emojiCount);
-      const most = sorted[sorted.length - 1].emojiCount || 1;
-      return sorted.map(u => ({
-        author: u.author,
-        value: most - u.emojiCount + 1,
-        displayValue: u.emojiCount.toLocaleString(),
-        sub: u.emojiCount === 0
-          ? 'zero emojis sent'
-          : `${(u.emojiCount / u.messageCount).toFixed(2)} per msg`,
-      }));
-    },
-  },
 };
 
 export function metricHasData(metricKey, a) {
