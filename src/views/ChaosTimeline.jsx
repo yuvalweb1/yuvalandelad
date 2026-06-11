@@ -158,12 +158,13 @@ function SlideIntro({ t, chaos }) {
           textShadow: '0 1px 0 rgba(255,255,255,0.4)',
         }}>⚡ {t.menu_chaos_eyebrow || 'CHAOS MODE'}</div>
         <div className="fs-display a-fade-up" style={{
-          marginTop: 14, fontSize: 'clamp(64px, 18vw, 96px)', fontWeight: 800,
-          letterSpacing: '-0.05em', lineHeight: 0.88,
+          marginTop: 14, fontSize: 'clamp(56px, 16vw, 84px)', fontWeight: 800,
+          letterSpacing: '-0.04em', lineHeight: 1.05,
+          paddingBottom: 8, paddingInlineEnd: 10,
           backgroundImage: `linear-gradient(135deg, ${MAGENTA} 0%, ${CORAL} 50%, ${GOLD} 100%)`,
           WebkitBackgroundClip: 'text', backgroundClip: 'text',
           color: 'transparent', WebkitTextFillColor: 'transparent',
-          filter: 'drop-shadow(0 4px 0 rgba(74,14,78,0.18)) drop-shadow(0 10px 22px rgba(255,24,103,0.30))',
+          filter: 'drop-shadow(0 3px 0 rgba(74,14,78,0.18)) drop-shadow(0 8px 18px rgba(255,24,103,0.28))',
           fontStyle: 'italic',
           animationDelay: '0.08s',
         }}>
@@ -240,8 +241,9 @@ function SlideSeismogram({ t, lang, chaos }) {
           color: GOLD, fontWeight: 800,
         }}>🌊 {t.chaos_seismogram_eyebrow || 'THE SEISMOGRAM'}</div>
         <div className="fs-display a-fade-up" style={{
-          marginTop: 10, fontSize: 'clamp(40px, 11vw, 56px)', fontWeight: 800,
-          letterSpacing: '-0.04em', lineHeight: 0.95,
+          marginTop: 10, fontSize: 'clamp(36px, 10vw, 50px)', fontWeight: 800,
+          letterSpacing: '-0.035em', lineHeight: 1.1,
+          paddingBottom: 8, paddingInlineEnd: 12,
           backgroundImage: `linear-gradient(135deg, #fff 0%, ${GOLD} 50%, ${MAGENTA} 100%)`,
           WebkitBackgroundClip: 'text', backgroundClip: 'text',
           color: 'transparent', WebkitTextFillColor: 'transparent',
@@ -484,7 +486,8 @@ function SlideAward({ t, lang, awardKey, award }) {
           {/* Big number — gradient fill for a premium look. */}
           <div className="fs-display a-fade-up" style={{
             fontSize: bigSize, fontWeight: 800,
-            letterSpacing: '-0.06em', lineHeight: 0.82,
+            letterSpacing: '-0.04em', lineHeight: 1.05,
+            paddingBottom: 12, paddingInlineEnd: 14, paddingInlineStart: 2,
             animationDelay: '0.16s', maxWidth: '100%',
             fontStyle: 'italic',
             backgroundImage: dark
@@ -493,8 +496,8 @@ function SlideAward({ t, lang, awardKey, award }) {
             WebkitBackgroundClip: 'text', backgroundClip: 'text',
             color: 'transparent', WebkitTextFillColor: 'transparent',
             filter: dark
-              ? `drop-shadow(0 6px 0 rgba(0,0,0,0.35)) drop-shadow(0 14px 26px ${theme.accent}88)`
-              : `drop-shadow(0 4px 0 rgba(74,14,78,0.22)) drop-shadow(0 14px 24px rgba(74,14,78,0.28))`,
+              ? `drop-shadow(0 4px 0 rgba(0,0,0,0.30)) drop-shadow(0 12px 24px ${theme.accent}77)`
+              : `drop-shadow(0 3px 0 rgba(74,14,78,0.20)) drop-shadow(0 12px 22px rgba(74,14,78,0.25))`,
           }}>{big}</div>
           <div className="fs-sans a-fade-up" style={{
             marginTop: 14, fontSize: 19, fontWeight: 700,
@@ -541,12 +544,13 @@ function SlidePeakIntro({ t }) {
           textShadow: '0 1px 0 rgba(255,255,255,0.5)',
         }}>📈 {t.chaos_peaks_intro_eyebrow || 'NOW THE PEAKS'}</div>
         <div className="fs-display a-fade-up" style={{
-          marginTop: 16, fontSize: 'clamp(48px, 14vw, 72px)', fontWeight: 800,
-          letterSpacing: '-0.05em', lineHeight: 0.9,
+          marginTop: 16, fontSize: 'clamp(42px, 12vw, 60px)', fontWeight: 800,
+          letterSpacing: '-0.04em', lineHeight: 1.08,
+          paddingBottom: 10, paddingInlineEnd: 12,
           backgroundImage: `linear-gradient(135deg, ${MAGENTA} 0%, ${CORAL} 100%)`,
           WebkitBackgroundClip: 'text', backgroundClip: 'text',
           color: 'transparent', WebkitTextFillColor: 'transparent',
-          filter: 'drop-shadow(0 4px 0 rgba(74,14,78,0.20)) drop-shadow(0 10px 20px rgba(255,24,103,0.30))',
+          filter: 'drop-shadow(0 3px 0 rgba(74,14,78,0.20)) drop-shadow(0 10px 18px rgba(255,24,103,0.28))',
           fontStyle: 'italic',
           animationDelay: '0.08s',
         }}>
@@ -632,9 +636,10 @@ function SlidePeak({ t, lang, peak, rank }) {
           color: isWinner ? GOLD : CORAL, fontWeight: 800,
         }}>{eyebrow}</div>
         <div className="fs-display a-fade-up" dir="auto" style={{
-          marginTop: 10, fontSize: isWinner ? 'clamp(38px, 11vw, 50px)' : 'clamp(32px, 9vw, 42px)',
+          marginTop: 10, fontSize: isWinner ? 'clamp(34px, 10vw, 46px)' : 'clamp(28px, 8vw, 38px)',
           fontWeight: 800, fontStyle: 'italic',
-          letterSpacing: '-0.045em', lineHeight: 1.0,
+          letterSpacing: '-0.035em', lineHeight: 1.12,
+          paddingBottom: 8, paddingInlineEnd: 10,
           backgroundImage: isWinner
             ? `linear-gradient(135deg, #fff 0%, ${GOLD} 100%)`
             : `linear-gradient(135deg, ${EGGPLANT} 0%, ${MAGENTA} 100%)`,
@@ -748,12 +753,13 @@ function SlideOutro({ t, chaos }) {
           color: MAGENTA, fontWeight: 800,
         }}>{t.chaos_outro_eyebrow || 'THAT WAS CHAOS'}</div>
         <div className="fs-display a-fade-up" style={{
-          marginTop: 14, fontSize: 'clamp(46px, 13vw, 64px)', fontWeight: 800,
-          letterSpacing: '-0.045em', lineHeight: 0.92,
+          marginTop: 14, fontSize: 'clamp(40px, 12vw, 56px)', fontWeight: 800,
+          letterSpacing: '-0.035em', lineHeight: 1.08,
+          paddingBottom: 10, paddingInlineEnd: 8,
           backgroundImage: `linear-gradient(135deg, ${MAGENTA} 0%, ${CORAL} 50%, ${GOLD} 100%)`,
           WebkitBackgroundClip: 'text', backgroundClip: 'text',
           color: 'transparent', WebkitTextFillColor: 'transparent',
-          filter: 'drop-shadow(0 4px 0 rgba(74,14,78,0.20)) drop-shadow(0 10px 20px rgba(255,24,103,0.30))',
+          filter: 'drop-shadow(0 3px 0 rgba(74,14,78,0.20)) drop-shadow(0 10px 18px rgba(255,24,103,0.28))',
           fontStyle: 'italic',
           animationDelay: '0.08s',
         }}>{t.chaos_outro_title || 'Your year in pure mayhem.'}</div>
