@@ -94,7 +94,7 @@ export default function Modes({ analytics, history = [], t, onUpload, onRoastMod
       position: 'relative', height: '100%', overflow: 'hidden',
       background: 'linear-gradient(180deg, #FFF6D6 0%, #FFF0E2 46%, #FDE6F1 100%)',
       display: 'flex', flexDirection: 'column',
-      padding: '44px 20px 92px',
+      padding: '44px 20px calc(92px + var(--safe-bottom, 0px))',
     }}>
       {/* Warm blob background — matches PostMenu / Landing */}
       <div aria-hidden style={{ position: 'absolute', inset: 0, pointerEvents: 'none', zIndex: 0, overflow: 'hidden' }}>

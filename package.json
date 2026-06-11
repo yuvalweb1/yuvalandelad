@@ -9,6 +9,7 @@
     "build": "vite build",
     "preview": "vite preview",
     "test": "node src/parser/zip.test.js && node src/parser/voiceAuthor.test.js",
+    "i18n:check": "node scripts/i18n-check.mjs",
     "theme": "node scripts/apply-theme.js",
     "sync": "npm run build && npx cap sync",
     "watch": "vite build --watch",

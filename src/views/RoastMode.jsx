@@ -3,7 +3,6 @@ import { interp, resolveTitle } from '../i18n';
 import ShareSheet from '../components/ShareSheet.jsx';
 
 const WARM_PALETTE = ['#f3722c', '#f9c74f', '#e8533a', '#FF8C00', '#c44d2e', '#8b5a3c'];
-const EXHIBITS = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'];
 const ROT_PATTERN = [-1, 0.7, -0.6, 1, -0.85, 0.5];
 
 function avatarColor(name) {
@@ -54,6 +53,7 @@ export default function RoastMode({ analytics, selectedAuthor, setSelectedAuthor
   if (!u) return null;
 
   const otherUsers = analytics.users.filter(x => x.author !== selectedAuthor);
+  const exhibitLetters = (t.rm_exhibit_letters || 'A,B,C,D,E,F,G,H').split(',');
 
   // Build the share text from the user's most cutting roast (kicker = punchline).
   // Falls back to a generic line when the user has no roasts on file.
@@ -88,7 +88,7 @@ export default function RoastMode({ analytics, selectedAuthor, setSelectedAuthor
         <div style={{ position: 'absolute', bottom: -80, right: -60, width: 220, height: 220, borderRadius: '50%', background: '#e8533a', opacity: 0.16, filter: 'blur(72px)' }} />
       </div>
 
-      <div style={{ position: 'relative', padding: '22px 18px 28px', zIndex: 1 }}>
+      <div style={{ position: 'relative', padding: 'calc(env(safe-area-inset-top, 0px) + 22px) 18px calc(env(safe-area-inset-bottom, 0px) + 28px)', zIndex: 1 }}>
 
         {/* HEADER */}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
@@ -99,9 +99,6 @@ export default function RoastMode({ analytics, selectedAuthor, setSelectedAuthor
             display: 'flex', alignItems: 'center', gap: 6,
             backdropFilter: 'blur(8px)',
           }}>
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
-              <polyline points="15 18 9 12 15 6" />
-            </svg>
             {t.rm_back}
           </button>
           <div className="fs-mono" style={{
@@ -137,7 +134,7 @@ export default function RoastMode({ analytics, selectedAuthor, setSelectedAuthor
         </div>
 
         {/* STAT STRIP */}
-        <div style={{ marginTop: 10, display: 'flex', gap: 6, overflowX: 'auto', paddingBottom: 2 }} className="no-sb">
+        <div style={{ marginTop: 10, display: 'flex', gap: 6, overflowX: 'auto', paddingBottom: 2, direction: 'ltr' }} className="no-sb">
           {[
             { label: 'Msgs', value: u.messageCount.toLocaleString() },
             { label: 'Peak', value: `${u.peakHour}:00` },
@@ -187,17 +184,17 @@ export default function RoastMode({ analytics, selectedAuthor, setSelectedAuthor
                   background: 'rgba(249,199,79,0.10)',
                   boxShadow: '0 4px 12px rgba(249,199,79,0.25)', zIndex: 2,
                 }}>
-                  Exhibit&nbsp;{EXHIBITS[i] || i + 1}
+                  {t.rm_exhibit || 'Exhibit'}&nbsp;{exhibitLetters[i] || i + 1}
                 </div>
 
                 {/* Handwritten index */}
                 <div style={{
                   fontFamily: "'Caveat', cursive",
                   color: '#f9c74f', opacity: 0.7, fontWeight: 600,
-                  marginBottom: 10, lineHeight: 1,
+                  marginBottom: 10, lineHeight: 1, textAlign: 'left',
                   transform: 'rotate(-3deg)', transformOrigin: 'left center', fontSize: 19,
                 }}>
-                  N&nbsp;{i + 1}
+                  {t.rm_index_prefix || 'N'}&nbsp;{i + 1}
                 </div>
 
                 {/* Setup line */}
@@ -332,7 +329,7 @@ export default function RoastMode({ analytics, selectedAuthor, setSelectedAuthor
       {/* Toast */}
       {toast && (
         <div style={{
-          position: 'absolute', bottom: 22, left: '50%', transform: 'translateX(-50%)',
+          position: 'absolute', bottom: 'calc(env(safe-area-inset-bottom, 0px) + 22px)', left: '50%', transform: 'translateX(-50%)',
           background: '#1a0606', color: '#fff',
           border: '1px solid rgba(243,114,44,0.45)',
           borderRadius: 999, padding: '10px 18px',

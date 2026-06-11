@@ -2,12 +2,14 @@ package com.recapped.app;
 
 import android.content.Intent;
 import android.database.Cursor;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.provider.OpenableColumns;
+import androidx.core.view.WindowCompat;
 import com.getcapacitor.BridgeActivity;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -25,6 +27,17 @@ public class MainActivity extends BridgeActivity {
     protected void onCreate(Bundle savedInstanceState) {
         registerPlugin(OpenAppPlugin.class);
         super.onCreate(savedInstanceState);
+
+        // Edge-to-edge: let the WebView draw behind the system bars and make the
+        // navigation bar transparent (no scrim) so env(safe-area-inset-bottom)
+        // reflects the real inset and the app's own background shows through
+        // instead of a solid black bar.
+        WindowCompat.setDecorFitsSystemWindows(getWindow(), false);
+        getWindow().setNavigationBarColor(Color.TRANSPARENT);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            getWindow().setNavigationBarContrastEnforced(false);
+        }
+
         cleanupStaleCache();
         handleShareIntent(getIntent());
     }
