@@ -69,6 +69,12 @@ export default {
   chaos_outro_eyebrow: 'THAT WAS CHAOS',
   chaos_outro_title: 'Your year in pure mayhem.',
   chaos_outro_sub: '{n} peaks. The seismogram. The dead zones. All you.',
+  chaos_unit_peaks: 'peaks',
+  chaos_unit_days: 'days',
+  chaos_unit_msgs: 'msgs',
+  chaos_unit_ppl: 'ppl',
+  chaos_intro_sub_short: 'Every wild minute. Every silence. Every shouting match.',
+  chaos_award_capsRiot_shout: 'STOP SHOUTING!!',
   // Chaos peak titles by time of day
   chaos_peak_late_night_eyebrow: '🌙 LATE NIGHT',
   chaos_peak_late_night_title: 'The 3 AM Eruption',

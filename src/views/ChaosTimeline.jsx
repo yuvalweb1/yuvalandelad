@@ -48,14 +48,19 @@ const AWARD_THEMES = {
   deadZone:  { emoji: '🪦', bg: NAVY,    fg: '#fff',     accent: MINT },
 };
 
-function formatPeakTime(iso) {
+// All date formatting goes through the app's active language, not
+// the browser locale — otherwise an English UI on an Israeli phone
+// gets Hebrew month names sprinkled into the deck.
+function formatPeakTime(iso, lang) {
   if (!iso) return '';
   const d = new Date(iso);
-  return `${d.toLocaleDateString(undefined, { month: 'short', day: 'numeric' })} · ${d.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit', hour12: false })}`;
+  const day = d.toLocaleDateString(lang || 'en', { month: 'short', day: 'numeric' });
+  const time = d.toLocaleTimeString(lang || 'en', { hour: '2-digit', minute: '2-digit', hour12: false });
+  return `${day} · ${time}`;
 }
-function dayOnly(iso) {
+function dayOnly(iso, lang) {
   if (!iso) return '';
-  return new Date(iso).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' });
+  return new Date(iso).toLocaleDateString(lang || 'en', { month: 'short', day: 'numeric', year: 'numeric' });
 }
 
 // ── Shared slide chrome ────────────────────────────────────────
@@ -136,7 +141,7 @@ function SlideIntro({ t, chaos }) {
             boxShadow: '0 5px 0 rgba(74,14,78,0.10), 0 14px 24px -8px rgba(74,14,78,0.20)',
           }}>
             <div className="fs-display" style={{ fontSize: 30, fontWeight: 800, color: EGGPLANT, letterSpacing: '-0.04em', lineHeight: 1 }}>{peakCount}</div>
-            <div className="fs-mono" style={{ marginTop: 4, fontSize: 10, fontWeight: 700, color: MUTED, letterSpacing: '0.10em', textTransform: 'uppercase' }}>peaks</div>
+            <div className="fs-mono" style={{ marginTop: 4, fontSize: 10, fontWeight: 700, color: MUTED, letterSpacing: '0.10em', textTransform: 'uppercase' }}>{t.chaos_unit_peaks || 'peaks'}</div>
           </div>
           <div style={{
             flex: 1, background: 'rgba(255,255,255,0.85)', borderRadius: 16, padding: '12px 12px',
@@ -144,7 +149,7 @@ function SlideIntro({ t, chaos }) {
             boxShadow: '0 5px 0 rgba(74,14,78,0.10), 0 14px 24px -8px rgba(74,14,78,0.20)',
           }}>
             <div className="fs-display" style={{ fontSize: 30, fontWeight: 800, color: EGGPLANT, letterSpacing: '-0.04em', lineHeight: 1 }}>{total}</div>
-            <div className="fs-mono" style={{ marginTop: 4, fontSize: 10, fontWeight: 700, color: MUTED, letterSpacing: '0.10em', textTransform: 'uppercase' }}>days</div>
+            <div className="fs-mono" style={{ marginTop: 4, fontSize: 10, fontWeight: 700, color: MUTED, letterSpacing: '0.10em', textTransform: 'uppercase' }}>{t.chaos_unit_days || 'days'}</div>
           </div>
         </div>
         <div className="fs-sans a-fade-up" style={{
@@ -164,7 +169,7 @@ function SlideIntro({ t, chaos }) {
   );
 }
 
-function SlideSeismogram({ t, chaos }) {
+function SlideSeismogram({ t, lang, chaos }) {
   const data = chaos.seismogram || [];
   // Re-bucket so we get ~70 bars on a phone width.
   const stride = Math.max(1, Math.ceil(data.length / 70));
@@ -178,7 +183,7 @@ function SlideSeismogram({ t, chaos }) {
   }
   const firstDay = data[0] ? new Date(data[0].day) : null;
   const lastDay = data[data.length - 1] ? new Date(data[data.length - 1].day) : null;
-  const monthLabel = (d) => d?.toLocaleDateString(undefined, { month: 'short', year: '2-digit' }) || '';
+  const monthLabel = (d) => d?.toLocaleDateString(lang || 'en', { month: 'short', year: '2-digit' }) || '';
   return (
     <SlideShell>
       <FloatingBlobs tint={VIOLET} />
@@ -225,7 +230,7 @@ function SlideSeismogram({ t, chaos }) {
             letterSpacing: '0.08em',
           }}>
             <span>{monthLabel(firstDay)}</span>
-            <span>{data.length} days</span>
+            <span>{data.length} {t.chaos_unit_days || 'days'}</span>
             <span>{monthLabel(lastDay)}</span>
           </div>
         </div>
@@ -320,7 +325,7 @@ function AwardVisual({ awardKey, award, theme, t }) {
         marginTop: 16, fontSize: 22, fontWeight: 800, color: theme.fg,
         letterSpacing: '0.04em', lineHeight: 1.1, opacity: 0.85,
         animationDelay: '0.4s',
-      }}>STOP SHOUTING!!</div>
+      }}>{t.chaos_award_capsRiot_shout || 'STOP SHOUTING!!'}</div>
     );
   }
   if (awardKey === 'deadZone') {
@@ -334,7 +339,7 @@ function AwardVisual({ awardKey, award, theme, t }) {
   return null;
 }
 
-function SlideAward({ t, awardKey, award }) {
+function SlideAward({ t, lang, awardKey, award }) {
   const theme = AWARD_THEMES[awardKey];
   const label = t[`chaos_award_${awardKey}_label`] || awardKey.toUpperCase();
   let big = '';
@@ -355,7 +360,7 @@ function SlideAward({ t, awardKey, award }) {
     const h = new Date(award.ts).getHours().toString().padStart(2, '0');
     const m = new Date(award.ts).getMinutes().toString().padStart(2, '0');
     big = `${h}:${m}`;
-    small = (t.chaos_award_latest_unit || 'on {date}').replace('{date}', dayOnly(award.ts));
+    small = (t.chaos_award_latest_unit || 'on {date}').replace('{date}', dayOnly(award.ts, lang));
   } else if (awardKey === 'deadZone') {
     big = `${award.days || Math.ceil(award.hours / 24)}`;
     small = t.chaos_award_deadZone_unit || 'days of pure silence';
@@ -419,7 +424,7 @@ function SlideAward({ t, awardKey, award }) {
             fontSize: 11, fontWeight: 700, opacity: 0.78,
             color: theme.fg, letterSpacing: '0.10em',
             animationDelay: '0.55s',
-          }}>📅 {formatPeakTime(award.ts)}</div>
+          }}>📅 {formatPeakTime(award.ts, lang)}</div>
         )}
       </div>
     </SlideShell>
@@ -455,7 +460,7 @@ function SlidePeakIntro({ t }) {
   );
 }
 
-function SlidePeak({ t, peak, rank }) {
+function SlidePeak({ t, lang, peak, rank }) {
   const titleInfo = PEAK_TITLES[peak.title] || PEAK_TITLES.late;
   const eyebrow = t[`chaos_peak_${peak.title}_eyebrow`] || titleInfo.eyebrow;
   const headline = t[`chaos_peak_${peak.title}_title`] || titleInfo.fallback;
@@ -483,7 +488,7 @@ function SlidePeak({ t, peak, rank }) {
           letterSpacing: '0.08em',
           animationDelay: '0.16s',
         }}>
-          {peak.count} msgs · {peak.uniqueSenders} ppl · {formatPeakTime(peak.ts)}
+          {peak.count} {t.chaos_unit_msgs || 'msgs'} · {peak.uniqueSenders} {t.chaos_unit_ppl || 'ppl'} · {formatPeakTime(peak.ts, lang)}
         </div>
 
         <div className="a-fade-up" style={{
@@ -548,7 +553,7 @@ function SlideOutro({ t, chaos }) {
 }
 
 // ── Main controller ────────────────────────────────────────────
-export default function ChaosTimeline({ analytics, t, onBack }) {
+export default function ChaosTimeline({ analytics, t, lang, onBack }) {
   const chaos = analytics?.chaos;
 
   // Compute the slide lineup once per chaos payload. Filters out
@@ -600,14 +605,14 @@ export default function ChaosTimeline({ analytics, t, onBack }) {
 
   const current = slides[slide];
   let body;
-  if (current.id === 'intro')          body = <SlideIntro t={t} chaos={chaos} />;
-  else if (current.id === 'seismogram') body = <SlideSeismogram t={t} chaos={chaos} />;
+  if (current.id === 'intro')          body = <SlideIntro t={t} lang={lang} chaos={chaos} />;
+  else if (current.id === 'seismogram') body = <SlideSeismogram t={t} lang={lang} chaos={chaos} />;
   else if (current.id === 'peaks-intro') body = <SlidePeakIntro t={t} />;
   else if (current.id === 'outro')      body = <SlideOutro t={t} chaos={chaos} />;
   else if (current.id.startsWith('award:'))
-    body = <SlideAward t={t} awardKey={current.awardKey} award={current.award} />;
+    body = <SlideAward t={t} lang={lang} awardKey={current.awardKey} award={current.award} />;
   else if (current.id.startsWith('peak:'))
-    body = <SlidePeak t={t} peak={current.peak} rank={current.rank} />;
+    body = <SlidePeak t={t} lang={lang} peak={current.peak} rank={current.rank} />;
 
   return (
     <div style={{ position: 'absolute', inset: 0, background: WHITE }}>

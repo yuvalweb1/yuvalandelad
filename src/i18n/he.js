@@ -69,6 +69,12 @@ export default {
   chaos_outro_eyebrow: 'זה היה כאוס',
   chaos_outro_title: 'שנה של בלאגן טהור.',
   chaos_outro_sub: '{n} שיאים. הסייסמוגרף. אזורי המתים. הכל אתם.',
+  chaos_unit_peaks: 'שיאים',
+  chaos_unit_days: 'ימים',
+  chaos_unit_msgs: 'הודעות',
+  chaos_unit_ppl: 'אנשים',
+  chaos_intro_sub_short: 'כל דקה פראית. כל שתיקה. כל קריאה.',
+  chaos_award_capsRiot_shout: 'די לצרוח!!',
   // כותרות שיאים לפי שעות
   chaos_peak_late_night_eyebrow: '🌙 חצות',
   chaos_peak_late_night_title: 'ההתפרצות של 3 לפנות בוקר',

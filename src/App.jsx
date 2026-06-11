@@ -573,7 +573,7 @@ function RecappedApp() {
             <DuoAnalysis t={t} onBack={() => setStage('modes')} />
           )}
           {stage === 'chaos' && (
-            <ChaosTimeline analytics={analytics} t={t} onBack={() => setStage('modes')} />
+            <ChaosTimeline analytics={analytics} t={t} lang={lang} onBack={() => setStage('modes')} />
           )}
         </div>
         {(stage === 'landing' || stage === 'modes') && (
