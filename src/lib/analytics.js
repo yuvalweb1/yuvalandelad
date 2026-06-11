@@ -981,9 +981,10 @@ function computeChaos(messages) {
   const buckets = Array.from(minuteBuckets.values());
 
   // Top 10 peaks — score blends raw count and emoji density so a
-  // 20-emoji 8-msg minute can beat a flat 10-msg minute.
+  // 20-emoji 8-msg minute can beat a flat 10-msg minute. Threshold
+  // is loose (count >= 2) so small chats still surface peaks.
   const scored = buckets
-    .filter(b => b.count >= 3)
+    .filter(b => b.count >= 2)
     .map(b => ({ ...b, score: b.count + b.emojiCount * 0.4 + b.uniqueSenders * 0.3 }));
   const peaks = scored
     .sort((a, b) => b.score - a.score)

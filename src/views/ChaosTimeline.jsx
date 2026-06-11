@@ -277,6 +277,18 @@ export default function ChaosTimeline({ analytics, t, onBack }) {
   const [expandedPeak, setExpandedPeak] = useState(0);
 
   if (!chaos || (chaos.peaks?.length || 0) === 0) {
+    // Distinguish two distinct empty states:
+    //   - chaos missing entirely → the saved recap predates this feature,
+    //     so the raw message buckets are gone. User must re-upload.
+    //   - chaos present but no peaks → the chat is genuinely too quiet
+    //     for any minute to clear the 2-msg threshold.
+    const needsReupload = !chaos;
+    const title = needsReupload
+      ? (t.chaos_empty_old_title || 'Re-upload to unlock')
+      : (t.chaos_empty_title || 'No chaos found');
+    const body = needsReupload
+      ? (t.chaos_empty_old_body || 'This recap was saved before Chaos Mode existed. Re-upload your chat to see the wildest moments.')
+      : (t.chaos_empty_body || 'This chat is suspiciously quiet. Try a livelier group.');
     return (
       <div style={{
         position: 'relative', height: '100%', overflow: 'hidden',
@@ -284,19 +296,15 @@ export default function ChaosTimeline({ analytics, t, onBack }) {
         display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
         padding: '24px', gap: 12, textAlign: 'center',
       }}>
-        <div aria-hidden style={{ fontSize: 64 }}>🌊</div>
-        <div className="fs-display" style={{ fontSize: 24, fontWeight: 800, color: PLUM }}>
-          {t.chaos_empty_title || 'No chaos found'}
-        </div>
-        <div className="fs-sans" style={{ fontSize: 14, color: MUTED, maxWidth: 280 }}>
-          {t.chaos_empty_body || 'This chat is suspiciously quiet. Try a livelier group.'}
-        </div>
+        <div aria-hidden style={{ fontSize: 64 }}>{needsReupload ? '📂' : '🌊'}</div>
+        <div className="fs-display" style={{ fontSize: 24, fontWeight: 800, color: PLUM }}>{title}</div>
+        <div className="fs-sans" style={{ fontSize: 14, color: MUTED, maxWidth: 300 }}>{body}</div>
         <button onClick={onBack} className="press" style={{
           marginTop: 12, padding: '12px 22px', borderRadius: 999,
           background: `linear-gradient(135deg, ${GOLD}, ${CORAL})`, color: EGGPLANT,
           border: '2px solid rgba(255,255,255,0.8)', cursor: 'pointer',
           fontWeight: 800, fontSize: 14,
-        }}>← {t.rm_back || 'Back'}</button>
+        }}>{t.rm_back || '← Back'}</button>
       </div>
     );
   }

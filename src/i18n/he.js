@@ -47,6 +47,8 @@ export default {
   chaos_what_happened: 'מה באמת קרה',
   chaos_empty_title: 'לא נמצא כאוס',
   chaos_empty_body: 'הקבוצה הזאת חשודה בשקט. נסה קבוצה ערה יותר.',
+  chaos_empty_old_title: 'העלה מחדש כדי לפתוח',
+  chaos_empty_old_body: 'הריקאפ הזה נשמר לפני שמצב הכאוס היה קיים. העלה את הצ׳אט מחדש כדי לראות את הרגעים הכי כאוטיים.',
   // כותרות שיאים לפי שעות
   chaos_peak_late_night_eyebrow: '🌙 חצות',
   chaos_peak_late_night_title: 'ההתפרצות של 3 לפנות בוקר',

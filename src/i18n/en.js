@@ -47,6 +47,8 @@ export default {
   chaos_what_happened: 'WHAT ACTUALLY HAPPENED',
   chaos_empty_title: 'No chaos found',
   chaos_empty_body: 'This chat is suspiciously quiet. Try a livelier group.',
+  chaos_empty_old_title: 'Re-upload to unlock',
+  chaos_empty_old_body: 'This recap was saved before Chaos Mode existed. Re-upload your chat to see the wildest moments.',
   // Chaos peak titles by time of day
   chaos_peak_late_night_eyebrow: '🌙 LATE NIGHT',
   chaos_peak_late_night_title: 'The 3 AM Eruption',
