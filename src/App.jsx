@@ -92,6 +92,15 @@ function RecappedApp() {
     tone: null,
     self: null,
   });
+  // Name + country captured by the Welcome questionnaire on first run.
+  // userName is the auto-match key for Onboarding (lets us skip the
+  // "Which one are you?" step when the chat has a matching participant).
+  const [userName, setUserName] = useState(() => {
+    try { return localStorage.getItem('cw_user_name') || ''; } catch { return ''; }
+  });
+  const [userCountry, setUserCountry] = useState(() => {
+    try { return localStorage.getItem('cw_user_country') || ''; } catch { return ''; }
+  });
   const [currentRecapId, setCurrentRecapId] = useState(null);
   const [history, setHistory] = useState(() => loadHistory());
   // Where Settings should return to. Set just before entering the settings stage.
@@ -377,9 +386,15 @@ function RecappedApp() {
             <Welcome
               t={t}
               lang={lang}
-              onComplete={({ lang: chosenLang }) => {
+              onComplete={({ lang: chosenLang, name }) => {
                 if (chosenLang && I18N[chosenLang] && chosenLang !== lang) {
                   setLang(chosenLang);
+                }
+                // Persist name so Onboarding can match it against the
+                // chat participants and auto-pick "who you are".
+                if (name) {
+                  setUserName(name);
+                  try { localStorage.setItem('cw_user_name', name); } catch {}
                 }
                 try {
                   localStorage.setItem('cw_seen_welcome', '1');

@@ -66,6 +66,8 @@ export default {
   welcome_subtitle: 'שתי שאלות קצרות — ונצא לדרך.',
   welcome_lang_subtitle: 'בחרו שפה כדי להתחיל.',
   welcome_name_label: 'איך קוראים לך?',
+  welcome_name_title: 'איך קוראים לך?',
+  welcome_name_help: 'נשתמש בזה כדי לזהות אותך אוטומטית בצ׳אט — בלי לשאול פעמיים.',
   welcome_name_placeholder: 'הכנס את שמך',
   welcome_country_label: 'מאיפה אתה?',
   welcome_country_placeholder: 'מדינה / עיר',

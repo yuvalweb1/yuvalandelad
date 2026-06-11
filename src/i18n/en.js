@@ -66,6 +66,8 @@ export default {
   welcome_subtitle: "Two quick questions — then we're rolling.",
   welcome_lang_subtitle: 'Pick your language to get started.',
   welcome_name_label: "What's your name?",
+  welcome_name_title: "What's your name?",
+  welcome_name_help: "We use it to auto-pick you in your chat — so we don't ask twice.",
   welcome_name_placeholder: 'Type your name',
   welcome_country_label: 'Where are you from?',
   welcome_country_placeholder: 'Country / City',
