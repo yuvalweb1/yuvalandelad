@@ -917,5 +917,193 @@ export function computeAll(messages) {
     top3Share,
     // Social layer outputs
     mostLikely, achievementsByUser,
+    // Chaos Mode payload — computed lazily so the main pass stays lean.
+    // Includes top peaks (with the actual message excerpts!), 5 named
+    // awards, and a daily seismogram for the year-strip visualisation.
+    chaos: computeChaos(sorted),
+  };
+}
+
+// ============================================================
+// computeChaos — second pass over the sorted messages to produce
+// the data the Chaos Mode view needs:
+//   - peaks: top 10 chaotic minutes, each with up to 8 message
+//     excerpts so the UI can show "what actually happened"
+//   - awards: 5 named superlatives (loudest, latest, speed-run,
+//     group riot, dead zone)
+//   - seismogram: per-day chaos score for the year-strip strip
+// Everything here is deterministic — same input, same output.
+// ============================================================
+function computeChaos(messages) {
+  if (!messages || messages.length === 0) {
+    return { peaks: [], awards: {}, seismogram: [], totalDays: 0 };
+  }
+
+  // Bucket by minute, capturing message excerpts so the UI can
+  // surface "what actually happened" — the unique feature vs. Wrapped.
+  const minuteBuckets = new Map();
+  for (const m of messages) {
+    if (!m.timestamp) continue;
+    const key = Math.floor(m.timestamp.getTime() / 60000);
+    let b = minuteBuckets.get(key);
+    if (!b) {
+      b = {
+        key,
+        ts: m.timestamp,
+        count: 0,
+        authors: new Set(),
+        emojiCount: 0,
+        voiceCount: 0,
+        mediaCount: 0,
+        capsCount: 0,
+        excerpts: [],
+      };
+      minuteBuckets.set(key, b);
+    }
+    b.count++;
+    b.authors.add(m.author);
+    if (m.emojis?.length) b.emojiCount += m.emojis.length;
+    if (m.isVoice) b.voiceCount++;
+    if (m.hasMedia) b.mediaCount++;
+    const text = m.content || '';
+    if (text.length >= 6 && text === text.toUpperCase() && /[A-Za-zא-ת]/.test(text)) b.capsCount++;
+    // Keep up to ~10 excerpts per minute — enough for the UI to
+    // tell the story without bloating analytics output.
+    if (b.excerpts.length < 10 && text.trim().length > 0) {
+      b.excerpts.push({
+        author: m.author,
+        content: text.length > 180 ? text.slice(0, 180) + '…' : text,
+        isVoice: !!m.isVoice,
+        hasMedia: !!m.hasMedia,
+      });
+    }
+  }
+  const buckets = Array.from(minuteBuckets.values());
+
+  // Top 10 peaks — score blends raw count and emoji density so a
+  // 20-emoji 8-msg minute can beat a flat 10-msg minute.
+  const scored = buckets
+    .filter(b => b.count >= 3)
+    .map(b => ({ ...b, score: b.count + b.emojiCount * 0.4 + b.uniqueSenders * 0.3 }));
+  const peaks = scored
+    .sort((a, b) => b.score - a.score)
+    .slice(0, 10)
+    .map(b => ({
+      ts: b.ts.toISOString(),
+      hour: b.ts.getHours(),
+      count: b.count,
+      uniqueSenders: b.authors.size,
+      emojiCount: b.emojiCount,
+      voiceCount: b.voiceCount,
+      mediaCount: b.mediaCount,
+      capsCount: b.capsCount,
+      excerpts: b.excerpts,
+      title: peakTitle(b),
+    }));
+
+  // 5 awards. argmax helpers; tolerate empty buckets gracefully.
+  const award = (filterFn, scoreFn) => {
+    const eligible = buckets.filter(filterFn);
+    if (!eligible.length) return null;
+    let best = eligible[0], bestScore = scoreFn(best);
+    for (const b of eligible) {
+      const s = scoreFn(b);
+      if (s > bestScore) { best = b; bestScore = s; }
+    }
+    return {
+      ts: best.ts.toISOString(),
+      count: best.count,
+      uniqueSenders: best.authors.size,
+      emojiCount: best.emojiCount,
+      voiceCount: best.voiceCount,
+      capsCount: best.capsCount,
+    };
+  };
+  const isLate = (b) => { const h = b.ts.getHours(); return h >= 0 && h <= 5; };
+  const awards = {
+    loudest:   award(b => b.emojiCount >= 3, b => b.emojiCount),
+    latest:    award(b => isLate(b) && b.count >= 4, b => b.count + (5 - b.ts.getHours()) * 2),
+    speedRun:  award(b => b.count >= 5, b => b.count),
+    groupRiot: award(b => b.authors.size >= 3, b => b.authors.size * 10 + b.count),
+    deadZone:  findLongestGap(messages),
+    capsRiot:  award(b => b.capsCount >= 2, b => b.capsCount),
+  };
+
+  // Seismogram — one bucket per day, normalised score for visualisation.
+  const dayBuckets = new Map();
+  for (const m of messages) {
+    if (!m.timestamp) continue;
+    const dayKey = m.timestamp.toISOString().slice(0, 10);
+    let d = dayBuckets.get(dayKey);
+    if (!d) {
+      d = { day: dayKey, count: 0, emojiCount: 0, senders: new Set() };
+      dayBuckets.set(dayKey, d);
+    }
+    d.count++;
+    if (m.emojis?.length) d.emojiCount += m.emojis.length;
+    d.senders.add(m.author);
+  }
+  // Fill in zero days so the strip is continuous.
+  const sortedDays = Array.from(dayBuckets.values()).sort((a, b) => a.day.localeCompare(b.day));
+  const allDays = [];
+  if (sortedDays.length) {
+    const start = new Date(sortedDays[0].day);
+    const end = new Date(sortedDays[sortedDays.length - 1].day);
+    const cursor = new Date(start);
+    while (cursor <= end) {
+      const dayKey = cursor.toISOString().slice(0, 10);
+      const d = dayBuckets.get(dayKey);
+      allDays.push({
+        day: dayKey,
+        count: d?.count || 0,
+        emojiCount: d?.emojiCount || 0,
+        senders: d?.senders.size || 0,
+      });
+      cursor.setDate(cursor.getDate() + 1);
+    }
+  }
+  const maxCount = Math.max(1, ...allDays.map(d => d.count));
+  const seismogram = allDays.map(d => ({
+    day: d.day,
+    count: d.count,
+    intensity: d.count / maxCount, // 0..1 for the heat bar
+  }));
+
+  return { peaks, awards, seismogram, totalDays: allDays.length };
+}
+
+// Title generator for a peak minute — gives each one a flavour so
+// the UI doesn't read like a spreadsheet. Deterministic.
+function peakTitle(b) {
+  const h = b.ts.getHours();
+  if (h >= 0 && h <= 4)   return 'late_night';   // The 3 AM Eruption
+  if (h >= 5 && h <= 8)   return 'morning';      // The Coffee Riot
+  if (h >= 9 && h <= 11)  return 'midmorning';   // The Morning Surge
+  if (h >= 12 && h <= 14) return 'lunch';        // The Lunch Hour Madness
+  if (h >= 15 && h <= 17) return 'afternoon';    // The Afternoon Storm
+  if (h >= 18 && h <= 21) return 'evening';      // The Evening Riot
+  return 'late';                                  // The Late-Night Storm
+}
+
+function findLongestGap(messages) {
+  if (messages.length < 2) return null;
+  let maxGap = 0, gapStart = null, gapEnd = null;
+  for (let i = 1; i < messages.length; i++) {
+    const a = messages[i - 1].timestamp;
+    const b = messages[i].timestamp;
+    if (!a || !b) continue;
+    const gap = b - a;
+    if (gap > maxGap) {
+      maxGap = gap;
+      gapStart = a;
+      gapEnd = b;
+    }
+  }
+  if (maxGap <= 0) return null;
+  return {
+    fromTs: gapStart.toISOString(),
+    toTs: gapEnd.toISOString(),
+    days: Math.round(maxGap / (1000 * 60 * 60 * 24)),
+    hours: Math.round(maxGap / (1000 * 60 * 60)),
   };
 }

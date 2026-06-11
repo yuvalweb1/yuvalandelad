@@ -148,7 +148,7 @@ export default function Modes({ analytics, history = [], t, onUpload, onRoastMod
             gradient="linear-gradient(135deg, #00BFFF 0%, #573280 100%)"
             fg="#fff"
             shadowColor="#2e1856"
-            onClick={showComingSoon}
+            onClick={onChaos}
           />
         </div>
       ) : (
