@@ -13,8 +13,8 @@ import { buildLevel, LEVEL_COUNT } from '../duo/levelGen.js';
 import { buildQuestions } from '../duo/questions.js';
 import { buildArtifacts } from '../duo/artifacts.js';
 import {
-  loadSave, recordRun, setTrail, totalStars, isUnlocked,
-  STAR_GATES, DOUBLE_JUMP_AT, TRAILS,
+  loadSave, recordRun, totalStars, isUnlocked,
+  STAR_GATES, DOUBLE_JUMP_AT,
 } from '../duo/storage.js';
 
 const GOLD = '#f9c74f';
@@ -192,7 +192,6 @@ export default function DuoQuest({ analytics, selectedAuthor, t, onBack }) {
   const stars = totalStars(save, sk);
   const season = save.seasons[sk] || { stars: {}, boss: {}, runs: 0 };
   const hasDoubleJump = stars >= DOUBLE_JUMP_AT;
-  const trail = TRAILS.find(x => x.id === save.trail && stars >= x.starsAt) || TRAILS[0];
 
   const questions = useMemo(() => buildQuestions(analytics, A, B), [analytics, A, B]);
   const artifacts = useMemo(() => buildArtifacts(analytics, A, B), [analytics, A, B]);
@@ -360,7 +359,7 @@ export default function DuoQuest({ analytics, selectedAuthor, t, onBack }) {
       <div style={{ height: '100%', background: bg, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 16, padding: 24, textAlign: 'center' }}>
         <div style={{ fontSize: 52 }}>🏃</div>
         <div className="fs-sans" style={{ color: 'rgba(255,255,255,0.7)', fontSize: 14 }}>{t.duoq_need_two || 'The Long Run needs two people in the chat.'}</div>
-        <BigButton onClick={onBack} ghost style={{ maxWidth: 200 }}>{t.rm_back || '← Back'}</BigButton>
+        <BigButton onClick={onBack} ghost style={{ maxWidth: 200 }}>{t.rm_back || 'Back'}</BigButton>
       </div>
     );
   }
@@ -420,7 +419,7 @@ export default function DuoQuest({ analytics, selectedAuthor, t, onBack }) {
           </div>
 
           {/* The path (bottom = level 1, climb upward) */}
-          <div ref={mapRef} className="no-sb" style={{ flex: 1, overflowY: 'auto', display: 'flex', flexDirection: 'column-reverse', padding: '10px 0 18px' }}>
+          <div ref={mapRef} className="no-sb" style={{ flex: 1, overflowY: 'auto', display: 'flex', flexDirection: 'column-reverse', padding: '10px 0 32px' }}>
             <div style={{ display: 'flex', flexDirection: 'column-reverse', alignItems: 'center' }}>
               {Array.from({ length: LEVEL_COUNT }, (_, i) => {
                 const unlocked = isUnlocked(save, sk, i);
@@ -477,31 +476,6 @@ export default function DuoQuest({ analytics, selectedAuthor, t, onBack }) {
               )}
             </div>
           </div>
-
-          {/* Trails strip */}
-          <div style={{ padding: '10px 16px calc(env(safe-area-inset-bottom, 0px) + 16px)', display: 'flex', alignItems: 'center', gap: 10, justifyContent: 'center' }}>
-            <span className="fs-mono" style={{ fontSize: 10, color: 'rgba(255,255,255,0.45)', letterSpacing: '0.12em', textTransform: 'uppercase' }}>
-              {t.duoq_trails || 'Trail'}
-            </span>
-            {TRAILS.map(tr => {
-              const open = stars >= tr.starsAt;
-              const active = trail.id === tr.id;
-              return (
-                <button key={tr.id} disabled={!open}
-                  onClick={() => { setTrail(analytics, A, B, tr.id); refreshSave(); }}
-                  className={open ? 'press' : ''}
-                  style={{
-                    width: 30, height: 30, borderRadius: '50%', cursor: open ? 'pointer' : 'default',
-                    background: open ? tr.color : 'rgba(255,255,255,0.08)',
-                    border: active ? '2.5px solid #fff' : '2px solid rgba(255,255,255,0.18)',
-                    opacity: open ? 1 : 0.45, fontSize: 9, color: 'rgba(255,255,255,0.7)',
-                    boxShadow: active ? `0 0 12px ${tr.color}` : 'none',
-                  }}>
-                  {!open && `${tr.starsAt}★`}
-                </button>
-              );
-            })}
-          </div>
         </div>
       )}
 
@@ -513,7 +487,7 @@ export default function DuoQuest({ analytics, selectedAuthor, t, onBack }) {
             level={level}
             playerName={A}
             partnerName={B}
-            trailColor={trail.color}
+            trailColor={GOLD}
             doubleJump={hasDoubleJump}
             paused={overlay !== null}
             reducedMotion={reducedMotion}
@@ -585,10 +559,10 @@ export default function DuoQuest({ analytics, selectedAuthor, t, onBack }) {
           <div style={{ display: 'flex', flexDirection: 'column', gap: 10, width: '100%', maxWidth: 300, marginTop: 26 }}>
             {levelIdx + 1 < LEVEL_COUNT && isUnlocked(save, sk, levelIdx + 1) ? (
               <BigButton onClick={() => startRun(levelIdx + 1)}>
-                {interp(t.duoq_next_level || 'NEXT: {name} →', { name: levelName(levelIdx + 1) })}
+                {'NEXT: ' + levelName(levelIdx + 1)}
               </BigButton>
             ) : (
-              <BigButton onClick={() => startRun(levelIdx)}>↺ {t.duoq_replay || 'Run it again'}</BigButton>
+              <BigButton onClick={() => startRun(levelIdx)}>REPLAY</BigButton>
             )}
             <div style={{ display: 'flex', gap: 10 }}>
               <BigButton ghost onClick={shareRun} style={{ flex: 1 }}>📤 {t.duoq_share || 'Share'}</BigButton>
@@ -620,7 +594,7 @@ export default function DuoQuest({ analytics, selectedAuthor, t, onBack }) {
             </div>
             <div style={{ display: 'flex', gap: 10, marginTop: 18 }}>
               <BigButton ghost onClick={() => setOverlay(null)} style={{ flex: 1 }}>{t.duoq_not_yet || 'Not yet'}</BigButton>
-              <BigButton onClick={() => startRun(levelIdx)} style={{ flex: 1.6 }}>{t.duoq_run || 'RUN →'}</BigButton>
+              <BigButton onClick={() => startRun(levelIdx)} style={{ flex: 1.6 }}>{t.duoq_run || 'RUN'}</BigButton>
             </div>
           </div>
         </Modal>
@@ -641,7 +615,7 @@ export default function DuoQuest({ analytics, selectedAuthor, t, onBack }) {
               <ArtifactBody art={artifacts[levelIdx]} t={t} A={A} B={B} />
             </div>
             <BigButton onClick={() => setOverlay(null)} style={{ marginTop: 18 }}>
-              {t.duoq_keep_running || 'KEEP RUNNING →'}
+              {t.duoq_keep_running || 'KEEP RUNNING'}
             </BigButton>
           </div>
         </Modal>
@@ -697,7 +671,7 @@ export default function DuoQuest({ analytics, selectedAuthor, t, onBack }) {
                   {interp(t[`duoq_q_${question.id}_win`] || '', bossVars())}
                 </div>
                 <BigButton onClick={() => completeRun(runStats, bossDone)} style={{ marginTop: 14 }}>
-                  {t.duoq_claim || 'CLAIM THE RUN →'}
+                  {t.duoq_claim || 'CLAIM THE RUN'}
                 </BigButton>
               </div>
             )}
@@ -710,8 +684,8 @@ export default function DuoQuest({ analytics, selectedAuthor, t, onBack }) {
         <Modal>
           <div style={{ textAlign: 'center', display: 'flex', flexDirection: 'column', gap: 10 }}>
             <div className="fs-display" style={{ fontSize: 22, fontWeight: 800, color: '#fff', marginBottom: 6 }}>⏸ {t.duoq_paused || 'Paused'}</div>
-            <BigButton onClick={() => setOverlay(null)}>{t.duoq_resume || 'RESUME →'}</BigButton>
-            <BigButton ghost onClick={() => startRun(levelIdx)}>↺ {t.duoq_restart || 'Restart level'}</BigButton>
+            <BigButton onClick={() => setOverlay(null)}>{t.duoq_resume || 'RESUME'}</BigButton>
+            <BigButton ghost onClick={() => startRun(levelIdx)}>RESTART</BigButton>
             <BigButton ghost onClick={() => { setOverlay(null); setScreen('map'); }}>🗺 {t.duoq_map || 'Map'}</BigButton>
           </div>
         </Modal>
@@ -729,7 +703,7 @@ export default function DuoQuest({ analytics, selectedAuthor, t, onBack }) {
               {t.duoq_dead_sub || 'Every long run has its rough patch.'}
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginTop: 18 }}>
-              <BigButton onClick={() => startRun(levelIdx)}>↺ {t.duoq_retry || 'RUN IT BACK'}</BigButton>
+              <BigButton onClick={() => startRun(levelIdx)}>RETRY</BigButton>
               <BigButton ghost onClick={() => { setOverlay(null); setScreen('map'); }}>🗺 {t.duoq_map || 'Map'}</BigButton>
             </div>
           </div>

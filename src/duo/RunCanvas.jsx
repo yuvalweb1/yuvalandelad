@@ -100,6 +100,7 @@ export default function RunCanvas({
 
     function loseHeart(fell) {
       hearts--; combo = 0; meter = Math.max(0, meter - 4);
+      floatText(p.x - 60, p.y - 46, 'COMBO BROKEN', '#fb7185');
       flash = 0.35; shake = reducedMotion ? 0 : 0.3;
       try { navigator.vibrate && navigator.vibrate(30); } catch {}
       if (hearts <= 0) {
@@ -321,9 +322,6 @@ export default function RunCanvas({
         }
         ctx.globalAlpha = 1;
         ctx.font = '34px serif'; ctx.fillText('🌙', 296, 128); // below the HUD row
-      } else {
-        ctx.globalAlpha = 0.85; ctx.font = '30px serif';
-        ctx.fillText('☀️', 300, 124); ctx.globalAlpha = 1;
       }
 
       // Parallax hills
@@ -501,38 +499,42 @@ export default function RunCanvas({
       }
 
       // ── HUD ─────────────────────────────────────────────
-      const safeTop = 54;
+      const safeTop = 104;
       // Hearts
       ctx.font = '17px serif';
       for (let i = 0; i < 3; i++) ctx.fillText(i < hearts ? '❤️' : '🖤', 14 + i * 22, safeTop);
       // Coins
       ctx.textAlign = 'end';
       ctx.fillStyle = '#fff'; ctx.font = '800 16px sans-serif';
-      ctx.fillText(`${coins}`, PHYS.W - 36, safeTop - 1);
+      ctx.fillText(`${coins}`, PHYS.W - 36, safeTop);
       ctx.textAlign = 'start';
-      ctx.font = '15px serif'; ctx.fillText(coinState[0]?.emoji || '✨', PHYS.W - 30, safeTop - 1);
+      ctx.font = '15px serif'; ctx.fillText(coinState[0]?.emoji || '✨', PHYS.W - 30, safeTop);
       // Assist meter
       ctx.fillStyle = 'rgba(255,255,255,0.16)';
-      ctx.beginPath(); ctx.roundRect(PHYS.W - 80, safeTop + 8, 66, 5, 3); ctx.fill();
+      ctx.beginPath(); ctx.roundRect(PHYS.W - 80, safeTop + 18, 66, 5, 3); ctx.fill();
       ctx.fillStyle = PARTNER_COLOR;
       const mw = magnet > 0 ? 66 : (meter / 12) * 66;
-      ctx.beginPath(); ctx.roundRect(PHYS.W - 80, safeTop + 8, Math.max(2, mw), 5, 3); ctx.fill();
-      // Progress bar
+      ctx.beginPath(); ctx.roundRect(PHYS.W - 80, safeTop + 18, Math.max(2, mw), 5, 3); ctx.fill();
+      // Progress bar (centered)
       const prog = Math.min(1, p.x / level.finishX);
+      const barWidth = PHYS.W - 160;
+      const barX = (PHYS.W - barWidth) / 2;
       ctx.fillStyle = 'rgba(255,255,255,0.18)';
-      ctx.beginPath(); ctx.roundRect(80, safeTop - 18, PHYS.W - 196, 5, 3); ctx.fill();
+      ctx.beginPath(); ctx.roundRect(barX, safeTop - 26, barWidth, 5, 3); ctx.fill();
       ctx.fillStyle = pal.edge;
-      ctx.beginPath(); ctx.roundRect(80, safeTop - 18, Math.max(3, (PHYS.W - 196) * prog), 5, 3); ctx.fill();
+      ctx.beginPath(); ctx.roundRect(barX, safeTop - 26, Math.max(3, barWidth * prog), 5, 3); ctx.fill();
       if (level.capsule && !capsuleHit) {
         const capProg = Math.min(1, level.capsule.x / level.finishX);
+        const barWidth = PHYS.W - 160;
+        const barX = (PHYS.W - barWidth) / 2;
         ctx.font = '11px serif';
-        ctx.fillText('💌', 76 + (PHYS.W - 196) * capProg, safeTop - 22);
+        ctx.fillText('💌', barX + barWidth * capProg, safeTop - 30);
       }
       // Combo callout
       if (combo >= 5) {
         ctx.textAlign = 'center';
         ctx.fillStyle = trailColor; ctx.font = '800 15px sans-serif';
-        ctx.fillText(`×${combo} ${labels.combo || 'COMBO'}`, PHYS.W / 2, safeTop + 22);
+        ctx.fillText(`×${combo} ${labels.combo || 'COMBO'}`, PHYS.W / 2, safeTop + 36);
         ctx.textAlign = 'start';
       }
     }
