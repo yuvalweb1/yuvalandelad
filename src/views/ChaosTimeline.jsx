@@ -563,7 +563,7 @@ function TitleScene({ t, rounds, days, onStart }) {
         background: `linear-gradient(135deg, ${GOLD}, ${CORAL} 60%, ${MAGENTA})`, color: PLUM,
         fontWeight: 800, fontSize: 18, fontFamily: 'inherit',
         boxShadow: `0 12px 30px -8px ${MAGENTA}88, 0 2px 0 rgba(255,255,255,0.4) inset`, animationDelay: '0.42s',
-      }}>{t.cg_title_cta || 'Start the game →'}</button>
+      }}>{t.cg_title_cta || 'Start the game'}</button>
     </div>
   );
 }
@@ -763,7 +763,7 @@ function QuestionScene({ scene, t, lang, guess, setGuess, reveal, lastResult, ro
             width: '100%', padding: '17px', borderRadius: 999, border: 'none', cursor: 'pointer',
             background: '#fff', color: PLUM, fontWeight: 800, fontSize: 17, fontFamily: 'inherit',
             boxShadow: '0 12px 28px -10px rgba(255,255,255,0.5)',
-          }}>{t.cg_continue || 'Continue →'}</button>
+          }}>{t.cg_continue || 'Continue'}</button>
         )}
       </div>
     </div>
@@ -929,7 +929,7 @@ function ChaosEmpty({ t, onBack, needsReupload }) {
         marginTop: 12, padding: '12px 22px', borderRadius: 999,
         background: `linear-gradient(135deg, ${GOLD}, ${CORAL})`, color: EGGPLANT,
         border: '2px solid rgba(255,255,255,0.8)', cursor: 'pointer', fontWeight: 800, fontSize: 14,
-      }}>{t.rm_back || '← Back'}</button>
+      }}>{t.rm_back || 'Back'}</button>
     </div>
   );
 }

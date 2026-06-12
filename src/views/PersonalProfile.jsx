@@ -11,7 +11,7 @@ export default function PersonalProfile({ t, onBack }) {
         fontSize: 13, fontWeight: 700,
         boxShadow: '0 4px 0 rgba(0,191,255,0.22)',
       }}>
-        {t.rm_back || '← Back'}
+        {t.rm_back || 'Back'}
       </button>
 
       <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', textAlign: 'center', gap: 14 }}>

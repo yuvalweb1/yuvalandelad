@@ -142,7 +142,7 @@ export default function PremiumPromo({ t, lang = 'en', onUpgrade, onDismiss }) {
               <div className="fs-display" style={{
                 fontSize: 17, fontWeight: 800, letterSpacing: '-0.02em',
               }}>
-                {interp(t.promo_cta || 'Upgrade · {price}', { price: priceLabel })} →
+                {interp(t.promo_cta || 'Upgrade · {price}', { price: priceLabel })}
               </div>
             </button>
 

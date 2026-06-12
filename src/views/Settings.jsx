@@ -201,7 +201,7 @@ export default function Settings({
             <span className="fs-mono" style={{
               fontSize: 12, color: SKY, fontWeight: 800, flexShrink: 0,
               letterSpacing: '0.08em',
-            }}>{t.settings_change || 'Change'} →</span>
+            }}>{t.settings_change || 'Change'}</span>
           </button>
         </Section>
 
@@ -279,9 +279,6 @@ export default function Settings({
                     {history.length} {history.length === 1 ? (t.settings_recap_one || 'recap saved') : (t.settings_recap_many || 'recaps saved')}
                   </div>
                 </div>
-                <span className="fs-mono" style={{
-                  fontSize: 12, color: ROSE, fontWeight: 800, flexShrink: 0,
-                }}>→</span>
               </button>
             )
           ) : (

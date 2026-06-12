@@ -31,7 +31,6 @@ function ModeTile({ label, title, emoji, gradient, fg = '#fff', shadowColor = '#
           textShadow: fg === '#fff' ? '0 1px 3px rgba(0,0,0,0.20)' : 'none',
         }}>{title}</div>
       </div>
-      <div aria-hidden style={{ fontSize: 20, opacity: 0.75, flexShrink: 0 }}>→</div>
     </button>
   );
 }
@@ -70,7 +69,7 @@ function LockedState({ t, onUpload }) {
         cursor: 'pointer',
         boxShadow: '0 6px 0 rgba(74,14,78,0.25), 0 14px 24px -6px rgba(74,14,78,0.30)',
       }}>
-        {t.modes_locked_cta || 'Upload a chat →'}
+        {t.modes_locked_cta || 'Upload a chat'}
       </button>
     </div>
   );

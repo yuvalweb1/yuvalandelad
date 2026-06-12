@@ -89,7 +89,7 @@ export default function VideoAdSlot({ slot, t, onComplete }) {
         }}
       >
         {canSkip
-          ? `${(t && t.ad_skip) || 'Skip ad'} →`
+          ? (t && t.ad_skip) || 'Skip ad'
           : interp((t && t.ad_skip_in) || 'Skip in {s}s', { s: remaining })}
       </button>
 

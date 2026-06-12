@@ -299,7 +299,7 @@ export default function RoastMode({ analytics, selectedAuthor, setSelectedAuthor
                     </div>
                   </div>
                   <div className="fs-mono" style={{ fontSize: 10, color: '#f3722c', letterSpacing: '0.18em', fontWeight: 800 }}>
-                    ROAST →
+                    ROAST
                   </div>
                 </button>
               ))}

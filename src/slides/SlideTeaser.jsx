@@ -57,12 +57,6 @@ const SlideTeaser = React.memo(function SlideTeaser({ t, onMenu, onExit, onRoast
                 flex: 1, fontSize: 17, fontWeight: 800, color: '#4A0E4E', letterSpacing: '-0.01em',
                 overflowWrap: 'break-word', wordBreak: 'break-word', lineHeight: 1.25,
               }}>{c.label}</div>
-              <div style={{
-                flexShrink: 0, width: 28, height: 28, borderRadius: 999,
-                background: c.accent, color: '#fff',
-                display: 'flex', alignItems: 'center', justifyContent: 'center',
-                fontSize: 15, fontWeight: 800, boxShadow: `0 3px 0 ${c.deep}55`,
-              }}>←</div>
             </button>
           ))}
         </div>

@@ -182,7 +182,7 @@ export default function Welcome({ t, lang = 'en', onComplete }) {
                   transition: 'background 0.2s, color 0.2s, box-shadow 0.2s',
                 }}
               >
-                {t2.welcome_continue || 'Continue →'}
+                {t2.welcome_continue || 'Continue'}
               </button>
               <button
                 onClick={() => onComplete({ lang: pickedLang, name: '' })}

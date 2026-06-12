@@ -56,7 +56,7 @@ export default function BottomNavBar({ active, onHome, onModes, t }) {
       borderTop: '1px solid rgba(74,14,78,0.07)',
       borderTopLeftRadius: 18, borderTopRightRadius: 18,
       boxShadow: '0 -2px 16px -4px rgba(74,14,78,0.10)',
-      paddingBottom: 'calc(var(--safe-bottom, 0px) + 16px)',
+      paddingBottom: 'calc(min(var(--safe-bottom, 0px), 12px) + 24px)',
       overflow: 'hidden',
     }}>
       <NavTab

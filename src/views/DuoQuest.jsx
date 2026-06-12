@@ -382,7 +382,7 @@ export default function DuoQuest({ analytics, selectedAuthor, t, onBack }) {
         <div style={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
           {/* Header */}
           <div style={{ padding: 'calc(env(safe-area-inset-top, 0px) + 16px) 16px 10px', display: 'flex', alignItems: 'center', gap: 10 }}>
-            <button onClick={onBack} className="press" style={hdrBtn}>{t.rm_back || '← Back'}</button>
+            <button onClick={onBack} className="press" style={hdrBtn}>{t.rm_back || 'Back'}</button>
             <div style={{ flex: 1 }} />
             <div className="fs-mono" style={{ fontSize: 12, fontWeight: 800, color: GOLD, background: 'rgba(249,199,79,0.12)', border: `1px solid ${GOLD}44`, borderRadius: 999, padding: '6px 12px' }}>
               ⭐ {stars}/{LEVEL_COUNT * 3}
@@ -419,7 +419,7 @@ export default function DuoQuest({ analytics, selectedAuthor, t, onBack }) {
           </div>
 
           {/* The path (bottom = level 1, climb upward) */}
-          <div ref={mapRef} className="no-sb" style={{ flex: 1, overflowY: 'auto', display: 'flex', flexDirection: 'column-reverse', padding: '10px 0 32px' }}>
+          <div ref={mapRef} className="no-sb" style={{ flex: 1, overflowY: 'auto', display: 'flex', flexDirection: 'column-reverse', padding: '10px 0 64px' }}>
             <div style={{ display: 'flex', flexDirection: 'column-reverse', alignItems: 'center' }}>
               {Array.from({ length: LEVEL_COUNT }, (_, i) => {
                 const unlocked = isUnlocked(save, sk, i);
