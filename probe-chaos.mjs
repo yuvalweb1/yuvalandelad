@@ -1,0 +1,11 @@
+import { readFileSync } from 'node:fs';
+import { parseWhatsApp } from './src/parser/parse.js';
+import { computeAll } from './src/lib/analytics.js';
+const text = readFileSync('public/demo_chat.txt', 'utf8');
+const { messages } = parseWhatsApp(text);
+console.log('messages:', messages.length);
+const a = computeAll(messages);
+const c = a.chaos;
+console.log('seismogram days:', c.seismogram.length);
+console.log('peaks:', c.peaks.length, c.peaks.slice(0,5).map(p=>({n:p.count,ppl:p.uniqueSenders,emoji:p.emojiCount,caps:p.capsCount})));
+console.log('awards:', Object.fromEntries(Object.entries(c.awards).map(([k,v])=>[k, v && (v.count ?? v.days ?? v.emojiCount ?? v.capsCount ?? v.uniqueSenders ?? '✓')])));
