@@ -126,9 +126,9 @@ export default function Modes({ analytics, history = [], t, onUpload, onRoastMod
             onClick={onRoastMode}
           />
           <ModeTile
-            label={t.menu_duo_eyebrow || 'Duo mode'}
-            title={t.menu_duo_title || 'Compare two'}
-            emoji="👯"
+            label={t.menu_duo_eyebrow || 'Duo game'}
+            title={t.menu_duo_title || 'The Long Run'}
+            emoji="🏃"
             gradient="linear-gradient(135deg, #FFD700 0%, #FF8C00 100%)"
             fg="#4A0E4E"
             shadowColor="#b56500"

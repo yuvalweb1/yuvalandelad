@@ -19,7 +19,7 @@ import Wrapped from './views/Wrapped.jsx';
 import VerifyView from './views/VerifyView.jsx';
 import RoastMode from './views/RoastMode.jsx';
 import Modes from './views/Modes.jsx';
-import DuoAnalysis from './views/DuoAnalysis.jsx';
+import DuoQuest from './views/DuoQuest.jsx';
 import ChaosTimeline from './views/ChaosTimeline.jsx';
 import Settings from './views/Settings.jsx';
 import VideoAdSlot from './components/VideoAdSlot.jsx';
@@ -570,7 +570,7 @@ function RecappedApp() {
             />
           )}
           {stage === 'duo' && analytics && (
-            <DuoAnalysis
+            <DuoQuest
               analytics={analytics}
               selectedAuthor={selectedAuthor}
               t={t}
