@@ -42,12 +42,17 @@ export const STOPWORDS = new Set([
   // media-omission noise (safety net — these lines should be flagged as media,
   // but never let the "omitted" word become a signature/top word)
   'הושמט','הושמטה','הושמטו','נכללה',
-  // deleted-message noise (safety net for any DELETED_PATTERNS misses)
-  'נמחקה','נמחק','מחקת',
-  // poll noise (safety net for multi-line poll bodies that start with a question)
-  'אפשרות',
+  // deleted-message noise (safety net for any DELETED_PATTERNS misses, incl.
+  // the definite-article form "ההודעה" from "ההודעה נמחקה")
+  'נמחקה','נמחק','מחקת','ההודעה',
+  // poll noise (safety net for multi-line poll bodies that start with a
+  // question; "האפשרות" is the definite-article form of "אפשרות")
+  'אפשרות','האפשרות',
   // English
   'the','a','an','is','are','was','were','be','been','being','have','has','had','do','does','did','will','would','should','could','can','may','might','must','i','you','he','she','it','we','they','me','him','her','us','them','my','your','his','its','our','their','this','that','these','those','and','or','but','if','then','so','for','of','at','by','with','from','to','in','on','as','no','yes','not','just','very','too','also','only','all','some','any','more','most','lol','omg','idk','tbh','btw','oh','ah','hmm','yeah','yep','ok','okay','like','one','two','get','got','going','gonna','wanna','what','when','where','why','how','who','which','because','about','out','up','down','here','there','omitted',
+  // deleted/poll noise in other supported locales — safety net mirroring the
+  // Hebrew entries above, for exports made on phones set to these languages
+  'deleted','option','eliminado','eliminaste','eliminó','opción','opcion','apagada','apagou','apagaste','opção','opcao','supprimé','supprime','gelöscht','eliminato','opzione','удалено','удалили','вариант','silindi','sildiniz','seçenek',
 ]);
 
 // Returns the [key, count] entry with the highest count without sorting.

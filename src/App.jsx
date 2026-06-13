@@ -8,7 +8,7 @@ import { RTL_LANGS, detectLang, buildT, I18N } from './i18n';
 import ErrorBoundary from './components/ErrorBoundary.jsx';
 import GlobalStyles from './components/GlobalStyles.jsx';
 import BlobBackground from './components/BlobBackground.jsx';
-import HomeIndicator from './components/HomeIndicator.jsx';
+import RotateLockOverlay from './components/RotateLockOverlay.jsx';
 import BottomNavBar from './components/BottomNavBar.jsx';
 import HowToGuide from './views/HowToGuide.jsx';
 import Welcome from './views/Welcome.jsx';
@@ -380,6 +380,7 @@ function RecappedApp() {
         fontFamily: '"DM Sans", "Comix CLM", -apple-system, sans-serif',
         isolation: 'isolate',
       }}>
+        <RotateLockOverlay t={t} />
         <BlobBackground />
         <div style={{ position: 'absolute', inset: 0, overflow: 'hidden' }} dir={isRTL ? 'rtl' : 'auto'}>
           {stage === 'welcome' && (
@@ -589,7 +590,6 @@ function RecappedApp() {
             t={t}
           />
         )}
-        <HomeIndicator />
         {/* Payment sheet — rendered at App level so any surface (entry
             promo, Settings upsell, future inline CTAs) can open it via
             the shared `paymentOpen` flag. */}

@@ -50,17 +50,31 @@ export const VOICE_PATTERNS = [
   /PTT-.*\.opus/, /\.opus/,
 ];
 
-// Poll-vote messages — WhatsApp exports poll votes as plain messages starting
-// with "אפשרות" (Hebrew) or "option" (English). Not real conversation content;
-// excluded from word-frequency only (still counted as a message/interaction).
+// Poll-vote messages — WhatsApp exports poll votes/options as plain messages
+// starting with the localized word for "option" (with or without a leading
+// definite article, e.g. Hebrew "אפשרות"/"האפשרות"). Not real conversation
+// content; excluded from word-frequency only (still counted as a
+// message/interaction).
 export const POLL_PATTERNS = [
-  /^אפשרות(?:\s|$)/,  // Hebrew: "אפשרות 1", "אפשרות: כן"
-  /^option(?:\s|$)/i, // English: "Option 1", "Option: Yes"
+  /^ה?אפשרות(?:\s|:|$)/,  // Hebrew: "אפשרות 1", "האפשרות: כן"
+  /^option(?:\s|:|$)/i,   // English/French/German: "Option 1", "Option: Yes"
+  /^opci[óo]n(?:\s|:|$)/i, // Spanish: "Opción 1"
+  /^op[çc][ãa]o(?:\s|:|$)/i, // Portuguese: "Opção 1"
+  /^opzione(?:\s|:|$)/i,  // Italian: "Opzione 1"
+  /^вариант(?:\s|:|$)/i,  // Russian: "Вариант 1"
+  /^seçenek(?:\s|:|$)/i,  // Turkish: "Seçenek 1"
+  /^خيار(?:\s|:|$)/,      // Arabic: "خيار 1"
+  /^विकल्प(?:\s|:|$)/,     // Hindi: "विकल्प 1"
+  /^選択肢/,               // Japanese: "選択肢1"
+  /^옵션(?:\s|:|$)/,       // Korean: "옵션 1"
+  /^选项/,                 // Chinese (simplified): "选项1"
 ];
 
 // Deleted-message notices — many phrasings, so kept broad (unanchored,
 // tolerant of trailing punctuation). These messages are excluded from all
-// analytics (counted only as `deletedMessages` in diagnostics).
+// analytics (counted only as `deletedMessages` in diagnostics). Covers every
+// locale this app ships UI for, since the export's language depends on the
+// exporting phone's locale, not this app's display language.
 export const DELETED_PATTERNS = [
   // Hebrew: ה/הודעה · זו/זאת/הזו/הזאת · "נמחקה" (incl. "ההודעה נמחקה")
   /הודעה\s*(?:הזו|הזאת|זו|זאת)?\s*נמחקה/,
@@ -68,6 +82,41 @@ export const DELETED_PATTERNS = [
   // English (tolerant of a trailing period/space/marker)
   /this message was deleted/i,
   /you deleted this message/i,
+  // Spanish
+  /se elimin[óo] este mensaje/i,
+  /eliminaste este mensaje/i,
+  // Portuguese (BR + PT)
+  /esta mensagem foi apagada/i,
+  /(?:você apagou|apagaste) esta mensagem/i,
+  // French
+  /ce message a été supprimé/i,
+  /vous avez supprimé ce message/i,
+  // German
+  /diese nachricht wurde gelöscht/i,
+  /du hast diese nachricht gelöscht/i,
+  // Italian
+  /questo messaggio è stato eliminato/i,
+  /hai eliminato questo messaggio/i,
+  // Russian
+  /это сообщение (?:было )?удалено/i,
+  /вы удалили это сообщение/i,
+  // Turkish
+  /bu mesaj[ıi] sildiniz/i,
+  /bu mesaj silindi/i,
+  // Arabic
+  /تم حذف هذه الرسالة/,
+  /حذفت هذه الرسالة/,
+  // Hindi (spelling of "message" varies between मैसेज/मेसेज)
+  /यह (?:मैसेज|मेसेज) डिलीट कर दिया/,
+  /आपने यह (?:मैसेज|मेसेज) डिलीट कर दिया/,
+  // Japanese
+  /このメッセージは削除されました/,
+  /このメッセージを削除しました/,
+  // Korean
+  /이 메시지(?:는|가|를)?\s*삭제(?:되었습니다|했습니다)/,
+  // Chinese (simplified)
+  /此消息已删除/,
+  /你已删除(?:这条|此)消息/,
 ];
 
 // Pseudo-authors WhatsApp puts on the exporter's OWN system actions

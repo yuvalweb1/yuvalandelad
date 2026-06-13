@@ -253,6 +253,40 @@ export default function GlobalStyles() {
         }
         * { transition-duration: 0.001ms !important; }
       }
+
+      /* ===== Portrait lock =====
+         The native shells (Android manifest, iOS Info.plist) and the
+         PWA manifest already pin the app to portrait. A plain mobile
+         browser tab can still be rotated though, so this overlay
+         catches that case: (hover: none) + (pointer: coarse) targets
+         touch devices (not a resized desktop window), and it only
+         shows up once the device is actually turned to landscape. */
+      .cw-rotate-lock { display: none; }
+      @media (orientation: landscape) and (hover: none) and (pointer: coarse) {
+        .cw-rotate-lock {
+          display: flex;
+          position: fixed;
+          inset: 0;
+          z-index: 9999;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+          gap: 16px;
+          padding: 32px;
+          text-align: center;
+          background: #0a0a0f;
+          color: #f4f4f8;
+        }
+      }
+      .cw-rotate-icon { animation: rotateHint 2.6s ease-in-out infinite; }
+      @keyframes rotateHint {
+        0%, 15%  { transform: rotate(0deg); }
+        45%, 65% { transform: rotate(-90deg); }
+        85%, 100% { transform: rotate(0deg); }
+      }
+      @media (prefers-reduced-motion: reduce) {
+        .cw-rotate-icon { animation: none; }
+      }
     `}</style>
   );
 }

@@ -109,7 +109,7 @@ export default function RoastMode({ analytics, selectedAuthor, setSelectedAuthor
             transform: 'rotate(-2deg)',
             boxShadow: '0 4px 12px rgba(249,199,79,0.40)',
           }}>
-            The Receipts
+            {t.rm_receipts || 'The Receipts'}
           </div>
         </div>
 
@@ -128,7 +128,7 @@ export default function RoastMode({ analytics, selectedAuthor, setSelectedAuthor
               fontSize: 12, color: 'rgba(255,255,255,0.60)',
               marginTop: 6, fontStyle: 'italic',
             }}>
-              "{resolveTitle(u, t)}" · {u.roasts.length} exhibits filed
+              "{resolveTitle(u, t)}" {interp(u.roasts.length === 1 ? (t.rm_exhibit_filed || '{n} exhibit filed') : (t.rm_exhibits_filed || '{n} exhibits filed'), { n: u.roasts.length })}
             </div>
           </div>
         </div>
@@ -136,12 +136,10 @@ export default function RoastMode({ analytics, selectedAuthor, setSelectedAuthor
         {/* STAT STRIP */}
         <div style={{ marginTop: 10, display: 'flex', gap: 6, overflowX: 'auto', paddingBottom: 2, direction: 'ltr' }} className="no-sb">
           {[
-            { label: 'Msgs', value: u.messageCount.toLocaleString() },
-            { label: 'Peak', value: `${u.peakHour}:00` },
-            { label: 'Night', value: `${u.nightPct}%` },
-            { label: 'Streak', value: `${u.longestStreak}d` },
-            u.avgRespMin != null && { label: 'Reply', value: u.avgRespMin < 60 ? `${Math.round(u.avgRespMin)}m` : `${(u.avgRespMin / 60).toFixed(1)}h` },
-          ].filter(Boolean).map((s, i) => (
+            { label: t.rm_stat_messages || 'Messages', value: u.messageCount.toLocaleString() },
+            { label: t.rm_stat_peak || 'Peak', value: `${u.peakHour}:00` },
+            { label: t.rm_stat_night || 'Night', value: `${Math.round(u.nightPct)}%` },
+          ].map((s, i) => (
             <div key={i} style={{
               flexShrink: 0, padding: '6px 10px',
               background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.12)',
@@ -227,20 +225,23 @@ export default function RoastMode({ analytics, selectedAuthor, setSelectedAuthor
         }}>
           <div style={{ position: 'absolute', top: -40, right: -40, width: 160, height: 160, borderRadius: '50%', background: '#f9c74f', opacity: 0.18, filter: 'blur(60px)', pointerEvents: 'none' }} />
           <div className="fs-mono" style={{ fontSize: 10, color: '#f9c74f', letterSpacing: '0.24em', fontWeight: 800, textTransform: 'uppercase', position: 'relative' }}>
-            ✦ Verdict
+            ✦ {t.rm_verdict || 'Verdict'}
           </div>
           <div className="fs-display" style={{
             position: 'relative', fontSize: 22, lineHeight: 1.18,
             fontStyle: 'italic', marginTop: 6, color: '#fff', fontWeight: 800, letterSpacing: '-0.02em',
           }}>
-            Send this to <span style={{ color: '#f3722c' }}>{selectedAuthor}</span>.
+            {(() => {
+              const [pre, post] = (t.rm_send_to || 'Send this to {name}.').split('{name}');
+              return <>{pre}<span style={{ color: '#f3722c' }}>{selectedAuthor}</span>{post}</>;
+            })()}
             <br />
             <span style={{ color: 'rgba(255,255,255,0.55)', fontStyle: 'normal', fontSize: 16, fontFamily: 'var(--font-sans)', fontWeight: 500 }}>
-              You know you want to.
+              {t.rm_want_to || 'You know you want to.'}
             </span>
           </div>
           <div style={{ display: 'flex', gap: 8, marginTop: 14, justifyContent: 'center', position: 'relative' }}>
-            <button className="press" onClick={() => popToast('Image saved')} style={{
+            <button className="press" onClick={() => popToast(t.rm_image_saved || 'Image saved')} style={{
               padding: '10px 18px', background: '#f3722c', border: 'none',
               borderRadius: 999, cursor: 'pointer', color: '#1a0606',
               fontFamily: 'var(--font-display)', fontWeight: 800, fontSize: 13, letterSpacing: '-0.01em',
@@ -251,7 +252,7 @@ export default function RoastMode({ analytics, selectedAuthor, setSelectedAuthor
                 <path d="M3 9a2 2 0 0 1 2-2h2.5l1.5-2h6l1.5 2H19a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
                 <circle cx="12" cy="13" r="3.5" />
               </svg>
-              Screenshot
+              {t.rm_screenshot_btn || 'Screenshot'}
             </button>
             <button className="press" onClick={() => setShareOpen(true)} style={{
               padding: '10px 18px', background: 'transparent', border: '1.5px solid #f9c74f',
@@ -264,7 +265,7 @@ export default function RoastMode({ analytics, selectedAuthor, setSelectedAuthor
                 <polyline points="16 6 12 2 8 6" />
                 <line x1="12" y1="2" x2="12" y2="15" />
               </svg>
-              Share
+              {t.rm_share_btn || 'Share'}
             </button>
           </div>
         </div>
@@ -274,10 +275,10 @@ export default function RoastMode({ analytics, selectedAuthor, setSelectedAuthor
           <div style={{ marginTop: 24 }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
               <div className="fs-mono" style={{ fontSize: 10, color: 'rgba(255,255,255,0.55)', letterSpacing: '0.22em', fontWeight: 700, textTransform: 'uppercase' }}>
-                Next defendant
+                {t.rm_next_defendant || 'Next defendant'}
               </div>
               <div className="fs-mono" style={{ fontSize: 10, color: '#f3722c', fontWeight: 800, letterSpacing: '0.18em', textTransform: 'uppercase' }}>
-                {otherUsers.length} pending
+                {interp(t.rm_pending || '{n} pending', { n: otherUsers.length })}
               </div>
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
@@ -299,7 +300,7 @@ export default function RoastMode({ analytics, selectedAuthor, setSelectedAuthor
                     </div>
                   </div>
                   <div className="fs-mono" style={{ fontSize: 10, color: '#f3722c', letterSpacing: '0.18em', fontWeight: 800 }}>
-                    ROAST
+                    {t.rm_btn || 'ROAST'}
                   </div>
                 </button>
               ))}
@@ -313,8 +314,8 @@ export default function RoastMode({ analytics, selectedAuthor, setSelectedAuthor
           fontSize: 10, color: 'rgba(255,255,255,0.42)', lineHeight: 1.5,
           fontFamily: 'var(--font-mono)', letterSpacing: '0.06em',
         }}>
-          All exhibits drawn from this chat's data.<br />
-          Deterministic. Defensible. Devastating.
+          {t.rm_footer1 || "All exhibits drawn from this chat's data."}<br />
+          {t.rm_footer2 || 'Deterministic. Defensible. Devastating.'}
         </div>
       </div>
 
