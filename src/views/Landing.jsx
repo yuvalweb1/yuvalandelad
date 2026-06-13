@@ -269,10 +269,10 @@ export default function Landing({
               onClick={handleSwitchClick}
               className="press fs-sans"
               style={{
-                padding: '11px 18px',
+                padding: '8.25px 13.5px',
                 background: 'rgba(74,14,78,0.08)',
-                border: 'none', borderRadius: 12,
-                fontSize: 15, fontWeight: 700, color: '#573280',
+                border: 'none', borderRadius: 9,
+                fontSize: 11.25, fontWeight: 700, color: '#573280',
                 cursor: 'pointer', letterSpacing: '-0.01em',
               }}>
               SWITCH ↓
@@ -391,9 +391,9 @@ export default function Landing({
                 {t.landing_step1}
               </div>
               <button onClick={onHowTo} className="press fs-sans" style={{
-                flexShrink: 0, padding: '12px 19px',
-                background: '#4A0E4E', border: 'none', borderRadius: 13,
-                color: '#FFD700', fontSize: 15.5, fontWeight: 700,
+                flexShrink: 0, padding: '9px 14.25px',
+                background: '#4A0E4E', border: 'none', borderRadius: 9.75,
+                color: '#FFD700', fontSize: 11.6, fontWeight: 700,
                 cursor: 'pointer', whiteSpace: 'nowrap', letterSpacing: '-0.01em',
               }}>
                 {t.howto_link}
@@ -413,9 +413,9 @@ export default function Landing({
                 {t.landing_step2}
               </div>
               <div dir="auto" style={{
-                flexShrink: 0, padding: '11px 18px',
+                flexShrink: 0, padding: '8.25px 13.5px',
                 background: 'rgba(74,14,78,0.06)', border: '1px solid rgba(74,14,78,0.08)',
-                borderRadius: 12, color: 'rgba(74,14,78,0.50)', fontSize: 15, fontWeight: 600,
+                borderRadius: 9, color: 'rgba(74,14,78,0.50)', fontSize: 11.25, fontWeight: 600,
                 whiteSpace: 'nowrap', letterSpacing: '-0.01em',
               }}>
                 {t.landing_upload_btn || 'Upload ↑'}
