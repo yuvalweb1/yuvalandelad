@@ -7,8 +7,9 @@ const MAX_ROWS = 5;
 const ACCENT = '#f94144';
 
 const SlideSignatureEmoji = React.memo(function SlideSignatureEmoji({ a, t, profile, lang }) {
-  const allRows = (a.users || []).filter(u => u.topEmoji);
+  const allRows = a.users || [];
   if (allRows.length === 0) return null;
+  const maxTopEmojiCount = Math.max(1, ...allRows.map(u => u.topEmojiCount || 0));
   const [expanded, setExpanded] = useState(false);
   const overflow = allRows.length - MAX_ROWS;
   const showOverflow = overflow > 0 && !expanded;
@@ -79,7 +80,7 @@ const SlideSignatureEmoji = React.memo(function SlideSignatureEmoji({ a, t, prof
           position: 'absolute', top: 0, bottom: 0,
           [nameLtr ? 'right' : 'left']: 0,
           background: isWinner ? 'rgba(255,215,0,0.28)' : 'rgba(249,65,68,0.16)',
-          width: `${Math.max(8, Math.round((u.topEmojiCount / (allRows[0]?.topEmojiCount || 1)) * 100))}%`,
+          width: `${Math.max(8, Math.round((u.topEmojiCount / maxTopEmojiCount) * 100))}%`,
           animationDelay: `${0.6 + i * 0.08}s`,
           pointerEvents: 'none',
         }} />
