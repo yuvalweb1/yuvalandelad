@@ -929,6 +929,9 @@ export function computeAll(messages) {
     // Includes top peaks (with the actual message excerpts!), 5 named
     // awards, and a daily seismogram for the year-strip visualisation.
     chaos: computeChaos(sorted),
+    // Guess Who? payload — a per-author pool of memorable quotes the
+    // "who said this?" mode turns into a guessing game.
+    guessWho: computeGuessWho(sorted, userMap),
   };
 }
 
@@ -1115,4 +1118,71 @@ function findLongestGap(messages) {
     days: Math.round(maxGap / (1000 * 60 * 60 * 24)),
     hours: Math.round(maxGap / (1000 * 60 * 60)),
   };
+}
+
+// ============================================================
+// computeGuessWho — builds a pool of memorable, "guessable" quotes
+// per author for the "Who said this?" mode. The view turns the pool
+// into rounds (the real author + decoys) on its own.
+//
+// A good quote is text-only (no media/voice/links), long enough to
+// carry personality but short enough to fit a card, and ideally
+// carries the author's signature (their top word/emoji) so a guess
+// is fair-but-fun rather than a coin flip. Everything here is a pure,
+// deterministic function of the messages — same chat → same pool.
+//   Returns { quotes: [{ author, content }], authors: [names] }
+// ============================================================
+function computeGuessWho(messages, userMap) {
+  const PER_AUTHOR = 4;
+  const byAuthor = new Map(); // author -> [{ content, score, key }]
+
+  for (const m of messages) {
+    // Only clean, quotable text — media/voice/poll/links don't read as a quote.
+    if (m.hasMedia || m.isVoice || m.isPoll || m.hasLink || !m.content) continue;
+    const wc = m.wordCount || 0;
+    if (wc < 3 || wc > 28) continue;
+    const text = m.content.replace(/\s+/g, ' ').trim();
+    if (text.length < 12 || text.length > 160) continue;
+
+    const u = userMap[m.author];
+    const lower = text.toLowerCase();
+    // Score for guessability + personality.
+    let score = Math.max(0, 8 - Math.abs(wc - 11)); // length sweet spot ≈ 11 words
+    if (m.isQuestion) score += 1.5;
+    score += Math.min(3, (text.match(/!/g) || []).length);
+    if (m.emojis?.length) score += Math.min(3, m.emojis.length);
+    // Signature word/emoji makes the author recognisable without being a gimme.
+    if (u?.topWord && u.topWordCount >= 8 && lower.includes(u.topWord)) score += 4;
+    if (u?.topEmoji && m.emojis?.includes(u.topEmoji)) score += 3;
+    if (/\b[A-Z]{3,}\b/.test(text)) score += 1; // English caps energy (Hebrew has no case)
+
+    // Collapse near-duplicates from the same author (e.g. they spam one phrase).
+    const key = lower.replace(/[^a-zא-ת0-9]/gi, '').slice(0, 24);
+    if (!key) continue;
+    let list = byAuthor.get(m.author);
+    if (!list) { list = []; byAuthor.set(m.author, list); }
+    const existing = list.find(q => q.key === key);
+    if (existing) {
+      if (score > existing.score) { existing.content = text; existing.score = score; }
+    } else {
+      list.push({ content: text, score, key });
+    }
+  }
+
+  // Stable author order (by volume) so the pool — and any saved recap — is
+  // reproducible. Tiebreak on name to stay deterministic.
+  const sortedAuthors = [...byAuthor.keys()].sort((a, b) =>
+    (userMap[b]?.messageCount || 0) - (userMap[a]?.messageCount || 0) || (a < b ? -1 : 1));
+
+  const quotes = [];
+  const authors = [];
+  for (const author of sortedAuthors) {
+    const top = byAuthor.get(author)
+      .sort((x, y) => y.score - x.score || (x.content < y.content ? -1 : 1))
+      .slice(0, PER_AUTHOR);
+    if (!top.length) continue;
+    authors.push(author);
+    for (const q of top) quotes.push({ author, content: q.content });
+  }
+  return { quotes, authors };
 }

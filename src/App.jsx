@@ -21,6 +21,7 @@ import RoastMode from './views/RoastMode.jsx';
 import Modes from './views/Modes.jsx';
 import DuoQuest from './views/DuoQuest.jsx';
 import ChaosTimeline from './views/ChaosTimeline.jsx';
+import GuessWho from './views/GuessWho.jsx';
 import Settings from './views/Settings.jsx';
 import VideoAdSlot from './components/VideoAdSlot.jsx';
 import PremiumPromo, { shouldShowPromo, markPromoDismissed } from './components/PremiumPromo.jsx';
@@ -568,6 +569,7 @@ function RecappedApp() {
               onRoastMode={() => enterMode('roastmode')}
               onDuo={() => enterMode('duo')}
               onChaos={() => enterMode('chaos')}
+              onGuessWho={() => enterMode('guesswho')}
             />
           )}
           {stage === 'duo' && analytics && (
@@ -581,6 +583,9 @@ function RecappedApp() {
           )}
           {stage === 'chaos' && (
             <ChaosTimeline analytics={analytics} t={t} lang={lang} onBack={() => setStage('modes')} />
+          )}
+          {stage === 'guesswho' && (
+            <GuessWho analytics={analytics} t={t} onBack={() => setStage('modes')} />
           )}
         </div>
         {(stage === 'landing' || stage === 'modes') && (

@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Recapped — Ultra Pop ad</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@700;800&family=DM+Sans:wght@400;500&family=Instrument+Serif:ital@0;1&family=Inter+Tight:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body {
+    margin: 0;
+    width: 1080px;
+    height: 1920px;
+    overflow: hidden;
+  }
+  body {
+    position: relative;
+    background: linear-gradient(180deg, #FFD700 0%, #FFC400 38%, #FF9E10 72%, #FF8C00 100%);
+    font-family: 'Bricolage Grotesque', sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* ---------- background art (full bleed) ---------- */
+  .blob { position: absolute; border-radius: 50%; filter: blur(110px); }
+  .blob-pink  { width: 760px; height: 760px; right: -260px; top: -180px;  background: rgba(255,105,180,0.42); }
+  .blob-sky   { width: 820px; height: 820px; left: -320px;  top: 620px;   background: rgba(0,191,255,0.30); }
+  .blob-cream { width: 700px; height: 700px; right: -220px; bottom: -160px; background: rgba(255,246,214,0.55); }
+
+  .dotgrid {
+    position: absolute; inset: 0;
+    background-image: radial-gradient(rgba(74,14,78,0.12) 3px, transparent 3px);
+    background-size: 46px 46px;
+    -webkit-mask-image: linear-gradient(180deg, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0.25) 45%, rgba(0,0,0,0.55) 100%);
+            mask-image: linear-gradient(180deg, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0.25) 45%, rgba(0,0,0,0.55) 100%);
+  }
+
+  .spark { position: absolute; }
+
+  /* ---------- layout ---------- */
+  .content {
+    position: absolute; inset: 0;
+    padding: 0 84px;
+  }
+
+  .eyebrow {
+    position: absolute; top: 238px; left: 84px;
+    display: inline-flex; align-items: center; gap: 14px;
+    background: #4A0E4E; color: #FFF6D6;
+    border-radius: 999px;
+    padding: 16px 30px 18px;
+    font-weight: 800; font-size: 30px; letter-spacing: 0.14em;
+    box-shadow: 0 6px 0 rgba(74,14,78,0.22);
+  }
+  .eyebrow .dot { width: 14px; height: 14px; border-radius: 50%; background: #FFD700; }
+
+  h1 {
+    position: absolute; top: 314px; left: 84px; width: 920px;
+    font-weight: 800; font-size: 136px; line-height: 0.93;
+    letter-spacing: -0.035em;
+    color: #4A0E4E;
+  }
+  .hl-word { position: relative; display: inline-block; }
+  .hl-word svg { position: absolute; left: -2%; bottom: -42px; width: 104%; height: 42px; }
+
+  .subhead {
+    position: absolute; top: 724px; left: 86px; width: 910px;
+    font-family: 'Inter Tight', sans-serif;
+    font-weight: 600; font-size: 35px; line-height: 1.3;
+    color: rgba(58,8,62,0.92);
+  }
+
+  /* ---------- pop cards ---------- */
+  .cards { position: absolute; top: 820px; left: 84px; width: 912px; }
+
+  .card {
+    border-radius: 28px;
+    border: 3px solid rgba(255,255,255,0.07);
+    box-shadow: 0 10px 0 rgba(74,14,78,0.22), 0 22px 45px -8px rgba(74,14,78,0.45);
+    padding: 24px 42px;
+    display: flex; align-items: center; gap: 30px;
+  }
+
+  .card-eggplant { background: #4A0E4E; transform: rotate(-1.6deg); }
+  .card-navy     { background: #0A192F; transform: rotate(1.4deg); margin-top: 22px; }
+
+  .badge {
+    flex: 0 0 auto;
+    width: 96px; height: 96px; border-radius: 24px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 50px;
+    font-family: 'Segoe UI Emoji', sans-serif;
+  }
+  .card-eggplant .badge { background: rgba(255,215,0,0.16); }
+  .card-navy .badge     { background: rgba(0,191,255,0.14); }
+
+  .card-body { flex: 1 1 auto; min-width: 0; }
+  .award-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 700; font-size: 30px; letter-spacing: 0.16em;
+  }
+  .card-eggplant .award-label { color: #FFD700; }
+  .card-navy .award-label     { color: #00BFFF; }
+
+  .award-name {
+    font-weight: 800; font-size: 52px; line-height: 1.05;
+    color: #ffffff; margin-top: 4px;
+  }
+  .award-evidence {
+    font-family: 'Inter Tight', sans-serif;
+    font-weight: 500; font-size: 31px; line-height: 1.25;
+    color: rgba(255,255,255,0.82); margin-top: 6px;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .card-stat {
+    flex: 0 0 auto; text-align: right;
+    font-family: 'Inter Tight', sans-serif;
+    font-variant-numeric: tabular-nums;
+    line-height: 1;
+  }
+  .card-stat .num { font-weight: 800; font-size: 88px; display: block; }
+  .card-stat .cap {
+    display: block; margin-top: 8px;
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 600; font-size: 30px; letter-spacing: 0.1em;
+  }
+  .card-eggplant .num { color: #FFD700; }
+  .card-eggplant .cap { color: rgba(255,255,255,0.6); }
+  .card-navy .num { color: #00BFFF; }
+  .card-navy .cap { color: rgba(255,255,255,0.6); }
+
+  /* roast sticker */
+  .sticker {
+    background: #FFF6D6;
+    border-radius: 28px;
+    border: 3px solid rgba(74,14,78,0.10);
+    box-shadow: 0 10px 0 rgba(74,14,78,0.22), 0 22px 45px -8px rgba(74,14,78,0.35);
+    padding: 24px 44px 26px;
+    transform: rotate(-1.1deg);
+    margin-top: 22px;
+  }
+  .sticker .roast-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 700; font-size: 30px; letter-spacing: 0.16em;
+    color: #D60D55;
+  }
+  .sticker .roast-text {
+    margin-top: 8px;
+    font-weight: 700; font-size: 39px; line-height: 1.22;
+    color: #4A0E4E;
+  }
+  .sticker .roast-text .pop { color: #D60D55; font-variant-numeric: tabular-nums; }
+
+  /* floating count chip */
+  .chip {
+    position: absolute; top: 774px; right: 64px;
+    background: #ffffff; color: #4A0E4E;
+    border-radius: 999px; padding: 14px 28px 16px;
+    font-family: 'Inter Tight', sans-serif;
+    font-weight: 700; font-size: 30px;
+    font-variant-numeric: tabular-nums;
+    transform: rotate(3deg);
+    box-shadow: 0 8px 0 rgba(74,14,78,0.18), 0 16px 30px -8px rgba(74,14,78,0.4);
+    z-index: 3;
+  }
+
+  /* ---------- CTA + trust ---------- */
+  .bottom {
+    position: absolute; left: 84px; width: 912px; top: 1486px;
+    text-align: center;
+  }
+  .cta {
+    display: inline-flex; align-items: center; gap: 18px;
+    background: #FF69B4; color: #4A0E4E;
+    border-radius: 999px;
+    padding: 30px 66px 34px;
+    font-weight: 800; font-size: 47px; letter-spacing: -0.01em;
+    box-shadow: 0 6px 0 rgba(0,0,0,0.2), 0 12px 26px -4px rgba(255,24,103,0.45);
+    transform: rotate(-1deg);
+  }
+  .trust {
+    margin-top: 30px;
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 600; font-size: 30px; letter-spacing: 0.05em;
+    color: #4A0E4E;
+    display: flex; align-items: center; justify-content: center; gap: 14px;
+  }
+  .trust svg { flex: 0 0 auto; }
+</style>
+</head>
+<body>
+
+  <!-- background art -->
+  <div class="blob blob-pink"></div>
+  <div class="blob blob-sky"></div>
+  <div class="blob blob-cream"></div>
+  <div class="dotgrid"></div>
+
+  <!-- sparkles -->
+  <svg class="spark" style="top: 360px; right: 96px; opacity:0.55;" width="74" height="74" viewBox="0 0 74 74">
+    <path d="M37 0 C40 22 52 34 74 37 C52 40 40 52 37 74 C34 52 22 40 0 37 C22 34 34 22 37 0 Z" fill="#4A0E4E"/>
+  </svg>
+  <svg class="spark" style="top: 712px; right: 210px; opacity:0.4;" width="44" height="44" viewBox="0 0 74 74">
+    <path d="M37 0 C40 22 52 34 74 37 C52 40 40 52 37 74 C34 52 22 40 0 37 C22 34 34 22 37 0 Z" fill="#4A0E4E"/>
+  </svg>
+  <svg class="spark" style="top: 1740px; left: 96px; opacity:0.35;" width="58" height="58" viewBox="0 0 74 74">
+    <path d="M37 0 C40 22 52 34 74 37 C52 40 40 52 37 74 C34 52 22 40 0 37 C22 34 34 22 37 0 Z" fill="#4A0E4E"/>
+  </svg>
+  <svg class="spark" style="top: 1790px; right: 150px; opacity:0.3;" width="46" height="46" viewBox="0 0 74 74">
+    <path d="M37 0 C40 22 52 34 74 37 C52 40 40 52 37 74 C34 52 22 40 0 37 C22 34 34 22 37 0 Z" fill="#4A0E4E"/>
+  </svg>
+  <svg class="spark" style="top: 96px; left: 120px; opacity:0.3;" width="52" height="52" viewBox="0 0 74 74">
+    <path d="M37 0 C40 22 52 34 74 37 C52 40 40 52 37 74 C34 52 22 40 0 37 C22 34 34 22 37 0 Z" fill="#4A0E4E"/>
+  </svg>
+
+  <div class="content">
+
+    <div class="eyebrow"><span class="dot"></span>RECAPPED</div>
+
+    <h1>your group<br>chat has<br><span class="hl-word">receipts.<svg viewBox="0 0 420 42" preserveAspectRatio="none"><path d="M10 30 C 110 10, 250 8, 410 22" stroke="#FF1867" stroke-width="17" fill="none" stroke-linecap="round"/></svg></span></h1>
+
+    <div class="subhead">Stats. Roasts. Drama. Built from your actual messages.</div>
+
+    <div class="chip">14,382 messages analyzed</div>
+
+    <div class="cards">
+
+      <div class="card card-eggplant">
+        <div class="badge">🎤</div>
+        <div class="card-body">
+          <div class="award-label">MAIN CHARACTER</div>
+          <div class="award-name">Noa</div>
+          <div class="award-evidence">started it. escalated it.</div>
+        </div>
+        <div class="card-stat"><span class="num">73%</span><span class="cap">OF DRAMA</span></div>
+      </div>
+
+      <div class="card card-navy">
+        <div class="badge">⏰</div>
+        <div class="card-body">
+          <div class="award-label">3 AM PHILOSOPHER</div>
+          <div class="award-name">Daniel</div>
+          <div class="award-evidence">112 messages after midnight</div>
+        </div>
+        <div class="card-stat"><span class="num">3:42</span><span class="cap">AM</span></div>
+      </div>
+
+      <div class="sticker">
+        <div class="roast-label">CERTIFIED ROAST</div>
+        <div class="roast-text">Omer replied &ldquo;lol&rdquo; <span class="pop">482 times</span>. That&rsquo;s it. That&rsquo;s the contribution.</div>
+      </div>
+
+    </div>
+
+    <div class="bottom">
+      <div class="cta">Expose them <span style="font-family:'Inter Tight',sans-serif;">&rarr;</span></div>
+      <div class="trust">
+        <svg width="30" height="34" viewBox="0 0 30 34" fill="none">
+          <rect x="2" y="14" width="26" height="18" rx="5" fill="#4A0E4E"/>
+          <path d="M8 14 V10 a7 7 0 0 1 14 0 V14" stroke="#4A0E4E" stroke-width="5" fill="none"/>
+        </svg>
+        <span>NOTHING LEAVES YOUR PHONE.</span>
+      </div>
+    </div>
+
+  </div>
+
+</body>
+</html>

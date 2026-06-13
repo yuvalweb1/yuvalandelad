@@ -75,7 +75,7 @@ function LockedState({ t, onUpload }) {
   );
 }
 
-export default function Modes({ analytics, history = [], t, onUpload, onRoastMode, onDuo, onChaos }) {
+export default function Modes({ analytics, history = [], t, onUpload, onRoastMode, onDuo, onChaos, onGuessWho }) {
   // A chat the user already imported or picked from history counts as
   // "available" even before it's loaded into the active session — don't make
   // them feel locked out of something they just brought in.
@@ -110,10 +110,10 @@ export default function Modes({ analytics, history = [], t, onUpload, onRoastMod
       {unlocked ? (
         <div style={{
           position: 'relative', zIndex: 10,
-          display: 'flex', flexDirection: 'column', gap: 12, marginTop: 24,
-          // 50vh keeps the three tiles to roughly half the screen; each
-          // tile is flex:1 inside so they split that height evenly.
-          height: '50vh',
+          // flex:1 lets the tile stack fill the space under the header (above
+          // the bottom nav); each tile is flex:1 inside so they split it evenly.
+          flex: 1, minHeight: 0,
+          display: 'flex', flexDirection: 'column', gap: 11, marginTop: 22,
         }}>
           <ModeTile
             label={t.menu_roast_mode || 'Roast mode'}
@@ -123,6 +123,15 @@ export default function Modes({ analytics, history = [], t, onUpload, onRoastMod
             fg="#fff"
             shadowColor="#a8284c"
             onClick={onRoastMode}
+          />
+          <ModeTile
+            label={t.menu_guesswho_eyebrow || 'Who said this?'}
+            title={t.menu_guesswho_title || 'Guess Who'}
+            emoji="🕵️"
+            gradient="linear-gradient(135deg, #00BFFF 0%, #FF1867 100%)"
+            fg="#fff"
+            shadowColor="#7a1240"
+            onClick={onGuessWho}
           />
           <ModeTile
             label={t.menu_duo_eyebrow || 'Duo game'}
@@ -137,9 +146,9 @@ export default function Modes({ analytics, history = [], t, onUpload, onRoastMod
             label={t.menu_chaos_eyebrow || 'Chaos mode'}
             title={t.menu_chaos_title || 'Chaos timeline'}
             emoji="🌀"
-            gradient="linear-gradient(135deg, #00BFFF 0%, #573280 100%)"
+            gradient="linear-gradient(135deg, #573280 0%, #2a0645 100%)"
             fg="#fff"
-            shadowColor="#2e1856"
+            shadowColor="#1a0633"
             onClick={onChaos}
           />
         </div>

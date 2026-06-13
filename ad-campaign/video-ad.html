@@ -1,0 +1,190 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@700;800&family=DM+Sans:wght@400;500&family=Instrument+Serif:ital@0;1&family=Inter+Tight:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --banana:#FFD700; --mango:#FF8C00; --eggplant:#4A0E4E; --navy:#0A192F;
+    --sky:#00BFFF; --pink:#FF69B4; --magenta:#FF1867; --coral:#f06449;
+    --cream:#FFF6D6;
+  }
+  html,body{margin:0;padding:0;width:1080px;height:1920px;overflow:hidden;background:#0a0a0f;}
+  body{font-family:'DM Sans',sans-serif;color:#fff;-webkit-font-smoothing:antialiased;position:relative;}
+  .disp{font-family:'Bricolage Grotesque',sans-serif;}
+  .mono{font-family:'JetBrains Mono',monospace;}
+  .num{font-family:'Inter Tight',sans-serif;font-variant-numeric:tabular-nums;}
+  .serif{font-family:'Instrument Serif',serif;font-style:italic;}
+
+  /* ===== persistent cinematic background ===== */
+  .bg{position:absolute;inset:0;background:linear-gradient(180deg,#1a0a3a 0%,#2a0645 60%,#0A192F 100%);}
+  .glow{position:absolute;inset:0;background:radial-gradient(120% 80% at 50% 0%,rgba(255,24,103,0.30) 0%,transparent 55%),radial-gradient(100% 80% at 0% 100%,rgba(87,50,128,0.45) 0%,transparent 60%);}
+  .blob{position:absolute;border-radius:50%;filter:blur(90px);opacity:.35;}
+  .b1{width:560px;height:560px;background:var(--magenta);top:-120px;left:-140px;animation:drift1 11s ease-in-out infinite;}
+  .b2{width:520px;height:520px;background:var(--sky);bottom:60px;right:-160px;opacity:.22;animation:drift2 13s ease-in-out infinite;}
+  .b3{width:420px;height:420px;background:var(--mango);bottom:-140px;left:-80px;opacity:.20;animation:drift3 12s ease-in-out infinite;}
+  @keyframes drift1{0%,100%{transform:translate(0,0) scale(1)}33%{transform:translate(50px,-30px) scale(1.08)}66%{transform:translate(-25px,25px) scale(.95)}}
+  @keyframes drift2{0%,100%{transform:translate(0,0) scale(1)}40%{transform:translate(-45px,30px) scale(1.07)}70%{transform:translate(30px,-20px) scale(.94)}}
+  @keyframes drift3{0%,100%{transform:translate(0,0) scale(1)}30%{transform:translate(25px,35px) scale(1.1)}60%{transform:translate(-35px,-25px) scale(.92)}}
+  .grain{position:absolute;inset:0;opacity:.05;background-image:radial-gradient(rgba(255,255,255,.7) 1px,transparent 1px);background-size:7px 7px;}
+
+  /* ===== scene plumbing ===== */
+  .scene{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;opacity:0;visibility:hidden;transition:opacity .45s ease,transform .45s ease;}
+  .scene.on{opacity:1;visibility:visible;}
+  .scene.off{opacity:0;visibility:visible;transform:translateY(-46px) scale(.97);}
+
+  @keyframes fadeUp{from{opacity:0;transform:translateY(46px)}to{opacity:1;transform:translateY(0)}}
+  @keyframes springIn{0%{opacity:0;transform:scale(.45)}62%{transform:scale(1.07)}100%{opacity:1;transform:scale(1)}}
+  @keyframes roastIn{0%{opacity:0;transform:translateY(60px) scale(.85) rotate(-2.5deg)}55%{transform:translateY(-8px) scale(1.04) rotate(1deg)}75%{transform:translateY(3px) scale(.99) rotate(0)}100%{opacity:1;transform:translateY(0) scale(1) rotate(0)}}
+  @keyframes ping{0%{transform:scale(.92);opacity:.7}75%,100%{transform:scale(1.22);opacity:0}}
+  @keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
+  @keyframes barUp{from{transform:scaleY(0)}to{transform:scaleY(1)}}
+
+  /* every animated child starts hidden; the scene's .on arms it */
+  .a{opacity:0;}
+  .scene.on .a{animation:fadeUp .65s cubic-bezier(.16,1,.3,1) both;}
+  .scene.on .a-spring{animation:springIn .7s cubic-bezier(.34,1.56,.64,1) both;}
+  .scene.on .a-roast{animation:roastIn .85s cubic-bezier(.34,1.56,.64,1) both;}
+
+  /* ===== scene 1 — the dare ===== */
+  .eyebrow{display:inline-flex;align-items:center;gap:18px;padding:18px 38px;border-radius:999px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.16);font-size:30px;letter-spacing:.34em;color:var(--banana);margin-bottom:90px;}
+  .eyebrow .dot{width:14px;height:14px;border-radius:50%;background:var(--magenta);}
+  .h1{font-weight:800;font-size:158px;line-height:1.04;text-align:center;letter-spacing:-3px;}
+  .h1 .l1,.h1 .l3{background:linear-gradient(180deg,#fff 0%,#fff 42%,#FFE08A 62%,#FF9CE0 95%);-webkit-background-clip:text;background-clip:text;color:transparent;}
+  .h1 .l2{font-family:'Instrument Serif',serif;font-style:italic;font-weight:400;font-size:172px;background:linear-gradient(135deg,#FFD700 0%,#FFB400 55%,#FF8C00 100%);-webkit-background-clip:text;background-clip:text;color:transparent;filter:drop-shadow(0 0 28px rgba(255,180,0,.35));}
+  .s1-sub{margin-top:96px;font-size:38px;color:rgba(255,255,255,.75);}
+
+  /* ===== scene 2 — the receipts ===== */
+  .s2-label{font-size:32px;letter-spacing:.4em;color:var(--sky);margin-bottom:40px;}
+  .counter{font-weight:800;font-size:300px;line-height:1;letter-spacing:-10px;background:linear-gradient(180deg,#fff 0%,#fff 45%,#FFE08A 65%,#FF9CE0 100%);-webkit-background-clip:text;background-clip:text;color:transparent;}
+  .s2-unit{font-size:64px;font-weight:700;color:rgba(255,255,255,.85);margin-top:8px;letter-spacing:-1px;}
+  .bars{display:flex;align-items:flex-end;gap:26px;height:240px;margin-top:110px;}
+  .bar{width:92px;border-radius:18px 18px 8px 8px;background:linear-gradient(180deg,rgba(255,255,255,.34),rgba(255,255,255,.10));transform-origin:bottom;transform:scaleY(0);}
+  .bar.hot{background:linear-gradient(180deg,#FFD700 0%,#FF1867 75%);box-shadow:0 0 34px rgba(255,24,103,.55);}
+  .scene.on .bar{animation:barUp .8s cubic-bezier(.16,1,.3,1) both;}
+  .s2-punch{margin-top:96px;font-size:56px;font-weight:500;color:rgba(255,255,255,.92);}
+  .s2-punch b{color:var(--banana);font-weight:700;}
+
+  /* ===== scene 3 — the roast ===== */
+  .card{width:840px;border-radius:30px;padding:54px 58px;text-align:left;}
+  .card-chaos{position:relative;background:rgba(20,8,40,.78);border:3px solid transparent;background-clip:padding-box;box-shadow:0 0 0 3px rgba(255,255,255,0);}
+  .card-chaos::before{content:'';position:absolute;inset:-3px;border-radius:33px;padding:3px;background:linear-gradient(160deg,#00BFFF,#7A5CFF 38%,#FF69B4 68%,#FF8C00);-webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask-composite:exclude;}
+  .card-eyebrow{font-size:30px;letter-spacing:.32em;font-weight:700;margin-bottom:22px;}
+  .ce-m{color:var(--magenta);}
+  .ce-g{color:var(--banana);}
+  .card-big{font-weight:800;font-size:140px;line-height:1;letter-spacing:-4px;background:linear-gradient(135deg,#FFD700 0%,#FF1867 80%);-webkit-background-clip:text;background-clip:text;color:transparent;}
+  .card-ev{margin-top:26px;font-size:42px;color:rgba(255,255,255,.8);}
+  .card-ghost{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.16);backdrop-filter:blur(8px);margin-top:46px;transform:rotate(-1.6deg);}
+  .ghost-row{display:flex;align-items:baseline;gap:28px;}
+  .ghost-name{font-weight:800;font-size:84px;letter-spacing:-2px;color:#fff;}
+  .ghost-tag{font-size:40px;color:rgba(255,255,255,.7);}
+  .ghost-ev{margin-top:14px;font-size:40px;color:var(--banana);}
+
+  /* ===== scene 4 — trust + CTA ===== */
+  .wordmark{font-weight:800;font-size:64px;letter-spacing:-1px;margin-bottom:120px;}
+  .wordmark span{background:linear-gradient(160deg,#00BFFF,#7A5CFF 38%,#FF69B4 68%,#FF8C00);-webkit-background-clip:text;background-clip:text;color:transparent;}
+  .lock{width:140px;height:140px;border-radius:50%;background:rgba(255,215,0,.12);border:2px solid rgba(255,215,0,.45);display:grid;place-items:center;font-size:64px;margin-bottom:64px;}
+  .type-line{font-size:48px;font-weight:700;color:var(--banana);letter-spacing:.06em;min-height:64px;}
+  .type-line .caret{display:inline-block;width:6px;height:52px;background:var(--banana);vertical-align:-6px;margin-left:8px;animation:blink 1s steps(1) infinite;}
+  @keyframes blink{50%{opacity:0}}
+  .trust-sub{margin-top:34px;font-size:32px;letter-spacing:.28em;color:rgba(255,255,255,.6);}
+  .cta-wrap{position:relative;margin-top:130px;}
+  .cta-ring{position:absolute;inset:-4px;border-radius:999px;border:3px solid rgba(0,191,255,.65);animation:ping 2.2s ease-out infinite;}
+  .cta{display:inline-flex;align-items:center;gap:20px;background:var(--sky);color:var(--navy);border-radius:999px;padding:42px 92px;font-weight:800;font-size:58px;font-family:'Bricolage Grotesque',sans-serif;box-shadow:0 10px 0 rgba(0,0,0,.22),0 26px 60px -8px rgba(0,191,255,.55);animation:bob 3s ease-in-out infinite;}
+</style>
+</head>
+<body>
+  <div class="bg"></div>
+  <div class="blob b1"></div><div class="blob b2"></div><div class="blob b3"></div>
+  <div class="glow"></div>
+  <div class="grain"></div>
+
+  <!-- BEAT 1 · 0–3s · the dare -->
+  <section class="scene on" id="s1">
+    <div class="eyebrow mono a" style="animation-delay:.15s"><span class="dot"></span>RECAPPED · YOUR WHATSAPP YEAR</div>
+    <div class="h1 disp">
+      <div class="l1 a" style="animation-delay:.35s">ready to</div>
+      <div class="l2 a" style="animation-delay:.6s">expose</div>
+      <div class="l3 a" style="animation-delay:.85s">your group?</div>
+    </div>
+    <div class="s1-sub a" style="animation-delay:1.25s">stats · roasts · drama — from your real messages</div>
+  </section>
+
+  <!-- BEAT 2 · 3–7s · the receipts -->
+  <section class="scene" id="s2">
+    <div class="s2-label mono a" style="animation-delay:.1s">THIS YEAR YOUR GROUP SENT</div>
+    <div class="counter num" id="counter">0</div>
+    <div class="s2-unit a" style="animation-delay:.4s">messages</div>
+    <div class="bars">
+      <div class="bar" style="height:36%;animation-delay:.5s"></div>
+      <div class="bar" style="height:58%;animation-delay:.62s"></div>
+      <div class="bar" style="height:44%;animation-delay:.74s"></div>
+      <div class="bar hot" style="height:100%;animation-delay:.86s"></div>
+      <div class="bar" style="height:30%;animation-delay:.98s"></div>
+    </div>
+    <div class="s2-punch a" style="animation-delay:2.6s"><b>one yapper</b> carried all of it.</div>
+  </section>
+
+  <!-- BEAT 3 · 7–11s · the roast -->
+  <section class="scene" id="s3">
+    <div class="card card-chaos a-roast" style="animation-delay:.15s">
+      <div class="card-eyebrow mono ce-m">🔥 CHAOS MOMENT</div>
+      <div class="card-big num">3:42 AM</div>
+      <div class="card-ev serif">the voice note incident. nine minutes. zero context.</div>
+    </div>
+    <div class="card card-ghost a-roast" style="animation-delay:1.5s">
+      <div class="card-eyebrow mono ce-g">👻 THE GHOST</div>
+      <div class="ghost-row"><span class="ghost-name disp">Tom</span><span class="ghost-tag serif">last seen typing in March</span></div>
+      <div class="ghost-ev">47 questions left on read</div>
+    </div>
+  </section>
+
+  <!-- BEAT 4 · 11–15s · trust + CTA -->
+  <section class="scene" id="s4">
+    <div class="wordmark disp a" style="animation-delay:.1s"><span>Recapped</span></div>
+    <div class="lock a-spring" style="animation-delay:.3s">🔒</div>
+    <div class="type-line mono"><span id="typer"></span><span class="caret" id="caret"></span></div>
+    <div class="trust-sub mono a" style="animation-delay:2.1s">NO SERVERS · NO AI · NO TRACKING</div>
+    <div class="cta-wrap a-spring" style="animation-delay:2.5s">
+      <div class="cta-ring"></div>
+      <div class="cta">Play my Wrapped →</div>
+    </div>
+  </section>
+
+<script>
+  const $ = id => document.getElementById(id);
+  const show = (hide, reveal) => { $(hide).classList.add('off'); $(hide).classList.remove('on'); $(reveal).classList.add('on'); };
+
+  function countUp(el, target, dur) {
+    const t0 = performance.now();
+    (function tick(now) {
+      const p = Math.min(1, (now - t0) / dur);
+      const eased = 1 - Math.pow(1 - p, 3);
+      el.textContent = Math.round(target * eased).toLocaleString('en-US');
+      if (p < 1) requestAnimationFrame(tick);
+    })(t0);
+  }
+
+  function typewrite(el, text, dur) {
+    const t0 = performance.now();
+    (function tick(now) {
+      const p = Math.min(1, (now - t0) / dur);
+      el.textContent = text.slice(0, Math.round(text.length * p));
+      if (p < 1) requestAnimationFrame(tick);
+    })(t0);
+  }
+
+  document.fonts.ready.then(() => {
+    // beat boundaries (ms): s1 0–3000, s2 3000–7000, s3 7000–11000, s4 11000–15500
+    setTimeout(() => show('s1', 's2'), 3000);
+    setTimeout(() => countUp($('counter'), 47318, 2100), 3250);
+    setTimeout(() => show('s2', 's3'), 7000);
+    setTimeout(() => show('s3', 's4'), 11000);
+    setTimeout(() => typewrite($('typer'), 'NOTHING LEAVES YOUR PHONE.', 1400), 11600);
+    setTimeout(() => $('caret').style.display = 'none', 13300);
+  });
+</script>
+</body>
+</html>
