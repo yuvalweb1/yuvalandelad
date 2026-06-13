@@ -171,13 +171,13 @@ export default function ShareSheet({ open, onClose, title, text, t }) {
     <>
       {/* Backdrop */}
       <div onClick={onClose} aria-hidden="true" style={{
-        position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.75)',
+        position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.75)',
         zIndex: 60, animation: 'fadeIn 0.2s ease-out both',
       }} />
 
       {/* Sheet */}
       <div role="dialog" aria-modal="true" className="no-sb" style={{
-        position: 'absolute', insetInlineStart: 0, insetInlineEnd: 0, bottom: 0,
+        position: 'fixed', insetInlineStart: 0, insetInlineEnd: 0, bottom: 0,
         overflowY: 'auto', background: '#1a0a14',
         borderRadius: '28px 28px 0 0', zIndex: 61,
         maxHeight: '88%', padding: '12px 18px 24px',
