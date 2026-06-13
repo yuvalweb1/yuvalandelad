@@ -16,7 +16,7 @@ const HAZARD_EMOJI = { block: '🚧', ghost: '👻', bat: '🦇' };
 
 export default function RunCanvas({
   level, playerName, partnerName, trailColor = '#f9c74f',
-  doubleJump = false, paused = false, reducedMotion = false,
+  doubleJump = false, paused = false, reducedMotion = false, isRTL = false,
   labels = {}, onCapsule, onFinish, onDead, onQuit,
 }) {
   const canvasRef = useRef(null);
@@ -349,10 +349,16 @@ export default function RunCanvas({
 
       // Tutorial signpost (level 1)
       if (level.signpost) {
+        ctx.font = '700 12px sans-serif';
+        const hintText = labels.hint || 'TAP = JUMP · HOLD = HIGHER';
+        const textWidth = ctx.measureText(hintText).width;
+        const boxPadding = 18;
+        const boxWidth = Math.min(Math.max(textWidth + boxPadding * 2, 160), PHYS.W - 40);
+        const boxX = Math.max(20, Math.min(PHYS.W / 2 - boxWidth / 2, PHYS.W - boxWidth - 20));
         ctx.fillStyle = 'rgba(255,255,255,0.16)';
-        ctx.beginPath(); ctx.roundRect(248, start.y - 64, 150, 34, 8); ctx.fill();
-        ctx.fillStyle = '#fff'; ctx.font = '700 12px sans-serif'; ctx.textAlign = 'center';
-        ctx.fillText(labels.hint || 'TAP = JUMP · HOLD = HIGHER', 323, start.y - 42);
+        ctx.beginPath(); ctx.roundRect(boxX, start.y - 64, boxWidth, 34, 8); ctx.fill();
+        ctx.fillStyle = '#fff'; ctx.textAlign = 'center';
+        ctx.fillText(hintText, boxX + boxWidth / 2, start.y - 42);
         ctx.textAlign = 'start';
       }
 
@@ -500,21 +506,30 @@ export default function RunCanvas({
 
       // ── HUD ─────────────────────────────────────────────
       const safeTop = 104;
-      // Hearts
+      // Hearts (always on the left)
       ctx.font = '17px serif';
       for (let i = 0; i < 3; i++) ctx.fillText(i < hearts ? '❤️' : '🖤', 14 + i * 22, safeTop);
-      // Coins
-      ctx.textAlign = 'end';
-      ctx.fillStyle = '#fff'; ctx.font = '800 16px sans-serif';
-      ctx.fillText(`${coins}`, PHYS.W - 36, safeTop);
-      ctx.textAlign = 'start';
-      ctx.font = '15px serif'; ctx.fillText(coinState[0]?.emoji || '✨', PHYS.W - 30, safeTop);
-      // Assist meter
+      // Coins (right in LTR, left in RTL)
+      ctx.font = '15px serif';
+      if (isRTL) {
+        ctx.textAlign = 'start';
+        ctx.fillText(coinState[0]?.emoji || '✨', 14, safeTop);
+        ctx.fillStyle = '#fff'; ctx.font = '800 16px sans-serif';
+        ctx.fillText(`${coins}`, 32, safeTop);
+      } else {
+        ctx.textAlign = 'end';
+        ctx.fillStyle = '#fff'; ctx.font = '800 16px sans-serif';
+        ctx.fillText(`${coins}`, PHYS.W - 36, safeTop);
+        ctx.textAlign = 'start';
+        ctx.font = '15px serif'; ctx.fillText(coinState[0]?.emoji || '✨', PHYS.W - 30, safeTop);
+      }
+      // Assist meter (right in LTR, left in RTL)
       ctx.fillStyle = 'rgba(255,255,255,0.16)';
-      ctx.beginPath(); ctx.roundRect(PHYS.W - 80, safeTop + 18, 66, 5, 3); ctx.fill();
+      const meterX = isRTL ? 14 : PHYS.W - 80;
+      ctx.beginPath(); ctx.roundRect(meterX, safeTop + 18, 66, 5, 3); ctx.fill();
       ctx.fillStyle = PARTNER_COLOR;
       const mw = magnet > 0 ? 66 : (meter / 12) * 66;
-      ctx.beginPath(); ctx.roundRect(PHYS.W - 80, safeTop + 18, Math.max(2, mw), 5, 3); ctx.fill();
+      ctx.beginPath(); ctx.roundRect(meterX, safeTop + 18, Math.max(2, mw), 5, 3); ctx.fill();
       // Progress bar (centered)
       const prog = Math.min(1, p.x / level.finishX);
       const barWidth = PHYS.W - 160;
@@ -569,7 +584,7 @@ export default function RunCanvas({
       window.removeEventListener('keyup', key);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [level, doubleJump, reducedMotion]);
+  }, [level, doubleJump, reducedMotion, isRTL]);
 
   return (
     <canvas

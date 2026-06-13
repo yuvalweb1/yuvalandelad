@@ -575,6 +575,7 @@ function RecappedApp() {
               analytics={analytics}
               selectedAuthor={selectedAuthor}
               t={t}
+              lang={lang}
               onBack={() => setStage('modes')}
             />
           )}

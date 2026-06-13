@@ -7,7 +7,7 @@
 // All persistent progression lives in src/duo/storage.js.
 // ============================================================
 import { useState, useMemo, useRef, useEffect } from 'react';
-import { interp } from '../i18n';
+import { interp, RTL_LANGS } from '../i18n';
 import RunCanvas from '../duo/RunCanvas.jsx';
 import { buildLevel, LEVEL_COUNT } from '../duo/levelGen.js';
 import { buildQuestions } from '../duo/questions.js';
@@ -159,8 +159,9 @@ function ArtifactBody({ art, t, A, B }) {
 }
 const bodyStyle = { fontSize: 14, lineHeight: 1.55, color: 'rgba(255,255,255,0.85)', margin: 0 };
 
-export default function DuoQuest({ analytics, selectedAuthor, t, onBack }) {
+export default function DuoQuest({ analytics, selectedAuthor, t, lang, onBack }) {
   const users = analytics.users || [];
+  const isRTL = RTL_LANGS.has(lang);
 
   // Seed the pair: tightest duo, with the viewer pulled in when known.
   const [initA, initB] = useMemo(() => {
@@ -491,6 +492,7 @@ export default function DuoQuest({ analytics, selectedAuthor, t, onBack }) {
             doubleJump={hasDoubleJump}
             paused={overlay !== null}
             reducedMotion={reducedMotion}
+            isRTL={isRTL}
             labels={{
               hint: t.duoq_hint_hold || 'TAP = JUMP · HOLD = HIGHER',
               combo: t.duoq_combo || 'COMBO',
@@ -500,11 +502,11 @@ export default function DuoQuest({ analytics, selectedAuthor, t, onBack }) {
             onFinish={handleFinish}
             onDead={(s) => { setRunStats(s); setOverlay('dead'); }}
           />
-          {/* Floating run chrome */}
-          <div style={{ position: 'absolute', top: 'calc(env(safe-area-inset-top, 0px) + 8px)', insetInlineEnd: 10, display: 'flex', gap: 8 }}>
+          {/* Floating run chrome — RTL-aware positioning */}
+          <div style={{ position: 'absolute', top: 'calc(env(safe-area-inset-top, 0px) + 8px)', ...(isRTL ? { insetInlineStart: 10 } : { insetInlineEnd: 10 }), display: 'flex', gap: 8 }}>
             <button onClick={() => setOverlay('paused')} className="press" style={runBtn}>⏸</button>
           </div>
-          <div className="fs-mono" style={{ position: 'absolute', top: 'calc(env(safe-area-inset-top, 0px) + 12px)', insetInlineStart: 12, fontSize: 10, fontWeight: 800, letterSpacing: '0.12em', color: 'rgba(255,255,255,0.55)' }}>
+          <div className="fs-mono" style={{ position: 'absolute', top: 'calc(env(safe-area-inset-top, 0px) + 12px)', ...(isRTL ? { insetInlineEnd: 12 } : { insetInlineStart: 12 }), fontSize: 10, fontWeight: 800, letterSpacing: '0.12em', color: 'rgba(255,255,255,0.55)' }}>
             {levelName(levelIdx)}
           </div>
         </div>
