@@ -138,9 +138,7 @@ const SlideReady = React.memo(function SlideReady({ t = {}, lang = 'en' }) {
           animationDelay: '0.72s',
           display: 'flex', gap: 10, flex: 1, minHeight: 0,
         }}>
-          {isRTL
-            ? <>{forwardHint}{backHint}</>
-            : <>{backHint}{forwardHint}</>}
+          {<>{backHint}{forwardHint}</>}
         </div>
       </div>
     </SlideShell>
