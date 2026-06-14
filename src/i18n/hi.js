@@ -3,6 +3,17 @@
 // add per-slide keys as needed.
 
 export default {
+  // ── Time-period picker + trailing-window variants ──
+  period_all: 'सभी',
+  period_year: 'साल',
+  period_season: 'सीज़न',
+  period_month: '4 हफ्ते',
+  go_title_season: 'एक सीज़न, आंकड़ों में',
+  go_title_month: '4 हफ्ते, आंकड़ों में',
+  photos_title_season: 'इस सीज़न में {n} फ़ोटो',
+  photos_title_month: '4 हफ्तों में {n} फ़ोटो',
+  awards_title_family_season: 'सबसे खास',
+  awards_title_family_month: 'सबसे खास',
   landing_eyebrow: 'नया · WHATSAPP UNWRAPPED',
   landing_h1_a: 'अपने ग्रुप',
   landing_h1_b: 'को',

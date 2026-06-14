@@ -1,4 +1,15 @@
 export default {
+  // ── Time-period picker + trailing-window variants ──
+  period_all: 'الكل',
+  period_year: 'سنة',
+  period_season: 'موسم',
+  period_month: '4 أسابيع',
+  go_title_season: 'موسم بالأرقام',
+  go_title_month: '4 أسابيع بالأرقام',
+  photos_title_season: '{n} صورة هذا الموسم',
+  photos_title_month: '{n} صورة في 4 أسابيع',
+  awards_title_family_season: 'الأبرز',
+  awards_title_family_month: 'الأبرز',
   landing_eyebrow: 'CHATWRAPPED · سنتك على واتساب',
   landing_h1_a: 'جاهز',
   landing_h1_b: 'لفضح',

@@ -1,7 +1,7 @@
 import React, { useState, useRef, useCallback } from 'react';
 import SlideShell from './SlideShell.jsx';
 import MedalCoin from '../components/MedalCoin.jsx';
-import { interp, typedCopy } from '../i18n';
+import { interp, typedCopy, typedPeriodCopy } from '../i18n';
 
 const BADGE_META = {
   fastest:  { accent: '#277da1' },
@@ -45,7 +45,7 @@ function Toast({ msg }) {
   );
 }
 
-const SlideAwards = React.memo(function SlideAwards({ a, t, profile }) {
+const SlideAwards = React.memo(function SlideAwards({ a, t, profile, period }) {
   const type = profile?.relationship || 'other';
   const [toastMsg, setToastMsg] = useState(null);
   const toastTimer = useRef(null);
@@ -114,7 +114,7 @@ const SlideAwards = React.memo(function SlideAwards({ a, t, profile }) {
             fontSize: 28, lineHeight: 1.04,
             fontWeight: 800, letterSpacing: '-0.03em', color: '#2a0645',
           }}>
-            {typedCopy(t, 'awards_title', type)}{' '}
+            {typedPeriodCopy(t, 'awards_title', type, period)}{' '}
             <span className="fs-serif" style={{ fontStyle: 'italic', color: '#f06449', fontWeight: 400 }}>
               {typedCopy(t, 'awards_are', type)}
             </span>

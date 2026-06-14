@@ -1,4 +1,15 @@
 export default {
+  // ── Time-period picker + trailing-window variants ──
+  period_all: 'Всё',
+  period_year: 'Год',
+  period_season: 'Сезон',
+  period_month: '4 недели',
+  go_title_season: 'Сезон в цифрах',
+  go_title_month: '4 недели в цифрах',
+  photos_title_season: '{n} фото за сезон',
+  photos_title_month: '{n} фото за 4 недели',
+  awards_title_family_season: 'Лучшие моменты',
+  awards_title_family_month: 'Лучшие моменты',
   landing_eyebrow: 'CHATWRAPPED · ТВОЙ ГОД В WHATSAPP',
   landing_h1_a: 'готов',
   landing_h1_b: 'разоблачить',

@@ -4,6 +4,8 @@ import { computeAll } from './lib/analytics.js';
 import { generateSampleMedia } from './lib/sample.js';
 import { loadHistory, saveRecap, removeRecap, clearHistory, deriveChatName, updateRecapProfile } from './lib/history.js';
 import { saveMedia, loadMedia, deleteMedia, clearAllMedia } from './lib/mediaStore.js';
+import { saveMessages, loadMessages, deleteMessages, clearAllMessages } from './lib/messageStore.js';
+import { filterMessagesByPeriod, makeInRange, previewStatsForPeriod, availablePeriods } from './lib/period.js';
 import { RTL_LANGS, detectLang, buildT, I18N } from './i18n';
 import ErrorBoundary from './components/ErrorBoundary.jsx';
 import GlobalStyles from './components/GlobalStyles.jsx';
@@ -33,6 +35,34 @@ import { SLIDES_BY_TYPE, SLIDE_COMPONENTS } from './slides';
 // MAIN
 // ============================================================
 
+// Attach (period-filtered) media to a computed analytics object. Media items
+// carry `.ts`; `makeInRange` keeps everything for the 'all' window and
+// fail-opens for items the parser couldn't time-stamp.
+function attachMedia(analyticsObj, media, period, messages) {
+  if (!analyticsObj) return analyticsObj;
+  const m = media || {};
+  const inRange = makeInRange(period, messages);
+  const photos   = (m.photos   || []).filter(inRange);
+  const voice    = (m.voice    || []).filter(inRange);
+  const videos   = (m.videos   || []).filter(inRange);
+  const stickers = (m.stickers || []).filter(inRange);
+  return {
+    ...analyticsObj,
+    photos, voice, videos, stickers,
+    totalPhotoCount: photos.length,
+    totalStickerInstances: stickers.reduce((s, x) => s + (x.count || 1), 0),
+  };
+}
+
+// Revoke every object URL held by a media bundle (covers the full set, not a
+// period-filtered subset, so nothing leaks when we swap or drop a session).
+function revokeMedia(media) {
+  if (!media) return;
+  for (const list of [media.photos, media.voice, media.videos, media.stickers]) {
+    for (const item of (list || [])) { try { URL.revokeObjectURL(item.url); } catch {} }
+  }
+}
+
 export default function App() {
   return (
     <ErrorBoundary>
@@ -51,7 +81,11 @@ function RecappedApp() {
       return 'landing';
     } catch { return 'welcome'; }
   });
+  // `analytics` is period-filtered (drives the Wrapped deck + Verify).
+  // `fullAnalytics` is always all-time (drives the game modes + Onboarding,
+  // which are framed as whole-chat experiences). They're equal when period==='all'.
   const [analytics, setAnalytics] = useState(null);
+  const [fullAnalytics, setFullAnalytics] = useState(null);
   const [diagnostics, setDiagnostics] = useState(null);
   const [selectedAuthor, setSelectedAuthor] = useState('');
   const [parseError, setParseError] = useState(null);
@@ -103,6 +137,23 @@ function RecappedApp() {
   });
   const [currentRecapId, setCurrentRecapId] = useState(null);
   const [history, setHistory] = useState(() => loadHistory());
+  // ── Time-period scoping ──────────────────────────────────────────────
+  // The selected chat's parsed messages + media are kept in memory so the
+  // Landing card can preview any trailing window live, and so opening the
+  // recap can recompute analytics for the chosen window without a re-parse.
+  // `recapMessages`/`recapMedia` may be null (legacy recap with no persisted
+  // messages → all-time only). `period` is one of 'all'|'year'|'season'|'month'.
+  const [recapMessages, setRecapMessages] = useState(null);
+  const [recapMedia, setRecapMedia] = useState(null);
+  const [savedStats, setSavedStats] = useState(null);
+  const [period, setPeriod] = useState('all');
+  const [selectedRecapId, setSelectedRecapId] = useState(() => {
+    try { return loadHistory()[0]?.id || null; } catch { return null; }
+  });
+  // Which recap's messages are currently in `recapMessages`, and whose live
+  // media blob URLs are in `recapMedia`. Used to skip redundant IDB reloads.
+  const [loadedSessionId, setLoadedSessionId] = useState(null);
+  const [mediaSessionId, setMediaSessionId] = useState(null);
   // Where Settings should return to. Set just before entering the settings stage.
   const [settingsReturn, setSettingsReturn] = useState('landing');
   const openSettings = useCallback((from) => {
@@ -214,11 +265,14 @@ function RecappedApp() {
         a.totalStickerInstances = media?.totalStickerInstances ?? 0;
       }
       // Persist stats snapshot (without blob URLs — those die on reload).
-      // Media blobs go to IndexedDB separately via mediaStore.
+      // Media blobs go to IndexedDB separately via mediaStore; raw messages go
+      // to messageStore so the recap can be re-scoped to a window later.
       const { photos: _photos, voice: _voice, videos: _videos, stickers: _stickers, ...stats } = a;
       const entry = saveRecap({ chatName: deriveChatName({ diagnostics: diag, fileName: file.name }), stats });
+      const sessionMedia = { photos: a.photos, voice: a.voice, videos: a.videos, stickers: a.stickers };
       setCurrentRecapId(entry.id);
-      saveMedia(entry.id, { photos: a.photos, voice: a.voice, videos: a.videos, stickers: a.stickers });
+      saveMedia(entry.id, sessionMedia);
+      saveMessages(entry.id, parsed);
       setHistory(loadHistory());
       setParsingStage(4);
       await new Promise(r => setTimeout(r, 400));
@@ -229,7 +283,20 @@ function RecappedApp() {
         // VerifyView rather than crashing on a.users[0].author.
         throw new Error(t.err_no_msgs);
       }
+      // Parse-on-select: rather than jump straight into the deck, return to
+      // Landing with this freshly-parsed chat selected and its messages/media
+      // held in memory, so the card shows live per-window stats + the picker.
+      // Tapping the CTA then opens the deck for whatever window is chosen.
+      revokeMedia(recapMediaRef.current);
+      setRecapMessages(parsed);
+      setRecapMedia(sessionMedia);
+      setSavedStats(stats);
+      setSelectedRecapId(entry.id);
+      setLoadedSessionId(entry.id);
+      setMediaSessionId(entry.id);
+      setPeriod('all');
       setAnalytics(null);
+      setFullAnalytics(null);
       setSelectedAuthor('');
       setSlide(0);
       setStage('landing');
@@ -280,48 +347,101 @@ function RecappedApp() {
     return () => { delete window.__capacitorSharedFile; };
   }, []);
 
+  // Mirror the in-memory session into refs so the load/parse callbacks can read
+  // the latest values without being re-created (and without stale closures).
+  const recapMessagesRef = useRef(recapMessages);
+  const recapMediaRef    = useRef(recapMedia);
+  const loadedSessionRef = useRef(loadedSessionId);
+  const mediaSessionRef  = useRef(mediaSessionId);
+  const periodRef        = useRef(period);
+  useEffect(() => { recapMessagesRef.current = recapMessages; }, [recapMessages]);
+  useEffect(() => { recapMediaRef.current    = recapMedia;    }, [recapMedia]);
+  useEffect(() => { loadedSessionRef.current = loadedSessionId; }, [loadedSessionId]);
+  useEffect(() => { mediaSessionRef.current  = mediaSessionId; }, [mediaSessionId]);
+  useEffect(() => { periodRef.current        = period;        }, [period]);
+
   const reset = () => {
-    // Free any object URLs created for chat media before dropping analytics.
-    if (analytics) {
-      const all = [
-        ...(analytics.photos   || []),
-        ...(analytics.voice    || []),
-        ...(analytics.videos   || []),
-        ...(analytics.stickers || []),
-      ];
-      for (const m of all) { try { URL.revokeObjectURL(m.url); } catch {} }
-    }
+    // Free every object URL created for chat media (full set) before dropping.
+    revokeMedia(recapMediaRef.current);
     setAnalytics(null);
+    setFullAnalytics(null);
     setDiagnostics(null);
     setCurrentRecapId(null);
+    setRecapMessages(null);
+    setRecapMedia(null);
+    setSavedStats(null);
+    setLoadedSessionId(null);
+    setMediaSessionId(null);
+    setSelectedRecapId(null);
+    setPeriod('all');
     setStage('landing');
     setParseError(null);
     setSlide(0);
   };
 
-  const analyticsRef = useRef(analytics);
-  useEffect(() => { analyticsRef.current = analytics; }, [analytics]);
+  // Browsing history on Landing: lazily load the selected recap's messages so
+  // the card can preview per-window stats. Media is deferred to open time.
+  useEffect(() => {
+    if (!selectedRecapId || selectedRecapId === loadedSessionId) return;
+    let cancelled = false;
+    (async () => {
+      const entry = loadHistory().find(r => r.id === selectedRecapId);
+      const loaded = await loadMessages(selectedRecapId);
+      if (cancelled) return;
+      setSavedStats(entry?.stats || null);
+      setRecapMessages(loaded.length ? loaded : null);
+      setLoadedSessionId(selectedRecapId);
+    })();
+    return () => { cancelled = true; };
+  }, [selectedRecapId, loadedSessionId]);
+
+  const handleSelectRecap = useCallback((id) => {
+    setSelectedRecapId(id);
+    setPeriod('all');
+  }, []);
 
   const handleLoadRecap = useCallback(async (id, destination) => {
-    // Always reload fresh from storage to get the latest profile
-    const freshHistory = loadHistory();
-    const entry = freshHistory.find(r => r.id === id);
+    const entry = loadHistory().find(r => r.id === id);
     if (!entry) return;
-    // Revoke blob URLs from whatever recap is currently active before swapping.
-    const prev = analyticsRef.current;
-    if (prev) {
-      for (const m of [...(prev.photos||[]), ...(prev.voice||[]), ...(prev.videos||[]), ...(prev.stickers||[])]) {
-        try { URL.revokeObjectURL(m.url); } catch {}
-      }
+    const per = periodRef.current;
+
+    // Messages: reuse the in-memory session if it's the same recap, else load.
+    let msgs = recapMessagesRef.current;
+    if (loadedSessionRef.current !== id || !msgs) {
+      const loaded = await loadMessages(id);
+      msgs = loaded.length ? loaded : null;
     }
-    const media = await loadMedia(id);
-    const a = { ...entry.stats, ...media };
+    // Media: reuse in-memory if same session (keeps the live blob URLs); else
+    // revoke the old set and load fresh from IndexedDB.
+    let media = recapMediaRef.current;
+    if (mediaSessionRef.current !== id || !media) {
+      revokeMedia(recapMediaRef.current);
+      media = await loadMedia(id);
+    }
+
+    // All-time analytics (game modes + onboarding). Legacy recaps with no
+    // persisted messages fall back to the saved snapshot.
+    const fullBase = msgs ? computeAll(msgs) : entry.stats;
+    const fullA = fullBase ? attachMedia(fullBase, media, 'all', msgs) : null;
+    // Period-filtered analytics (the deck). Identical to all-time when the
+    // window is 'all' or there are no messages to slice.
+    const filteredA = (per === 'all' || !msgs)
+      ? fullA
+      : attachMedia(computeAll(filterMessagesByPeriod(msgs, per)), media, per, msgs);
+
     const savedProfile = entry.profile || { relationship: null, tone: null, self: null };
+    setRecapMessages(msgs);
+    setRecapMedia(media);
+    setSavedStats(entry.stats);
+    setLoadedSessionId(id);
+    setMediaSessionId(id);
+    setFullAnalytics(fullA);
+    setAnalytics(filteredA);
     setDiagnostics(null);
-    setAnalytics(a);
-    setSelectedAuthor(a.users?.[0]?.author || '');
+    setSelectedAuthor((filteredA || fullA)?.users?.[0]?.author || '');
     setProfile(savedProfile);
     setCurrentRecapId(id);
+    setSelectedRecapId(id);
     setSlide(0);
     // First time: relationship hasn't been chosen yet, show onboarding.
     // Onboarding only collects `self` + `relationship` (not `tone`), so
@@ -337,13 +457,37 @@ function RecappedApp() {
     }
   }, []);
 
+  // Live card data for the selected recap, recomputed as the window changes.
+  const previewStats = useMemo(() => {
+    if (recapMessages && loadedSessionId === selectedRecapId) {
+      return previewStatsForPeriod(recapMessages, period);
+    }
+    if (savedStats) {
+      return {
+        totalMessages: savedStats.totalMessages,
+        totalParticipants: savedStats.totalParticipants ?? savedStats.users?.length ?? 0,
+        durationDays: savedStats.durationDays,
+      };
+    }
+    return null;
+  }, [recapMessages, loadedSessionId, selectedRecapId, period, savedStats]);
+
+  const periodChoices = useMemo(
+    () => (recapMessages && loadedSessionId === selectedRecapId)
+      ? availablePeriods(recapMessages)
+      : ['all'],
+    [recapMessages, loadedSessionId, selectedRecapId]
+  );
+
   // Modes hub tiles need `analytics` to render — but a chat the user already
   // imported or picked from history may not be loaded into the active session
   // yet (Landing keeps the parsed result staged until the user confirms it).
   // Rather than show "locked" for a chat that's plainly already there, load
   // the most recent one on demand and continue straight into the requested mode.
   const enterMode = useCallback((destination) => {
-    if (analytics) {
+    // Game modes run on all-time data (fullAnalytics), independent of the
+    // window chosen for the deck.
+    if (fullAnalytics) {
       if (destination === 'roastmode') enterRoastMode('modes');
       else setStage(destination);
       return;
@@ -356,17 +500,22 @@ function RecappedApp() {
     } else {
       handleLoadRecap(mostRecent.id, destination);
     }
-  }, [analytics, history, enterRoastMode, handleLoadRecap]);
+  }, [fullAnalytics, history, enterRoastMode, handleLoadRecap]);
 
   const handleDeleteRecap = useCallback((id) => {
     deleteMedia(id);
-    setHistory(removeRecap(id));
+    deleteMessages(id);
+    const next = removeRecap(id);
+    setHistory(next);
+    setSelectedRecapId(prev => (prev === id ? (next[0]?.id || null) : prev));
   }, []);
 
   const handleClearHistory = useCallback(() => {
     clearAllMedia();
+    clearAllMessages();
     clearHistory();
     setHistory([]);
+    setSelectedRecapId(null);
   }, []);
 
   return (
@@ -443,6 +592,12 @@ function RecappedApp() {
                 onLoadRecap={handleLoadRecap}
                 onDeleteRecap={handleDeleteRecap}
                 onClearHistory={handleClearHistory}
+                selectedRecapId={selectedRecapId}
+                onSelectRecap={handleSelectRecap}
+                period={period}
+                setPeriod={setPeriod}
+                periodChoices={periodChoices}
+                previewStats={previewStats}
               />
               {/* shouldShowPromo() already returns false when isPremium is true,
                   so promoOpen alone is the sufficient condition. */}
@@ -466,9 +621,9 @@ function RecappedApp() {
               onComplete={() => setStage('landing')}
             />
           )}
-          {stage === 'onboard' && analytics && (
+          {stage === 'onboard' && fullAnalytics && (
             <Onboarding
-              analytics={analytics}
+              analytics={fullAnalytics}
               t={t}
               profile={profile}
               setProfile={setProfile}
@@ -481,7 +636,7 @@ function RecappedApp() {
                 }
                 // Reload history after saving profile
                 setHistory(loadHistory());
-                if (finalProfile.self && analytics.userMap[finalProfile.self]) {
+                if (finalProfile.self && fullAnalytics.userMap[finalProfile.self]) {
                   setSelectedAuthor(finalProfile.self);
                 }
                 // Navigate to the intended destination (or wrapped if none specified)
@@ -507,10 +662,10 @@ function RecappedApp() {
               onComplete={() => setStage('wrapped')}
             />
           )}
-          {stage === 'verify' && diagnostics && analytics && (
+          {stage === 'verify' && diagnostics && fullAnalytics && (
             <VerifyView
               diagnostics={diagnostics}
-              analytics={analytics}
+              analytics={fullAnalytics}
               fileName={fileName}
               t={t}
               onContinue={() => setStage('wrapped')}
@@ -529,6 +684,7 @@ function RecappedApp() {
               setSlide={setSlide}
               profile={profile}
               setProfile={setProfile}
+              period={period}
               t={t}
               lang={lang}
               onExit={() => {
@@ -562,9 +718,9 @@ function RecappedApp() {
               onComplete={() => setStage('roastmode')}
             />
           )}
-          {stage === 'roastmode' && analytics && (
+          {stage === 'roastmode' && fullAnalytics && (
             <RoastMode
-              analytics={analytics}
+              analytics={fullAnalytics}
               selectedAuthor={selectedAuthor}
               setSelectedAuthor={setSelectedAuthor}
               t={t}
@@ -573,7 +729,7 @@ function RecappedApp() {
           )}
           {stage === 'modes' && (
             <Modes
-              analytics={analytics}
+              analytics={fullAnalytics}
               history={history}
               t={t}
               onUpload={() => setStage('landing')}
@@ -582,9 +738,9 @@ function RecappedApp() {
               onGuessWho={() => enterMode('guesswho')}
             />
           )}
-          {stage === 'duo' && analytics && (
+          {stage === 'duo' && fullAnalytics && (
             <DuoQuest
-              analytics={analytics}
+              analytics={fullAnalytics}
               selectedAuthor={selectedAuthor}
               t={t}
               lang={lang}
@@ -592,7 +748,7 @@ function RecappedApp() {
             />
           )}
           {stage === 'guesswho' && (
-            <GuessWho analytics={analytics} t={t} onBack={() => setStage('modes')} />
+            <GuessWho analytics={fullAnalytics} t={t} onBack={() => setStage('modes')} />
           )}
         </div>
         {(stage === 'landing' || stage === 'modes') && (

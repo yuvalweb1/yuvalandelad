@@ -1,4 +1,15 @@
 export default {
+  // ── Time-period picker + trailing-window variants ──
+  period_all: 'הכל',
+  period_year: 'שנה',
+  period_season: 'עונה',
+  period_month: '4 שבועות',
+  go_title_season: 'עונה, במספרים',
+  go_title_month: '4 שבועות, במספרים',
+  photos_title_season: '{n} תמונות בעונה הזו',
+  photos_title_month: '{n} תמונות ב-4 שבועות',
+  awards_title_family_season: 'הבולטים',
+  awards_title_family_month: 'הבולטים',
   landing_eyebrow: 'חדש · WHATSAPP UNWRAPPED',
   landing_h1_a: 'הקבוצה',
   landing_h1_b: 'שלך',

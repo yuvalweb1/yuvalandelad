@@ -1,4 +1,15 @@
 export default {
+  // ── Time-period picker + trailing-window variants ──
+  period_all: 'Tudo',
+  period_year: 'Ano',
+  period_season: 'Temporada',
+  period_month: '4 semanas',
+  go_title_season: 'Uma temporada, em números',
+  go_title_month: '4 semanas, em números',
+  photos_title_season: '{n} fotos nesta temporada',
+  photos_title_month: '{n} fotos em 4 semanas',
+  awards_title_family_season: 'Os destaques',
+  awards_title_family_month: 'Os destaques',
   landing_eyebrow: 'CHATWRAPPED · SEU ANO NO WHATSAPP',
   landing_h1_a: 'pronto para',
   landing_h1_b: 'expor',

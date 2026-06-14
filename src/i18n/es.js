@@ -28,6 +28,11 @@ export default {
   landing_stat_people: 'PERSONAS',
   landing_stat_span: 'PERIODO',
   landing_history_viewed: 'Visto {rel} · desde {date}',
+  // Selector de periodo (ventanas finales)
+  period_all: 'Todo',
+  period_year: 'Año',
+  period_season: 'Temporada',
+  period_month: '4 semanas',
   a11y_previous: 'Anterior',
   a11y_next: 'Siguiente',
   a11y_menu: 'Menú',
@@ -872,6 +877,8 @@ export default {
   go_title_work: 'Este año, en números',
   go_eyebrow_couple: 'NOSOTROS',
   go_title_couple: 'Nuestro año, en números',
+  go_title_season: 'Una temporada, en números',
+  go_title_month: '4 semanas, en números',
 
   // leaderboard
   lb_eyebrow_friends: 'CLASIFICACIÓN',
@@ -910,6 +917,8 @@ export default {
   photos_sub_family: 'Todos los momentos',
   photos_eyebrow_couple: 'NUESTROS RECUERDOS',
   photos_title_couple: '{n} fotos de nosotros',
+  photos_title_season: '{n} fotos esta temporada',
+  photos_title_month: '{n} fotos en 4 semanas',
   photos_sub_couple: 'Trozos del año',
 
   // awards
@@ -918,6 +927,8 @@ export default {
   awards_are_friends: 'son…',
   awards_eyebrow_family: '✦ LOS PREMIOS DE LA FAMILIA',
   awards_title_family: 'Los destacados de este año',
+  awards_title_family_season: 'Los destacados',
+  awards_title_family_month: 'Los destacados',
   awards_are_family: 'son…',
   awards_eyebrow_work: '✦ LOS PREMIOS DE LA OFICINA',
   awards_title_work: 'Evaluación de desempeño',

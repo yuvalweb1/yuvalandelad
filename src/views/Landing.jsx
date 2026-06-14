@@ -1,6 +1,6 @@
 import { useRef, useState, useCallback, useMemo } from 'react';
 import BottomSheet from '../components/BottomSheet.jsx';
-import { relativeTime, chatNameFromFile } from '../lib/history.js';
+import { relativeTime } from '../lib/history.js';
 import { interp } from '../i18n';
 
 const LANGUAGES = [
@@ -24,44 +24,42 @@ export default function Landing({
   onFile, onDemo, parseError, t, lang, setLang, onHowTo, onOpenSettings,
   includeMedia = true, setIncludeMedia,
   history = [], onLoadRecap, onDeleteRecap, onClearHistory,
+  selectedRecapId = null, onSelectRecap,
+  period = 'all', setPeriod, periodChoices = ['all'], previewStats = null,
 }) {
   const fileInputRef = useRef(null);
   const [langOpen, setLangOpen] = useState(false);
   const [historyOpen, setHistoryOpen] = useState(false);
   const [shaking, setShaking] = useState(false);
   const [howToPulse, setHowToPulse] = useState(false);
-  const [pendingFile, setPendingFile] = useState(null);
-  const [selectedHistoryId, setSelectedHistoryId] = useState(() =>
-    history.length > 0 ? history[0].id : null
-  );
   const emojiRots = useMemo(() => [10, -13, 16, -9, 12].map(base => {
     const jitter = ((Math.random() * 12) | 0) - 6;
     return base + jitter;
   }), []);
 
-  const selectedHistoryItem = selectedHistoryId ? history.find(r => r.id === selectedHistoryId) : null;
-  const hasSelection = pendingFile !== null || selectedHistoryItem != null;
+  // Selection is controlled by App (so it can hold the chat's messages in
+  // memory for the live per-window preview). A fresh upload parses on select
+  // and comes back as the most-recent history entry, already selected.
+  const selectedHistoryItem = selectedRecapId ? history.find(r => r.id === selectedRecapId) : null;
+  const hasSelection = selectedHistoryItem != null;
 
   const handleCtaMain = useCallback(() => {
-    if (pendingFile) {
-      onFile(pendingFile);
-    } else if (selectedHistoryItem) {
+    if (selectedHistoryItem) {
       onLoadRecap(selectedHistoryItem.id);
     } else {
       setShaking(true);
       setHowToPulse(true);
       setTimeout(() => { setShaking(false); setHowToPulse(false); }, 520);
     }
-  }, [pendingFile, selectedHistoryItem, onFile, onLoadRecap]);
+  }, [selectedHistoryItem, onLoadRecap]);
 
+  // Parse-on-select: picking a file starts parsing immediately (full-screen
+  // Parsing stage), then returns here with the chat selected + stats populated.
   const handleFileChange = useCallback((e) => {
     const f = e.target.files?.[0];
-    if (f) {
-      setPendingFile(f);
-      setSelectedHistoryId(null);
-    }
+    if (f) onFile(f);
     e.target.value = '';
-  }, []);
+  }, [onFile]);
 
   const handleSwitchClick = useCallback(() => {
     if (history.length > 0) {
@@ -72,18 +70,16 @@ export default function Landing({
   }, [history.length]);
 
   const handleSelectHistory = useCallback((id) => {
-    setSelectedHistoryId(id);
-    setPendingFile(null);
+    onSelectRecap?.(id);
     setHistoryOpen(false);
-  }, []);
+  }, [onSelectRecap]);
 
   const handleDemo = useCallback(async () => {
     const res = await fetch('demo_chat.txt');
     const text = await res.text();
     const file = new File([text], 'WhatsApp Chat with The Squad.txt', { type: 'text/plain' });
-    setPendingFile(file);
-    setSelectedHistoryId(null);
-  }, []);
+    onFile(file);
+  }, [onFile]);
 
   return (
     <>
@@ -285,11 +281,11 @@ export default function Landing({
               <div style={{ display: 'flex', alignItems: 'center', gap: 9 }}>
                 <div style={{
                   flexShrink: 0, width: 34, height: 34, borderRadius: 999,
-                  background: pendingFile ? 'rgba(74,14,78,0.15)' : '#FF69B4',
+                  background: '#FF69B4',
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
                   fontSize: 17,
                 }}>
-                  {pendingFile ? '📄' : '💬'}
+                  💬
                 </div>
                 <div style={{ flex: 1, minWidth: 0 }}>
                   <div dir="auto" style={{
@@ -297,69 +293,83 @@ export default function Landing({
                     overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
                     lineHeight: 1.2,
                   }}>
-                    {pendingFile
-                      ? chatNameFromFile(pendingFile.name)
-                      : selectedHistoryItem?.chatName}
+                    {selectedHistoryItem?.chatName}
                   </div>
                   <div style={{ fontSize: 11, color: 'rgba(74,14,78,0.50)', marginTop: 2, lineHeight: 1.3 }}>
-                    {pendingFile
-                      ? (t.landing_ready_to_analyze || 'Ready to analyze')
-                      : selectedHistoryItem
-                        ? interp(t.landing_history_viewed || 'Viewed {rel} · since {date}', {
-                            rel: relativeTime(selectedHistoryItem.date, lang),
-                            date: new Date(selectedHistoryItem.stats.start).toLocaleDateString(lang, { month: 'short', year: 'numeric' }),
-                          })
-                        : ''}
+                    {selectedHistoryItem
+                      ? interp(t.landing_history_viewed || 'Viewed {rel} · since {date}', {
+                          rel: relativeTime(selectedHistoryItem.date, lang),
+                          date: new Date(selectedHistoryItem.stats.start).toLocaleDateString(lang, { month: 'short', year: 'numeric' }),
+                        })
+                      : ''}
                   </div>
                 </div>
               </div>
 
-              {/* Stats row — real values for parsed recaps, ? for pending files */}
-              {(selectedHistoryItem?.stats || pendingFile) && (
-                <>
-                  <div style={{ height: 1, background: 'rgba(74,14,78,0.09)', margin: '9px 0 8px' }} />
-                  <div style={{ display: 'flex', alignItems: 'center' }}>
-                    {[
-                      {
-                        label: t.landing_stat_messages || 'MESSAGES',
-                        value: pendingFile ? '?' : selectedHistoryItem.stats.totalMessages != null
-                          ? selectedHistoryItem.stats.totalMessages.toLocaleString()
-                          : '—',
-                      },
-                      {
-                        label: t.landing_stat_people || 'PEOPLE',
-                        value: pendingFile ? '?' : (selectedHistoryItem.stats.totalParticipants
-                          ?? selectedHistoryItem.stats.users?.length
-                          ?? '—'),
-                      },
-                      {
-                        label: t.landing_stat_span || 'SPAN',
-                        value: pendingFile ? '?' : selectedHistoryItem.stats.durationDays != null
-                          ? `${selectedHistoryItem.stats.durationDays}d`
-                          : '—',
-                      },
-                    ].map((stat, i, arr) => (
-                      <div key={stat.label} style={{
-                        flex: 1, textAlign: 'center',
-                        borderRight: i < arr.length - 1 ? '1px solid rgba(74,14,78,0.12)' : 'none',
-                        padding: '0 4px',
-                      }}>
-                        <div className="fs-sans" style={{
-                          fontSize: 15, fontWeight: 800, lineHeight: 1,
-                          color: pendingFile ? 'rgba(74,14,78,0.30)' : '#2a0645',
-                        }}>
-                          {stat.value}
-                        </div>
-                        <div className="fs-mono" style={{
-                          fontSize: 8.5, fontWeight: 700, letterSpacing: '0.10em',
-                          color: 'rgba(74,14,78,0.45)', textTransform: 'uppercase', marginTop: 2,
-                        }}>
-                          {stat.label}
-                        </div>
-                      </div>
-                    ))}
+              {/* Stats row — live values for the selected trailing window */}
+              <div style={{ height: 1, background: 'rgba(74,14,78,0.09)', margin: '9px 0 8px' }} />
+              <div style={{ display: 'flex', alignItems: 'center' }}>
+                {[
+                  {
+                    label: t.landing_stat_messages || 'MESSAGES',
+                    value: previewStats?.totalMessages != null
+                      ? previewStats.totalMessages.toLocaleString() : '—',
+                  },
+                  {
+                    label: t.landing_stat_people || 'PEOPLE',
+                    value: previewStats?.totalParticipants ?? '—',
+                  },
+                  {
+                    label: t.landing_stat_span || 'SPAN',
+                    value: previewStats?.durationDays != null
+                      ? `${previewStats.durationDays}d` : '—',
+                  },
+                ].map((stat, i, arr) => (
+                  <div key={stat.label} style={{
+                    flex: 1, textAlign: 'center',
+                    borderRight: i < arr.length - 1 ? '1px solid rgba(74,14,78,0.12)' : 'none',
+                    padding: '0 4px',
+                  }}>
+                    <div className="fs-sans" style={{
+                      fontSize: 15, fontWeight: 800, lineHeight: 1, color: '#2a0645',
+                    }}>
+                      {stat.value}
+                    </div>
+                    <div className="fs-mono" style={{
+                      fontSize: 8.5, fontWeight: 700, letterSpacing: '0.10em',
+                      color: 'rgba(74,14,78,0.45)', textTransform: 'uppercase', marginTop: 2,
+                    }}>
+                      {stat.label}
+                    </div>
                   </div>
-                </>
+                ))}
+              </div>
+
+              {/* Time-period picker — trailing windows ending at the last message.
+                  Only shown when more than one window is meaningful for this chat. */}
+              {setPeriod && periodChoices.length > 1 && (
+                <div role="group" aria-label={t.period_all || 'Time period'} style={{ display: 'flex', gap: 6, marginTop: 10 }}>
+                  {periodChoices.map(p => {
+                    const active = period === p;
+                    return (
+                      <button
+                        key={p}
+                        onClick={() => setPeriod(p)}
+                        aria-pressed={active}
+                        className="press fs-sans"
+                        style={{
+                          flex: 1, padding: '8px 4px', borderRadius: 999,
+                          border: 'none', cursor: 'pointer',
+                          fontSize: 12, fontWeight: 700, letterSpacing: '-0.01em',
+                          background: active ? '#4A0E4E' : 'rgba(74,14,78,0.07)',
+                          color: active ? '#fff' : '#573280',
+                          transition: 'background 0.18s ease-out, color 0.18s ease-out',
+                        }}>
+                        {t[`period_${p}`] || p}
+                      </button>
+                    );
+                  })}
+                </div>
               )}
             </>
           )}
@@ -501,7 +511,7 @@ export default function Landing({
                 style={{
                   flex: 1, minWidth: 0,
                   display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: 3,
-                  background: r.id === selectedHistoryId ? 'rgba(74,14,78,0.06)' : 'transparent',
+                  background: r.id === selectedRecapId ? 'rgba(74,14,78,0.06)' : 'transparent',
                   border: 'none', color: '#2a0645',
                   textAlign: 'start', cursor: 'pointer', padding: '4px 6px',
                   borderRadius: 10,
@@ -515,7 +525,7 @@ export default function Landing({
                   fontSize: 12, color: 'rgba(74,14,78,0.50)', letterSpacing: '0.04em',
                 }}>{relativeTime(r.date, lang)}</div>
               </button>
-              {r.id === selectedHistoryId && (
+              {r.id === selectedRecapId && (
                 <span style={{ fontSize: 16, color: '#FF1867', flexShrink: 0 }}>✓</span>
               )}
               <button

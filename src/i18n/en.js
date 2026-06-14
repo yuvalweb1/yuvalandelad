@@ -28,6 +28,11 @@ export default {
   landing_stat_people: 'PEOPLE',
   landing_stat_span: 'SPAN',
   landing_history_viewed: 'Viewed {rel} · since {date}',
+  // Time-period picker (trailing windows ending at the last message)
+  period_all: 'All',
+  period_year: 'Year',
+  period_season: 'Season',
+  period_month: '4 weeks',
   rotate_title: 'Turn back to portrait',
   rotate_body: 'Recapped is designed for portrait mode only.',
   a11y_previous: 'Previous',
@@ -1271,6 +1276,9 @@ export default {
   go_title_work: 'This year, in numbers',
   go_eyebrow_couple: 'US',
   go_title_couple: 'Our year, in numbers',
+  // Period-window variants (override the "year" wording for shorter windows)
+  go_title_season: 'A season, in numbers',
+  go_title_month: '4 weeks, in numbers',
 
   // leaderboard
   lb_eyebrow_friends: 'LEADERBOARD',
@@ -1310,6 +1318,9 @@ export default {
   photos_eyebrow_couple: 'OUR MEMORIES',
   photos_title_couple: '{n} photos of us',
   photos_sub_couple: 'Pieces of the year',
+  // Period-window variants
+  photos_title_season: '{n} photos this season',
+  photos_title_month: '{n} photos in 4 weeks',
 
   // awards
   awards_eyebrow_friends: '✦ AND THE AWARDS GO TO',
@@ -1317,6 +1328,8 @@ export default {
   awards_are_friends: 'are…',
   awards_eyebrow_family: '✦ THE FAMILY AWARDS',
   awards_title_family: 'This year\'s standouts',
+  awards_title_family_season: 'The standouts',
+  awards_title_family_month: 'The standouts',
   awards_are_family: 'are…',
   awards_eyebrow_work: '✦ THE OFFICE AWARDS',
   awards_title_work: 'Performance review',

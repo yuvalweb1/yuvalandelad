@@ -1,4 +1,15 @@
 export default {
+  // ── Time-period picker + trailing-window variants ──
+  period_all: 'Tümü',
+  period_year: 'Yıl',
+  period_season: 'Sezon',
+  period_month: '4 hafta',
+  go_title_season: 'Bir sezon, rakamlarla',
+  go_title_month: '4 hafta, rakamlarla',
+  photos_title_season: 'Bu sezon {n} fotoğraf',
+  photos_title_month: '4 haftada {n} fotoğraf',
+  awards_title_family_season: 'Öne çıkanlar',
+  awards_title_family_month: 'Öne çıkanlar',
   landing_eyebrow: 'YENİ · WHATSAPP UNWRAPPED',
   landing_h1_a: 'Grubunu',
   landing_h1_b: 'ifşa',

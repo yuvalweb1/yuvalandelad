@@ -28,6 +28,11 @@ export default {
   landing_stat_people: 'PERSONNES',
   landing_stat_span: 'PÉRIODE',
   landing_history_viewed: 'Vu {rel} · depuis {date}',
+  // Sélecteur de période (fenêtres glissantes)
+  period_all: 'Tout',
+  period_year: 'Année',
+  period_season: 'Saison',
+  period_month: '4 semaines',
   a11y_previous: 'Précédent',
   a11y_next: 'Suivant',
   a11y_menu: 'Menu',
@@ -871,6 +876,8 @@ export default {
   go_title_work: 'Cette année, en chiffres',
   go_eyebrow_couple: 'NOUS',
   go_title_couple: 'Notre année, en chiffres',
+  go_title_season: 'Une saison, en chiffres',
+  go_title_month: '4 semaines, en chiffres',
 
   // leaderboard
   lb_eyebrow_friends: 'CLASSEMENT',
@@ -909,6 +916,8 @@ export default {
   photos_sub_family: 'Tous les moments',
   photos_eyebrow_couple: 'NOS SOUVENIRS',
   photos_title_couple: '{n} photos de nous',
+  photos_title_season: '{n} photos cette saison',
+  photos_title_month: '{n} photos en 4 semaines',
   photos_sub_couple: 'Des morceaux de l\'année',
 
   // awards
@@ -917,6 +926,8 @@ export default {
   awards_are_friends: 'sont…',
   awards_eyebrow_family: '✦ LES PRIX DE LA FAMILLE',
   awards_title_family: 'Les vedettes de cette année',
+  awards_title_family_season: 'Les vedettes',
+  awards_title_family_month: 'Les vedettes',
   awards_are_family: 'sont…',
   awards_eyebrow_work: '✦ LES PRIX DU BUREAU',
   awards_title_work: 'Entretien d\'évaluation',

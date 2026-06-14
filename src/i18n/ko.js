@@ -1,5 +1,16 @@
 // Korean — critical UI strings. Missing keys fall back to EN.
 export default {
+  // ── Time-period picker + trailing-window variants ──
+  period_all: '전체',
+  period_year: '연간',
+  period_season: '시즌',
+  period_month: '4주',
+  go_title_season: '한 시즌, 숫자로',
+  go_title_month: '4주, 숫자로',
+  photos_title_season: '이번 시즌 사진 {n}장',
+  photos_title_month: '4주간 사진 {n}장',
+  awards_title_family_season: '이번 시즌의 주인공',
+  awards_title_family_month: '이번 시즌의 주인공',
   landing_eyebrow: '신규 · WHATSAPP UNWRAPPED',
   landing_h1_a: '당신의',
   landing_h1_b: '그룹',

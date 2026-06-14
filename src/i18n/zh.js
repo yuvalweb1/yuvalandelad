@@ -1,5 +1,16 @@
 // Simplified Chinese — critical UI strings. Missing keys fall back to EN.
 export default {
+  // ── Time-period picker + trailing-window variants ──
+  period_all: '全部',
+  period_year: '一年',
+  period_season: '一季',
+  period_month: '4 周',
+  go_title_season: '一季，用数字说话',
+  go_title_month: '4 周，用数字说话',
+  photos_title_season: '本季 {n} 张照片',
+  photos_title_month: '4 周内 {n} 张照片',
+  awards_title_family_season: '本季亮点人物',
+  awards_title_family_month: '本季亮点人物',
   landing_eyebrow: '新 · WHATSAPP UNWRAPPED',
   landing_h1_a: '准备好',
   landing_h1_b: '揭露',

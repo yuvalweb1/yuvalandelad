@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useAnimatedNumber } from '../hooks/useAnimatedNumber.js';
 import SlideShell from './SlideShell.jsx';
 import ListSlideDecor from '../components/ListSlideDecor.jsx';
-import { typedCopy } from '../i18n';
+import { typedCopy, typedPeriodCopy } from '../i18n';
 
 function RevealTile({ question, icon, color, numValue, strValue, label, sub, delay }) {
   const [flipped, setFlipped] = useState(false);
@@ -106,7 +106,7 @@ function RevealTile({ question, icon, color, numValue, strValue, label, sub, del
   );
 }
 
-const SlideGroupOverview = React.memo(function SlideGroupOverview({ a, t, profile }) {
+const SlideGroupOverview = React.memo(function SlideGroupOverview({ a, t, profile, period }) {
   const type = profile?.relationship || 'other';
   const peakHour = (a.groupHourly?.length)
     ? a.groupHourly.indexOf(Math.max(...a.groupHourly)) : null;
@@ -140,7 +140,7 @@ const SlideGroupOverview = React.memo(function SlideGroupOverview({ a, t, profil
           textShadow: '0 2px 0 rgba(255,255,255,0.65), 0 1px 3px rgba(42,6,69,0.1)',
           padding: '0 8px',
         }}>
-          {typedCopy(t, 'go_title', type)}
+          {typedPeriodCopy(t, 'go_title', type, period)}
         </div>
 
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, flex: 1 }}>

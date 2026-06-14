@@ -1,5 +1,16 @@
 // Japanese — critical UI strings. Missing keys fall back to EN.
 export default {
+  // ── Time-period picker + trailing-window variants ──
+  period_all: 'すべて',
+  period_year: '1年',
+  period_season: 'シーズン',
+  period_month: '4週間',
+  go_title_season: 'ワンシーズンを数字で',
+  go_title_month: '4週間を数字で',
+  photos_title_season: '今シーズンの写真 {n} 枚',
+  photos_title_month: '4週間で写真 {n} 枚',
+  awards_title_family_season: '注目の人々',
+  awards_title_family_month: '注目の人々',
   landing_eyebrow: '新登場 · WHATSAPP UNWRAPPED',
   landing_h1_a: 'グループの',
   landing_h1_b: '真実',

@@ -303,7 +303,7 @@ export default function Settings({
               fontSize: 26, fontWeight: 800, color: EGGPLANT, letterSpacing: '-0.03em',
               lineHeight: 1,
             }}>
-              chat<span style={{ color: MANGO, fontStyle: 'italic' }}>wrapped</span>
+              Recapped
             </div>
             <div className="fs-mono" style={{
               fontSize: 10, color: 'rgba(74,14,78,0.55)', letterSpacing: '0.16em',

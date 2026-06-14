@@ -51,6 +51,30 @@ export function typedCopy(t, key, type) {
   return t[`${key}_${type}`] || t[key];
 }
 
+// Period-aware copy lookup. Returns `t[key_period]` if present, else `t[key]`.
+// Mirrors `typedCopy`, but keyed by the trailing-window type so a slide can keep
+// its all-time wording as the base key and override just the headlines that bake
+// in a "this year" assumption for the shorter windows.
+//   period 'all' / 'year'  → base key (a year of data; the existing copy is fine)
+//   period 'season'        → `${key}_season` if it exists, else base
+//   period 'month'         → `${key}_month`  if it exists, else base
+export function periodCopy(t, key, period) {
+  if (!period || period === 'all' || period === 'year') return t[key];
+  return t[`${key}_${period}`] || t[key];
+}
+
+// Combined relationship + period lookup for the few deck titles that are BOTH
+// relationship-aware (via typedCopy) and bake in a "this year" assumption.
+// For the full-chat / year windows we keep the existing relationship wording.
+// For the shorter windows we prefer a generic period variant (`${key}_season`
+// / `${key}_month`) over the relationship base, so the period stays accurate
+// even though we don't author the full relationship×window matrix.
+//   lookup order (season/month): key_type_period → key_period → typedCopy(key,type)
+export function typedPeriodCopy(t, key, type, period) {
+  if (!period || period === 'all' || period === 'year') return typedCopy(t, key, type);
+  return t[`${key}_${type}_${period}`] || t[`${key}_${period}`] || typedCopy(t, key, type);
+}
+
 // Translate a user's title from their stored key + vars
 export function resolveTitle(u, t) {
   if (!u || !u.titleKey) return '';

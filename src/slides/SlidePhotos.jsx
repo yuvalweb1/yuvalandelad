@@ -1,8 +1,8 @@
 import React from 'react';
 import SlideShell from './SlideShell.jsx';
-import { interp, typedCopy } from '../i18n';
+import { interp, typedCopy, typedPeriodCopy } from '../i18n';
 
-const SlidePhotos = React.memo(function SlidePhotos({ a, t, profile }) {
+const SlidePhotos = React.memo(function SlidePhotos({ a, t, profile, period }) {
   const type = profile?.relationship || 'other';
   const photos = a.photos || [];
   if (photos.length === 0) return null;
@@ -15,7 +15,7 @@ const SlidePhotos = React.memo(function SlidePhotos({ a, t, profile }) {
           {typedCopy(t, 'photos_eyebrow', type)}
         </div>
         <div className="fs-display a-fade-up" style={{ textAlign: 'center', animationDelay: '0.15s', fontSize: 30, lineHeight: 1.12, letterSpacing: '-0.03em', fontWeight: 800, color: '#2a0645', marginTop: 8, marginBottom: 14 }}>
-          {interp(typedCopy(t, 'photos_title', type), { n: (a.totalPhotoCount || photos.length).toLocaleString() })}
+          {interp(typedPeriodCopy(t, 'photos_title', type, period), { n: (a.totalPhotoCount || photos.length).toLocaleString() })}
         </div>
         <div className="no-sb" style={{ flex: 1, overflowY: 'auto' }}>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 8 }}>
