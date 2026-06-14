@@ -75,7 +75,7 @@ function LockedState({ t, onUpload }) {
   );
 }
 
-export default function Modes({ analytics, history = [], t, onUpload, onRoastMode, onDuo, onChaos, onGuessWho }) {
+export default function Modes({ analytics, history = [], t, onUpload, onRoastMode, onDuo, onRuins, onGuessWho }) {
   // A chat the user already imported or picked from history counts as
   // "available" even before it's loaded into the active session — don't make
   // them feel locked out of something they just brought in.
@@ -143,13 +143,13 @@ export default function Modes({ analytics, history = [], t, onUpload, onRoastMod
             onClick={onDuo}
           />
           <ModeTile
-            label={t.menu_chaos_eyebrow || 'Chaos mode'}
-            title={t.menu_chaos_title || 'Chaos timeline'}
-            emoji="🌀"
-            gradient="linear-gradient(135deg, #573280 0%, #2a0645 100%)"
-            fg="#fff"
-            shadowColor="#1a0633"
-            onClick={onChaos}
+            label={t.menu_ruins_eyebrow || 'Ruins mode'}
+            title={t.menu_ruins_title || 'The Ruins'}
+            emoji="🏛️"
+            gradient="linear-gradient(135deg, #F9C74F 0%, #C9A876 100%)"
+            fg="#1B1813"
+            shadowColor="#7a5c2e"
+            onClick={onRuins}
           />
         </div>
       ) : (

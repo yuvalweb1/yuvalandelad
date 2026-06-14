@@ -802,7 +802,7 @@ export default {
   nav_home: 'בית',
   nav_modes: 'מצבים',
   modes_locked_title: 'פתח/י את המצבים שלך',
-  modes_locked_body: 'העלה/י צ׳אט כדי לגשת לרוסט, נחש מי אמר, דואו וכאוס',
+  modes_locked_body: 'העלה/י צ׳אט כדי לגשת לרוסט, נחש מי אמר, דואו והחורבות',
   modes_locked_cta: 'העלה/י צ׳אט',
   rm_back: 'חזור',
   rm_exhibit: 'מוצג',

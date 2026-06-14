@@ -546,6 +546,8 @@ export function computeAll(messages) {
       startDate: eraStart,
       endDate: eraEnd,
       msgPerDay: Math.round(eraMsgPerDay),
+      nightPct: Math.round(eraNightPct),
+      mediaPct: Math.round(eraMediaPct),
     });
   }
 
@@ -932,6 +934,9 @@ export function computeAll(messages) {
     // Guess Who? payload — a per-author pool of memorable quotes the
     // "who said this?" mode turns into a guessing game.
     guessWho: computeGuessWho(sorted, userMap),
+    // Ruins Mode payload — recurring short phrases ("running jokes"),
+    // up to 2, used to build Joke Shrine micro-cases.
+    runningJokes: computeRunningJokes(sorted),
   };
 }
 
@@ -1118,6 +1123,70 @@ function findLongestGap(messages) {
     days: Math.round(maxGap / (1000 * 60 * 60 * 24)),
     hours: Math.round(maxGap / (1000 * 60 * 60)),
   };
+}
+
+// ============================================================
+// computeRunningJokes — finds short messages the group kept repeating
+// over time: normalize text (strip links/emoji/punctuation, lowercase),
+// group exact matches, keep groups that recur >= 4 times across >= 3
+// distinct weeks. Returns up to 2, sorted by week-spread then count.
+// Feeds Ruins Mode's Joke Shrine micro-cases. Deterministic — same
+// input, same output.
+// ============================================================
+const RUNNING_JOKE_STOPLIST = new Set([
+  // English short reactions / greetings
+  'ok', 'okay', 'k', 'kk', 'yes', 'no', 'lol', 'lmao', 'lmaoo', 'haha', 'hahaha',
+  'hahahaha', 'yeah', 'yea', 'yep', 'nope', 'sure', 'thanks', 'thank you', 'thx',
+  'good morning', 'good night', 'morning', 'night', 'hi', 'hey', 'hello', 'same',
+  'true', 'exactly', 'wow', 'nice', 'cool', 'fine', 'omg', 'wtf', 'idk', 'np', 'np!',
+  'hmm', 'hmmm', 'hm', 'huh', 'mhm',
+  // Hebrew short reactions / greetings
+  'כן', 'לא', 'אוקיי', 'אוקי', 'תודה', 'בוקר טוב', 'לילה טוב', 'היי', 'שלום',
+  'סבבה', 'מעולה', 'נכון', 'בטח', 'אחלה', 'וואו', 'חחח', 'חחחח', 'חחחחח', 'חחחחחח',
+]);
+
+function normalizeJokeText(content) {
+  return content
+    .replace(LINK_RE, '')
+    .replace(EMOJI_RE, '')
+    .toLowerCase()
+    .replace(/[!?.,;:"'`~()*_\-]+/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+function computeRunningJokes(sorted) {
+  const WEEK_MS = 7 * 24 * 60 * 60 * 1000;
+  const groups = new Map();
+  for (const m of sorted) {
+    if (m.hasMedia || m.isVoice || m.isDeleted || m.isPoll) continue;
+    const norm = normalizeJokeText(m.content);
+    if (norm.length < 2 || RUNNING_JOKE_STOPLIST.has(norm)) continue;
+    const wordCount = norm.split(' ').filter(Boolean).length;
+    if (wordCount < 1 || wordCount > 6) continue;
+
+    let g = groups.get(norm);
+    if (!g) { g = { count: 0, authorCounts: new Map(), weeks: new Set(), samples: [] }; groups.set(norm, g); }
+    g.count++;
+    g.authorCounts.set(m.author, (g.authorCounts.get(m.author) || 0) + 1);
+    g.weeks.add(Math.floor(m.timestamp.getTime() / WEEK_MS));
+    if (g.samples.length < 20) {
+      g.samples.push({ author: m.author, content: m.content.length > 180 ? m.content.slice(0, 180) + '…' : m.content });
+    }
+  }
+
+  const candidates = [];
+  for (const [phrase, g] of groups) {
+    if (g.count < 4 || g.weeks.size < 3) continue;
+    const topAuthor = maxEntry(Object.fromEntries(g.authorCounts))?.[0] || null;
+    const mid = Math.floor(g.samples.length / 2);
+    const samples = g.samples.length > 1
+      ? [g.samples[0], g.samples[mid], g.samples[g.samples.length - 1]].filter((s, i, arr) => arr.findIndex(x => x === s) === i)
+      : g.samples;
+    candidates.push({ phrase, count: g.count, weeks: g.weeks.size, topAuthor, samples });
+  }
+  candidates.sort((a, b) => b.weeks - a.weeks || b.count - a.count);
+  return candidates.slice(0, 2);
 }
 
 // ============================================================

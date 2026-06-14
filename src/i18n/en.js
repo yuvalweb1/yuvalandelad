@@ -857,7 +857,7 @@ export default {
   nav_home: 'Home',
   nav_modes: 'Modes',
   modes_locked_title: 'Unlock your modes',
-  modes_locked_body: 'Upload a chat to access Roast, Guess Who, Duo & Chaos',
+  modes_locked_body: 'Upload a chat to access Roast, Guess Who, Duo & The Ruins',
   modes_locked_cta: 'Upload a chat',
   // Roast mode
   rm_back: 'Back',
