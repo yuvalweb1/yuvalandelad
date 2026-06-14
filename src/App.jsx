@@ -20,7 +20,6 @@ import VerifyView from './views/VerifyView.jsx';
 import RoastMode from './views/RoastMode.jsx';
 import Modes from './views/Modes.jsx';
 import DuoQuest from './views/DuoQuest.jsx';
-import RuinsOfGroup from './views/RuinsOfGroup.jsx';
 import GuessWho from './views/GuessWho.jsx';
 import Settings from './views/Settings.jsx';
 import VideoAdSlot from './components/VideoAdSlot.jsx';
@@ -118,6 +117,11 @@ function RecappedApp() {
     setRoastReturn(from);
     setStage(adEnabled('pre_roast') ? 'ad_pre_roast' : 'roastmode');
   }, []);
+
+  // Track the intended destination when loading a recap that needs onboarding.
+  // If a user clicks a mode before recap is loaded, onboarding completes to that
+  // mode instead of always going to wrapped.
+  const [onboardingDestination, setOnboardingDestination] = useState(null);
 
   // Premium plan flag — Phase 1: client-side only, no real payment yet.
   // Sync the boolean to localStorage AND to ADS.userPremium so the module-level
@@ -326,6 +330,7 @@ function RecappedApp() {
     // Wrapped into the mode they actually asked for — but onboarding can't
     // be skipped, so it still wins when the chat hasn't been profiled yet.
     if (!savedProfile.relationship) {
+      setOnboardingDestination(destination || 'wrapped');
       setStage('onboard');
     } else {
       setStage(destination || 'wrapped');
@@ -479,13 +484,19 @@ function RecappedApp() {
                 if (finalProfile.self && analytics.userMap[finalProfile.self]) {
                   setSelectedAuthor(finalProfile.self);
                 }
-                setStage(adEnabled('pre_wrapped') ? 'ad_pre_wrapped' : 'wrapped');
+                // Navigate to the intended destination (or wrapped if none specified)
+                const destination = onboardingDestination || 'wrapped';
+                setOnboardingDestination(null);
+                setStage(destination);
               }}
               onSkip={() => {
                 if (currentRecapId) {
                   updateRecapProfile(currentRecapId, profile);
                 }
-                setStage(adEnabled('pre_wrapped') ? 'ad_pre_wrapped' : 'wrapped');
+                // Navigate to the intended destination (or wrapped if none specified)
+                const destination = onboardingDestination || 'wrapped';
+                setOnboardingDestination(null);
+                setStage(destination);
               }}
             />
           )}
@@ -568,7 +579,6 @@ function RecappedApp() {
               onUpload={() => setStage('landing')}
               onRoastMode={() => enterMode('roastmode')}
               onDuo={() => enterMode('duo')}
-              onRuins={() => enterMode('ruins')}
               onGuessWho={() => enterMode('guesswho')}
             />
           )}
@@ -580,9 +590,6 @@ function RecappedApp() {
               lang={lang}
               onBack={() => setStage('modes')}
             />
-          )}
-          {stage === 'ruins' && (
-            <RuinsOfGroup analytics={analytics} diagnostics={diagnostics} fileName={fileName} t={t} lang={lang} isRTL={isRTL} onBack={() => setStage('modes')} />
           )}
           {stage === 'guesswho' && (
             <GuessWho analytics={analytics} t={t} onBack={() => setStage('modes')} />

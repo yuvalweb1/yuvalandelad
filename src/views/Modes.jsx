@@ -59,7 +59,7 @@ function LockedState({ t, onUpload }) {
       <div className="fs-sans" style={{
         fontSize: 14, lineHeight: 1.5, color: 'rgba(74,14,78,0.6)', maxWidth: 260,
       }}>
-        {t.modes_locked_body || 'Upload a chat to access Roast, Duo & Chaos'}
+        {t.modes_locked_body || 'Upload a chat to access Roast, Guess Who & Duo'}
       </div>
       <button onClick={onUpload} className="press" style={{
         marginTop: 6, padding: '14px 26px',
@@ -75,7 +75,7 @@ function LockedState({ t, onUpload }) {
   );
 }
 
-export default function Modes({ analytics, history = [], t, onUpload, onRoastMode, onDuo, onRuins, onGuessWho }) {
+export default function Modes({ analytics, history = [], t, onUpload, onRoastMode, onDuo, onGuessWho }) {
   // A chat the user already imported or picked from history counts as
   // "available" even before it's loaded into the active session — don't make
   // them feel locked out of something they just brought in.
@@ -141,15 +141,6 @@ export default function Modes({ analytics, history = [], t, onUpload, onRoastMod
             fg="#4A0E4E"
             shadowColor="#b56500"
             onClick={onDuo}
-          />
-          <ModeTile
-            label={t.menu_ruins_eyebrow || 'Ruins mode'}
-            title={t.menu_ruins_title || 'The Ruins'}
-            emoji="🏛️"
-            gradient="linear-gradient(135deg, #F9C74F 0%, #C9A876 100%)"
-            fg="#1B1813"
-            shadowColor="#7a5c2e"
-            onClick={onRuins}
           />
         </div>
       ) : (
