@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import BottomSheet from '../components/BottomSheet.jsx';
 import { RTL_LANGS, interp } from '../i18n';
 import { formatPrice } from '../lib/pricing.js';
@@ -38,10 +38,18 @@ export default function Settings({
   showDemo, setShowDemo,
   isPremium, setPremium, onUpgrade,
   history = [], onClearHistory,
+  onFile,
   onBack,
 }) {
   const [langOpen, setLangOpen] = useState(false);
   const [confirmClear, setConfirmClear] = useState(false);
+  const fileInputRef = useRef(null);
+
+  const handleFileChange = (e) => {
+    const f = e.target.files?.[0];
+    if (f) onFile?.(f);
+    e.target.value = '';
+  };
   const currentLang = LANGUAGES.find(l => l.code === lang) || LANGUAGES[0];
   const priceLabel = formatPrice(lang);
 
@@ -226,6 +234,42 @@ export default function Settings({
 
         {/* Data */}
         <Section icon="🗂️" title={t.settings_data || 'Data'} accent={MANGO}>
+          {onFile && (
+            <>
+              <input ref={fileInputRef} type="file" accept=".txt,.zip,application/zip,text/plain"
+                style={{ display: 'none' }}
+                onChange={handleFileChange} />
+              <button onClick={() => fileInputRef.current?.click()} className="press" style={{
+                width: '100%', display: 'flex', alignItems: 'center', gap: 12,
+                padding: '12px 14px', background: 'transparent', border: 'none',
+                cursor: 'pointer', textAlign: 'start',
+              }}>
+                <div style={{
+                  width: 36, height: 36, borderRadius: 12, flexShrink: 0,
+                  background: `${MANGO}1f`, border: `2px solid ${MANGO}44`,
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  fontSize: 18,
+                }}>📤</div>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div className="fs-sans" dir="auto" style={{
+                    fontSize: 15, fontWeight: 800, color: EGGPLANT, letterSpacing: '-0.01em', lineHeight: 1.25,
+                  }}>
+                    {t.settings_upload_title}
+                  </div>
+                  <div className="fs-mono" style={{
+                    fontSize: 11, color: 'rgba(74,14,78,0.55)', marginTop: 3, fontWeight: 600,
+                  }}>
+                    {t.settings_upload_hint}
+                  </div>
+                </div>
+                <span className="fs-mono" style={{
+                  fontSize: 12, color: MANGO, fontWeight: 800, flexShrink: 0,
+                  letterSpacing: '0.08em', whiteSpace: 'nowrap',
+                }}>{t.settings_upload_action}</span>
+              </button>
+              <div style={{ height: 1, background: 'rgba(74,14,78,0.08)', margin: '0 14px' }} />
+            </>
+          )}
           {history && history.length > 0 ? (
             confirmClear ? (
               <div style={{ display: 'flex', flexDirection: 'column', gap: 8, padding: 6 }}>

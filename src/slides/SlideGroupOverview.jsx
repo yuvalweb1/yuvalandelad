@@ -4,7 +4,7 @@ import SlideShell from './SlideShell.jsx';
 import ListSlideDecor from '../components/ListSlideDecor.jsx';
 import { typedCopy, typedPeriodCopy } from '../i18n';
 
-function RevealTile({ question, icon, color, numValue, strValue, label, sub, delay }) {
+function RevealTile({ question, icon, color, numValue, strValue, label, sub, delay, revealLabel = 'Reveal' }) {
   const [flipped, setFlipped] = useState(false);
   const animated = useAnimatedNumber(flipped && numValue != null ? numValue : 0, 1400, [flipped]);
   const display = strValue != null ? strValue : animated.toLocaleString();
@@ -66,7 +66,7 @@ function RevealTile({ question, icon, color, numValue, strValue, label, sub, del
             <span className="fs-sans" style={{
               fontSize: 11, fontWeight: 800, letterSpacing: '0.1em',
               textTransform: 'uppercase', color: '#fff',
-            }}>Reveal</span>
+            }}>{revealLabel}</span>
           </div>
         </div>
 
@@ -115,10 +115,10 @@ const SlideGroupOverview = React.memo(function SlideGroupOverview({ a, t, profil
   const range = `${fmt(a.start)} – ${fmt(a.end)}`;
 
   const tiles = [
-    { question: t.go_q_messages, numValue: a.totalMessages, label: t.go_messages, icon: '💬', color: '#8338ec', delay: '0.3s' },
-    { question: t.go_q_people, numValue: a.totalParticipants, label: t.go_people, icon: '👥', color: '#f3722c', delay: '0.45s' },
-    { question: t.go_q_days, numValue: a.durationDays, label: t.go_days, sub: range, icon: '📅', color: '#277da1', delay: '0.6s' },
-    { question: t.go_q_peakhour, strValue: peakHourStr, label: t.go_peakhour, icon: '⏰', color: '#e05c8a', delay: '0.75s' },
+    { question: t.go_q_messages, numValue: a.totalMessages, label: t.go_messages, icon: '💬', color: '#8338ec', delay: '0.3s', revealLabel: t.reveal_button || 'Reveal' },
+    { question: t.go_q_people, numValue: a.totalParticipants, label: t.go_people, icon: '👥', color: '#f3722c', delay: '0.45s', revealLabel: t.reveal_button || 'Reveal' },
+    { question: t.go_q_days, numValue: a.durationDays, label: t.go_days, sub: range, icon: '📅', color: '#277da1', delay: '0.6s', revealLabel: t.reveal_button || 'Reveal' },
+    { question: t.go_q_peakhour, strValue: peakHourStr, label: t.go_peakhour, icon: '⏰', color: '#e05c8a', delay: '0.75s', revealLabel: t.reveal_button || 'Reveal' },
   ];
 
   return (

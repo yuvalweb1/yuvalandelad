@@ -169,11 +169,6 @@ function RecappedApp() {
     setStage(adEnabled('pre_roast') ? 'ad_pre_roast' : 'roastmode');
   }, []);
 
-  // Track the intended destination when loading a recap that needs onboarding.
-  // If a user clicks a mode before recap is loaded, onboarding completes to that
-  // mode instead of always going to wrapped.
-  const [onboardingDestination, setOnboardingDestination] = useState(null);
-
   // Premium plan flag — Phase 1: client-side only, no real payment yet.
   // Sync the boolean to localStorage AND to ADS.userPremium so the module-level
   // adEnabled() returns false everywhere when premium is on.
@@ -443,17 +438,17 @@ function RecappedApp() {
     setCurrentRecapId(id);
     setSelectedRecapId(id);
     setSlide(0);
-    // First time: relationship hasn't been chosen yet, show onboarding.
+    // First time landing on Wrapped: relationship hasn't been chosen yet,
+    // show onboarding (it picks the slide deck via `profile.relationship`).
     // Onboarding only collects `self` + `relationship` (not `tone`), so
     // `relationship` is the signal that the user has been through it.
-    // `destination` lets callers (e.g. the Modes hub) skip straight past
-    // Wrapped into the mode they actually asked for — but onboarding can't
-    // be skipped, so it still wins when the chat hasn't been profiled yet.
-    if (!savedProfile.relationship) {
-      setOnboardingDestination(destination || 'wrapped');
+    // Game modes (Modes hub) don't read `profile` at all, so a `destination`
+    // other than 'wrapped' skips onboarding entirely and goes straight in.
+    const dest = destination || 'wrapped';
+    if (!savedProfile.relationship && dest === 'wrapped') {
       setStage('onboard');
     } else {
-      setStage(destination || 'wrapped');
+      setStage(dest);
     }
   }, []);
 
@@ -496,7 +491,8 @@ function RecappedApp() {
     if (!mostRecent) return;
     if (destination === 'roastmode') {
       setRoastReturn('modes');
-      handleLoadRecap(mostRecent.id, adEnabled('pre_roast') ? 'ad_pre_roast' : 'roastmode');
+      const dest = adEnabled('pre_roast') ? 'ad_pre_roast' : 'roastmode';
+      handleLoadRecap(mostRecent.id, dest);
     } else {
       handleLoadRecap(mostRecent.id, destination);
     }
@@ -639,19 +635,13 @@ function RecappedApp() {
                 if (finalProfile.self && fullAnalytics.userMap[finalProfile.self]) {
                   setSelectedAuthor(finalProfile.self);
                 }
-                // Navigate to the intended destination (or wrapped if none specified)
-                const destination = onboardingDestination || 'wrapped';
-                setOnboardingDestination(null);
-                setStage(destination);
+                setStage('wrapped');
               }}
               onSkip={() => {
                 if (currentRecapId) {
                   updateRecapProfile(currentRecapId, profile);
                 }
-                // Navigate to the intended destination (or wrapped if none specified)
-                const destination = onboardingDestination || 'wrapped';
-                setOnboardingDestination(null);
-                setStage(destination);
+                setStage('wrapped');
               }}
             />
           )}
@@ -708,6 +698,7 @@ function RecappedApp() {
               onUpgrade={() => setPaymentOpen(true)}
               history={history}
               onClearHistory={handleClearHistory}
+              onFile={handleFile}
               onBack={() => setStage(settingsReturn)}
             />
           )}

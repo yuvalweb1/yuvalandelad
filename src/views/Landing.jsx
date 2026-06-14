@@ -382,22 +382,22 @@ export default function Landing({
           style={{ display: 'none' }}
           onChange={handleFileChange} />
 
-        {/* Prereq card — shows the 2-step flow so the upload CTA has context */}
+        {/* Prereq card — single focus: the export step, now the primary CTA */}
         {onHowTo && (
           <div className={howToPulse ? 'guide-pulse' : ''} style={{
-            marginBottom: 10,
+            marginBottom: 14,
             background: 'rgba(255,255,255,0.82)',
             border: '1.5px solid rgba(255,255,255,0.95)',
             borderRadius: 18,
-            padding: '11px 12px',
+            padding: '14px 14px',
             boxShadow: '0 6px 0 rgba(74,14,78,0.14), 0 16px 28px -8px rgba(74,14,78,0.22)',
           }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 9 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
               <div style={{
                 flexShrink: 0, width: 7, height: 7, borderRadius: 999,
                 background: '#4A0E4E', marginLeft: 2,
               }} />
-              <div className="fs-sans" dir="auto" style={{ flex: 1, minWidth: 0, fontSize: 15, fontWeight: 700, color: '#2a0645', lineHeight: 1.25, overflowWrap: 'break-word', wordBreak: 'break-word' }}>
+              <div className="fs-sans" dir="auto" style={{ flex: 1, minWidth: 0, fontSize: 15, fontWeight: 700, color: '#2a0645', lineHeight: 1.3, overflowWrap: 'break-word', wordBreak: 'break-word' }}>
                 {t.landing_step1}
               </div>
               <button onClick={onHowTo} className="press fs-sans" style={{
@@ -409,49 +409,27 @@ export default function Landing({
                 {t.howto_link}
               </button>
             </div>
-            <div style={{ height: 1, background: 'rgba(74,14,78,0.07)', margin: '9px 0' }} />
-            <button onClick={() => fileInputRef.current?.click()} className="press fs-sans" style={{
-              display: 'flex', alignItems: 'center', gap: 9,
-              width: '100%', background: 'transparent', border: 'none',
-              padding: 0, cursor: 'pointer', textAlign: 'start',
-            }}>
-              <div style={{
-                flexShrink: 0, width: 5, height: 5, borderRadius: 999,
-                background: 'rgba(74,14,78,0.35)', marginLeft: 3,
-              }} />
-              <div dir="auto" style={{ flex: 1, minWidth: 0, fontSize: 12, fontWeight: 500, color: 'rgba(74,14,78,0.55)', lineHeight: 1.25, overflowWrap: 'break-word', wordBreak: 'break-word' }}>
-                {t.landing_step2}
-              </div>
-              <div dir="auto" style={{
-                flexShrink: 0, padding: '8.25px 13.5px',
-                background: 'rgba(74,14,78,0.06)', border: '1px solid rgba(74,14,78,0.08)',
-                borderRadius: 9, color: 'rgba(74,14,78,0.50)', fontSize: 11.25, fontWeight: 600,
-                whiteSpace: 'nowrap', letterSpacing: '-0.01em',
-              }}>
-                {t.landing_upload_btn || 'Upload ↑'}
-              </div>
-            </button>
           </div>
         )}
 
-        {/* Main CTA — active when a chat is selected */}
+        {/* Main CTA — primary action, gets the strongest visual weight */}
         <button
           onClick={handleCtaMain}
           className={`press${shaking && !hasSelection ? ' cta-shake' : ''}`}
           style={{
             width: '100%', position: 'relative', overflow: 'hidden',
-            padding: '20px 18px',
-            color: hasSelection ? '#4A0E4E' : 'rgba(74,14,78,0.58)',
+            padding: '22px 20px',
+            color: hasSelection ? '#2a0645' : 'rgba(74,14,78,0.58)',
             background: hasSelection
               ? 'linear-gradient(135deg, #FFD700 0%, #FFC200 100%)'
               : 'linear-gradient(135deg, rgba(235,215,200,0.78) 0%, rgba(218,205,188,0.72) 100%)',
             border: hasSelection ? '2px solid rgba(255,255,255,0.80)' : '2px solid rgba(255,255,255,0.72)',
-            borderRadius: 22,
-            fontSize: 20, fontWeight: 800,
+            borderRadius: 24,
+            fontSize: 21, fontWeight: 800,
             cursor: hasSelection ? 'pointer' : 'default',
             letterSpacing: '-0.01em',
             boxShadow: hasSelection
-              ? '0 6px 0 rgba(74,14,78,0.25), 0 14px 24px -6px rgba(74,14,78,0.30)'
+              ? '0 8px 0 rgba(74,14,78,0.28), 0 18px 32px -8px rgba(74,14,78,0.32)'
               : '0 4px 0 rgba(74,14,78,0.13), 0 10px 20px -6px rgba(74,14,78,0.14)',
             opacity: hasSelection ? 1 : 0.88,
             transition: 'background 0.25s, color 0.25s, box-shadow 0.25s, opacity 0.25s',
@@ -459,7 +437,7 @@ export default function Landing({
           <span className="fs-display" style={{ position: 'relative' }}>{t.landing_cta}</span>
         </button>
 
-        {/* Secondary: demo only — how-to is now surfaced in the prereq card above */}
+        {/* Secondary: demo only — upload-existing-file moved to Settings */}
         {onDemo && (
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', marginTop: 12 }}>
             <button onClick={handleDemo} className="press fs-sans" style={{
