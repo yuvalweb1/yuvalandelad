@@ -122,9 +122,13 @@ export const DELETED_PATTERNS = [
 // Pseudo-authors WhatsApp puts on the exporter's OWN system actions
 // (never real contact names): the gender-neutral Hebrew pronoun "את/ה"
 // and the English "You". Excluded so they don't appear as a participant.
+// "Unknown" covers WhatsApp's placeholder for unattributable notifications
+// (most commonly a missed group call) — shows up as a "participant" with
+// exactly 1 message in groups where one of those occurred.
 export const SYSTEM_AUTHOR_NAMES = new Set([
   'את/ה', 'את\\ה',
   'You', '~You',
+  'Unknown',
 ]);
 
 // Group-IDENTITY notices: the end-to-end-encryption notice is attributed by

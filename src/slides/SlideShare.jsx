@@ -41,9 +41,7 @@ const ORANGE   = '#FF8C00';
 const CREAM    = '#FFF6D6';
 const PINK     = '#FDE6F1';
 
-// App isn't published yet — link to the Play Store front page as a placeholder
-// until there's a real listing to deep-link to.
-const GOOGLE_PLAY_URL = 'https://play.google.com/store';
+const GOOGLE_PLAY_URL = 'https://play.google.com/store/apps/details?id=com.recapped.app';
 
 const OPTIONS = [
   { id: 'A', nameKey: 'share_style_a', glyph: '🍌', grad: ['#FFE259', '#FFA751'], ink: INK_PLUM, Comp: CardBananaDrop },
@@ -322,7 +320,7 @@ const SlideShare = React.memo(function SlideShare({ a, t, profile, diagnostics, 
     return new Promise(resolve => canvas.toBlob(resolve, 'image/png', 0.95));
   }
 
-  const shareText = `${headline} ${headLabel}. ${t.share_caught || 'on ChatWrapped'} → ${location.origin}`;
+  const shareText = `${headline} ${headLabel}. ${t.share_caught || 'on ChatWrapped'} → ${GOOGLE_PLAY_URL}`;
   const whatsappShareText = `${t.share_whatsapp_message || 'Use Recap for your next group!'} ${GOOGLE_PLAY_URL}`;
 
   const onShareWhatsApp = async () => {
@@ -381,7 +379,7 @@ const SlideShare = React.memo(function SlideShare({ a, t, profile, diagnostics, 
         catch (e) { if (e?.name === 'AbortError') return; }
       }
       if (navigator.share) {
-        try { await navigator.share({ text: shareText, url: location.origin }); return; }
+        try { await navigator.share({ text: shareText, url: GOOGLE_PLAY_URL }); return; }
         catch (e) { if (e?.name === 'AbortError') return; }
       }
       // No share sheet at all (older desktop browsers): copy link to clipboard.

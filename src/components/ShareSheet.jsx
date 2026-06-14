@@ -9,13 +9,11 @@
 // ============================================================
 import { useEffect, useState } from 'react';
 
-// Compose the share URL from the live origin so it works wherever the
-// app is hosted. Falls back to a sensible default during SSR / build.
+// Share links always point to the Play Store listing.
+const PLAY_STORE_URL = 'https://play.google.com/store/apps/details?id=com.recapped.app';
+
 function appUrl() {
-  if (typeof window !== 'undefined' && window.location && window.location.origin) {
-    return window.location.origin;
-  }
-  return 'https://recapped.app';
+  return PLAY_STORE_URL;
 }
 
 // Brand-colored circular icon. Children is the glyph (SVG or text).

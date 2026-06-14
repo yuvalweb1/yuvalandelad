@@ -114,7 +114,9 @@
       "Bash(mkdir -p play-store/canva)",
       "Bash(curl -sL \"https://design.canva.ai/_8Afd45vu70v0PX\" -o play-store/canva/opt1.png)",
       "mcp__claude_ai_Canva__create-design-from-candidate",
-      "mcp__claude_ai_Canva__export-design"
+      "mcp__claude_ai_Canva__export-design",
+      "PowerShell(node scripts/i18n-check.mjs)",
+      "PowerShell(node scripts/ruins-verify.mjs)"
     ],
     "additionalDirectories": [
       "\\tmp"

@@ -188,7 +188,7 @@ function PersonSheet({ open, users, selected, onPick, onClose, t }) {
 // ── Main component ─────────────────────────────────────────────────────────
 export default function PostMenu({
   analytics, diagnostics, selectedAuthor, setSelectedAuthor, t,
-  onReplay, onReset, onDebug, onRoastMode, onDuo, onChaos, onProfile, onOpenSettings,
+  onReplay, onReset, onDebug, onRoastMode, onDuo, onRuins, onProfile, onOpenSettings,
 }) {
   const [sheetOpen, setSheetOpen] = useState(false);
 
@@ -325,15 +325,15 @@ export default function PostMenu({
             onClick={onDuo}
           />
         )}
-        {onChaos && (
+        {onRuins && (
           <ModeTile
-            label={t.menu_chaos_eyebrow || 'Chaos mode'}
-            title={t.menu_chaos_title || 'Chaos timeline'}
-            emoji="🌀"
-            gradient="linear-gradient(135deg, #00BFFF 0%, #573280 100%)"
-            fg="#fff"
-            shadowColor="#2e1856"
-            onClick={onChaos}
+            label={t.menu_ruins_eyebrow || 'Ruins mode'}
+            title={t.menu_ruins_title || 'The Ruins'}
+            emoji="🏛️"
+            gradient="linear-gradient(135deg, #F9C74F 0%, #C9A876 100%)"
+            fg="#1B1813"
+            shadowColor="#7a5c2e"
+            onClick={onRuins}
           />
         )}
       </div>
