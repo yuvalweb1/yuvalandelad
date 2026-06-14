@@ -20,7 +20,8 @@ import VerifyView from './views/VerifyView.jsx';
 import RoastMode from './views/RoastMode.jsx';
 import Modes from './views/Modes.jsx';
 import DuoQuest from './views/DuoQuest.jsx';
-import RuinsOfGroup from './views/RuinsOfGroup.jsx';
+import ChaosTimeline from './views/ChaosTimeline.jsx';
+import GuessWho from './views/GuessWho.jsx';
 import Settings from './views/Settings.jsx';
 import VideoAdSlot from './components/VideoAdSlot.jsx';
 import PremiumPromo, { shouldShowPromo, markPromoDismissed } from './components/PremiumPromo.jsx';
@@ -567,7 +568,8 @@ function RecappedApp() {
               onUpload={() => setStage('landing')}
               onRoastMode={() => enterMode('roastmode')}
               onDuo={() => enterMode('duo')}
-              onRuins={() => enterMode('ruins')}
+              onChaos={() => enterMode('chaos')}
+              onGuessWho={() => enterMode('guesswho')}
             />
           )}
           {stage === 'duo' && analytics && (
@@ -579,8 +581,11 @@ function RecappedApp() {
               onBack={() => setStage('modes')}
             />
           )}
-          {stage === 'ruins' && (
-            <RuinsOfGroup analytics={analytics} diagnostics={diagnostics} fileName={fileName} t={t} lang={lang} isRTL={isRTL} onBack={() => setStage('modes')} />
+          {stage === 'chaos' && (
+            <ChaosTimeline analytics={analytics} t={t} lang={lang} onBack={() => setStage('modes')} />
+          )}
+          {stage === 'guesswho' && (
+            <GuessWho analytics={analytics} t={t} onBack={() => setStage('modes')} />
           )}
         </div>
         {(stage === 'landing' || stage === 'modes') && (

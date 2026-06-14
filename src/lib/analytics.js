@@ -546,8 +546,6 @@ export function computeAll(messages) {
       startDate: eraStart,
       endDate: eraEnd,
       msgPerDay: Math.round(eraMsgPerDay),
-      nightPct: Math.round(eraNightPct),
-      mediaPct: Math.round(eraMediaPct),
     });
   }
 
@@ -931,9 +929,9 @@ export function computeAll(messages) {
     // Includes top peaks (with the actual message excerpts!), 5 named
     // awards, and a daily seismogram for the year-strip visualisation.
     chaos: computeChaos(sorted),
-    // Ruins Mode payload — recurring short phrases ("running jokes"),
-    // up to 2, used to build Joke Shrine micro-cases.
-    runningJokes: computeRunningJokes(sorted),
+    // Guess Who? payload — a per-author pool of memorable quotes the
+    // "who said this?" mode turns into a guessing game.
+    guessWho: computeGuessWho(sorted, userMap),
   };
 }
 
@@ -1086,70 +1084,6 @@ function computeChaos(messages) {
   return { peaks, awards, seismogram, totalDays: allDays.length };
 }
 
-// ============================================================
-// computeRunningJokes — finds short messages the group kept repeating
-// over time: normalize text (strip links/emoji/punctuation, lowercase),
-// group exact matches, keep groups that recur >= 4 times across >= 3
-// distinct weeks. Returns up to 2, sorted by week-spread then count.
-// Feeds Ruins Mode's Joke Shrine micro-cases. Deterministic — same
-// input, same output.
-// ============================================================
-const RUNNING_JOKE_STOPLIST = new Set([
-  // English short reactions / greetings
-  'ok', 'okay', 'k', 'kk', 'yes', 'no', 'lol', 'lmao', 'lmaoo', 'haha', 'hahaha',
-  'hahahaha', 'yeah', 'yea', 'yep', 'nope', 'sure', 'thanks', 'thank you', 'thx',
-  'good morning', 'good night', 'morning', 'night', 'hi', 'hey', 'hello', 'same',
-  'true', 'exactly', 'wow', 'nice', 'cool', 'fine', 'omg', 'wtf', 'idk', 'np', 'np!',
-  'hmm', 'hmmm', 'hm', 'huh', 'mhm',
-  // Hebrew short reactions / greetings
-  'כן', 'לא', 'אוקיי', 'אוקי', 'תודה', 'בוקר טוב', 'לילה טוב', 'היי', 'שלום',
-  'סבבה', 'מעולה', 'נכון', 'בטח', 'אחלה', 'וואו', 'חחח', 'חחחח', 'חחחחח', 'חחחחחח',
-]);
-
-function normalizeJokeText(content) {
-  return content
-    .replace(LINK_RE, '')
-    .replace(EMOJI_RE, '')
-    .toLowerCase()
-    .replace(/[!?.,;:"'`~()*_\-]+/g, ' ')
-    .replace(/\s+/g, ' ')
-    .trim();
-}
-
-function computeRunningJokes(sorted) {
-  const WEEK_MS = 7 * 24 * 60 * 60 * 1000;
-  const groups = new Map();
-  for (const m of sorted) {
-    if (m.hasMedia || m.isVoice || m.isDeleted || m.isPoll) continue;
-    const norm = normalizeJokeText(m.content);
-    if (norm.length < 2 || RUNNING_JOKE_STOPLIST.has(norm)) continue;
-    const wordCount = norm.split(' ').filter(Boolean).length;
-    if (wordCount < 1 || wordCount > 6) continue;
-
-    let g = groups.get(norm);
-    if (!g) { g = { count: 0, authorCounts: new Map(), weeks: new Set(), samples: [] }; groups.set(norm, g); }
-    g.count++;
-    g.authorCounts.set(m.author, (g.authorCounts.get(m.author) || 0) + 1);
-    g.weeks.add(Math.floor(m.timestamp.getTime() / WEEK_MS));
-    if (g.samples.length < 20) {
-      g.samples.push({ author: m.author, content: m.content.length > 180 ? m.content.slice(0, 180) + '…' : m.content });
-    }
-  }
-
-  const candidates = [];
-  for (const [phrase, g] of groups) {
-    if (g.count < 4 || g.weeks.size < 3) continue;
-    const topAuthor = maxEntry(Object.fromEntries(g.authorCounts))?.[0] || null;
-    const mid = Math.floor(g.samples.length / 2);
-    const samples = g.samples.length > 1
-      ? [g.samples[0], g.samples[mid], g.samples[g.samples.length - 1]].filter((s, i, arr) => arr.findIndex(x => x === s) === i)
-      : g.samples;
-    candidates.push({ phrase, count: g.count, weeks: g.weeks.size, topAuthor, samples });
-  }
-  candidates.sort((a, b) => b.weeks - a.weeks || b.count - a.count);
-  return candidates.slice(0, 2);
-}
-
 // Title generator for a peak minute — gives each one a flavour so
 // the UI doesn't read like a spreadsheet. Deterministic.
 function peakTitle(b) {
@@ -1184,4 +1118,71 @@ function findLongestGap(messages) {
     days: Math.round(maxGap / (1000 * 60 * 60 * 24)),
     hours: Math.round(maxGap / (1000 * 60 * 60)),
   };
+}
+
+// ============================================================
+// computeGuessWho — builds a pool of memorable, "guessable" quotes
+// per author for the "Who said this?" mode. The view turns the pool
+// into rounds (the real author + decoys) on its own.
+//
+// A good quote is text-only (no media/voice/links), long enough to
+// carry personality but short enough to fit a card, and ideally
+// carries the author's signature (their top word/emoji) so a guess
+// is fair-but-fun rather than a coin flip. Everything here is a pure,
+// deterministic function of the messages — same chat → same pool.
+//   Returns { quotes: [{ author, content }], authors: [names] }
+// ============================================================
+function computeGuessWho(messages, userMap) {
+  const PER_AUTHOR = 4;
+  const byAuthor = new Map(); // author -> [{ content, score, key }]
+
+  for (const m of messages) {
+    // Only clean, quotable text — media/voice/poll/links don't read as a quote.
+    if (m.hasMedia || m.isVoice || m.isPoll || m.hasLink || !m.content) continue;
+    const wc = m.wordCount || 0;
+    if (wc < 3 || wc > 28) continue;
+    const text = m.content.replace(/\s+/g, ' ').trim();
+    if (text.length < 12 || text.length > 160) continue;
+
+    const u = userMap[m.author];
+    const lower = text.toLowerCase();
+    // Score for guessability + personality.
+    let score = Math.max(0, 8 - Math.abs(wc - 11)); // length sweet spot ≈ 11 words
+    if (m.isQuestion) score += 1.5;
+    score += Math.min(3, (text.match(/!/g) || []).length);
+    if (m.emojis?.length) score += Math.min(3, m.emojis.length);
+    // Signature word/emoji makes the author recognisable without being a gimme.
+    if (u?.topWord && u.topWordCount >= 8 && lower.includes(u.topWord)) score += 4;
+    if (u?.topEmoji && m.emojis?.includes(u.topEmoji)) score += 3;
+    if (/\b[A-Z]{3,}\b/.test(text)) score += 1; // English caps energy (Hebrew has no case)
+
+    // Collapse near-duplicates from the same author (e.g. they spam one phrase).
+    const key = lower.replace(/[^a-zא-ת0-9]/gi, '').slice(0, 24);
+    if (!key) continue;
+    let list = byAuthor.get(m.author);
+    if (!list) { list = []; byAuthor.set(m.author, list); }
+    const existing = list.find(q => q.key === key);
+    if (existing) {
+      if (score > existing.score) { existing.content = text; existing.score = score; }
+    } else {
+      list.push({ content: text, score, key });
+    }
+  }
+
+  // Stable author order (by volume) so the pool — and any saved recap — is
+  // reproducible. Tiebreak on name to stay deterministic.
+  const sortedAuthors = [...byAuthor.keys()].sort((a, b) =>
+    (userMap[b]?.messageCount || 0) - (userMap[a]?.messageCount || 0) || (a < b ? -1 : 1));
+
+  const quotes = [];
+  const authors = [];
+  for (const author of sortedAuthors) {
+    const top = byAuthor.get(author)
+      .sort((x, y) => y.score - x.score || (x.content < y.content ? -1 : 1))
+      .slice(0, PER_AUTHOR);
+    if (!top.length) continue;
+    authors.push(author);
+    for (const q of top) quotes.push({ author, content: q.content });
+  }
+  return { quotes, authors };
 }

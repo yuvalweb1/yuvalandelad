@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Recapped — Notification Storm</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@700;800&family=DM+Sans:wght@400;500&family=Instrument+Serif:ital@0;1&family=Inter+Tight:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { margin: 0; width: 1080px; height: 1920px; overflow: hidden; }
+
+  body {
+    position: relative;
+    font-family: 'DM Sans', sans-serif;
+    background:
+      radial-gradient(120% 80% at 50% 0%, rgba(255,24,103,0.32) 0%, transparent 55%),
+      linear-gradient(180deg, #1a0a3a 0%, #2a0645 60%, #0A192F 100%);
+    color: #fff;
+  }
+
+  /* ---------- background art (full bleed) ---------- */
+  .glow { position: absolute; border-radius: 50%; filter: blur(110px); pointer-events: none; }
+  .glow-magenta { width: 760px; height: 760px; left: -240px; top: 540px; background: rgba(255,24,103,0.22); }
+  .glow-sky     { width: 640px; height: 640px; right: -260px; top: 980px; background: rgba(0,191,255,0.16); }
+  .glow-mango   { width: 560px; height: 560px; left: 50%; transform: translateX(-50%); bottom: -260px; background: rgba(255,140,0,0.14); }
+
+  .ghost-num {
+    position: absolute; top: 1100px; left: 50%; transform: translateX(-50%) rotate(-4deg);
+    font-family: 'Inter Tight', sans-serif; font-weight: 800; font-size: 420px;
+    letter-spacing: -0.04em; color: rgba(255,255,255,0.025); white-space: nowrap;
+    font-variant-numeric: tabular-nums; pointer-events: none;
+  }
+
+  .speck { position: absolute; border-radius: 50%; background: rgba(255,255,255,0.35); pointer-events: none; }
+
+  /* tiny stray unread badges floating in the storm */
+  .stray {
+    position: absolute; font-family: 'JetBrains Mono', monospace; font-weight: 700;
+    font-size: 30px; padding: 8px 22px; border-radius: 999px;
+    background: rgba(255,24,103,0.22); color: rgba(255,214,228,0.75);
+    border: 1px solid rgba(255,24,103,0.35);
+  }
+
+  /* ---------- layout column ---------- */
+  .stage {
+    position: absolute; inset: 0;
+    display: flex; flex-direction: column; align-items: center;
+    padding: 226px 56px 0;
+  }
+
+  /* ---------- eyebrow ---------- */
+  .eyebrow {
+    display: flex; align-items: center; gap: 18px;
+    font-family: 'JetBrains Mono', monospace; font-weight: 600;
+    font-size: 30px; letter-spacing: 0.34em; text-transform: uppercase;
+    color: rgba(255,246,214,0.85);
+  }
+  .eyebrow .dot {
+    width: 22px; height: 22px; border-radius: 50%;
+    background: linear-gradient(160deg, #00BFFF 0%, #7A5CFF 38%, #FF69B4 68%, #FF8C00 100%);
+    box-shadow: 0 0 18px rgba(255,105,180,0.7);
+  }
+
+  /* ---------- headline ---------- */
+  .headline { text-align: center; margin-top: 30px; }
+  .headline .line1 {
+    font-family: 'Bricolage Grotesque', sans-serif; font-weight: 800;
+    font-size: 112px; line-height: 1; letter-spacing: -0.028em;
+    white-space: nowrap;
+    background: linear-gradient(135deg, #FF1867 0%, #f06449 50%, #FFD700 100%);
+    -webkit-background-clip: text; background-clip: text; color: transparent;
+    padding-bottom: 6px;
+  }
+  .headline .line2 {
+    font-family: 'Instrument Serif', serif; font-style: italic; font-weight: 400;
+    font-size: 128px; line-height: 0.96; color: #FFF6D6;
+    margin-top: 2px; white-space: nowrap;
+  }
+
+  /* ---------- notification cascade ---------- */
+  .cascade {
+    width: 100%; margin-top: 34px;
+    display: flex; flex-direction: column;
+  }
+
+  .notif {
+    background: rgba(255,255,255,0.07);
+    -webkit-backdrop-filter: blur(20px); backdrop-filter: blur(20px);
+    border: 1px solid rgba(255,255,255,0.14);
+    border-radius: 22px;
+    padding: 18px 30px;
+  }
+  .notif-head { display: flex; align-items: center; gap: 18px; }
+  .avatar {
+    width: 52px; height: 52px; border-radius: 50%; flex: 0 0 auto;
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Bricolage Grotesque', sans-serif; font-weight: 800;
+    font-size: 28px; color: #1a0a3a;
+  }
+  .sender { font-family: 'Inter Tight', sans-serif; font-weight: 700; font-size: 32px; color: #fff; }
+  .when { margin-left: auto; font-family: 'JetBrains Mono', monospace; font-size: 30px; color: rgba(255,255,255,0.55); }
+  .preview { margin-top: 10px; font-size: 35px; line-height: 1.22; color: rgba(255,255,255,0.92); font-weight: 500; }
+
+  /* per-card placement: widths, rotation, fade, blur — oldest at top */
+  .n1 { width: 730px; align-self: flex-start; margin-left: 8px;
+        transform: rotate(-2.6deg) scale(0.96); opacity: 0.42; filter: blur(2.2px); }
+  .n2 { width: 520px; align-self: flex-end; margin-right: 14px; margin-top: -46px;
+        transform: rotate(2.1deg) scale(0.97); opacity: 0.58; filter: blur(1.2px); }
+  .n3 { width: 420px; align-self: flex-start; margin-left: 92px; margin-top: -42px;
+        transform: rotate(-1.6deg); opacity: 0.74; filter: blur(0.4px); }
+
+  /* system-style chip */
+  .sys {
+    align-self: center; margin-top: -24px;
+    display: flex; align-items: center; gap: 20px;
+    background: rgba(255,255,255,0.09);
+    border: 1px solid rgba(255,255,255,0.16);
+    border-radius: 999px; padding: 14px 34px;
+    transform: rotate(1.1deg); opacity: 0.88;
+  }
+  .sys .count {
+    font-family: 'Inter Tight', sans-serif; font-weight: 800; font-size: 34px;
+    font-variant-numeric: tabular-nums;
+    background: rgba(255,24,103,0.85); color: #fff;
+    border-radius: 999px; padding: 4px 20px;
+  }
+  .sys .label { font-family: 'DM Sans', sans-serif; font-size: 33px; color: rgba(255,246,214,0.92); }
+
+  /* ---------- focal card ---------- */
+  .focal-wrap {
+    align-self: center; width: 100%; margin-top: 14px;
+    background: linear-gradient(160deg, #00BFFF 0%, #7A5CFF 38%, #FF69B4 68%, #FF8C00 100%);
+    padding: 3px; border-radius: 28px;
+    transform: rotate(-1deg);
+    box-shadow:
+      0 10px 0 rgba(74,14,78,0.22),
+      0 22px 45px -8px rgba(74,14,78,0.45),
+      0 0 80px rgba(255,24,103,0.35);
+  }
+  .focal {
+    background: linear-gradient(180deg, rgba(26,10,58,0.97) 0%, rgba(10,25,47,0.97) 100%);
+    border-radius: 25px; padding: 26px 38px 28px;
+  }
+  .focal .notif-head { gap: 20px; }
+  .app-icon {
+    width: 56px; height: 56px; border-radius: 16px; flex: 0 0 auto; position: relative;
+    background: linear-gradient(160deg, #00BFFF 0%, #7A5CFF 38%, #FF69B4 68%, #FF8C00 100%);
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Bricolage Grotesque', sans-serif; font-weight: 800; font-size: 32px; color: #0A192F;
+  }
+  .badge {
+    position: absolute; top: -12px; right: -14px;
+    background: #FF1867; color: #fff; border-radius: 999px;
+    font-family: 'Inter Tight', sans-serif; font-weight: 800; font-size: 24px;
+    padding: 3px 12px; box-shadow: 0 4px 12px rgba(255,24,103,0.6);
+  }
+  .focal .sender { font-size: 34px; letter-spacing: 0.02em; }
+  .focal-title {
+    margin-top: 16px;
+    font-family: 'Bricolage Grotesque', sans-serif; font-weight: 800;
+    font-size: 48px; line-height: 1.08; letter-spacing: -0.01em;
+  }
+  .focal-title .grad {
+    background: linear-gradient(180deg, #ffffff 0%, #ffffff 38%, #FFE08A 56%, #FF9CE0 88%);
+    -webkit-background-clip: text; background-clip: text; color: transparent;
+  }
+  .focal-sub {
+    margin-top: 6px;
+    font-family: 'Instrument Serif', serif; font-style: italic;
+    font-size: 38px; color: #FF9CE0;
+  }
+  .divider { height: 1px; background: rgba(255,255,255,0.14); margin: 18px 0 12px; }
+  .mini { display: flex; align-items: baseline; gap: 16px; padding: 5px 0; font-size: 32px; }
+  .mini .ic { font-size: 31px; flex: 0 0 46px; }
+  .mini .who { font-family: 'Inter Tight', sans-serif; font-weight: 700; color: #fff; white-space: nowrap; }
+  .mini .what { color: rgba(255,246,214,0.82); }
+  .mini .num {
+    margin-left: auto; font-family: 'Inter Tight', sans-serif; font-weight: 800;
+    font-variant-numeric: tabular-nums; font-size: 34px; white-space: nowrap;
+    background: linear-gradient(135deg, #FF1867 0%, #f06449 50%, #FFD700 100%);
+    -webkit-background-clip: text; background-clip: text; color: transparent;
+  }
+
+  /* ---------- bottom: CTA + trust ---------- */
+  .bottom { margin-top: auto; margin-bottom: 226px; display: flex; flex-direction: column; align-items: center; }
+  .value-line {
+    margin-bottom: 22px; font-family: 'DM Sans', sans-serif; font-size: 33px;
+    color: rgba(255,246,214,0.8); letter-spacing: 0.01em;
+  }
+  .value-line b { font-weight: 500; color: #fff; }
+  .cta {
+    display: inline-flex; align-items: center; gap: 20px;
+    font-family: 'Inter Tight', sans-serif; font-weight: 800;
+    font-size: 44px; letter-spacing: -0.01em; color: #04121f;
+    background: #00BFFF; border-radius: 999px; padding: 26px 62px;
+    box-shadow: 0 6px 0 rgba(0,0,0,0.2), 0 12px 26px -4px rgba(0,191,255,0.5);
+  }
+  .trust {
+    margin-top: 24px;
+    font-family: 'JetBrains Mono', monospace; font-weight: 500;
+    font-size: 30px; letter-spacing: 0.18em; color: rgba(255,246,214,0.72);
+  }
+</style>
+</head>
+<body>
+
+  <!-- background art -->
+  <div class="glow glow-magenta"></div>
+  <div class="glow glow-sky"></div>
+  <div class="glow glow-mango"></div>
+  <div class="ghost-num">47,203</div>
+  <div class="speck" style="width:6px;height:6px;left:130px;top:380px;opacity:.5"></div>
+  <div class="speck" style="width:4px;height:4px;left:920px;top:300px;opacity:.4"></div>
+  <div class="speck" style="width:5px;height:5px;left:980px;top:760px;opacity:.45"></div>
+  <div class="speck" style="width:4px;height:4px;left:70px;top:1180px;opacity:.35"></div>
+  <div class="speck" style="width:6px;height:6px;left:540px;top:1840px;opacity:.3"></div>
+  <div class="stray" style="right:64px; top:586px; transform:rotate(8deg); opacity:.55;">+47</div>
+  <div class="stray" style="left:44px; top:912px; transform:rotate(-7deg); opacity:.45;">+12</div>
+
+  <div class="stage">
+
+    <!-- brand eyebrow -->
+    <div class="eyebrow"><span class="dot"></span>Recapped</div>
+
+    <!-- headline -->
+    <div class="headline">
+      <div class="line1">47,203 messages.</div>
+      <div class="line2">zero closure.</div>
+    </div>
+
+    <!-- notification cascade -->
+    <div class="cascade">
+
+      <div class="notif n1">
+        <div class="notif-head">
+          <div class="avatar" style="background:#FFD700;">M</div>
+          <div class="sender">Maya</div>
+          <div class="when">02:13</div>
+        </div>
+        <div class="preview">WHO LEFT THE GROUP</div>
+      </div>
+
+      <div class="notif n2">
+        <div class="notif-head">
+          <div class="avatar" style="background:#00BFFF;">T</div>
+          <div class="sender">Tom</div>
+          <div class="when">02:14</div>
+        </div>
+        <div class="preview">not me</div>
+      </div>
+
+      <div class="notif n3">
+        <div class="notif-head">
+          <div class="avatar" style="background:#FF69B4;">N</div>
+          <div class="sender">Noa</div>
+          <div class="when">02:14</div>
+        </div>
+        <div class="preview">&#128064;</div>
+      </div>
+
+      <div class="sys">
+        <span class="count">214</span>
+        <span class="label">messages Daniel missed overnight</span>
+      </div>
+
+      <!-- focal notification -->
+      <div class="focal-wrap">
+        <div class="focal">
+          <div class="notif-head">
+            <div class="app-icon">R<span class="badge">1</span></div>
+            <div class="sender">RECAPPED</div>
+            <div class="when">now</div>
+          </div>
+          <div class="focal-title">&#128293; <span class="grad">your group&rsquo;s year is ready.</span></div>
+          <div class="focal-sub">it&rsquo;s worse than you think.</div>
+          <div class="divider"></div>
+          <div class="mini">
+            <span class="ic">&#127942;</span>
+            <span class="who">Maya</span>
+            <span class="what">crowned Chief Yapper</span>
+            <span class="num">14,382 msgs</span>
+          </div>
+          <div class="mini">
+            <span class="ic">&#127769;</span>
+            <span class="who">Omer</span>
+            <span class="what">still typing at</span>
+            <span class="num">3:42 AM</span>
+          </div>
+          <div class="mini">
+            <span class="ic">&#128123;</span>
+            <span class="who">Tom</span>
+            <span class="what">left on read</span>
+            <span class="num">47 questions</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- CTA + trust -->
+    <div class="bottom">
+      <div class="value-line"><b>Stats. Roasts. Drama.</b> Built from your actual messages.</div>
+      <div class="cta">Play my Wrapped <span>&rarr;</span></div>
+      <div class="trust">PROCESSED ENTIRELY ON YOUR DEVICE</div>
+    </div>
+
+  </div>
+
+</body>
+</html>
