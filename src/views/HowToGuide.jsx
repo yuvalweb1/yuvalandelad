@@ -286,7 +286,7 @@ function getSteps(platform, t) {
 
 // ── main component ────────────────────────────────────────────────────────────
 
-export default function HowToGuide({ t, onStart, onHome, lang, setLang }) {
+export default function HowToGuide({ t, onStart, onHome, lang, setLang, hasChat }) {
   const [platform, setPlatform] = useState('ios');
   const [stepIdx, setStepIdx] = useState(0);
   const [langOpen, setLangOpen] = useState(false);
@@ -456,7 +456,7 @@ export default function HowToGuide({ t, onStart, onHome, lang, setLang }) {
         }}>
           <div className="a-shine" style={{ position: 'absolute', inset: 0 }} />
           <span className="fs-display" style={{ position: 'relative' }}>
-            {isLast ? t.howto_cta : t.howto_next}
+            {isLast ? (hasChat ? t.howto_cta : t.howto_cta_import) : t.howto_next}
           </span>
         </button>
       </div>

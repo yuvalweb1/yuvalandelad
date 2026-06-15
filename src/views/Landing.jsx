@@ -1,4 +1,4 @@
-import { useRef, useState, useCallback, useMemo } from 'react';
+import { useRef, useState, useCallback, useMemo, useEffect } from 'react';
 import BottomSheet from '../components/BottomSheet.jsx';
 import { relativeTime } from '../lib/history.js';
 import { interp } from '../i18n';
@@ -26,6 +26,7 @@ export default function Landing({
   history = [], onLoadRecap, onDeleteRecap, onClearHistory,
   selectedRecapId = null, onSelectRecap,
   period = 'all', setPeriod, periodChoices = ['all'], previewStats = null,
+  autoOpenPicker = false, onAutoOpenPickerHandled,
 }) {
   const fileInputRef = useRef(null);
   const [langOpen, setLangOpen] = useState(false);
@@ -36,6 +37,14 @@ export default function Landing({
     const jitter = ((Math.random() * 12) | 0) - 6;
     return base + jitter;
   }), []);
+
+  // Coming back from the how-to guide with no chat imported yet — open the
+  // file picker immediately so the guide reads as a call to action.
+  useEffect(() => {
+    if (!autoOpenPicker) return;
+    fileInputRef.current?.click();
+    onAutoOpenPickerHandled?.();
+  }, [autoOpenPicker, onAutoOpenPickerHandled]);
 
   // Selection is controlled by App (so it can hold the chat's messages in
   // memory for the live per-window preview). A fresh upload parses on select
@@ -246,16 +255,16 @@ export default function Landing({
         <div style={{
           background: 'rgba(255,255,255,0.82)',
           border: '1.5px solid rgba(255,255,255,0.95)',
-          borderRadius: 18,
-          padding: '11px 12px',
+          borderRadius: 14,
+          padding: '8px 9px',
           boxShadow: '0 4px 0 rgba(74,14,78,0.12), 0 10px 18px -6px rgba(74,14,78,0.18)',
         }}>
           {/* Header row */}
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: hasSelection ? 8 : 0 }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
-              <span aria-hidden="true" style={{ color: '#FF1867', fontSize: 11, lineHeight: 1 }}>★</span>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: hasSelection ? 6 : 0 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+              <span aria-hidden="true" style={{ color: '#FF1867', fontSize: 9, lineHeight: 1 }}>★</span>
               <span className="fs-mono" style={{
-                fontSize: 9, fontWeight: 700, letterSpacing: '0.13em',
+                fontSize: 8, fontWeight: 700, letterSpacing: '0.13em',
                 color: 'rgba(74,14,78,0.55)', textTransform: 'uppercase',
               }}>
                 {hasSelection ? (t.landing_now_selected || 'NOW SELECTED') : (t.landing_no_chat_selected || 'NO CHAT SELECTED')}
@@ -265,10 +274,10 @@ export default function Landing({
               onClick={handleSwitchClick}
               className="press fs-sans"
               style={{
-                padding: '8.25px 13.5px',
+                padding: '6px 10px',
                 background: 'rgba(74,14,78,0.08)',
-                border: 'none', borderRadius: 9,
-                fontSize: 11.25, fontWeight: 700, color: '#573280',
+                border: 'none', borderRadius: 8,
+                fontSize: 10, fontWeight: 700, color: '#573280',
                 cursor: 'pointer', letterSpacing: '-0.01em',
               }}>
               SWITCH ↓
@@ -278,28 +287,27 @@ export default function Landing({
           {hasSelection && (
             <>
               {/* Chat identity row */}
-              <div style={{ display: 'flex', alignItems: 'center', gap: 9 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 7 }}>
                 <div style={{
-                  flexShrink: 0, width: 34, height: 34, borderRadius: 999,
+                  flexShrink: 0, width: 26, height: 26, borderRadius: 999,
                   background: '#FF69B4',
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  fontSize: 17,
+                  fontSize: 13,
                 }}>
                   💬
                 </div>
                 <div style={{ flex: 1, minWidth: 0 }}>
                   <div dir="auto" style={{
-                    fontSize: 17, fontWeight: 800, color: '#2a0645',
+                    fontSize: 14, fontWeight: 800, color: '#2a0645',
                     overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
                     lineHeight: 1.2,
                   }}>
                     {selectedHistoryItem?.chatName}
                   </div>
-                  <div style={{ fontSize: 11, color: 'rgba(74,14,78,0.50)', marginTop: 2, lineHeight: 1.3 }}>
+                  <div style={{ fontSize: 9.5, color: 'rgba(74,14,78,0.50)', marginTop: 1, lineHeight: 1.3 }}>
                     {selectedHistoryItem
-                      ? interp(t.landing_history_viewed || 'Viewed {rel} · since {date}', {
+                      ? interp(t.landing_history_viewed || 'Last watched {rel}', {
                           rel: relativeTime(selectedHistoryItem.date, lang),
-                          date: new Date(selectedHistoryItem.stats.start).toLocaleDateString(lang, { month: 'short', year: 'numeric' }),
                         })
                       : ''}
                   </div>
@@ -307,7 +315,7 @@ export default function Landing({
               </div>
 
               {/* Stats row — live values for the selected trailing window */}
-              <div style={{ height: 1, background: 'rgba(74,14,78,0.09)', margin: '9px 0 8px' }} />
+              <div style={{ height: 1, background: 'rgba(74,14,78,0.09)', margin: '7px 0 6px' }} />
               <div style={{ display: 'flex', alignItems: 'center' }}>
                 {[
                   {
@@ -319,11 +327,6 @@ export default function Landing({
                     label: t.landing_stat_people || 'PEOPLE',
                     value: previewStats?.totalParticipants ?? '—',
                   },
-                  {
-                    label: t.landing_stat_span || 'SPAN',
-                    value: previewStats?.durationDays != null
-                      ? `${previewStats.durationDays}d` : '—',
-                  },
                 ].map((stat, i, arr) => (
                   <div key={stat.label} style={{
                     flex: 1, textAlign: 'center',
@@ -331,13 +334,13 @@ export default function Landing({
                     padding: '0 4px',
                   }}>
                     <div className="fs-sans" style={{
-                      fontSize: 15, fontWeight: 800, lineHeight: 1, color: '#2a0645',
+                      fontSize: 13, fontWeight: 800, lineHeight: 1, color: '#2a0645',
                     }}>
                       {stat.value}
                     </div>
                     <div className="fs-mono" style={{
-                      fontSize: 8.5, fontWeight: 700, letterSpacing: '0.10em',
-                      color: 'rgba(74,14,78,0.45)', textTransform: 'uppercase', marginTop: 2,
+                      fontSize: 7.5, fontWeight: 700, letterSpacing: '0.10em',
+                      color: 'rgba(74,14,78,0.45)', textTransform: 'uppercase', marginTop: 1,
                     }}>
                       {stat.label}
                     </div>
@@ -348,7 +351,7 @@ export default function Landing({
               {/* Time-period picker — trailing windows ending at the last message.
                   Only shown when more than one window is meaningful for this chat. */}
               {setPeriod && periodChoices.length > 1 && (
-                <div role="group" aria-label={t.period_all || 'Time period'} style={{ display: 'flex', gap: 6, marginTop: 10 }}>
+                <div role="group" aria-label={t.period_all || 'Time period'} style={{ display: 'flex', gap: 5, marginTop: 7 }}>
                   {periodChoices.map(p => {
                     const active = period === p;
                     return (
@@ -358,9 +361,9 @@ export default function Landing({
                         aria-pressed={active}
                         className="press fs-sans"
                         style={{
-                          flex: 1, padding: '8px 4px', borderRadius: 999,
+                          flex: 1, padding: '6px 4px', borderRadius: 999,
                           border: 'none', cursor: 'pointer',
-                          fontSize: 12, fontWeight: 700, letterSpacing: '-0.01em',
+                          fontSize: 10.5, fontWeight: 700, letterSpacing: '-0.01em',
                           background: active ? '#4A0E4E' : 'rgba(74,14,78,0.07)',
                           color: active ? '#fff' : '#573280',
                           transition: 'background 0.18s ease-out, color 0.18s ease-out',

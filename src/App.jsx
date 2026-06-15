@@ -23,6 +23,8 @@ import RoastMode from './views/RoastMode.jsx';
 import Modes from './views/Modes.jsx';
 import DuoQuest from './views/DuoQuest.jsx';
 import GuessWho from './views/GuessWho.jsx';
+import GroupCourt from './views/GroupCourt.jsx';
+import HotTakes from './views/HotTakes.jsx';
 import Settings from './views/Settings.jsx';
 import VideoAdSlot from './components/VideoAdSlot.jsx';
 import PremiumPromo, { shouldShowPromo, markPromoDismissed } from './components/PremiumPromo.jsx';
@@ -137,6 +139,9 @@ function RecappedApp() {
   });
   const [currentRecapId, setCurrentRecapId] = useState(null);
   const [history, setHistory] = useState(() => loadHistory());
+  // Set when the how-to guide finishes with no chat imported yet — tells
+  // Landing to immediately open the file picker so the guide feels like a CTA.
+  const [autoOpenPicker, setAutoOpenPicker] = useState(false);
   // ── Time-period scoping ──────────────────────────────────────────────
   // The selected chat's parsed messages + media are kept in memory so the
   // Landing card can preview any trailing window live, and so opening the
@@ -561,12 +566,14 @@ function RecappedApp() {
               t={t}
               lang={lang}
               setLang={setLang}
+              hasChat={history.length > 0}
               onHome={() => {
                 try { localStorage.setItem('cw_seen_guide', '1'); } catch {}
                 setStage('landing');
               }}
               onStart={() => {
                 try { localStorage.setItem('cw_seen_guide', '1'); } catch {}
+                if (history.length === 0) setAutoOpenPicker(true);
                 setStage('landing');
               }}
             />
@@ -593,6 +600,8 @@ function RecappedApp() {
                 period={period}
                 setPeriod={setPeriod}
                 periodChoices={periodChoices}
+                autoOpenPicker={autoOpenPicker}
+                onAutoOpenPickerHandled={() => setAutoOpenPicker(false)}
                 previewStats={previewStats}
               />
               {/* shouldShowPromo() already returns false when isPremium is true,
@@ -727,6 +736,8 @@ function RecappedApp() {
               onRoastMode={() => enterMode('roastmode')}
               onDuo={() => enterMode('duo')}
               onGuessWho={() => enterMode('guesswho')}
+              onCourt={() => enterMode('court')}
+              onHotTakes={() => enterMode('hottake')}
             />
           )}
           {stage === 'duo' && fullAnalytics && (
@@ -740,6 +751,12 @@ function RecappedApp() {
           )}
           {stage === 'guesswho' && (
             <GuessWho analytics={fullAnalytics} t={t} onBack={() => setStage('modes')} />
+          )}
+          {stage === 'court' && fullAnalytics && (
+            <GroupCourt analytics={fullAnalytics} profile={profile} t={t} onBack={() => setStage('modes')} />
+          )}
+          {stage === 'hottake' && fullAnalytics && (
+            <HotTakes analytics={fullAnalytics} profile={profile} t={t} onBack={() => setStage('modes')} />
           )}
         </div>
         {(stage === 'landing' || stage === 'modes') && (

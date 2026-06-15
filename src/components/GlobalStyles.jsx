@@ -13,6 +13,15 @@ export default function GlobalStyles() {
       .fs-mono { font-family: 'Inter Tight', 'DM Sans', -apple-system, sans-serif; font-feature-settings: 'tnum' on; font-variant-numeric: tabular-nums; font-weight: 500; }
       .fs-sans { font-family: 'DM Sans', -apple-system, sans-serif; }
       .fs-serif { font-family: 'Instrument Serif', Georgia, serif; }
+      /* Decorative pixel font (Group Court). Latin-only glyphs, so it is
+         used ONLY for chrome/labels/numbers that are safe to keep Latin —
+         never for translatable body copy. Hebrew/Arabic fall back via
+         'Rubik Black'. */
+      .fs-pixel { font-family: 'Press Start 2P', 'Rubik Black', monospace; line-height: 1.5; letter-spacing: 0; }
+      /* Heavy condensed display (Hot Takes / fight-night). Anton has Latin
+         only; Hebrew/Arabic fall back to the bold Rubik Black face. */
+      .fs-boxing { font-family: 'Anton', 'Rubik Black', 'Bricolage Grotesque', sans-serif; letter-spacing: 0.01em; }
+      .px-crisp { image-rendering: pixelated; image-rendering: crisp-edges; }
       /* Country flag emoji fallback — Windows ships without the regional
          indicator font, so 🇮🇱 renders as "IL". main.jsx loads the
          "Twemoji Country Flags" webfont via polyfill; this class opts
@@ -128,6 +137,95 @@ export default function GlobalStyles() {
         70%  { opacity: 0; }
         100% { transform: scale(1.7); opacity: 0; }
       }
+
+      /* ===== Group Court (pixel-art) ===== */
+      /* Judge idle bob — a tiny 2-step "sprite" sway, no easing for a retro feel. */
+      @keyframes pxBob {
+        0%, 100% { transform: translateY(0); }
+        50%      { transform: translateY(-3px); }
+      }
+      .a-px-bob { animation: pxBob 1.6s steps(2, end) infinite; }
+      /* Gavel raise → slam. Steps give it a choppy 8-bit motion. */
+      @keyframes gavelSlam {
+        0%   { transform: rotate(-48deg); }
+        55%  { transform: rotate(-48deg); }
+        70%  { transform: rotate(8deg); }
+        78%  { transform: rotate(2deg); }
+        100% { transform: rotate(6deg); }
+      }
+      .a-gavel-slam { animation: gavelSlam 0.85s steps(6, end) both; transform-origin: 80% 80%; }
+      /* Classified bar wiping off the case text, pixel-stepped. */
+      @keyframes pxWipe {
+        from { clip-path: inset(0 0 0 0); }
+        to   { clip-path: inset(0 0 0 100%); }
+      }
+      .a-px-wipe { animation: pxWipe 0.5s steps(8, end) both; }
+      /* GUILTY / verdict stamp dropping in pixel chunks. */
+      @keyframes pxStamp {
+        0%   { opacity: 0; transform: scale(2.4) rotate(-8deg); }
+        60%  { opacity: 1; transform: scale(0.86) rotate(-8deg); }
+        80%  { transform: scale(1.08) rotate(-6deg); }
+        100% { opacity: 1; transform: scale(1) rotate(-6deg); }
+      }
+      .a-px-stamp { animation: pxStamp 0.5s steps(5, end) both; }
+      /* Dust puff ring on gavel impact. */
+      @keyframes pxDust {
+        0%   { transform: scale(0.3); opacity: 0.9; }
+        100% { transform: scale(2.2); opacity: 0; }
+      }
+      .a-px-dust { animation: pxDust 0.6s steps(5, end) both; }
+      /* Spotlight cone gently breathing. */
+      @keyframes pxBlink {
+        0%, 100% { opacity: 1; }
+        50%      { opacity: 0.45; }
+      }
+      .a-px-blink { animation: pxBlink 1s steps(2, end) infinite; }
+
+      /* ===== Hot Takes (fight-night) ===== */
+      /* ON-AIR / round bell flash. */
+      @keyframes bellRing {
+        0%, 100% { transform: rotate(0deg); }
+        15% { transform: rotate(-16deg); }
+        30% { transform: rotate(13deg); }
+        45% { transform: rotate(-10deg); }
+        60% { transform: rotate(7deg); }
+        75% { transform: rotate(-4deg); }
+      }
+      .a-bell-ring { animation: bellRing 0.7s ease-in-out both; transform-origin: 50% 0%; }
+      /* KO / verdict stamp punching in. */
+      @keyframes koPunch {
+        0%   { opacity: 0; transform: scale(0.2) rotate(-12deg); }
+        55%  { opacity: 1; transform: scale(1.22) rotate(-12deg); }
+        72%  { transform: scale(0.94) rotate(-9deg); }
+        100% { opacity: 1; transform: scale(1) rotate(-11deg); }
+      }
+      .a-ko-punch { animation: koPunch 0.55s cubic-bezier(0.34,1.56,0.64,1) both; }
+      /* Spotlight sweep over the ring during suspense. */
+      @keyframes ringSweep {
+        0%   { transform: translateX(-40%) skewX(-12deg); opacity: 0; }
+        25%  { opacity: 0.55; }
+        100% { transform: translateX(140%) skewX(-12deg); opacity: 0; }
+      }
+      .a-ring-sweep { animation: ringSweep 2.4s ease-in-out infinite; }
+      /* Rope / corner card slamming in from its side. */
+      @keyframes cornerInL {
+        0% { opacity: 0; transform: translateX(-40px) scale(0.92); }
+        70% { transform: translateX(4px) scale(1.01); }
+        100% { opacity: 1; transform: translateX(0) scale(1); }
+      }
+      @keyframes cornerInR {
+        0% { opacity: 0; transform: translateX(40px) scale(0.92); }
+        70% { transform: translateX(-4px) scale(1.01); }
+        100% { opacity: 1; transform: translateX(0) scale(1); }
+      }
+      .a-corner-l { animation: cornerInL 0.5s cubic-bezier(0.34,1.56,0.64,1) both; }
+      .a-corner-r { animation: cornerInR 0.5s cubic-bezier(0.34,1.56,0.64,1) both; }
+      /* Live red dot pulse. */
+      @keyframes livePulse {
+        0%, 100% { opacity: 1; box-shadow: 0 0 0 0 rgba(242,98,46,0.6); }
+        50%      { opacity: 0.7; box-shadow: 0 0 0 6px rgba(242,98,46,0); }
+      }
+      .a-live-pulse { animation: livePulse 1.4s ease-out infinite; }
       .slide-content { color: #2a0645; }
       .slide-content * { text-shadow: 0 1px 8px rgba(255,255,255,0.8); }
       .slide-content .fs-display.a-fade-up { filter: drop-shadow(0 0 14px rgba(255,255,255,0.5)); }
@@ -241,12 +339,15 @@ export default function GlobalStyles() {
         .a-pulse-glow, .a-spin, .a-shine, .a-shimmer-flash,
         .a-gradient-shift, .a-shake, .a-wobble, .a-float,
         .a-cta-ping, .a-cta-bob, .a-tap-press, .a-tap-ripple,
-        .a-coin-shine {
+        .a-coin-shine,
+        .a-px-bob, .a-px-blink, .a-ring-sweep, .a-live-pulse {
           animation: none !important;
         }
         .a-fade-up, .a-fade-in, .a-scale-in, .a-spring,
         .a-slide-right, .a-slide-up-far, .a-bar,
         .a-pop-in, .a-roast-card,
+        .a-gavel-slam, .a-px-wipe, .a-px-stamp, .a-px-dust,
+        .a-bell-ring, .a-ko-punch, .a-corner-l, .a-corner-r,
         .slide-in-right, .slide-in-left, .slide-content {
           animation-duration: 0.001ms !important;
           animation-delay: 0ms !important;
