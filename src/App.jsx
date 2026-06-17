@@ -31,7 +31,10 @@ import PremiumPromo, { shouldShowPromo, markPromoDismissed } from './components/
 import PaymentSheet from './components/PaymentSheet.jsx';
 import { ADS, adEnabled } from './lib/ads.js';
 import { initAdMob, loadInterstitial } from './lib/admob.js';
-import { SLIDES_BY_TYPE, SLIDE_COMPONENTS } from './slides';
+import { getDeck, SLIDE_COMPONENTS } from './slides';
+import { computeMonthExtras } from './lib/monthly.js';
+import { computeSeasonExtras } from './lib/season.js';
+import { detectSeasonTheme } from './lib/seasonTheme.js';
 
 // ============================================================
 // MAIN
@@ -425,9 +428,20 @@ function RecappedApp() {
     const fullA = fullBase ? attachMedia(fullBase, media, 'all', msgs) : null;
     // Period-filtered analytics (the deck). Identical to all-time when the
     // window is 'all' or there are no messages to slice.
-    const filteredA = (per === 'all' || !msgs)
+    let filteredA = (per === 'all' || !msgs)
       ? fullA
       : attachMedia(computeAll(filterMessagesByPeriod(msgs, per)), media, per, msgs);
+    // The 4-week deck needs month-over-month extras (growth, biggest moment,
+    // gm/gn, streaks) the base pipeline never computes — attach them here.
+    if (per === 'month' && msgs && filteredA) {
+      filteredA = { ...filteredA, monthly: computeMonthExtras(msgs) };
+    }
+    // The season deck needs month-by-month extras + a light seasonal theme
+    // (cosmetic only — never touches the numbers).
+    if (per === 'season' && msgs && filteredA) {
+      const season = computeSeasonExtras(msgs);
+      filteredA = { ...filteredA, season, seasonTheme: detectSeasonTheme({ ...filteredA, season }) };
+    }
 
     const savedProfile = entry.profile || { relationship: null, tone: null, self: null };
     setRecapMessages(msgs);
@@ -673,7 +687,7 @@ function RecappedApp() {
           )}
           {stage === 'wrapped' && analytics && (
             <Wrapped
-              slidesDef={SLIDES_BY_TYPE[profile.relationship] || SLIDES_BY_TYPE.other}
+              slidesDef={getDeck(profile.relationship, period)}
               slideComponents={SLIDE_COMPONENTS}
               analytics={analytics}
               diagnostics={diagnostics}
