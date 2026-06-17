@@ -107,6 +107,12 @@ export default function Landing({
         25%     { box-shadow: 0 6px 0 rgba(74,14,78,0.14), 0 16px 28px -8px rgba(74,14,78,0.30), 0 0 0 3px rgba(255,215,0,0.6); outline: 2px solid rgba(255,215,0,0.6); }
         55%     { box-shadow: 0 6px 0 rgba(74,14,78,0.14), 0 16px 28px -8px rgba(74,14,78,0.26), 0 0 0 2px rgba(255,215,0,0.35); outline: 2px solid rgba(255,215,0,0.35); }
       }
+      @keyframes cta-ring {
+        0%   { box-shadow: 0 4px 0 rgba(30,0,40,0.30), 0 0 0 0px rgba(255,215,0,0.55); }
+        60%  { box-shadow: 0 4px 0 rgba(30,0,40,0.30), 0 0 0 7px rgba(255,215,0,0); }
+        100% { box-shadow: 0 4px 0 rgba(30,0,40,0.30), 0 0 0 0px rgba(255,215,0,0); }
+      }
+      .cta-card-ring { animation: cta-ring 2s ease-out infinite; }
       .cta-shake { animation: shake-no 0.48s ease-in-out; }
       .guide-pulse { animation: pulse-guide 0.5s ease-in-out; }
       .recap-row { transition: background-color 0.18s ease-out; }
@@ -380,39 +386,73 @@ export default function Landing({
       </div>
 
 
-      <div className="a-fade-up" style={{ position: 'relative', zIndex: 10, flexShrink: 0, paddingTop: 8, animationDelay: '0.45s' }}>
+      <div className="a-fade-up" style={{ position: 'relative', zIndex: 10, flexShrink: 0, paddingTop: hasSelection ? 8 : 16, animationDelay: '0.45s' }}>
         <input ref={fileInputRef} type="file" accept=".txt,.zip,application/zip,text/plain"
           style={{ display: 'none' }}
           onChange={handleFileChange} />
 
-        {/* Prereq card — single focus: the export step, now the primary CTA */}
+        {/* Prereq card */}
         {onHowTo && (
-          <div className={howToPulse ? 'guide-pulse' : ''} style={{
-            marginBottom: 14,
-            background: 'rgba(255,255,255,0.82)',
-            border: '1.5px solid rgba(255,255,255,0.95)',
-            borderRadius: 18,
-            padding: '14px 14px',
-            boxShadow: '0 6px 0 rgba(74,14,78,0.14), 0 16px 28px -8px rgba(74,14,78,0.22)',
-          }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-              <div style={{
-                flexShrink: 0, width: 7, height: 7, borderRadius: 999,
-                background: '#4A0E4E', marginLeft: 2,
-              }} />
-              <div className="fs-sans" dir="auto" style={{ flex: 1, minWidth: 0, fontSize: 15, fontWeight: 700, color: '#2a0645', lineHeight: 1.3, overflowWrap: 'break-word', wordBreak: 'break-word' }}>
-                {t.landing_step1}
-              </div>
-              <button onClick={onHowTo} className="press fs-sans" style={{
-                flexShrink: 0, padding: '9px 14.25px',
-                background: '#4A0E4E', border: 'none', borderRadius: 9.75,
-                color: '#FFD700', fontSize: 11.6, fontWeight: 700,
-                cursor: 'pointer', whiteSpace: 'nowrap', letterSpacing: '-0.01em',
+          !hasSelection ? (
+            <button
+              onClick={onHowTo}
+              className={`press cta-card-ring`}
+              style={{
+                display: 'block', width: '100%', marginBottom: 14,
+                background: 'linear-gradient(135deg, #4A0E4E 0%, #6B1A72 100%)',
+                border: '1.5px solid rgba(255,215,0,0.25)',
+                borderRadius: 18,
+                padding: '13px 16px',
+                cursor: 'pointer', textAlign: 'start',
               }}>
-                {t.howto_link}
-              </button>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div className="fs-sans" dir="auto" style={{
+                    fontSize: 17, fontWeight: 800, color: '#FFD700',
+                    lineHeight: 1.2, overflowWrap: 'break-word', wordBreak: 'break-word',
+                  }}>
+                    {t.landing_step1_cta || 'Start your recap here'}
+                  </div>
+                </div>
+                <div style={{
+                  flexShrink: 0, width: 36, height: 36, borderRadius: 999,
+                  background: '#FFD700',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                }}>
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#4A0E4E" strokeWidth="2.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                    <polyline points="9 18 15 12 9 6"/>
+                  </svg>
+                </div>
+              </div>
+            </button>
+          ) : (
+            <div className={howToPulse ? 'guide-pulse' : ''} style={{
+              marginBottom: 14,
+              background: 'rgba(255,255,255,0.82)',
+              border: '1.5px solid rgba(255,255,255,0.95)',
+              borderRadius: 18,
+              padding: '14px 14px',
+              boxShadow: '0 6px 0 rgba(74,14,78,0.14), 0 16px 28px -8px rgba(74,14,78,0.22)',
+            }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                <div style={{
+                  flexShrink: 0, width: 7, height: 7, borderRadius: 999,
+                  background: '#4A0E4E', marginLeft: 2,
+                }} />
+                <div className="fs-sans" dir="auto" style={{ flex: 1, minWidth: 0, fontSize: 15, fontWeight: 700, color: '#2a0645', lineHeight: 1.3, overflowWrap: 'break-word', wordBreak: 'break-word' }}>
+                  {t.landing_step1}
+                </div>
+                <button onClick={onHowTo} className="press fs-sans" style={{
+                  flexShrink: 0, padding: '9px 14.25px',
+                  background: '#4A0E4E', border: 'none', borderRadius: 9.75,
+                  color: '#FFD700', fontSize: 11.6, fontWeight: 700,
+                  cursor: 'pointer', whiteSpace: 'nowrap', letterSpacing: '-0.01em',
+                }}>
+                  {t.howto_link}
+                </button>
+              </div>
             </div>
-          </div>
+          )
         )}
 
         {/* Main CTA — primary action, gets the strongest visual weight */}

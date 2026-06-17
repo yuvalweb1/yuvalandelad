@@ -35,7 +35,7 @@ function MiniPhone({ children }) {
   return (
     <div style={{
       width: PHONE_W * PHONE_SCALE, height: PHONE_H * PHONE_SCALE,
-      flexShrink: 0, position: 'relative',
+      flexShrink: 1, minHeight: PHONE_H * PHONE_SCALE * 0.75, position: 'relative',
     }}>
       <div style={{
         width: PHONE_W, height: PHONE_H, borderRadius: 22, background: '#ECE5DD',
@@ -287,7 +287,7 @@ function getSteps(platform, t) {
 // ── main component ────────────────────────────────────────────────────────────
 
 export default function HowToGuide({ t, onStart, onHome, lang, setLang, hasChat }) {
-  const [platform, setPlatform] = useState('ios');
+  const [platform, setPlatform] = useState('android');
   const [stepIdx, setStepIdx] = useState(0);
   const [langOpen, setLangOpen] = useState(false);
   const currentLang = LANGUAGES.find(l => l.code === lang) || LANGUAGES[0];
@@ -412,7 +412,8 @@ export default function HowToGuide({ t, onStart, onHome, lang, setLang, hasChat 
         display: 'flex', flexDirection: 'column',
         alignItems: 'center', justifyContent: 'center',
         padding: '16px 20px',
-        gap: 20,
+        gap: 16,
+        overflowY: 'auto',
       }}>
         {/* illustration */}
         <WaMock kind={step.k} t={t} />
