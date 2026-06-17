@@ -82,7 +82,7 @@ function Eyebrow({ children, color = INK_MUTED, anim = 'a-fade-up' }) {
 
 export default function HotTakes({ analytics, profile, t, onBack }) {
   const rounds = useMemo(() => buildHotTakeRounds(analytics, profile?.relationship || 'other'), [analytics, profile]);
-  const defaultNames = useMemo(() => (analytics?.users || []).slice(0, 4).map(u => u.author), [analytics]);
+  const defaultNames = useMemo(() => (analytics?.users || []).map(u => u.author), [analytics]);
   const savedJurors = useMemo(() => loadJurors(), []);
 
   const game = useVoteGame(rounds, {
@@ -109,9 +109,15 @@ export default function HotTakes({ analytics, profile, t, onBack }) {
 
   const handleStart = (names) => { saveJurors(names); game.startWithPlayers(names); };
 
+  // Instructions show on every entry, before setup.
+  const [intro, setIntro] = useState(true);
+
   return (
     <div style={{ position: 'absolute', inset: 0, overflow: 'hidden', background: theme.bg, color: theme.ink }}>
-      {game.phase === 'setup' && (
+      {game.phase === 'setup' && intro && (
+        <HowItWorksScreen t={t} onContinue={() => setIntro(false)} />
+      )}
+      {game.phase === 'setup' && !intro && (
         <FighterSetupScreen t={t} defaultNames={defaultNames} savedJurors={savedJurors} onStart={handleStart} onSolo={game.startSolo} />
       )}
       {game.phase === 'prompt' && (
@@ -141,12 +147,42 @@ export default function HotTakes({ analytics, profile, t, onBack }) {
   );
 }
 
+// ── How it works (shown on every entry) ─────────────────────────────
+function HowItWorksScreen({ t, onContinue }) {
+  const steps = [
+    { glove: RED, t: t.ht_how_1_t || 'Hear the take', b: t.ht_how_1_b || 'A spicy claim about someone in the group drops in.' },
+    { glove: BLUE, t: t.ht_how_2_t || 'Pick a corner', b: t.ht_how_2_b || 'Everyone secretly votes Agree (red) or Disagree (blue).' },
+    { glove: GOLD, t: t.ht_how_3_t || 'The data decides', b: t.ht_how_3_b || 'The receipts land a verdict.' },
+  ];
+  return (
+    <Arena action={<BigFightButton onClick={onContinue} kind="flame" tall={false}>{t.ht_how_cta || 'Ring the bell'}</BigFightButton>}>
+      <Eyebrow color={FLAME}>{t.ht_how_eyebrow || 'How the fight works'}</Eyebrow>
+      <div className="fs-boxing" style={{ fontSize: 26, letterSpacing: '0.02em', textTransform: 'uppercase' }}>{t.ht_how_title || 'Tonight’s main event'}</div>
+      <div style={{ width: '100%', maxWidth: 340, flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: 12 }}>
+        {steps.map((s, i) => (
+          <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 12, textAlign: 'start', background: CROWD2, border: `2px solid rgba(247,241,232,0.12)`, borderRadius: 14, padding: '12px 14px' }}>
+            <div style={{ flexShrink: 0 }}><Glove size={36} color={s.glove} /></div>
+            <div style={{ minWidth: 0 }}>
+              <div className="fs-boxing" style={{ fontSize: 16, letterSpacing: '0.02em' }}>{s.t}</div>
+              <div className="fs-sans" style={{ fontSize: 13, lineHeight: 1.4, color: INK_MUTED, marginTop: 2 }}>{s.b}</div>
+            </div>
+          </div>
+        ))}
+      </div>
+    </Arena>
+  );
+}
+
 // ── Fighter setup (themed) ──────────────────────────────────────────
 function FighterSetupScreen({ t, defaultNames, savedJurors, onStart, onSolo }) {
-  const initial = (savedJurors && savedJurors.length >= 2) ? savedJurors : (defaultNames || []).slice(0, 4);
+  // Auto-fill with everyone in the chat. Editing stays fully available.
+  const initial = (defaultNames && defaultNames.length >= 2)
+    ? defaultNames
+    : (savedJurors && savedJurors.length >= 2 ? savedJurors : (defaultNames || []));
+  const MAX_PLAYERS = Math.max(8, (defaultNames || []).length);
   const [names, setNames] = useState(initial.length ? initial : ['', '']);
   const setName = (i, v) => setNames(p => p.map((n, idx) => idx === i ? v : n));
-  const add = () => setNames(p => p.length < 8 ? [...p, ''] : p);
+  const add = () => setNames(p => p.length < MAX_PLAYERS ? [...p, ''] : p);
   const remove = (i) => setNames(p => p.length > 2 ? p.filter((_, idx) => idx !== i) : p);
   const valid = names.map(n => n.trim()).filter(Boolean);
   const canStart = valid.length >= 2;
@@ -179,7 +215,7 @@ function FighterSetupScreen({ t, defaultNames, savedJurors, onStart, onSolo }) {
             )}
           </div>
         ))}
-        {names.length < 8 && (
+        {names.length < MAX_PLAYERS && (
           <button onClick={add} className="press fs-boxing" style={{ padding: '12px', border: '2px dashed rgba(247,241,232,0.22)', background: 'transparent', color: INK_MUTED, fontSize: 14, letterSpacing: '0.06em', textTransform: 'uppercase', cursor: 'pointer', borderRadius: 12, flexShrink: 0 }}>+ {t.vote_add_player || 'Add player'}</button>
         )}
       </div>

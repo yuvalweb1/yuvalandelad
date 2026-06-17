@@ -23,6 +23,7 @@ import {
   SYSTEM_HEADER_PATTERNS,
   LINK_RE,
   EMOJI_RE,
+  isStandaloneEmoji,
 } from './patterns.js';
 
 /**
@@ -182,7 +183,7 @@ export function parseWhatsApp(rawText) {
       }
 
       // Track emojis in author names (we'll exclude these from emoji counts later)
-      (cleanAuthor.match(EMOJI_RE) || []).forEach(e => authorNameEmojis.add(e));
+      (cleanAuthor.match(EMOJI_RE) || []).filter(isStandaloneEmoji).forEach(e => authorNameEmojis.add(e));
 
       const isDeleted = DELETED_PATTERNS.some(p => p.test(content));
       const isPoll = !isDeleted && POLL_PATTERNS.some(p => p.test(content));
@@ -191,9 +192,12 @@ export function parseWhatsApp(rawText) {
       const isVoice = VOICE_PATTERNS.some(p => p.test(content));
       const hasMedia = !isVoice && MEDIA_PATTERNS.some(p => p.test(content));
       const linkMatches = content.match(LINK_RE) || [];
-      const emojis = (content.match(EMOJI_RE) || []);
+      const rawEmojiMatches = (content.match(EMOJI_RE) || []);
+      // Count only real standalone emoji (drop lone tofu symbols like ♂/♀),
+      // but still strip every match from the text so word counts stay clean.
+      const emojis = rawEmojiMatches.filter(isStandaloneEmoji);
       let cleanContent = linkMatches.length > 0 ? content.replace(LINK_RE, '') : content;
-      if (emojis.length > 0) cleanContent = cleanContent.replace(EMOJI_RE, '');
+      if (rawEmojiMatches.length > 0) cleanContent = cleanContent.replace(EMOJI_RE, '');
       cleanContent = cleanContent.trim();
       const wordCount = cleanContent.length > 0 ? cleanContent.split(/\s+/).filter(Boolean).length : 0;
       const isQuestion = /[?؟]/.test(content);

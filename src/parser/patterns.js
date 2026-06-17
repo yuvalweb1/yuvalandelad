@@ -146,7 +146,37 @@ export const GROUP_IDENTITY_PATTERNS = [
 ];
 
 export const LINK_RE = /(https?:\/\/[^\s]+)/g;
-export const EMOJI_RE = /[\u{1F300}-\u{1F9FF}\u{2600}-\u{27BF}\u{2700}-\u{27BF}\u{1F000}-\u{1F02F}\u{1F0A0}-\u{1F0FF}\u{1F100}-\u{1F64F}\u{1F910}-\u{1F96B}\u{1F980}-\u{1F9E0}\u{1F1E6}-\u{1F1FF}]/gu;
+
+// Emoji matcher. We match whole emoji *grapheme clusters* so a ZWJ
+// sequence like 🤷‍♂️ stays one token instead of leaking a bare "♂"
+// (which renders as tofu and used to pollute "signature emoji"):
+//   - a flag = two regional indicators
+//   - or a pictographic base + optional skin-tone modifier + optional
+//     variation selector, then any number of ZWJ-joined continuations.
+// `\p{Extended_Pictographic}` is the correct emoji set; bare text-default
+// symbols that slip through (e.g. a lone ♂ ♀ ☑) are filtered by
+// isStandaloneEmoji() below so they never count on their own.
+export const EMOJI_RE = /\p{RI}\p{RI}|\p{Extended_Pictographic}[\u{1F3FB}-\u{1F3FF}\u{FE0F}]?(?:\u{200D}\p{Extended_Pictographic}[\u{1F3FB}-\u{1F3FF}\u{FE0F}]?)*/gu;
+
+// Lone code points that ARE Extended_Pictographic but render as plain
+// text glyphs (tofu / thin symbols) when they appear by themselves
+// rather than inside a ZWJ sequence. We drop these so they never become
+// someone's "top emoji". Gender/zodiac/misc dingbats are the usual
+// offenders seen in real chats (the trailing ♂ of 🤷‍♂️, etc.).
+const TEXT_DEFAULT_SYMBOLS = new Set([
+  '♂', '♀', '⚥', '⚧', '☉', '☿', '♁', '♃', '♄', '♅', '♆', '♇',
+  '⚕', '⚖', '⚗', '⚙', '⚛', '⚜', '☑', '☒', '✓', '✔', '✗', '✘',
+  '‼', '⁉', '™', '℠', '©', '®', '°', '·',
+]);
+
+// True if `s` is a real, self-contained emoji worth counting. A single
+// bare text-default symbol (no VS16, no ZWJ partner) is rejected.
+export function isStandaloneEmoji(s) {
+  if (!s) return false;
+  // Multi-codepoint tokens (ZWJ sequences, flags, modified emoji) are fine.
+  if ([...s].length > 1) return true;
+  return !TEXT_DEFAULT_SYMBOLS.has(s);
+}
 
 // Two header formats with all known variants.
 // iOS:     [DD.MM.YYYY, HH:MM:SS] Sender: msg   (also DD/MM/YYYY, DD-MM-YYYY, with/without AM/PM)

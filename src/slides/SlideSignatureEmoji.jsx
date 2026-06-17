@@ -7,7 +7,10 @@ const MAX_ROWS = 5;
 const ACCENT = '#f94144';
 
 const SlideSignatureEmoji = React.memo(function SlideSignatureEmoji({ a, t, profile, lang }) {
-  const allRows = a.users || [];
+  // Only people with a real signature emoji. Users whose only "emoji" was
+  // a lone symbol (now filtered out in the parser) have topEmoji === null,
+  // and showing them rendered an empty/tofu box, so drop them here.
+  const allRows = (a.users || []).filter(u => u.topEmoji && u.topEmojiCount > 0);
   if (allRows.length === 0) return null;
   const maxTopEmojiCount = Math.max(1, ...allRows.map(u => u.topEmojiCount || 0));
   const [expanded, setExpanded] = useState(false);

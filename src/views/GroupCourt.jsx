@@ -109,7 +109,7 @@ function Mugshot({ name, size = 50 }) {
 
 export default function GroupCourt({ analytics, profile, t, onBack }) {
   const rounds = useMemo(() => buildCourtRounds(analytics), [analytics]);
-  const defaultNames = useMemo(() => (analytics?.users || []).slice(0, 4).map(u => u.author), [analytics]);
+  const defaultNames = useMemo(() => (analytics?.users || []).map(u => u.author), [analytics]);
   const savedJurors = useMemo(() => loadJurors(), []);
 
   const game = useVoteGame(rounds, {
@@ -136,9 +136,15 @@ export default function GroupCourt({ analytics, profile, t, onBack }) {
 
   const handleStart = (names) => { saveJurors(names); game.startWithPlayers(names); };
 
+  // Instructions show on every entry, before setup.
+  const [intro, setIntro] = useState(true);
+
   return (
     <div style={{ position: 'absolute', inset: 0, overflow: 'hidden', background: theme.bg, color: theme.ink }}>
-      {game.phase === 'setup' && (
+      {game.phase === 'setup' && intro && (
+        <HowItWorksScreen t={t} onContinue={() => setIntro(false)} />
+      )}
+      {game.phase === 'setup' && !intro && (
         <JurySetupScreen t={t} defaultNames={defaultNames} savedJurors={savedJurors} onStart={handleStart} onSolo={game.startSolo} />
       )}
       {game.phase === 'prompt' && (
@@ -168,12 +174,45 @@ export default function GroupCourt({ analytics, profile, t, onBack }) {
   );
 }
 
+// ── How it works (shown on every entry) ─────────────────────────────
+function HowItWorksScreen({ t, onContinue }) {
+  const steps = [
+    { n: '1', t: t.gc_how_1_t || 'Read the charge', b: t.gc_how_1_b || 'A case file opens with an accusation about the group.' },
+    { n: '2', t: t.gc_how_2_t || 'The jury votes', b: t.gc_how_2_b || 'Everyone secretly taps who they think is guilty.' },
+    { n: '3', t: t.gc_how_3_t || 'The data rules', b: t.gc_how_3_b || 'The evidence opens and the gavel names the real culprit.' },
+  ];
+  return (
+    <CourtScene
+      judge={<PixelJudge size={104} pose="idle" />}
+      action={<BigPixelButton onClick={onContinue} kind="gold" tall={false}>{t.gc_how_cta || 'Enter the courtroom'}</BigPixelButton>}
+    >
+      <Eyebrow>{t.gc_how_eyebrow || 'How the court works'}</Eyebrow>
+      <div className="fs-pixel" style={{ fontSize: 15, lineHeight: 1.5 }}>{t.gc_how_title || 'Court is now in session'}</div>
+      <div style={{ width: '100%', maxWidth: 340, flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: 12 }}>
+        {steps.map(s => (
+          <div key={s.n} style={{ display: 'flex', alignItems: 'center', gap: 12, textAlign: 'start', background: PAPER, border: `4px solid ${INK}`, padding: '12px 14px', boxShadow: `4px 5px 0 0 rgba(36,23,16,0.2)` }}>
+            <div className="fs-pixel" aria-hidden style={{ width: 34, height: 34, flexShrink: 0, background: GOLD, color: INK, border: `3px solid ${INK}`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 13 }}>{s.n}</div>
+            <div style={{ minWidth: 0 }}>
+              <div className="fs-sans" style={{ fontWeight: 800, fontSize: 15 }}>{s.t}</div>
+              <div className="fs-sans" style={{ fontSize: 13, lineHeight: 1.4, color: INK_SOFT, marginTop: 2 }}>{s.b}</div>
+            </div>
+          </div>
+        ))}
+      </div>
+    </CourtScene>
+  );
+}
+
 // ── Jury setup (themed) ─────────────────────────────────────────────
 function JurySetupScreen({ t, defaultNames, savedJurors, onStart, onSolo }) {
-  const initial = (savedJurors && savedJurors.length >= 2) ? savedJurors : (defaultNames || []).slice(0, 4);
+  // Auto-fill with everyone in the chat. Editing stays fully available.
+  const initial = (defaultNames && defaultNames.length >= 2)
+    ? defaultNames
+    : (savedJurors && savedJurors.length >= 2 ? savedJurors : (defaultNames || []));
+  const MAX_PLAYERS = Math.max(8, (defaultNames || []).length);
   const [names, setNames] = useState(initial.length ? initial : ['', '']);
   const setName = (i, v) => setNames(p => p.map((n, idx) => idx === i ? v : n));
-  const add = () => setNames(p => p.length < 8 ? [...p, ''] : p);
+  const add = () => setNames(p => p.length < MAX_PLAYERS ? [...p, ''] : p);
   const remove = (i) => setNames(p => p.length > 2 ? p.filter((_, idx) => idx !== i) : p);
   const valid = names.map(n => n.trim()).filter(Boolean);
   const canStart = valid.length >= 2;
@@ -222,7 +261,7 @@ function JurySetupScreen({ t, defaultNames, savedJurors, onStart, onSolo }) {
             )}
           </div>
         ))}
-        {names.length < 8 && (
+        {names.length < MAX_PLAYERS && (
           <button onClick={add} className="press fs-pixel" style={{
             padding: '12px', border: `4px dashed ${INK}`, background: 'transparent', color: INK_SOFT,
             fontSize: 10, lineHeight: 1.5, cursor: 'pointer', borderRadius: 0, flexShrink: 0,
@@ -233,28 +272,39 @@ function JurySetupScreen({ t, defaultNames, savedJurors, onStart, onSolo }) {
   );
 }
 
-// ── Case file reveal: CLASSIFIED bar pixel-wipes off the accusation ──
+// ── Case file reveal: the CASE is the hero. A big case-file dossier
+//    fills the stage; a CLASSIFIED bar pixel-wipes off the accusation.
+//    The vote CTA is a modest button below — the case leads.
 function CaseFileScreen({ t, round, roundIdx, total, onContinue }) {
   const [open, setOpen] = useState(false);
   const prompt = fill(t[round.promptKey] || round.promptKey, round.promptVars);
   return (
     <CourtScene
-      judge={<PixelJudge size={116} pose="idle" />}
-      action={<BigPixelButton onClick={onContinue} kind="gold">{t.gc_cast_vote || 'Cast your vote'}</BigPixelButton>}
+      judge={<PixelJudge size={84} pose="idle" />}
+      action={<BigPixelButton onClick={onContinue} kind="gold" tall={false} disabled={!open}>{t.gc_cast_vote || 'Cast your vote'}</BigPixelButton>}
     >
       <Eyebrow>{fill(t.gc_case_of || 'Case {n} of {total}', { n: roundIdx + 1, total })}</Eyebrow>
-      <PixelPanel fill={KRAFT} style={{ width: '100%', maxWidth: 340 }}>
-        <div className="fs-pixel" aria-hidden style={{ fontSize: 10, color: 'rgba(36,23,16,0.6)', marginBottom: 14 }}>
+
+      {/* Hero dossier: grows to fill the stage. */}
+      <PixelPanel fill={KRAFT} className="a-pop-in" style={{
+        width: '100%', maxWidth: 350, flex: 1, minHeight: 0, marginTop: 4,
+        display: 'flex', flexDirection: 'column',
+      }}>
+        <div className="fs-pixel" aria-hidden style={{ fontSize: 11, color: 'rgba(36,23,16,0.6)', letterSpacing: 0 }}>
           {t.gc_case_file || 'CASE FILE'}
         </div>
-        <div style={{ position: 'relative', minHeight: 72 }}>
-          <div dir="auto" className="fs-display" style={{ fontSize: 20, fontWeight: 800, lineHeight: 1.35 }}>{prompt}</div>
+        <div aria-hidden style={{ height: 3, background: INK, margin: '10px 0 0' }} />
+
+        {/* The accusation — the centrepiece, vertically centred and large. */}
+        <div style={{ position: 'relative', flex: 1, minHeight: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '14px 4px' }}>
+          <div dir="auto" className="fs-display" style={{ fontSize: 'clamp(22px, 6.4vw, 30px)', fontWeight: 800, lineHeight: 1.3 }}>{prompt}</div>
           {!open && (
             <button className="press" onClick={() => setOpen(true)} style={{
               position: 'absolute', inset: '-4px', background: INK, border: 'none', cursor: 'pointer', padding: 0,
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 12,
             }}>
-              <span className="fs-pixel" style={{ color: GOLD, fontSize: 9, lineHeight: 1.6 }}>{t.gc_tap_reveal || 'TAP TO DECLASSIFY'}</span>
+              <span aria-hidden className="a-px-blink" style={{ fontSize: 30 }}>🔍</span>
+              <span className="fs-pixel" style={{ color: GOLD, fontSize: 11, lineHeight: 1.6 }}>{t.gc_tap_reveal || 'TAP TO DECLASSIFY'}</span>
             </button>
           )}
           {open && <div aria-hidden className="a-px-wipe" style={{ position: 'absolute', inset: '-4px', background: INK }} />}

@@ -1,41 +1,38 @@
 // ============================================================
-// GuessWho — "Who said this?"
+// GuessWho — "Who Said This?" (heavy TV trivia game-show skin)
 //
-// A fast trivia game built from the deterministic
-// `analytics.guessWho` quote pool. Each round shows a REAL message
-// from the chat and asks which group member sent it. Tap a name →
-// the answer is revealed instantly, with a little fun-fact about the
-// real sender (their signature word/emoji), points, and streak combos.
-// It climaxes in a "Detective IQ" score you can replay or share.
+// An endless quiz built from the deterministic `analytics.guessWho`
+// quote pool. Each question shows a REAL message from the chat with the
+// sender hidden, and four A/B/C/D answer lozenges. Lock one in → the
+// studio lights flash, the correct answer locks green, points + streak
+// combo land, and a fun-fact about the real sender appears.
 //
-// Pure + deterministic: rounds, decoys and option order all come from
-// a seeded shuffle keyed off the quote text — no Math.random /
-// Date.now. Same chat → same game.
+// ENDLESS: questions keep coming. The pool (a finite set of best quotes)
+// is cycled via a seeded shuffle and reshuffled when exhausted, so it
+// feels infinite without immediate repeats. Three wrong answers ends the
+// run → a "Studio IQ" finale you can replay.
+//
+// Pure + deterministic: the shuffle order, decoys and option order all
+// come from a seeded PRNG keyed off content + counters held in React
+// state — no Math.random / Date.now. Same chat → same game.
 // ============================================================
-import { useMemo, useRef, useState, useEffect } from 'react';
+import { useMemo, useRef, useState, useEffect, useCallback } from 'react';
 
-// ── Palette (shared with the other game modes) ─────────────────
-const CREAM    = '#FFF6D6';
-const PINK     = '#FDE6F1';
-const EGGPLANT = '#4A0E4E';
-const PLUM     = '#2a0645';
-const CORAL    = '#f06449';
-const GOLD     = '#FFD700';
-const SKY      = '#00BFFF';
-const MAGENTA  = '#FF1867';
-const MINT     = '#43AA8B';
-const ROSE     = '#F94144';
-const MUTED    = 'rgba(74,14,78,0.55)';
+// ── Game-show palette — a warm neon quiz studio ────────────────────
+const STAGE      = '#120A2A';   // deep studio violet-black
+const STAGE2     = '#1E1140';
+const NEON       = '#22D3EE';   // cyan stage light
+const HOT         = '#FF2D78';   // magenta accent
+const GOLD         = '#FFC83A';   // prize gold
+const GREEN        = '#39D98A';   // correct
+const RED          = '#FF4D4D';   // wrong
+const INK_DIM      = 'rgba(255,255,255,0.6)';
+const LETTERS      = ['A', 'B', 'C', 'D'];
+const LETTER_COLORS = [GOLD, NEON, HOT, '#A78BFA'];
+const LIVES = 3;
 
-// Cinematic dark canvas — a cool detective tilt vs. Chaos' hot pink.
-const GAME_BG = `
-  radial-gradient(120% 80% at 50% -5%, rgba(0,191,255,0.28) 0%, transparent 55%),
-  radial-gradient(100% 80% at 0% 105%, rgba(87,50,128,0.55) 0%, transparent 60%),
-  radial-gradient(90% 70% at 100% 100%, rgba(255,24,103,0.18) 0%, transparent 55%),
-  linear-gradient(180deg, #161a3a 0%, #2a0645 58%, #0A192F 100%)`;
-
-// Author bubble colours (deterministic by appearance order).
-const AUTHOR_COLORS = [GOLD, MAGENTA, SKY, MINT, '#FF8C00', '#FF69B4', CORAL, '#573280'];
+// Full studio backdrop: rotating spotlight rays + vignette + sparkle.
+const STAGE_BG = `radial-gradient(120% 90% at 50% -10%, ${STAGE2} 0%, ${STAGE} 60%)`;
 
 // ── Pure helpers ───────────────────────────────────────────────
 function fill(str, vars) {
@@ -56,7 +53,6 @@ function seededShuffle(arr, seed) {
   }
   return a;
 }
-// Short initials avatar for an author (first letters of up to 2 words).
 function initials(name) {
   const parts = String(name || '').trim().split(/\s+/).filter(Boolean);
   if (!parts.length) return '?';
@@ -64,8 +60,7 @@ function initials(name) {
   return (parts[0][0] || '') + (parts[1][0] || '');
 }
 
-// A one-line "fun fact" about the real sender — ties the reveal back
-// to the analytics the rest of the app already computed.
+// One-line "fun fact" about the real sender.
 function revealFact(u, t) {
   if (!u) return '';
   if (u.topWord && u.topWordCount >= 5) return fill(t.gw_fact_word, { word: u.topWord, n: u.topWordCount.toLocaleString() });
@@ -74,213 +69,211 @@ function revealFact(u, t) {
   return '';
 }
 
-// ── Round builder ──────────────────────────────────────────────
-// Turns the quote pool into an ordered, even-coverage set of rounds.
-function buildRounds(gw, userMap, t) {
-  if (!gw || !gw.quotes?.length) return [];
-  const authors = (gw.authors || []).filter(Boolean);
-  if (authors.length < 2) return [];
+// Build ONE question for a given quote: correct sender + 3 decoys, shuffled.
+function makeQuestion(quote, authors, userMap, t, idx) {
   const optionCount = Math.min(4, authors.length);
+  const seed = seedFromStr(quote.content + '|' + idx);
+  const decoys = seededShuffle(authors.filter(a => a !== quote.author), seed).slice(0, optionCount - 1);
+  const options = seededShuffle([quote.author, ...decoys], (seed ^ 0x9e3779b9) >>> 0);
+  return { content: quote.content, correct: quote.author, options, fact: revealFact(userMap?.[quote.author], t) };
+}
 
-  // Best-first quotes grouped by author (pool is already sorted).
-  const byAuthor = new Map();
-  for (const q of gw.quotes) {
-    if (!byAuthor.has(q.author)) byAuthor.set(q.author, []);
-    byAuthor.get(q.author).push(q.content);
-  }
-
-  // Round-robin across authors so no one dominates and coverage is even.
-  const queues = authors.map(a => ({ author: a, items: (byAuthor.get(a) || []).slice() }));
-  const MAX_ROUNDS = 10;
-  const picked = [];
-  let progressed = true;
-  while (picked.length < MAX_ROUNDS && progressed) {
-    progressed = false;
-    for (const q of queues) {
-      if (q.items.length && picked.length < MAX_ROUNDS) {
-        picked.push({ author: q.author, content: q.items.shift() });
-        progressed = true;
-      }
-    }
-  }
-  if (picked.length < 3) return [];
-
-  return picked.map((p, i) => {
-    const seed = seedFromStr(p.content + '|' + i);
-    const decoys = seededShuffle(authors.filter(a => a !== p.author), seed).slice(0, optionCount - 1);
-    const options = seededShuffle([p.author, ...decoys], (seed ^ 0x9e3779b9) >>> 0);
-    return { content: p.content, correct: p.author, options, fact: revealFact(userMap?.[p.author], t) };
-  });
+// An endless, deterministic feed of questions. The quote pool is finite
+// (a curated "best" set), so we walk a seeded-shuffled order and reshuffle
+// with a fresh derived seed once exhausted — feels infinite, never an
+// immediate repeat, fully reproducible.
+function makeQuoteFeed(gw) {
+  const authors = (gw?.authors || []).filter(Boolean);
+  const quotes = (gw?.quotes || []).filter(q => q?.content && q?.author);
+  if (authors.length < 2 || quotes.length < 3) return null;
+  const baseSeed = seedFromStr(quotes.map(q => q.content).join('¦'));
+  let order = seededShuffle(quotes, baseSeed);
+  let cursor = 0, cycle = 0;
+  return {
+    authors,
+    poolSize: quotes.length,
+    next() {
+      if (cursor >= order.length) { cycle++; order = seededShuffle(quotes, (baseSeed ^ Math.imul(cycle, 0x9e3779b9)) >>> 0); cursor = 0; }
+      return order[cursor++];
+    },
+  };
 }
 
 // ── Scoring ────────────────────────────────────────────────────
 const BASE = 1000;
-function gradeFor(t, iq) {
-  if (iq >= 90) return { title: t.gw_grade_5_title, sub: t.gw_grade_5_sub, color: GOLD };
-  if (iq >= 70) return { title: t.gw_grade_4_title, sub: t.gw_grade_4_sub, color: MAGENTA };
-  if (iq >= 50) return { title: t.gw_grade_3_title, sub: t.gw_grade_3_sub, color: SKY };
-  if (iq >= 25) return { title: t.gw_grade_2_title, sub: t.gw_grade_2_sub, color: CORAL };
-  return { title: t.gw_grade_1_title, sub: t.gw_grade_1_sub, color: ROSE };
+function gradeFor(t, hits) {
+  // Endless: grade by total correct answers reached before running out of lives.
+  if (hits >= 20) return { title: t.gw_grade_5_title, sub: t.gw_grade_5_sub, color: GOLD };
+  if (hits >= 12) return { title: t.gw_grade_4_title, sub: t.gw_grade_4_sub, color: HOT };
+  if (hits >= 7)  return { title: t.gw_grade_3_title, sub: t.gw_grade_3_sub, color: NEON };
+  if (hits >= 3)  return { title: t.gw_grade_2_title, sub: t.gw_grade_2_sub, color: GOLD };
+  return { title: t.gw_grade_1_title, sub: t.gw_grade_1_sub, color: RED };
 }
 
-// ── Shared chrome ──────────────────────────────────────────────
-function FloatingBlobs({ tint, op = 0.4 }) {
+// ── Studio backdrop chrome ─────────────────────────────────────
+function Studio({ tint = NEON, children }) {
   return (
-    <div aria-hidden style={{ position: 'absolute', inset: 0, overflow: 'hidden', pointerEvents: 'none' }}>
-      <div style={{ position: 'absolute', top: -90, left: -80, width: 280, height: 280, borderRadius: '50%', background: tint, opacity: op, filter: 'blur(86px)' }} />
-      <div style={{ position: 'absolute', top: 220, right: -90, width: 240, height: 240, borderRadius: '50%', background: tint, opacity: op * 0.6, filter: 'blur(80px)' }} />
-      <div style={{ position: 'absolute', bottom: -80, left: -60, width: 280, height: 280, borderRadius: '50%', background: tint, opacity: op * 0.75, filter: 'blur(80px)' }} />
+    <div style={{ position: 'absolute', inset: 0, overflow: 'hidden', background: STAGE_BG, color: '#fff', display: 'flex', flexDirection: 'column' }}>
+      {/* rotating spotlight rays */}
+      <div aria-hidden className="a-stage-rays" style={{
+        position: 'absolute', top: '-30%', left: '50%', width: '160%', height: '120%', transform: 'translateX(-50%)',
+        background: `repeating-conic-gradient(from 0deg at 50% 50%, ${tint}22 0deg 8deg, transparent 8deg 26deg)`,
+        opacity: 0.5, pointerEvents: 'none',
+      }} />
+      {/* twin top spotlights */}
+      <div aria-hidden style={{ position: 'absolute', top: '-16%', left: '20%', width: '60%', height: '60%', background: `radial-gradient(circle at 50% 0%, ${tint}33 0%, transparent 60%)`, pointerEvents: 'none' }} />
+      {/* stage floor glow */}
+      <div aria-hidden style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: '34%', background: `radial-gradient(120% 100% at 50% 100%, ${HOT}26 0%, transparent 70%)`, pointerEvents: 'none' }} />
+      <div aria-hidden style={{ position: 'absolute', inset: 0, background: 'radial-gradient(130% 100% at 50% 40%, transparent 40%, rgba(0,0,0,0.55) 100%)', pointerEvents: 'none' }} />
+      <div style={{ position: 'relative', zIndex: 2, flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column' }}>
+        {children}
+      </div>
     </div>
   );
 }
 
-// The quote on trial — a big WhatsApp-flavoured bubble with the
-// sender's name redacted to a "?" so it's purely a guess.
-function QuoteCard({ content }) {
+// A marquee-bulb frame around a node (game-show signage feel).
+function BulbFrame({ children, color = GOLD, style }) {
+  const N = 7;
   return (
-    <div dir="auto" className="a-pop-in" style={{
-      position: 'relative',
-      background: 'rgba(255,255,255,0.1)',
-      backdropFilter: 'blur(16px)', WebkitBackdropFilter: 'blur(16px)',
-      border: '1px solid rgba(255,255,255,0.2)',
-      borderInlineStart: `4px solid ${GOLD}`,
-      borderRadius: 20, padding: '18px 18px 20px',
-      boxShadow: '0 24px 50px -22px rgba(0,0,0,0.65)',
-    }}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 9, marginBottom: 10 }}>
-        <div aria-hidden style={{
-          width: 30, height: 30, borderRadius: '50%', flexShrink: 0,
-          background: 'rgba(255,255,255,0.14)', border: '1.5px dashed rgba(255,255,255,0.5)',
-          display: 'flex', alignItems: 'center', justifyContent: 'center',
-          fontSize: 15, fontWeight: 800, color: 'rgba(255,255,255,0.7)',
-        }}>?</div>
-        <div className="fs-mono" style={{ fontSize: 11, fontWeight: 800, letterSpacing: '0.14em', color: 'rgba(255,255,255,0.55)' }}>
-          ••••••••
+    <div style={{ position: 'relative', ...style }}>
+      {children}
+      {/* top + bottom bulb rows */}
+      {['top', 'bottom'].map(edge => (
+        <div key={edge} aria-hidden style={{ position: 'absolute', [edge]: -5, left: 10, right: 10, display: 'flex', justifyContent: 'space-between' }}>
+          {Array.from({ length: N }).map((_, i) => (
+            <span key={i} className="a-bulb" style={{ width: 5, height: 5, borderRadius: '50%', background: color, color, animationDelay: `${(i % 4) * 0.18}s` }} />
+          ))}
         </div>
-      </div>
-      <div className="fs-sans" style={{ fontSize: 'clamp(19px, 5.2vw, 24px)', fontWeight: 600, lineHeight: 1.36, color: '#fff' }}>
-        {content}
-      </div>
+      ))}
     </div>
   );
 }
 
-// The name options — one card per candidate sender.
-function NameOptions({ options, picked, correct, reveal, colorFor, onPick }) {
-  const twoCol = options.length > 2;
+// HUD lives row.
+function Lives({ lives, lostPulse }) {
   return (
-    <div style={{ display: 'grid', gridTemplateColumns: twoCol ? '1fr 1fr' : '1fr', gap: 10 }}>
-      {options.map((name) => {
-        const selected = picked === name;
-        const isCorrect = reveal && name === correct;
-        const isWrongPick = reveal && selected && name !== correct;
-        const c = colorFor(name);
-        let border = '1.5px solid rgba(255,255,255,0.18)';
-        let bg = 'rgba(255,255,255,0.07)';
-        let glow = '0 8px 20px -14px rgba(0,0,0,0.6)';
-        if (selected && !reveal) { border = `2px solid ${SKY}`; bg = 'rgba(255,255,255,0.14)'; glow = `0 10px 26px -10px ${SKY}`; }
-        if (isCorrect) { border = `2px solid ${MINT}`; bg = `${MINT}26`; glow = `0 10px 28px -8px ${MINT}99`; }
-        if (isWrongPick) { border = `2px solid ${ROSE}`; bg = `${ROSE}22`; glow = 'none'; }
+    <div style={{ display: 'flex', gap: 4 }}>
+      {Array.from({ length: LIVES }).map((_, i) => {
+        const alive = i < lives;
+        const justLost = lostPulse && i === lives;
         return (
-          <button
-            key={name} type="button" dir="auto"
-            onClick={() => !reveal && onPick(name)}
-            disabled={reveal}
-            aria-pressed={!reveal ? selected : undefined}
-            className={reveal ? '' : 'press'}
-            style={{
-              position: 'relative', textAlign: 'start', cursor: reveal ? 'default' : 'pointer',
-              padding: '13px 14px', borderRadius: 16, border, background: bg,
-              backdropFilter: 'blur(16px)', WebkitBackdropFilter: 'blur(16px)', boxShadow: glow,
-              color: '#fff', fontFamily: 'inherit', minHeight: 58,
-              display: 'flex', alignItems: 'center', gap: 11,
-              transition: 'background 0.2s, border-color 0.2s, box-shadow 0.2s',
-            }}>
-            <div aria-hidden style={{
-              width: 34, height: 34, borderRadius: '50%', flexShrink: 0,
-              background: reveal && !isCorrect && !isWrongPick ? 'rgba(255,255,255,0.12)' : `${c}2e`,
-              border: `1.5px solid ${reveal && !isCorrect && !isWrongPick ? 'rgba(255,255,255,0.2)' : c}`,
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-              fontSize: 12.5, fontWeight: 800, color: c, textTransform: 'uppercase',
-            }}>{initials(name)}</div>
-            <span className="fs-sans" style={{ flex: 1, minWidth: 0, fontSize: 15.5, fontWeight: 700, lineHeight: 1.15, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{name}</span>
-            {(isCorrect || isWrongPick) && (
-              <span aria-hidden style={{ fontSize: 17, flexShrink: 0 }}>{isCorrect ? '✓' : '✕'}</span>
-            )}
-          </button>
+          <span key={i} aria-hidden className={justLost ? 'a-life-lost' : ''} style={{ fontSize: 16, filter: alive ? 'none' : 'grayscale(1) opacity(0.35)' }}>❤️</span>
         );
       })}
     </div>
   );
 }
 
-// ── Title / cold open ──────────────────────────────────────────
-function TitleScene({ t, rounds, people, onStart }) {
-  const MARKS = ['"', '?', '“', '”', '?', '"'];
-  const pos = [
-    { top: '9%', left: '9%' }, { top: '14%', right: '11%' },
-    { top: '32%', right: '8%' }, { bottom: '30%', left: '8%' },
-    { bottom: '19%', right: '13%' }, { top: '45%', left: '46%' },
-  ];
+// The quote "on the spotlight" — a tilted neon plaque, sender hidden.
+function QuotePlaque({ content }) {
   return (
-    <div style={{ position: 'absolute', inset: 0, overflow: 'hidden', background: GAME_BG, color: '#fff',
-      display: 'flex', flexDirection: 'column',
-      padding: 'calc(env(safe-area-inset-top, 0px) + 64px) 26px calc(env(safe-area-inset-bottom, 0px) + 28px)' }}>
-      <FloatingBlobs tint={SKY} />
-      {MARKS.map((e, i) => (
-        <div key={i} className="a-float fs-display" aria-hidden style={{ position: 'absolute', ...pos[i], fontSize: 44, fontWeight: 800, color: 'rgba(255,255,255,0.16)', animationDelay: `${(i * 0.2) % 1.4}s` }}>{e}</div>
-      ))}
-      <div style={{ position: 'relative', zIndex: 2, flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
-        <div className="fs-mono a-fade-up" style={{ fontSize: 13, letterSpacing: '0.28em', textTransform: 'uppercase', color: SKY, fontWeight: 800 }}>
-          {t.gw_title_eyebrow || '🕵️ WHO SAID THIS?'}
+    <BulbFrame color={GOLD} style={{ width: '100%', maxWidth: 360 }}>
+      <div dir="auto" className="a-plaque-drop" style={{
+        position: 'relative', background: `linear-gradient(160deg, ${STAGE2} 0%, #160C36 100%)`,
+        border: `2px solid ${GOLD}`, borderRadius: 18, padding: '20px 18px',
+        boxShadow: `0 18px 44px -16px rgba(0,0,0,0.8), 0 0 0 4px rgba(255,200,58,0.12), inset 0 0 30px rgba(255,200,58,0.08)`,
+      }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 9, marginBottom: 12 }}>
+          <div aria-hidden style={{ width: 30, height: 30, borderRadius: '50%', flexShrink: 0, background: 'rgba(255,255,255,0.1)', border: `2px dashed ${GOLD}`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 16, fontWeight: 900, color: GOLD }}>?</div>
+          <div className="fs-mono" style={{ fontSize: 11, fontWeight: 800, letterSpacing: '0.2em', color: 'rgba(255,255,255,0.4)' }}>• • • • • • •</div>
         </div>
-        <div className="fs-display a-fade-up" style={{
-          marginTop: 14, fontSize: 'clamp(42px, 12vw, 64px)', fontWeight: 800, fontStyle: 'italic',
-          letterSpacing: '-0.045em', lineHeight: 0.96,
-          backgroundImage: `linear-gradient(135deg, #fff 0%, ${SKY} 45%, ${MAGENTA} 100%)`,
-          WebkitBackgroundClip: 'text', backgroundClip: 'text', color: 'transparent', WebkitTextFillColor: 'transparent',
-          filter: `drop-shadow(0 8px 24px ${SKY}55)`, animationDelay: '0.08s',
-        }}>{t.gw_title_h1 || 'Do you know who really said it?'}</div>
-        <div className="fs-sans a-fade-up" style={{ marginTop: 20, fontSize: 16, lineHeight: 1.5, color: 'rgba(255,255,255,0.78)', fontWeight: 500, maxWidth: 340, animationDelay: '0.2s' }}>
-          {t.gw_title_sub || 'Real messages, no names. Guess who fired each one off, build streaks, and prove you actually read the chat.'}
-        </div>
-        <div className="fs-mono a-fade-up" style={{ marginTop: 18, fontSize: 12, fontWeight: 700, letterSpacing: '0.12em', color: 'rgba(255,255,255,0.5)', animationDelay: '0.3s' }}>
-          {fill(t.gw_title_meta || '{n} quotes · {people} suspects', { n: rounds, people })}
-        </div>
+        <div dir="auto" className="fs-sans" style={{ fontSize: 'clamp(18px, 5vw, 23px)', fontWeight: 600, lineHeight: 1.34, color: '#fff' }}>{content}</div>
       </div>
-      <button onClick={onStart} className="press a-fade-up" style={{
-        position: 'relative', zIndex: 2, width: '100%', padding: '18px 24px', borderRadius: 999, border: 'none', cursor: 'pointer',
-        background: `linear-gradient(135deg, ${SKY}, ${MAGENTA} 80%)`, color: '#fff',
-        fontWeight: 800, fontSize: 18, fontFamily: 'inherit',
-        boxShadow: `0 12px 30px -8px ${MAGENTA}88, 0 2px 0 rgba(255,255,255,0.4) inset`, animationDelay: '0.42s',
-      }}>{t.gw_title_cta || 'Start guessing'}</button>
-    </div>
+    </BulbFrame>
   );
 }
 
-// ── Question scene ─────────────────────────────────────────────
-function QuestionScene({ round, t, picked, reveal, roundNum, roundTotal, score, streak, lastGain, colorFor, onPick, onContinue, bodyRef }) {
-  const right = reveal && picked === round.correct;
+// A single A/B/C/D answer lozenge — big, glowing, game-show styled.
+function AnswerLozenge({ letter, color, name, idx, picked, correct, reveal, onPick }) {
+  const selected = picked === name;
+  const isCorrect = reveal && name === correct;
+  const isWrongPick = reveal && selected && name !== correct;
+  let bg = `linear-gradient(160deg, ${STAGE2} 0%, #160C36 100%)`;
+  let bd = 'rgba(255,255,255,0.16)';
+  let glow = '0 8px 22px -14px rgba(0,0,0,0.8)';
+  let badgeBg = `${color}26`, badgeBd = color, badgeFg = color;
+  let cls = 'a-ans-in';
+  if (selected && !reveal) { bd = NEON; glow = `0 12px 30px -10px ${NEON}aa`; }
+  if (isCorrect) { bg = `linear-gradient(160deg, ${GREEN}3a 0%, ${GREEN}1a 100%)`; bd = GREEN; glow = `0 12px 32px -8px ${GREEN}cc`; badgeBg = GREEN; badgeBd = GREEN; badgeFg = '#06281A'; cls = 'a-ans-in a-lock-flash'; }
+  if (isWrongPick) { bg = `linear-gradient(160deg, ${RED}3a 0%, ${RED}14 100%)`; bd = RED; glow = 'none'; badgeBg = RED; badgeBd = RED; badgeFg = '#2A0606'; }
+  const dim = reveal && !isCorrect && !isWrongPick;
   return (
-    <div style={{ position: 'absolute', inset: 0, overflow: 'hidden', background: GAME_BG, color: '#fff', display: 'flex', flexDirection: 'column' }}>
-      <FloatingBlobs tint={reveal ? (right ? MINT : ROSE) : SKY} op={0.34} />
+    <button
+      type="button" dir="auto" disabled={reveal}
+      onClick={() => !reveal && onPick(name)}
+      aria-pressed={!reveal ? selected : undefined}
+      className={reveal ? cls : `press ${cls}`}
+      style={{
+        position: 'relative', textAlign: 'start', cursor: reveal ? 'default' : 'pointer',
+        width: '100%', minHeight: 0, padding: '12px 14px', borderRadius: 16,
+        border: `2.5px solid ${bd}`, background: bg, boxShadow: glow,
+        color: '#fff', fontFamily: 'inherit', display: 'flex', alignItems: 'center', gap: 12,
+        opacity: dim ? 0.45 : 1, animationDelay: `${idx * 0.06}s`,
+        transition: 'background 0.2s, border-color 0.2s, box-shadow 0.2s, opacity 0.2s',
+      }}>
+      <div aria-hidden className="fs-display" style={{
+        width: 40, height: 40, borderRadius: 12, flexShrink: 0, background: badgeBg,
+        border: `2px solid ${badgeBd}`, display: 'flex', alignItems: 'center', justifyContent: 'center',
+        fontSize: 19, fontWeight: 900, color: badgeFg,
+      }}>{letter}</div>
+      <span className="fs-sans" style={{ flex: 1, minWidth: 0, fontSize: 16, fontWeight: 800, lineHeight: 1.15, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{name}</span>
+      {(isCorrect || isWrongPick) && <span aria-hidden style={{ fontSize: 19, flexShrink: 0 }}>{isCorrect ? '✅' : '❌'}</span>}
+    </button>
+  );
+}
 
-      {/* HUD */}
-      <div style={{ position: 'relative', zIndex: 3, padding: 'calc(env(safe-area-inset-top, 0px) + 14px) 18px 0' }}>
-        <div style={{ display: 'flex', gap: 4, marginBottom: 12, paddingInlineEnd: 44 }}>
-          {Array.from({ length: roundTotal }).map((_, i) => (
-            <div key={i} style={{ flex: 1, height: 3, borderRadius: 8, background: i < roundNum - 1 ? 'rgba(255,255,255,0.6)' : i === roundNum - 1 ? SKY : 'rgba(255,255,255,0.16)', transition: 'background 0.3s' }} />
-          ))}
+// ── Title / cold open ──────────────────────────────────────────
+function TitleScene({ t, poolSize, people, onStart }) {
+  return (
+    <Studio tint={NEON}>
+      <div style={{ flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column', justifyContent: 'center', textAlign: 'center',
+        padding: 'calc(env(safe-area-inset-top, 0px) + 56px) 24px 8px' }}>
+        <div className="fs-mono a-fade-up" style={{ fontSize: 12, letterSpacing: '0.3em', textTransform: 'uppercase', color: NEON, fontWeight: 800 }}>
+          {t.gw_show_eyebrow || '🎬 ON THE SPOTLIGHT'}
         </div>
+        <BulbFrame color={GOLD} style={{ marginTop: 22, alignSelf: 'center' }}>
+          <div className="fs-display a-spring" style={{
+            padding: '6px 4px', fontSize: 'clamp(40px, 12.5vw, 62px)', fontWeight: 800, fontStyle: 'italic',
+            letterSpacing: '-0.04em', lineHeight: 0.95,
+            backgroundImage: `linear-gradient(135deg, #fff 0%, ${GOLD} 45%, ${HOT} 100%)`,
+            WebkitBackgroundClip: 'text', backgroundClip: 'text', color: 'transparent', WebkitTextFillColor: 'transparent',
+            filter: `drop-shadow(0 8px 26px ${HOT}66)`,
+          }}>{t.gw_show_title || 'WHO SAID THIS?!'}</div>
+        </BulbFrame>
+        <div className="fs-sans a-fade-up" style={{ marginTop: 22, fontSize: 16, lineHeight: 1.5, color: 'rgba(255,255,255,0.82)', fontWeight: 500, maxWidth: 330, alignSelf: 'center', animationDelay: '0.2s' }}>
+          {t.gw_show_sub || 'Real messages. Names hidden. Keep guessing who sent each one — 3 strikes and the show’s over.'}
+        </div>
+        <div className="fs-mono a-fade-up" style={{ marginTop: 18, fontSize: 12, fontWeight: 800, letterSpacing: '0.12em', color: 'rgba(255,255,255,0.5)', animationDelay: '0.3s' }}>
+          {fill(t.gw_show_meta || '{people} contestants · endless rounds', { people })}
+        </div>
+      </div>
+      <div style={{ flexShrink: 0, padding: '0 22px calc(env(safe-area-inset-bottom, 0px) + 18px)' }}>
+        <button onClick={onStart} className="press a-fade-up" style={{
+          width: '100%', height: '34vh', minHeight: 150, maxHeight: 300, borderRadius: 22, border: 'none', cursor: 'pointer',
+          background: `linear-gradient(135deg, ${GOLD}, ${HOT} 85%)`, color: '#fff',
+          fontFamily: 'inherit', display: 'flex', alignItems: 'center', justifyContent: 'center',
+          boxShadow: `0 16px 38px -10px ${HOT}aa, 0 2px 0 rgba(255,255,255,0.4) inset`, animationDelay: '0.42s',
+        }}>
+          <span className="fs-display" style={{ fontSize: 26, fontWeight: 800, fontStyle: 'italic', letterSpacing: '-0.02em' }}>{t.gw_show_cta || 'Enter the studio'}</span>
+        </button>
+      </div>
+    </Studio>
+  );
+}
+
+// ── Question / play scene ──────────────────────────────────────
+function QuestionScene({ q, t, picked, reveal, qNum, score, streak, lives, lostPulse, lastGain, scorePulse, onPick, onContinue, gameOverNext }) {
+  const right = reveal && picked === q.correct;
+  return (
+    <Studio tint={reveal ? (right ? GREEN : RED) : NEON}>
+      {/* HUD */}
+      <div style={{ flexShrink: 0, padding: 'calc(env(safe-area-inset-top, 0px) + 14px) 18px 0' }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', paddingInlineEnd: 44 }}>
-          <span className="fs-mono" style={{ fontSize: 11, fontWeight: 800, letterSpacing: '0.14em', color: 'rgba(255,255,255,0.6)', textTransform: 'uppercase' }}>
-            {fill(t.cg_round_of || 'Round {n}/{total}', { n: roundNum, total: roundTotal })}
-          </span>
+          <Lives lives={lives} lostPulse={lostPulse} />
           <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-            {streak >= 2 && (
-              <span className="fs-mono a-pop-in" style={{ fontSize: 12, fontWeight: 800, color: GOLD }}>🔥 ×{streak}</span>
-            )}
-            <span className="fs-mono" style={{ fontSize: 12, fontWeight: 800, color: '#fff' }}>
+            {streak >= 2 && <span className="fs-mono a-pop-in" style={{ fontSize: 13, fontWeight: 900, color: GOLD }}>🔥 ×{streak}</span>}
+            <span className={`fs-mono ${scorePulse ? 'a-score-pop' : ''}`} style={{ fontSize: 14, fontWeight: 900, color: '#fff', display: 'inline-block' }}>
               <span style={{ color: 'rgba(255,255,255,0.5)', fontSize: 10, letterSpacing: '0.1em' }}>{t.cg_score || 'SCORE'} </span>
               {score.toLocaleString()}
             </span>
@@ -288,115 +281,107 @@ function QuestionScene({ round, t, picked, reveal, roundNum, roundTotal, score, 
         </div>
       </div>
 
-      {/* Body */}
-      <div ref={bodyRef} className="no-sb" style={{ position: 'relative', zIndex: 2, flex: 1, minHeight: 0, overflowY: 'auto', display: 'flex', flexDirection: 'column', padding: '16px 22px 0' }}>
-        <div className="fs-mono" style={{ fontSize: 12, letterSpacing: '0.24em', textTransform: 'uppercase', color: reveal ? (right ? MINT : ROSE) : SKY, fontWeight: 800 }}>
-          {reveal ? (right ? (t.gw_correct || 'Correct!') : (t.gw_wrong || 'Nope.')) : (t.gw_eyebrow || 'WHO SAID THIS?')}
+      {/* Body — fixed, no scroll */}
+      <div style={{ flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '12px 18px 0', gap: 12, overflow: 'hidden' }}>
+        <div className="fs-mono" style={{ fontSize: 12, letterSpacing: '0.24em', textTransform: 'uppercase', color: reveal ? (right ? GREEN : RED) : NEON, fontWeight: 800 }}>
+          {reveal ? (right ? (t.gw_correct || 'Correct!') : (t.gw_wrong || 'Nope.')) : fill(t.gw_question_n || 'Question {n}', { n: qNum })}
         </div>
 
-        <div style={{ marginTop: 12 }}>
-          <QuoteCard content={round.content} />
-        </div>
+        <QuotePlaque content={q.content} />
 
-        <div style={{ marginTop: 16 }}>
-          <NameOptions options={round.options} picked={picked} correct={round.correct} reveal={reveal} colorFor={colorFor} onPick={onPick} />
+        {/* Answers — fill the rest of the stage */}
+        <div style={{ width: '100%', maxWidth: 360, flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: 9 }}>
+          {q.options.map((name, i) => (
+            <AnswerLozenge key={name} letter={LETTERS[i]} color={LETTER_COLORS[i]} name={name} idx={i}
+              picked={picked} correct={q.correct} reveal={reveal} onPick={onPick} />
+          ))}
         </div>
 
         {reveal && (
-          <div className="a-fade-up" style={{ marginTop: 16, animationDelay: '0.06s' }}>
-            <div className="fs-display" dir="auto" style={{
-              fontSize: 'clamp(20px, 5.4vw, 26px)', fontWeight: 800, lineHeight: 1.2, letterSpacing: '-0.02em',
-              backgroundImage: `linear-gradient(120deg, #fff 0%, ${right ? MINT : '#fff'} 100%)`,
-              WebkitBackgroundClip: 'text', backgroundClip: 'text', color: 'transparent', WebkitTextFillColor: 'transparent',
-            }}>
-              {fill(t.gw_reveal || 'It was {name}.', { name: round.correct })}
-              {lastGain > 0 && <span className="fs-mono" style={{ WebkitTextFillColor: GOLD, color: GOLD, fontSize: 16, marginInlineStart: 10 }}>+{lastGain.toLocaleString()}</span>}
+          <div className="a-fade-up" style={{ width: '100%', maxWidth: 360, textAlign: 'center', animationDelay: '0.06s' }}>
+            <div className="fs-display" dir="auto" style={{ fontSize: 'clamp(18px, 4.8vw, 23px)', fontWeight: 800, lineHeight: 1.2, letterSpacing: '-0.02em', color: '#fff' }}>
+              {fill(t.gw_reveal || 'It was {name}.', { name: q.correct })}
+              {lastGain > 0 && <span className="fs-mono" style={{ color: GOLD, fontSize: 16, marginInlineStart: 10 }}>+{lastGain.toLocaleString()}</span>}
             </div>
-            {round.fact && (
-              <div className="fs-sans" dir="auto" style={{ marginTop: 8, fontSize: 14.5, lineHeight: 1.45, color: 'rgba(255,255,255,0.72)', fontWeight: 500 }}>
-                {round.fact}
-              </div>
-            )}
+            {q.fact && <div className="fs-sans" dir="auto" style={{ marginTop: 5, fontSize: 13.5, lineHeight: 1.4, color: 'rgba(255,255,255,0.72)', fontWeight: 500 }}>{q.fact}</div>}
           </div>
         )}
-        <div style={{ flex: 1, minHeight: 12 }} />
       </div>
 
-      {/* Footer */}
-      <div style={{ position: 'relative', zIndex: 3, padding: '14px 22px calc(env(safe-area-inset-bottom, 0px) + 18px)' }}>
+      {/* Footer action */}
+      <div style={{ flexShrink: 0, padding: '12px 18px calc(env(safe-area-inset-bottom, 0px) + 16px)' }}>
         {reveal ? (
           <button onClick={onContinue} className="press" style={{
-            width: '100%', padding: '17px', borderRadius: 999, border: 'none', cursor: 'pointer',
-            background: '#fff', color: PLUM, fontWeight: 800, fontSize: 17, fontFamily: 'inherit',
-            boxShadow: '0 12px 28px -10px rgba(255,255,255,0.5)',
-          }}>{roundNum < roundTotal ? (t.cg_continue || 'Continue') : (t.gw_see_score || 'See my score')}</button>
+            width: '100%', padding: '18px', borderRadius: 16, border: 'none', cursor: 'pointer',
+            background: gameOverNext ? `linear-gradient(135deg, ${RED}, ${HOT})` : '#fff',
+            color: gameOverNext ? '#fff' : STAGE, fontFamily: 'inherit',
+            boxShadow: gameOverNext ? `0 12px 30px -10px ${RED}aa` : '0 12px 28px -10px rgba(255,255,255,0.5)',
+          }}>
+            <span className="fs-display" style={{ fontSize: 19, fontWeight: 800, fontStyle: 'italic' }}>
+              {gameOverNext ? (t.gw_show_over_cta || 'See how you did') : (t.gw_next_q || 'Next question')}
+            </span>
+          </button>
         ) : (
-          <div className="fs-mono" style={{ textAlign: 'center', padding: '12px 0', fontSize: 12, fontWeight: 700, letterSpacing: '0.12em', color: 'rgba(255,255,255,0.45)', textTransform: 'uppercase' }}>
-            {t.gw_tap_hint || 'Tap who you think said it'}
+          <div className="fs-mono" style={{ textAlign: 'center', padding: '14px 0', fontSize: 12, fontWeight: 800, letterSpacing: '0.14em', color: 'rgba(255,255,255,0.45)', textTransform: 'uppercase' }}>
+            {t.gw_lock_hint || 'Lock in your answer'}
           </div>
         )}
       </div>
-    </div>
+    </Studio>
   );
 }
 
-// ── Finale score ───────────────────────────────────────────────
-function ScoreScene({ t, iq, score, hits, total, bestStreak, onReplay, onBack }) {
-  const g = gradeFor(t, iq);
+// ── Finale ─────────────────────────────────────────────────────
+function ScoreScene({ t, hits, score, bestStreak, onReplay, onBack }) {
+  const g = gradeFor(t, hits);
   const CONFETTI = ['🎉', '✨', '🎊', '⭐', '💫', '🌟'];
-  const pos = [{ top: '10%', left: '12%' }, { top: '16%', right: '14%' }, { top: '30%', left: '20%' }, { bottom: '26%', right: '16%' }, { bottom: '16%', left: '18%' }, { top: '44%', right: '10%' }];
+  const pos = [{ top: '8%', left: '12%' }, { top: '14%', right: '14%' }, { top: '28%', left: '18%' }, { bottom: '28%', right: '16%' }, { bottom: '18%', left: '16%' }, { top: '40%', right: '10%' }];
   return (
-    <div style={{ position: 'absolute', inset: 0, overflow: 'hidden', background: GAME_BG, color: '#fff',
-      display: 'flex', flexDirection: 'column',
-      padding: 'calc(env(safe-area-inset-top, 0px) + 60px) 26px calc(env(safe-area-inset-bottom, 0px) + 28px)' }}>
-      <FloatingBlobs tint={g.color} op={0.45} />
-      {iq >= 70 && CONFETTI.map((e, i) => (
-        <div key={i} className="a-float" aria-hidden style={{ position: 'absolute', ...pos[i], fontSize: 26 + (i % 3) * 6, animationDelay: `${(i * 0.22) % 1.5}s` }}>{e}</div>
+    <Studio tint={g.color}>
+      {hits >= 7 && CONFETTI.map((e, i) => (
+        <div key={i} className="a-float" aria-hidden style={{ position: 'absolute', ...pos[i], fontSize: 26 + (i % 3) * 6, animationDelay: `${(i * 0.22) % 1.5}s`, zIndex: 1 }}>{e}</div>
       ))}
-      <div style={{ position: 'relative', zIndex: 2, flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', textAlign: 'center' }}>
+      <div style={{ flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', textAlign: 'center',
+        padding: 'calc(env(safe-area-inset-top, 0px) + 50px) 24px 8px' }}>
         <div className="fs-mono a-fade-up" style={{ fontSize: 12, letterSpacing: '0.3em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.6)', fontWeight: 800 }}>
-          {t.cg_score_eyebrow || 'GAME OVER'}
+          {t.gw_show_over || "That's a wrap!"}
         </div>
-        <div className="fs-mono a-fade-up" style={{ marginTop: 22, fontSize: 13, letterSpacing: '0.26em', textTransform: 'uppercase', color: g.color, fontWeight: 800, animationDelay: '0.05s' }}>
-          {t.gw_score_label || 'DETECTIVE IQ'}
+        <div className="fs-mono a-fade-up" style={{ marginTop: 18, fontSize: 13, letterSpacing: '0.26em', textTransform: 'uppercase', color: g.color, fontWeight: 800, animationDelay: '0.05s' }}>
+          {t.gw_streak_label || 'CORRECT ANSWERS'}
         </div>
-        <div className="fs-display a-spring" style={{
-          fontSize: 'clamp(108px, 38vw, 180px)', fontWeight: 800, fontStyle: 'italic', lineHeight: 0.86, letterSpacing: '-0.06em',
-          backgroundImage: `linear-gradient(180deg, #fff 0%, ${g.color} 95%)`,
-          WebkitBackgroundClip: 'text', backgroundClip: 'text', color: 'transparent', WebkitTextFillColor: 'transparent',
-          filter: `drop-shadow(0 10px 30px ${g.color}66)`,
-        }}>{iq}<span style={{ fontSize: '0.4em' }}>%</span></div>
-        <div className="fs-display a-fade-up" style={{ marginTop: 6, fontSize: 'clamp(28px, 8vw, 40px)', fontWeight: 800, fontStyle: 'italic', color: '#fff', letterSpacing: '-0.03em', animationDelay: '0.18s' }}>
+        <BulbFrame color={g.color} style={{ marginTop: 6 }}>
+          <div className="fs-display a-spring" style={{
+            padding: '4px 12px', fontSize: 'clamp(96px, 34vw, 160px)', fontWeight: 800, fontStyle: 'italic', lineHeight: 0.86, letterSpacing: '-0.05em',
+            backgroundImage: `linear-gradient(180deg, #fff 0%, ${g.color} 95%)`,
+            WebkitBackgroundClip: 'text', backgroundClip: 'text', color: 'transparent', WebkitTextFillColor: 'transparent',
+            filter: `drop-shadow(0 10px 30px ${g.color}66)`,
+          }}>{hits}</div>
+        </BulbFrame>
+        <div className="fs-display a-fade-up" style={{ marginTop: 10, fontSize: 'clamp(26px, 7.5vw, 38px)', fontWeight: 800, fontStyle: 'italic', color: '#fff', letterSpacing: '-0.03em', animationDelay: '0.18s' }}>
           {g.title}
         </div>
-        <div className="fs-sans a-fade-up" style={{ marginTop: 12, fontSize: 16, lineHeight: 1.45, color: 'rgba(255,255,255,0.78)', fontWeight: 500, maxWidth: 300, animationDelay: '0.28s' }}>
+        <div className="fs-sans a-fade-up" style={{ marginTop: 10, fontSize: 15, lineHeight: 1.45, color: 'rgba(255,255,255,0.78)', fontWeight: 500, maxWidth: 300, animationDelay: '0.28s' }}>
           {g.sub}
         </div>
-        <div className="a-fade-up" style={{ marginTop: 26, display: 'flex', gap: 10, flexWrap: 'wrap', justifyContent: 'center', animationDelay: '0.38s' }}>
+        <div className="a-fade-up" style={{ marginTop: 22, display: 'flex', gap: 10, flexWrap: 'wrap', justifyContent: 'center', animationDelay: '0.38s' }}>
           {[
-            fill(t.gw_score_correct || '{hits}/{total} correct', { hits, total }),
+            fill(t.gw_score_answered || '{hits} correct', { hits }),
             fill(t.cg_score_best_streak || 'Best streak ×{n}', { n: bestStreak }),
             fill(t.cg_score_points || '{n} pts', { n: score.toLocaleString() }),
           ].map((s, i) => (
-            <div key={i} className="fs-mono" style={{
-              padding: '10px 14px', borderRadius: 14, background: 'rgba(255,255,255,0.08)',
-              border: '1px solid rgba(255,255,255,0.16)', fontSize: 12, fontWeight: 800, color: 'rgba(255,255,255,0.88)', letterSpacing: '0.04em',
-            }}>{s}</div>
+            <div key={i} className="fs-mono" style={{ padding: '10px 14px', borderRadius: 14, background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.16)', fontSize: 12, fontWeight: 800, color: 'rgba(255,255,255,0.88)', letterSpacing: '0.04em' }}>{s}</div>
           ))}
         </div>
       </div>
-      <div style={{ position: 'relative', zIndex: 2, display: 'flex', gap: 10 }}>
-        <button onClick={onReplay} className="press" style={{
-          flex: 1, padding: '16px', borderRadius: 999, border: 'none', cursor: 'pointer',
-          background: `linear-gradient(135deg, ${SKY}, ${MAGENTA})`, color: '#fff', fontWeight: 800, fontSize: 16, fontFamily: 'inherit',
-          boxShadow: `0 10px 26px -8px ${MAGENTA}88`,
-        }}>{t.cg_replay || 'Play again'}</button>
-        <button onClick={onBack} className="press" style={{
-          flex: 1, padding: '16px', borderRadius: 999, cursor: 'pointer',
-          background: 'rgba(255,255,255,0.1)', color: '#fff', border: '1.5px solid rgba(255,255,255,0.22)', fontWeight: 800, fontSize: 16, fontFamily: 'inherit',
-        }}>{t.cg_done || 'Done'}</button>
+      <div style={{ flexShrink: 0, display: 'flex', gap: 10, padding: '0 22px calc(env(safe-area-inset-bottom, 0px) + 18px)' }}>
+        <button onClick={onReplay} className="press" style={{ flex: 1, padding: '17px', borderRadius: 16, border: 'none', cursor: 'pointer', background: `linear-gradient(135deg, ${GOLD}, ${HOT})`, color: '#fff', fontFamily: 'inherit', boxShadow: `0 12px 28px -8px ${HOT}aa` }}>
+          <span className="fs-display" style={{ fontSize: 17, fontWeight: 800, fontStyle: 'italic' }}>{t.cg_replay || 'Play again'}</span>
+        </button>
+        <button onClick={onBack} className="press" style={{ flex: 1, padding: '17px', borderRadius: 16, cursor: 'pointer', background: 'rgba(255,255,255,0.1)', color: '#fff', border: '1.5px solid rgba(255,255,255,0.22)', fontFamily: 'inherit' }}>
+          <span className="fs-display" style={{ fontSize: 17, fontWeight: 800, fontStyle: 'italic' }}>{t.cg_done || 'Done'}</span>
+        </button>
       </div>
-    </div>
+    </Studio>
   );
 }
 
@@ -404,94 +389,73 @@ function ScoreScene({ t, iq, score, hits, total, bestStreak, onReplay, onBack })
 export default function GuessWho({ analytics, t, onBack }) {
   const gw = analytics?.guessWho;
   const userMap = analytics?.userMap;
-  const rounds = useMemo(() => buildRounds(gw, userMap, t), [gw, userMap, t]);
-  const total = rounds.length;
+  const feed = useMemo(() => makeQuoteFeed(gw), [gw]);
 
-  // Stable per-author colour across the whole game.
-  const colorFor = useMemo(() => {
-    const map = new Map();
-    let ci = 0;
-    for (const r of rounds) for (const name of r.options) {
-      if (!map.has(name)) map.set(name, AUTHOR_COLORS[ci++ % AUTHOR_COLORS.length]);
-    }
-    return (name) => map.get(name) || CORAL;
-  }, [rounds]);
-
-  // step 0 = title, 1..total = rounds, total+1 = score.
-  const [step, setStep] = useState(0);
+  // phase: 'title' | 'play' | 'over'
+  const [phase, setPhase] = useState('title');
+  const [q, setQ] = useState(null);
+  const [qNum, setQNum] = useState(0);
   const [picked, setPicked] = useState(null);
   const [reveal, setReveal] = useState(false);
   const [lastGain, setLastGain] = useState(0);
   const [score, setScore] = useState(0);
   const [streak, setStreak] = useState(0);
   const [bestStreak, setBestStreak] = useState(0);
-  const [results, setResults] = useState([]); // booleans
-  const bodyRef = useRef(null);
+  const [hits, setHits] = useState(0);
+  const [lives, setLives] = useState(LIVES);
+  const [lostPulse, setLostPulse] = useState(false);
+  const [scorePulse, setScorePulse] = useState(false);
+  const idxRef = useRef(0);
 
-  useEffect(() => { if (bodyRef.current) bodyRef.current.scrollTop = 0; }, [step, reveal]);
+  const serveNext = useCallback(() => {
+    const quote = feed.next();
+    setQ(makeQuestion(quote, feed.authors, userMap, t, idxRef.current++));
+    setQNum(n => n + 1);
+    setPicked(null); setReveal(false); setLastGain(0); setLostPulse(false);
+  }, [feed, userMap, t]);
 
-  if (!gw || total === 0) {
-    return <GuessWhoEmpty t={t} onBack={onBack} needsReupload={!gw} />;
-  }
+  const start = useCallback(() => {
+    idxRef.current = 0;
+    setScore(0); setStreak(0); setBestStreak(0); setHits(0); setLives(LIVES); setQNum(0);
+    const quote = feed.next();
+    setQ(makeQuestion(quote, feed.authors, userMap, t, idxRef.current++));
+    setQNum(1); setPicked(null); setReveal(false); setLastGain(0);
+    setPhase('play');
+  }, [feed, userMap, t]);
 
-  const replay = () => {
-    setStep(0); setPicked(null); setReveal(false); setLastGain(0);
-    setScore(0); setStreak(0); setBestStreak(0); setResults([]);
-  };
-
-  const pick = (name) => {
-    if (reveal) return;
-    const round = rounds[step - 1];
-    const right = name === round.correct;
+  const pick = useCallback((name) => {
+    if (reveal || !q) return;
+    const right = name === q.correct;
     const streakAfter = right ? streak + 1 : 0;
-    const mult = right ? Math.min(2, 1 + 0.25 * (streakAfter - 1)) : 1;
+    const mult = right ? Math.min(3, 1 + 0.25 * (streakAfter - 1)) : 1;
     const gained = right ? Math.round(BASE * mult) : 0;
-    setPicked(name);
-    setReveal(true);
-    setLastGain(gained);
-    setScore(s => s + gained);
-    setStreak(streakAfter);
-    setBestStreak(b => Math.max(b, streakAfter));
-    setResults(r => [...r, right]);
-  };
+    setPicked(name); setReveal(true); setLastGain(gained);
+    if (right) {
+      setScore(s => s + gained); setScorePulse(true); setTimeout(() => setScorePulse(false), 480);
+      setStreak(streakAfter); setBestStreak(b => Math.max(b, streakAfter)); setHits(h => h + 1);
+    } else {
+      setStreak(0); setLives(l => l - 1); setLostPulse(true);
+    }
+  }, [reveal, q, streak]);
 
-  const next = () => {
-    if (step < total) { setStep(step + 1); setPicked(null); setReveal(false); setLastGain(0); }
-    else { setStep(total + 1); }
-  };
+  const cont = useCallback(() => {
+    if (lives <= 0) { setPhase('over'); return; }
+    serveNext();
+  }, [lives, serveNext]);
 
-  // Title.
-  if (step === 0) {
-    return (
-      <GameRoot onBack={onBack} t={t}>
-        <TitleScene t={t} rounds={total} people={gw.authors?.length || 0} onStart={() => setStep(1)} />
-      </GameRoot>
-    );
-  }
+  const gameOverNext = reveal && lives <= 0;
 
-  // Score.
-  if (step > total) {
-    const hits = results.filter(Boolean).length;
-    const iq = total ? Math.round((100 * hits) / total) : 0;
-    return (
-      <GameRoot onBack={onBack} t={t}>
-        <ScoreScene t={t} iq={iq} score={score} hits={hits} total={total} bestStreak={bestStreak} onReplay={replay} onBack={onBack} />
-      </GameRoot>
-    );
-  }
+  if (!feed) return <GuessWhoEmpty t={t} onBack={onBack} needsReupload={!gw} />;
 
-  // Question.
   return (
     <GameRoot onBack={onBack} t={t}>
-      <QuestionScene
-        round={rounds[step - 1]} t={t}
-        picked={picked} reveal={reveal}
-        roundNum={step} roundTotal={total}
-        score={score} streak={streak} lastGain={lastGain}
-        colorFor={colorFor}
-        onPick={pick} onContinue={next}
-        bodyRef={bodyRef}
-      />
+      {phase === 'title' && <TitleScene t={t} poolSize={feed.poolSize} people={feed.authors.length} onStart={start} />}
+      {phase === 'play' && q && (
+        <QuestionScene q={q} t={t} picked={picked} reveal={reveal} qNum={qNum} score={score} streak={streak}
+          lives={lives} lostPulse={lostPulse} lastGain={lastGain} scorePulse={scorePulse}
+          onPick={pick} onContinue={cont} gameOverNext={gameOverNext} />
+      )}
+      {phase === 'over' && <ScoreScene t={t} hits={hits} score={score} bestStreak={bestStreak} onReplay={start} onBack={onBack} />}
     </GameRoot>
   );
 }
@@ -499,11 +463,11 @@ export default function GuessWho({ analytics, t, onBack }) {
 // Shared root: the always-present close button.
 function GameRoot({ children, onBack, t }) {
   return (
-    <div style={{ position: 'absolute', inset: 0, background: PLUM, overflow: 'hidden' }}>
+    <div style={{ position: 'absolute', inset: 0, background: STAGE, overflow: 'hidden' }}>
       {children}
       <button onClick={onBack} className="press" aria-label={t.a11y_close || 'Close'} style={{
         position: 'absolute', top: 'calc(env(safe-area-inset-top, 0px) + 12px)', insetInlineEnd: 14, zIndex: 10,
-        background: 'rgba(0,0,0,0.28)', backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)',
+        background: 'rgba(0,0,0,0.4)', backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)',
         color: '#fff', border: 'none', width: 38, height: 38, borderRadius: '50%', cursor: 'pointer',
         display: 'flex', alignItems: 'center', justifyContent: 'center',
       }}>
@@ -518,26 +482,21 @@ function GameRoot({ children, onBack, t }) {
 // ── Empty-state view ───────────────────────────────────────────
 function GuessWhoEmpty({ t, onBack, needsReupload }) {
   const title = needsReupload
-    ? (t.gw_empty_old_title || t.chaos_empty_old_title || 'Re-upload to unlock')
+    ? (t.gw_empty_old_title || 'Re-upload to unlock')
     : (t.gw_empty_title || 'Not enough to guess');
   const body = needsReupload
     ? (t.gw_empty_old_body || 'This recap was saved before this mode existed. Re-upload your chat to play.')
     : (t.gw_empty_body || 'This chat needs a couple more talkative people for a fair game.');
   return (
-    <div style={{
-      position: 'absolute', inset: 0, overflow: 'hidden',
-      background: `linear-gradient(180deg, ${CREAM} 0%, #FFF0E2 46%, ${PINK} 100%)`,
-      display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
-      padding: '24px', gap: 12, textAlign: 'center',
-    }}>
-      <div aria-hidden style={{ fontSize: 64 }}>{needsReupload ? '📂' : '🕵️'}</div>
-      <div className="fs-display" style={{ fontSize: 24, fontWeight: 800, color: PLUM }}>{title}</div>
-      <div className="fs-sans" style={{ fontSize: 14, color: MUTED, maxWidth: 300 }}>{body}</div>
-      <button onClick={onBack} className="press" style={{
-        marginTop: 12, padding: '12px 22px', borderRadius: 999,
-        background: `linear-gradient(135deg, ${GOLD}, ${CORAL})`, color: EGGPLANT,
-        border: '2px solid rgba(255,255,255,0.8)', cursor: 'pointer', fontWeight: 800, fontSize: 14,
-      }}>{t.rm_back || 'Back'}</button>
-    </div>
+    <Studio tint={NEON}>
+      <div style={{ flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', textAlign: 'center', padding: '24px', gap: 12 }}>
+        <div aria-hidden style={{ fontSize: 64 }}>{needsReupload ? '📂' : '🎬'}</div>
+        <div className="fs-display" style={{ fontSize: 24, fontWeight: 800, fontStyle: 'italic', color: '#fff' }}>{title}</div>
+        <div className="fs-sans" style={{ fontSize: 14, color: INK_DIM, maxWidth: 300 }}>{body}</div>
+        <button onClick={onBack} className="press" style={{ marginTop: 12, padding: '14px 26px', borderRadius: 16, background: `linear-gradient(135deg, ${GOLD}, ${HOT})`, color: '#fff', border: 'none', cursor: 'pointer', fontFamily: 'inherit' }}>
+          <span className="fs-display" style={{ fontSize: 16, fontWeight: 800, fontStyle: 'italic' }}>{t.rm_back || 'Back'}</span>
+        </button>
+      </div>
+    </Studio>
   );
 }

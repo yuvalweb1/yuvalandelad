@@ -127,8 +127,8 @@ export default function Modes({ analytics, history = [], t, onUpload, onRoastMod
           <ModeTile
             label={t.menu_guesswho_eyebrow || 'Who said this?'}
             title={t.menu_guesswho_title || 'Guess Who'}
-            emoji="🕵️"
-            gradient="linear-gradient(135deg, #00BFFF 0%, #FF1867 100%)"
+            emoji="🎬"
+            gradient="linear-gradient(135deg, #FFC83A 0%, #FF2D78 55%, #22D3EE 100%)"
             fg="#fff"
             shadowColor="#7a1240"
             onClick={onGuessWho}
