@@ -421,12 +421,12 @@ export default function HowToGuide({ t, onStart, onHome, lang, setLang, hasChat 
         {/* step label */}
         <div style={{ width: '100%', textAlign: 'center' }}>
           <div className="fs-display" style={{
-            display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
             width: 42, height: 42, borderRadius: 999,
             background: '#FFD700', color: '#4A0E4E',
             fontSize: 21, fontWeight: 800,
             boxShadow: '0 3px 0 #E0A800',
-            marginBottom: 12,
+            margin: '0 auto 8px',
           }}>{stepIdx + 1}</div>
           <div className="fs-sans" dir="auto" style={{
             fontSize: 21, lineHeight: 1.35, fontWeight: 700, color: '#4A0E4E',

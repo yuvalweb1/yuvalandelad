@@ -33,6 +33,7 @@ export default function Landing({
   const [historyOpen, setHistoryOpen] = useState(false);
   const [shaking, setShaking] = useState(false);
   const [howToPulse, setHowToPulse] = useState(false);
+  const isRTL = lang === 'he' || lang === 'ar';
   const emojiRots = useMemo(() => [10, -13, 16, -9, 12].map(base => {
     const jitter = ((Math.random() * 12) | 0) - 6;
     return base + jitter;
@@ -74,7 +75,8 @@ export default function Landing({
     if (history.length > 0) {
       setHistoryOpen(true);
     } else {
-      fileInputRef.current?.click();
+      setHowToPulse(true);
+      setTimeout(() => setHowToPulse(false), 520);
     }
   }, [history.length]);
 
@@ -396,7 +398,7 @@ export default function Landing({
           !hasSelection ? (
             <button
               onClick={onHowTo}
-              className={`press cta-card-ring`}
+              className={`press cta-card-ring${howToPulse ? ' guide-pulse' : ''}`}
               style={{
                 display: 'block', width: '100%', marginBottom: 14,
                 background: 'linear-gradient(135deg, #4A0E4E 0%, #6B1A72 100%)',
@@ -419,7 +421,7 @@ export default function Landing({
                   background: '#FFD700',
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
                 }}>
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#4A0E4E" strokeWidth="2.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#4A0E4E" strokeWidth="2.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" style={{ transform: isRTL ? 'scaleX(-1)' : undefined }}>
                     <polyline points="9 18 15 12 9 6"/>
                   </svg>
                 </div>
@@ -469,12 +471,12 @@ export default function Landing({
             border: hasSelection ? '2px solid rgba(255,255,255,0.80)' : '2px solid rgba(255,255,255,0.72)',
             borderRadius: 24,
             fontSize: 21, fontWeight: 800,
-            cursor: hasSelection ? 'pointer' : 'default',
+            cursor: hasSelection ? 'pointer' : 'not-allowed',
             letterSpacing: '-0.01em',
             boxShadow: hasSelection
               ? '0 8px 0 rgba(74,14,78,0.28), 0 18px 32px -8px rgba(74,14,78,0.32)'
               : '0 4px 0 rgba(74,14,78,0.13), 0 10px 20px -6px rgba(74,14,78,0.14)',
-            opacity: hasSelection ? 1 : 0.88,
+            opacity: hasSelection ? 1 : 0.50,
             transition: 'background 0.25s, color 0.25s, box-shadow 0.25s, opacity 0.25s',
           }}>
           <span className="fs-display" style={{ position: 'relative' }}>{t.landing_cta}</span>

@@ -1135,16 +1135,19 @@ function findLongestGap(messages) {
 //   Returns { quotes: [{ author, content }], authors: [names] }
 // ============================================================
 function computeGuessWho(messages, userMap) {
-  const PER_AUTHOR = 4;
+  const PER_AUTHOR = 30;
   const byAuthor = new Map(); // author -> [{ content, score, key }]
 
   for (const m of messages) {
-    // Only clean, quotable text — media/voice/poll/links don't read as a quote.
-    if (m.hasMedia || m.isVoice || m.isPoll || m.hasLink || !m.content) continue;
+    if (m.hasMedia || m.isVoice || m.isPoll || !m.content) continue;
+    // wordCount is pre-computed without links/emojis stripped; use it as the word signal.
     const wc = m.wordCount || 0;
-    if (wc < 3 || wc > 28) continue;
-    const text = m.content.replace(/\s+/g, ' ').trim();
-    if (text.length < 12 || text.length > 160) continue;
+    if (wc < 2 || wc > 28) continue;
+    // Strip URLs for display — messages with commentary around a link are fine quotes.
+    const text = (m.hasLink
+      ? m.content.replace(/https?:\/\/\S+/g, '')
+      : m.content).replace(/\s+/g, ' ').trim();
+    if (text.length < 10 || text.length > 160) continue;
 
     const u = userMap[m.author];
     const lower = text.toLowerCase();
@@ -1159,7 +1162,7 @@ function computeGuessWho(messages, userMap) {
     if (/\b[A-Z]{3,}\b/.test(text)) score += 1; // English caps energy (Hebrew has no case)
 
     // Collapse near-duplicates from the same author (e.g. they spam one phrase).
-    const key = lower.replace(/[^a-zא-ת0-9]/gi, '').slice(0, 24);
+    const key = lower.replace(/[^a-zא-ת0-9]/gi, '').slice(0, 40);
     if (!key) continue;
     let list = byAuthor.get(m.author);
     if (!list) { list = []; byAuthor.set(m.author, list); }

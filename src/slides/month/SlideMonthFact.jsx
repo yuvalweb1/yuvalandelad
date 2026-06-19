@@ -70,9 +70,9 @@ const SlideMonthFact = React.memo(function SlideMonthFact({ a, t, cfg = 'emoji' 
             <div className="a-spring fs-display" dir="auto" style={{
               ...cardStyle(true),
               padding: '16px 26px', maxWidth: '92%',
-              fontSize: top.label.length > 9 ? 34 : 48, fontWeight: 900, color: '#4A0E4E',
+              fontSize: top.label.length > 15 ? 22 : top.label.length > 9 ? 34 : 48, fontWeight: 900, color: '#4A0E4E',
               letterSpacing: '-0.02em', textAlign: 'center',
-              overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+              overflow: 'hidden', whiteSpace: 'normal', wordBreak: 'break-word',
             }}>
               {top.label}
             </div>

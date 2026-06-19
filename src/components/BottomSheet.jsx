@@ -2,12 +2,12 @@ export default function BottomSheet({ children, onClose, title = 'Switch person'
   return (
     <>
       <div onClick={onClose} style={{
-        position: 'absolute', inset: 0,
+        position: 'fixed', inset: 0,
         background: light ? 'rgba(74,14,78,0.40)' : 'rgba(0,0,0,0.7)',
         zIndex: 60,
       }} />
       <div className="no-sb" style={{
-        position: 'absolute', left: 0, right: 0, bottom: 0,
+        position: 'fixed', left: 0, right: 0, bottom: 0,
         overflowY: 'auto',
         background: light ? 'rgba(255,252,243,0.99)' : '#0a0a0f',
         borderRadius: '24px 24px 0 0', zIndex: 61,

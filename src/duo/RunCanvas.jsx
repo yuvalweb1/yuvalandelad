@@ -298,6 +298,7 @@ export default function RunCanvas({
     }
 
     function render() {
+      ctx.direction = 'ltr';
       ctx.setTransform(view.scale, 0, 0, view.scale, 0, 0);
       const gs = view.groundShift || 0;
       const inStorm = level.storm && p.x > level.storm.x0 && p.x < level.storm.x1;

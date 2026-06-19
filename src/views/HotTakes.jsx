@@ -278,7 +278,7 @@ function VotingScreen({ t, round, roundIdx, total, isSolo, onPick }) {
       }}>
         {/* corner-post colour flag */}
         <div aria-hidden style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 8, background: color, borderRadius: '14px 14px 0 0' }} />
-        <div style={{ filter: active ? 'none' : 'saturate(0.9)' }}><Glove size={96} color={color} /></div>
+        <div style={{ filter: active ? 'none' : 'saturate(0.9)' }}><span style={{ fontSize: 76, lineHeight: 1, display: 'inline-block', transform: pick === 'disagree' ? 'scaleX(-1)' : 'none' }}>🥊</span></div>
         <span className="fs-boxing" style={{ fontSize: 30, letterSpacing: '0.04em' }}>{label}</span>
         {active && <span aria-hidden className="a-ko-punch fs-boxing" style={{ position: 'absolute', top: 14, insetInlineEnd: 14, fontSize: 15, padding: '4px 10px', borderRadius: 6, background: color, color: '#141017' }}>✓</span>}
       </button>

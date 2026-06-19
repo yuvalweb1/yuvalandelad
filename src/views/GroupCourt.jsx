@@ -339,7 +339,7 @@ function VotingScreen({ t, round, roundIdx, total, isSolo, onPick }) {
               opacity: picked && !sel ? 0.42 : 1, transition: 'opacity 0.2s, border-color 0.2s, background 0.2s',
             }}>
               <Mugshot name={name} size={56} />
-              <div className="fs-sans" style={{ fontWeight: 800, fontSize: 15, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: '100%' }}>{name}</div>
+              <div className="fs-sans" style={{ fontWeight: 800, fontSize: 15, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', width: '100%' }}>{name}</div>
               {sel && <div aria-hidden className="a-px-stamp fs-pixel" style={{ position: 'absolute', top: 4, insetInlineEnd: 4, padding: '3px 5px', background: GOLD, color: INK, fontSize: 8, border: `3px solid ${INK}` }}>✓</div>}
             </button>
           );

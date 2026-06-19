@@ -62,6 +62,7 @@ const SlideBusiestWeekday = React.memo(function SlideBusiestWeekday({ a, t, prof
                   boxShadow: isPeak ? '0 8px 18px rgba(39,125,161,0.35)' : 'none',
                 }} />
                 <div className="fs-sans" style={{
+                  width: '100%', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', textAlign: 'center',
                   fontSize: 11, fontWeight: isPeak ? 800 : 600,
                   color: isPeak ? '#277da1' : 'rgba(42,6,69,0.6)',
                   textTransform: 'uppercase', letterSpacing: '0.04em',
@@ -80,7 +81,7 @@ const SlideBusiestWeekday = React.memo(function SlideBusiestWeekday({ a, t, prof
           <span className="fs-mono" style={{ fontSize: 11, color: '#277da1', letterSpacing: '0.1em', textTransform: 'uppercase', fontWeight: 600 }}>
             {t.bw_peak_label || 'peak day'}
           </span>
-          <div className="fs-display" style={{ fontSize: 22, fontWeight: 800, color: '#2a0645', marginTop: 4 }}>
+          <div className="fs-display" style={{ fontSize: 22, fontWeight: 800, color: '#2a0645', marginTop: 4, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
             {peakDay}
           </div>
         </div>
