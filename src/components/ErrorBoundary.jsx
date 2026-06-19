@@ -19,7 +19,7 @@ export default class ErrorBoundary extends React.Component {
           padding: 24, fontFamily: 'monospace', fontSize: 23,
         }}>
           <div style={{ color: '#f3722c', fontWeight: 700, marginBottom: 12 }}>
-            Recapped hit an unexpected error.
+            Recapped ran into a problem.
           </div>
           <div style={{ marginBottom: 6 }}>{String(this.state.error)}</div>
           <div style={{ color: '#c8c8dc', marginTop: 12 }}>
