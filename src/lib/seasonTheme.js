@@ -53,9 +53,7 @@ const MONTH_TO_SEASON = [
 // messages inside the window (the "centre of gravity" of the recap) so a window
 // that straddles a boundary themes to where the action actually was.
 export function detectSeasonTheme(analytics) {
-  const hourly = analytics?.start; // touch to keep tree-shakers honest
-  let monthIdx = null;
-
+  let monthIdx;
   // Prefer the season extras' month buckets when present (most accurate).
   const months = analytics?.season?.months;
   if (months && months.length) {
@@ -67,7 +65,6 @@ export function detectSeasonTheme(analytics) {
   } else {
     monthIdx = new Date().getMonth();
   }
-  void hourly;
   const key = MONTH_TO_SEASON[monthIdx] || 'spring';
   return SEASON_THEMES[key];
 }
