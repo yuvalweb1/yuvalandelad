@@ -118,10 +118,18 @@
       "PowerShell(node scripts/i18n-check.mjs)",
       "PowerShell(node scripts/ruins-verify.mjs)",
       "PowerShell(node scripts/i18n-check.mjs 2>&1 | Select-Object -Last 40)",
-      "PowerShell(node scripts/ruins-verify.mjs 2>&1 | Select-Object -Last 60)"
+      "PowerShell(node scripts/ruins-verify.mjs 2>&1 | Select-Object -Last 60)",
+      "PowerShell(Test-Path *)",
+      "Bash(gh repo *)",
+      "WebFetch(domain:github.com)"
     ],
     "additionalDirectories": [
       "\\tmp"
     ]
-  }
+  },
+  "enabledMcpjsonServers": [
+    "claude-flow",
+    "ruv-swarm",
+    "flow-nexus"
+  ]
 }
