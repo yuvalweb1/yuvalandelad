@@ -121,7 +121,14 @@
       "PowerShell(node scripts/ruins-verify.mjs 2>&1 | Select-Object -Last 60)",
       "PowerShell(Test-Path *)",
       "Bash(gh repo *)",
-      "WebFetch(domain:github.com)"
+      "WebFetch(domain:github.com)",
+      "Bash(ruflo verify *)",
+      "Bash(ruflo *)",
+      "Bash(env)",
+      "WebFetch(domain:raw.githubusercontent.com)",
+      "mcp__ruflo__mcp_status",
+      "mcp__ruflo__system_health",
+      "mcp__ruflo__memory_stats"
     ],
     "additionalDirectories": [
       "\\tmp"
