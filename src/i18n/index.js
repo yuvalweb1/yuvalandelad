@@ -37,10 +37,12 @@ export function buildT(lang) {
   return { ...I18N.en, ...(I18N[lang] || {}) };
 }
 
-// Simple {placeholder} interpolation
+// Simple {placeholder} interpolation.
+// Wraps each substituted value in FSI/PDI (U+2068/U+2069) so that LTR content
+// (dates, numbers) embedded in RTL strings doesn't disrupt the BiDi algorithm.
 export function interp(str, vars) {
   if (!str || !vars) return str;
-  return str.replace(/\{(\w+)\}/g, (_, k) => vars[k] != null ? vars[k] : `{${k}}`);
+  return str.replace(/\{(\w+)\}/g, (_, k) => vars[k] != null ? `⁨${vars[k]}⁩` : `{${k}}`);
 }
 
 // Type-aware copy lookup. Returns `t[key_type]` if present, else falls back to `t[key]`.
