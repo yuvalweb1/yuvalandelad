@@ -23,6 +23,7 @@ import RoastMode from './views/RoastMode.jsx';
 import Modes from './views/Modes.jsx';
 import DuoQuest from './views/DuoQuest.jsx';
 import GuessWho from './views/GuessWho.jsx';
+import TwoTruths from './views/TwoTruths.jsx';
 import GroupCourt from './views/GroupCourt.jsx';
 import HotTakes from './views/HotTakes.jsx';
 import Settings from './views/Settings.jsx';
@@ -750,6 +751,7 @@ function RecappedApp() {
               onRoastMode={() => enterMode('roastmode')}
               onDuo={() => enterMode('duo')}
               onGuessWho={() => enterMode('guesswho')}
+              onTwoTruths={() => enterMode('twotruths')}
               onCourt={() => enterMode('court')}
               onHotTakes={() => enterMode('hottake')}
             />
@@ -765,6 +767,9 @@ function RecappedApp() {
           )}
           {stage === 'guesswho' && (
             <GuessWho analytics={fullAnalytics} t={t} onBack={() => setStage('modes')} />
+          )}
+          {stage === 'twotruths' && (
+            <TwoTruths analytics={fullAnalytics} t={t} onBack={() => setStage('modes')} />
           )}
           {stage === 'court' && fullAnalytics && (
             <GroupCourt analytics={fullAnalytics} profile={profile} t={t} onBack={() => setStage('modes')} />

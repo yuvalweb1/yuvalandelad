@@ -75,7 +75,7 @@ function LockedState({ t, onUpload }) {
   );
 }
 
-export default function Modes({ analytics, history = [], t, onUpload, onRoastMode, onDuo, onGuessWho, onCourt, onHotTakes }) {
+export default function Modes({ analytics, history = [], t, onUpload, onRoastMode, onDuo, onGuessWho, onTwoTruths, onCourt, onHotTakes }) {
   // A chat the user already imported or picked from history counts as
   // "available" even before it's loaded into the active session — don't make
   // them feel locked out of something they just brought in.
@@ -132,6 +132,15 @@ export default function Modes({ analytics, history = [], t, onUpload, onRoastMod
             fg="#fff"
             shadowColor="#7a1240"
             onClick={onGuessWho}
+          />
+          <ModeTile
+            label={t.menu_twotruths_eyebrow || 'Spot the lie'}
+            title={t.menu_twotruths_title || 'Two Truths & a Lie'}
+            emoji="🔎"
+            gradient="linear-gradient(135deg, #2DD4BF 0%, #0E7C73 60%, #0A2A2A 100%)"
+            fg="#fff"
+            shadowColor="#063b38"
+            onClick={onTwoTruths}
           />
           <ModeTile
             label={t.menu_duo_eyebrow || 'Duo game'}
