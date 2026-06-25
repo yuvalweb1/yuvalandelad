@@ -9,10 +9,10 @@ function ModeTile({ label, title, emoji, gradient, fg = '#fff', shadowColor = '#
       background: gradient,
       border: 'none',
       borderRadius: 22,
-      padding: '18px 20px',
+      padding: '18px 26px',
       cursor: 'pointer',
       color: fg,
-      display: 'flex', alignItems: 'center', gap: 16,
+      display: 'flex', alignItems: 'center', gap: 18,
       boxShadow: `0 7px 0 ${shadowColor}44, 0 18px 32px -10px ${shadowColor}88`,
     }}>
       <div aria-hidden style={{
