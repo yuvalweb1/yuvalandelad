@@ -3,6 +3,16 @@ import BottomSheet from '../components/BottomSheet.jsx';
 import { relativeTime } from '../lib/history.js';
 import { interp } from '../i18n';
 
+// Per-period accent colors so each time window reads as its own thing at a
+// glance. `solid` = active pill background (white text); `tint` = inactive
+// background; `text` = inactive label color. All chosen for ≥4.5:1 contrast.
+const PERIOD_COLORS = {
+  all:    { solid: '#4A0E4E', tint: 'rgba(74,14,78,0.08)',   text: '#4A0E4E' }, // brand deep purple
+  year:   { solid: '#1E40AF', tint: 'rgba(30,64,175,0.09)',  text: '#1E40AF' }, // indigo
+  season: { solid: '#047857', tint: 'rgba(4,120,87,0.10)',   text: '#047857' }, // emerald
+  month:  { solid: '#B45309', tint: 'rgba(180,83,9,0.10)',   text: '#B45309' }, // amber
+};
+
 const LANGUAGES = [
   { code: 'en', name: 'English', flag: '🇺🇸' },
   { code: 'he', name: 'עברית', flag: '🇮🇱' },
@@ -33,6 +43,7 @@ export default function Landing({
   const [historyOpen, setHistoryOpen] = useState(false);
   const [shaking, setShaking] = useState(false);
   const [howToPulse, setHowToPulse] = useState(false);
+  const [loading, setLoading] = useState(false);
   const isRTL = lang === 'he' || lang === 'ar';
   const emojiRots = useMemo(() => [10, -13, 16, -9, 12].map(base => {
     const jitter = ((Math.random() * 12) | 0) - 6;
@@ -52,16 +63,34 @@ export default function Landing({
   // and comes back as the most-recent history entry, already selected.
   const selectedHistoryItem = selectedRecapId ? history.find(r => r.id === selectedRecapId) : null;
   const hasSelection = selectedHistoryItem != null;
+  // Nothing imported yet — the card has no chat to point at, so it reads as a
+  // dimmed, inert placeholder rather than an actionable selection.
+  const noImport = history.length === 0;
 
-  const handleCtaMain = useCallback(() => {
-    if (selectedHistoryItem) {
-      onLoadRecap(selectedHistoryItem.id);
-    } else {
+  const handleCtaMain = useCallback(async () => {
+    if (!selectedHistoryItem) {
       setShaking(true);
       setHowToPulse(true);
       setTimeout(() => { setShaking(false); setHowToPulse(false); }, 520);
+      return;
     }
-  }, [selectedHistoryItem, onLoadRecap]);
+    if (loading) return;
+    // Big chats: onLoadRecap runs a synchronous computeAll() that blocks the
+    // main thread for ~1s with no feedback (messages are already in memory, so
+    // there's no await to yield on). Flip on the loading state and wait two
+    // frames so the spinner actually paints before the freeze begins. The
+    // spinner is transform-based, so the compositor keeps it turning even while
+    // JS is blocked.
+    setLoading(true);
+    await new Promise(requestAnimationFrame);
+    await new Promise(requestAnimationFrame);
+    try {
+      await onLoadRecap(selectedHistoryItem.id);
+      // Success unmounts Landing (stage change), so no need to reset loading.
+    } catch {
+      setLoading(false);
+    }
+  }, [selectedHistoryItem, onLoadRecap, loading]);
 
   // Parse-on-select: picking a file starts parsing immediately (full-screen
   // Parsing stage), then returns here with the chat selected + stats populated.
@@ -261,11 +290,15 @@ export default function Landing({
         marginTop: 10, animationDelay: '0.28s',
       }}>
         <div style={{
-          background: 'rgba(255,255,255,0.82)',
+          background: noImport ? 'rgba(255,255,255,0.50)' : 'rgba(255,255,255,0.82)',
           border: '1.5px solid rgba(255,255,255,0.95)',
           borderRadius: 14,
           padding: '8px 9px',
-          boxShadow: '0 4px 0 rgba(74,14,78,0.12), 0 10px 18px -6px rgba(74,14,78,0.18)',
+          boxShadow: noImport
+            ? '0 2px 0 rgba(74,14,78,0.06), 0 6px 12px -6px rgba(74,14,78,0.10)'
+            : '0 4px 0 rgba(74,14,78,0.12), 0 10px 18px -6px rgba(74,14,78,0.18)',
+          opacity: noImport ? 0.6 : 1,
+          transition: 'opacity 0.25s, background 0.25s, box-shadow 0.25s',
         }}>
           {/* Header row */}
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: hasSelection ? 6 : 0 }}>
@@ -281,12 +314,14 @@ export default function Landing({
             <button
               onClick={handleSwitchClick}
               className="press fs-sans"
+              aria-disabled={noImport}
               style={{
                 padding: '6px 10px',
                 background: 'rgba(74,14,78,0.08)',
                 border: 'none', borderRadius: 8,
                 fontSize: 10, fontWeight: 700, color: '#573280',
-                cursor: 'pointer', letterSpacing: '-0.01em',
+                cursor: noImport ? 'not-allowed' : 'pointer', letterSpacing: '-0.01em',
+                opacity: noImport ? 0.45 : 1,
               }}>
               SWITCH ↓
             </button>
@@ -323,8 +358,7 @@ export default function Landing({
               </div>
 
               {/* Stats row — live values for the selected trailing window */}
-              <div style={{ height: 1, background: 'rgba(74,14,78,0.09)', margin: '7px 0 6px' }} />
-              <div style={{ display: 'flex', alignItems: 'center' }}>
+              <div style={{ display: 'flex', alignItems: 'center', marginTop: 7 }}>
                 {[
                   {
                     label: t.landing_stat_messages || 'MESSAGES',
@@ -335,10 +369,9 @@ export default function Landing({
                     label: t.landing_stat_people || 'PEOPLE',
                     value: previewStats?.totalParticipants ?? '—',
                   },
-                ].map((stat, i, arr) => (
+                ].map((stat) => (
                   <div key={stat.label} style={{
                     flex: 1, textAlign: 'center',
-                    borderRight: i < arr.length - 1 ? '1px solid rgba(74,14,78,0.12)' : 'none',
                     padding: '0 4px',
                   }}>
                     <div className="fs-sans" style={{
@@ -362,6 +395,7 @@ export default function Landing({
                 <div role="group" aria-label={t.period_all || 'Time period'} style={{ display: 'flex', gap: 5, marginTop: 7 }}>
                   {periodChoices.map(p => {
                     const active = period === p;
+                    const c = PERIOD_COLORS[p] || PERIOD_COLORS.all;
                     return (
                       <button
                         key={p}
@@ -372,8 +406,8 @@ export default function Landing({
                           flex: 1, padding: '6px 4px', borderRadius: 999,
                           border: 'none', cursor: 'pointer',
                           fontSize: 10.5, fontWeight: 700, letterSpacing: '-0.01em',
-                          background: active ? '#4A0E4E' : 'rgba(74,14,78,0.07)',
-                          color: active ? '#fff' : '#573280',
+                          background: active ? c.solid : c.tint,
+                          color: active ? '#fff' : c.text,
                           transition: 'background 0.18s ease-out, color 0.18s ease-out',
                         }}>
                         {t[`period_${p}`] || p}
@@ -456,6 +490,8 @@ export default function Landing({
         {/* Main CTA — primary action, gets the strongest visual weight */}
         <button
           onClick={handleCtaMain}
+          aria-busy={loading}
+          disabled={loading}
           className={`press${shaking && !hasSelection ? ' cta-shake' : ''}`}
           style={{
             width: '100%', position: 'relative', overflow: 'hidden',
@@ -467,7 +503,7 @@ export default function Landing({
             border: hasSelection ? '2px solid rgba(255,255,255,0.80)' : '2px solid rgba(255,255,255,0.72)',
             borderRadius: 24,
             fontSize: 21, fontWeight: 800,
-            cursor: hasSelection ? 'pointer' : 'not-allowed',
+            cursor: loading ? 'progress' : (hasSelection ? 'pointer' : 'not-allowed'),
             letterSpacing: '-0.01em',
             boxShadow: hasSelection
               ? '0 8px 0 rgba(74,14,78,0.28), 0 18px 32px -8px rgba(74,14,78,0.32)'
@@ -475,7 +511,22 @@ export default function Landing({
             opacity: hasSelection ? 1 : 0.50,
             transition: 'background 0.25s, color 0.25s, box-shadow 0.25s, opacity 0.25s',
           }}>
-          <span className="fs-display" style={{ position: 'relative' }}>{t.landing_cta}</span>
+          <span className="fs-display" style={{
+            position: 'relative',
+            display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 12,
+          }}>
+            {loading && (
+              // Transform-based spin keeps turning on the compositor thread even
+              // while the synchronous analytics pass blocks the main thread.
+              <span className="a-spin" aria-hidden="true" style={{
+                width: 22, height: 22, flexShrink: 0,
+                border: '3px solid rgba(74,14,78,0.25)',
+                borderTopColor: '#2a0645',
+                borderRadius: '50%',
+              }} />
+            )}
+            {loading ? (t.landing_cta_loading || 'Exposing…') : t.landing_cta}
+          </span>
         </button>
 
         {/* Secondary: demo only — upload-existing-file moved to Settings */}

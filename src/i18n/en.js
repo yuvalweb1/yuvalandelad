@@ -16,6 +16,7 @@ export default {
   feat_drama_t: 'DRAMA',
   feat_drama_q: 'Who started the chaos?',
   landing_cta: 'Expose them',
+  landing_cta_loading: 'Exposing…',
   landing_trust: 'Everything is processed locally. Your chat never leaves your device.',
   landing_step1: 'Export your chat',
   landing_step1_cta: 'Start your recap here',

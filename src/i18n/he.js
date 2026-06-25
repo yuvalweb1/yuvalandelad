@@ -27,6 +27,7 @@ export default {
   feat_drama_t: 'דרמה',
   feat_drama_q: 'מי התחיל את הבלאגן?',
   landing_cta: 'לחשוף את הקבוצה',
+  landing_cta_loading: 'חושפים…',
   landing_trust: 'הצ׳אט שלכם לא עוזב את המכשיר. נקודה.',
   landing_step1: 'מייצאים את הצ׳אט מוואטסאפ',
   landing_step1_cta: 'התחילו את הסיכום כאן',
