@@ -157,3 +157,6 @@ play-store/sweep-he/
 .claude/
 .claude-flow/
 .mcp.json
+
+# IDE project files (IntelliJ/Android Studio) — machine-specific, never commit
+.idea/
