@@ -437,10 +437,6 @@ export default function Landing({
               boxShadow: '0 6px 0 rgba(74,14,78,0.14), 0 16px 28px -8px rgba(74,14,78,0.22)',
             }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                <div style={{
-                  flexShrink: 0, width: 7, height: 7, borderRadius: 999,
-                  background: '#4A0E4E', marginLeft: 2,
-                }} />
                 <div className="fs-sans" dir="auto" style={{ flex: 1, minWidth: 0, fontSize: 15, fontWeight: 700, color: '#2a0645', lineHeight: 1.3, overflowWrap: 'break-word', wordBreak: 'break-word' }}>
                   {t.landing_step1}
                 </div>
