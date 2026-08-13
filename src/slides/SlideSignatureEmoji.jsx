@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import SlideShell from './SlideShell.jsx';
 import ListSlideDecor from '../components/ListSlideDecor.jsx';
+import Twemoji from '../components/Twemoji.jsx';
 import { typedCopy, isRtlText } from '../i18n';
 
 const MAX_ROWS = 5;
@@ -39,7 +40,7 @@ const SlideSignatureEmoji = React.memo(function SlideSignatureEmoji({ a, t, prof
 
     const emojiEl = (
       <div style={{ flexShrink: 0, fontSize: 30, lineHeight: 1, minWidth: 36, textAlign: 'center' }}>
-        {u.topEmoji}
+        <Twemoji>{u.topEmoji}</Twemoji>
       </div>
     );
 

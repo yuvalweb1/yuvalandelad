@@ -170,6 +170,14 @@ function RecappedApp() {
     setStage('settings');
   }, []);
 
+  // Where the How-To guide should return to — it's reachable from the landing
+  // empty-state tutorial, the SWITCH sheet, and Settings. Set just before entry.
+  const [howToReturn, setHowToReturn] = useState('landing');
+  const openHowTo = useCallback((from) => {
+    setHowToReturn(from);
+    setStage('howto');
+  }, []);
+
   // Where Roast Mode should return to — it's reachable from both the Wrapped
   // deck and the bottom-nav Modes hub. Set just before entering (or its ad gate).
   const [roastReturn, setRoastReturn] = useState('wrapped');
@@ -584,12 +592,14 @@ function RecappedApp() {
               hasChat={history.length > 0}
               onHome={() => {
                 try { localStorage.setItem('cw_seen_guide', '1'); } catch {}
-                setStage('landing');
+                setStage(howToReturn);
               }}
               onStart={() => {
                 try { localStorage.setItem('cw_seen_guide', '1'); } catch {}
-                if (history.length === 0) setAutoOpenPicker(true);
-                setStage('landing');
+                // Only auto-open the picker when returning to an empty landing —
+                // a guide opened from Settings just returns to Settings.
+                if (howToReturn === 'landing' && history.length === 0) setAutoOpenPicker(true);
+                setStage(howToReturn);
               }}
             />
           )}
@@ -601,7 +611,8 @@ function RecappedApp() {
                 t={t}
                 lang={lang}
                 setLang={setLang}
-                onHowTo={() => setStage('howto')}
+                onHowTo={() => openHowTo('landing')}
+                onModes={() => setStage('modes')}
                 onDemo={showDemo ? true : null}
                 onOpenSettings={() => openSettings('landing')}
                 includeMedia={includeMedia}
@@ -723,6 +734,7 @@ function RecappedApp() {
               history={history}
               onClearHistory={handleClearHistory}
               onFile={handleFile}
+              onHowTo={() => openHowTo('settings')}
               onBack={() => setStage(settingsReturn)}
             />
           )}

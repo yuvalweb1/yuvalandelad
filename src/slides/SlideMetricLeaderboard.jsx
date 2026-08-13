@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import SlideShell from './SlideShell.jsx';
 import ListSlideDecor from '../components/ListSlideDecor.jsx';
+import Twemoji from '../components/Twemoji.jsx';
 import { typedCopy, isRtlText } from '../i18n';
 
 // Metric definitions (same as SlideMetric, but rendered in leaderboard style)
@@ -148,7 +149,7 @@ const SlideMetricLeaderboard = React.memo(function SlideMetricLeaderboard({ a, t
 
     const valueEl = (
       <div className="fs-display" style={{ flexShrink: 0, fontSize: 28, fontWeight: 800, color: def.color }}>
-        {row.displayValue}
+        <Twemoji>{row.displayValue}</Twemoji>
       </div>
     );
 

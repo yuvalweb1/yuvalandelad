@@ -31,7 +31,7 @@ const LANGUAGES = [
 ];
 
 export default function Landing({
-  onFile, onDemo, parseError, t, lang, setLang, onHowTo, onOpenSettings,
+  onFile, onDemo, parseError, t, lang, setLang, onHowTo, onModes, onOpenSettings,
   includeMedia = true, setIncludeMedia,
   history = [], onLoadRecap, onDeleteRecap, onClearHistory,
   selectedRecapId = null, onSelectRecap,
@@ -142,6 +142,15 @@ export default function Landing({
         0%   { box-shadow: 0 4px 0 rgba(30,0,40,0.30), 0 0 0 0px rgba(255,215,0,0.55); }
         60%  { box-shadow: 0 4px 0 rgba(30,0,40,0.30), 0 0 0 7px rgba(255,215,0,0); }
         100% { box-shadow: 0 4px 0 rgba(30,0,40,0.30), 0 0 0 0px rgba(255,215,0,0); }
+      }
+      @keyframes card-swap-in {
+        from { opacity: 0; transform: translateY(6px); }
+        to   { opacity: 1; transform: translateY(0); }
+      }
+      /* Soft content swap inside the persistent shared card slot (tutorial ⇄ modes). */
+      .card-swap-in { animation: card-swap-in 0.18s ease-out both; }
+      @media (prefers-reduced-motion: reduce) {
+        .card-swap-in { animation-duration: 0.001ms !important; }
       }
       .cta-card-ring { animation: cta-ring 2s ease-out infinite; }
       .cta-shake { animation: shake-no 0.48s ease-in-out; }
@@ -427,65 +436,132 @@ export default function Landing({
           style={{ display: 'none' }}
           onChange={handleFileChange} />
 
-        {/* Prereq card */}
-        {onHowTo && (
-          !hasSelection ? (
-            <button
-              onClick={onHowTo}
-              className={`press cta-card-ring${howToPulse ? ' guide-pulse' : ''}`}
+        {/* Shared card slot — ONE persistent container; its children swap by
+            import state. Empty → full "How to export" tutorial; populated →
+            Modes entry. Never unmount the slot; the keyed children crossfade. */}
+        <div style={{ marginBottom: 14 }}>
+          {!hasSelection ? (
+            /* Empty state — illustrated, dummy-proof export tutorial. */
+            <div
+              key="tutorial"
+              className={`card-swap-in${howToPulse ? ' guide-pulse' : ''}`}
               style={{
-                display: 'block', width: '100%', marginBottom: 14,
-                background: 'linear-gradient(135deg, #4A0E4E 0%, #6B1A72 100%)',
-                border: '1.5px solid rgba(255,215,0,0.25)',
+                background: 'rgba(255,255,255,0.82)',
+                border: '1.5px solid rgba(255,255,255,0.95)',
                 borderRadius: 18,
-                padding: '13px 16px',
-                cursor: 'pointer', textAlign: 'start',
+                padding: '13px 14px 14px',
+                boxShadow: '0 6px 0 rgba(74,14,78,0.14), 0 16px 28px -8px rgba(74,14,78,0.22)',
               }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-                <div style={{ flex: 1, minWidth: 0 }}>
-                  <div className="fs-sans" dir="auto" style={{
-                    fontSize: 17, fontWeight: 800, color: '#FFD700',
-                    lineHeight: 1.2, overflowWrap: 'break-word', wordBreak: 'break-word',
-                  }}>
-                    {t.landing_step1_cta || 'Start your recap here'}
-                  </div>
-                </div>
-                <div style={{
-                  flexShrink: 0, width: 36, height: 36, borderRadius: 999,
-                  background: '#FFD700',
-                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+              {/* eyebrow */}
+              <div style={{ display: 'flex', alignItems: 'center', gap: 5, marginBottom: 11 }}>
+                <span aria-hidden="true" style={{ color: '#FF1867', fontSize: 9, lineHeight: 1 }}>★</span>
+                <span className="fs-mono" style={{
+                  fontSize: 8, fontWeight: 700, letterSpacing: '0.13em',
+                  color: 'rgba(74,14,78,0.55)', textTransform: 'uppercase',
                 }}>
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#4A0E4E" strokeWidth="2.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" style={{ transform: isRTL ? 'scaleX(-1)' : undefined }}>
+                  {t.landing_howto_eyebrow || 'STEP 1 · EXPORT YOUR CHAT'}
+                </span>
+              </div>
+
+              {/* illustration + numbered steps */}
+              <div style={{ display: 'flex', alignItems: 'center', gap: 13 }}>
+                {/* mini WhatsApp "Export chat" mock — highlighted menu row + tap */}
+                <div aria-hidden="true" style={{
+                  flexShrink: 0, width: 74, height: 104, borderRadius: 14,
+                  background: '#ECE5DD', border: '3px solid #15151d', overflow: 'hidden',
+                  position: 'relative', boxShadow: '0 8px 18px -8px rgba(74,14,78,0.45)',
+                }}>
+                  <div style={{ height: 22, background: '#075E54', display: 'flex', alignItems: 'center', gap: 4, padding: '0 6px' }}>
+                    <span style={{ fontSize: 9, color: '#fff', lineHeight: 1 }}>‹</span>
+                    <div style={{ width: 11, height: 11, borderRadius: '50%', background: '#25D366' }} />
+                    <div style={{ flex: 1 }} />
+                    <span style={{ fontSize: 11, color: '#fff', lineHeight: 1 }}>⋮</span>
+                  </div>
+                  <div style={{ padding: '8px 6px', display: 'flex', flexDirection: 'column', gap: 5 }}>
+                    <div style={{ height: 9, borderRadius: 3, background: 'rgba(0,0,0,0.10)' }} />
+                    <div style={{
+                      height: 14, borderRadius: 4, background: '#FFD700',
+                      boxShadow: '0 0 0 2px #FF69B4',
+                      display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    }}>
+                      <span style={{ fontSize: 9, lineHeight: 1 }}>⬆️</span>
+                    </div>
+                    <div style={{ height: 9, borderRadius: 3, background: 'rgba(0,0,0,0.10)' }} />
+                  </div>
+                  <span className="a-float" style={{
+                    position: 'absolute', bottom: 5, insetInlineEnd: 7, fontSize: 18,
+                    filter: 'drop-shadow(0 2px 3px rgba(0,0,0,0.3))',
+                  }}>👆</span>
+                </div>
+
+                <ol style={{
+                  flex: 1, minWidth: 0, margin: 0, padding: 0, listStyle: 'none',
+                  display: 'flex', flexDirection: 'column', gap: 8,
+                }}>
+                  {[
+                    t.landing_howto_s1 || 'Open the chat in WhatsApp',
+                    t.landing_howto_s2 || 'Menu ⋮ → Export chat',
+                    t.landing_howto_s3 || 'Send the file here — without media',
+                  ].map((s, i) => (
+                    <li key={i} style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                      <span className="fs-display" aria-hidden="true" style={{
+                        flexShrink: 0, width: 20, height: 20, borderRadius: 999,
+                        background: '#4A0E4E', color: '#FFD700',
+                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                        fontSize: 11, fontWeight: 800,
+                      }}>{i + 1}</span>
+                      <span className="fs-sans" dir="auto" style={{
+                        fontSize: 12.5, fontWeight: 700, color: '#2a0645', lineHeight: 1.25,
+                      }}>{s}</span>
+                    </li>
+                  ))}
+                </ol>
+              </div>
+
+              {/* full step-by-step guide */}
+              {onHowTo && (
+                <button onClick={onHowTo} className="press cta-card-ring" style={{
+                  display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
+                  width: '100%', marginTop: 13,
+                  background: 'linear-gradient(135deg, #4A0E4E 0%, #6B1A72 100%)',
+                  border: '1.5px solid rgba(255,215,0,0.25)', borderRadius: 13,
+                  padding: '12px 16px', cursor: 'pointer',
+                  color: '#FFD700', fontSize: 15, fontWeight: 800, letterSpacing: '-0.01em',
+                }}>
+                  <span className="fs-sans">{t.howto_link || 'How to export'}</span>
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#FFD700" strokeWidth="2.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" style={{ transform: isRTL ? 'scaleX(-1)' : undefined }}>
                     <polyline points="9 18 15 12 9 6"/>
                   </svg>
-                </div>
-              </div>
-            </button>
-          ) : (
-            <div className={howToPulse ? 'guide-pulse' : ''} style={{
-              marginBottom: 14,
-              background: 'rgba(255,255,255,0.82)',
-              border: '1.5px solid rgba(255,255,255,0.95)',
-              borderRadius: 18,
-              padding: '14px 14px',
-              boxShadow: '0 6px 0 rgba(74,14,78,0.14), 0 16px 28px -8px rgba(74,14,78,0.22)',
-            }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                <div className="fs-sans" dir="auto" style={{ flex: 1, minWidth: 0, fontSize: 15, fontWeight: 700, color: '#2a0645', lineHeight: 1.3, overflowWrap: 'break-word', wordBreak: 'break-word' }}>
-                  {t.landing_step1}
-                </div>
-                <button onClick={onHowTo} className="press fs-sans" style={{
-                  flexShrink: 0, padding: '9px 14.25px',
-                  background: '#4A0E4E', border: 'none', borderRadius: 9.75,
-                  color: '#FFD700', fontSize: 11.6, fontWeight: 700,
-                  cursor: 'pointer', whiteSpace: 'nowrap', letterSpacing: '-0.01em',
-                }}>
-                  {t.howto_link}
                 </button>
-              </div>
+              )}
             </div>
-          )
-        )}
+          ) : (
+            /* Populated state — Modes entry, matching the primary CTA's shape &
+               weight but in the brand purple so the yellow recap CTA stays the
+               single primary action below it. */
+            <button
+              key="modes"
+              onClick={onModes}
+              className="card-swap-in press"
+              style={{
+                display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 12,
+                width: '100%', padding: '22px 20px',
+                background: 'linear-gradient(135deg, #4A0E4E 0%, #6B1A72 100%)',
+                border: '2px solid rgba(255,255,255,0.18)', borderRadius: 24,
+                color: '#FFD700', fontSize: 21, fontWeight: 800, letterSpacing: '-0.01em',
+                cursor: 'pointer',
+                boxShadow: '0 8px 0 rgba(30,0,40,0.40), 0 18px 32px -8px rgba(74,14,78,0.42)',
+              }}>
+              <span aria-hidden="true" style={{ display: 'inline-flex' }}>
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#FFD700" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M12 3l1.8 4.6L18 9l-4.2 1.4L12 15l-1.8-4.6L6 9l4.2-1.4z" />
+                  <path d="M5 16.5l.9 2.1 2.1.9-2.1.9-.9 2.1-.9-2.1L2 19.5l2.1-.9z" />
+                </svg>
+              </span>
+              <span className="fs-display">{t.landing_modes_cta || 'Explore modes'}</span>
+            </button>
+          )}
+        </div>
 
         {/* Main CTA — primary action, gets the strongest visual weight */}
         <button
@@ -612,6 +688,25 @@ export default function Landing({
               >✕</button>
             </div>
           ))}
+          {/* Safety net — export help, exactly when a returning user is
+              adding/switching a chat. Low-emphasis link, not a primary action. */}
+          {onHowTo && (
+            <button
+              onClick={() => { setHistoryOpen(false); onHowTo(); }}
+              className="press fs-sans"
+              style={{
+                display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
+                width: '100%', marginTop: 6, padding: '14px 8px', minHeight: 48,
+                background: 'transparent', border: 'none',
+                color: 'rgba(74,14,78,0.60)', fontSize: 14, fontWeight: 600,
+                cursor: 'pointer',
+              }}>
+              <span aria-hidden="true">📖</span>
+              <span style={{ textDecoration: 'underline', textUnderlineOffset: 3 }}>
+                {t.howto_link || 'How to export'}
+              </span>
+            </button>
+          )}
         </BottomSheet>
       )}
     </div>

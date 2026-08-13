@@ -6,6 +6,9 @@
   "description": "WhatsApp Wrapped — cinematic recap of your group chat year. 100% client-side.",
   "scripts": {
     "dev": "vite",
+    "predev": "node scripts/copy-twemoji.mjs",
+    "prebuild": "node scripts/copy-twemoji.mjs",
+    "twemoji:assets": "node scripts/copy-twemoji.mjs --force",
     "build": "vite build",
     "preview": "vite preview",
     "test": "node src/parser/zip.test.js && node src/parser/voiceAuthor.test.js",
@@ -31,6 +34,7 @@
     "react-dom": "^18.3.1"
   },
   "devDependencies": {
+    "@twemoji/svg": "^15.0.0",
     "@vitejs/plugin-react": "^4.3.4",
     "vite": "^8.0.16"
   },

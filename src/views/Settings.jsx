@@ -39,6 +39,7 @@ export default function Settings({
   isPremium, setPremium, onUpgrade,
   history = [], onClearHistory,
   onFile,
+  onHowTo,
   onBack,
 }) {
   const [langOpen, setLangOpen] = useState(false);
@@ -339,6 +340,40 @@ export default function Settings({
             </div>
           )}
         </Section>
+
+        {/* Help — permanent export tutorial entry, always reachable. */}
+        {onHowTo && (
+          <Section icon="📖" title={t.settings_help || 'Help'} accent={MINT}>
+            <button onClick={onHowTo} className="press" style={{
+              width: '100%', display: 'flex', alignItems: 'center', gap: 12,
+              padding: '12px 14px', background: 'transparent', border: 'none',
+              cursor: 'pointer', textAlign: 'start',
+            }}>
+              <div style={{
+                width: 36, height: 36, borderRadius: 12, flexShrink: 0,
+                background: `${MINT}1f`, border: `2px solid ${MINT}44`,
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                fontSize: 18,
+              }}>📲</div>
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <div className="fs-sans" dir="auto" style={{
+                  fontSize: 15, fontWeight: 800, color: EGGPLANT, letterSpacing: '-0.01em', lineHeight: 1.25,
+                }}>
+                  {t.settings_howto_title || 'How to export a chat'}
+                </div>
+                <div className="fs-mono" style={{
+                  fontSize: 11, color: 'rgba(74,14,78,0.55)', marginTop: 3, fontWeight: 600,
+                }}>
+                  {t.settings_howto_hint || 'Step-by-step guide for iOS & Android'}
+                </div>
+              </div>
+              <span className="fs-mono" style={{
+                fontSize: 12, color: MINT, fontWeight: 800, flexShrink: 0,
+                letterSpacing: '0.08em', whiteSpace: 'nowrap',
+              }}>{t.settings_howto_action || 'Open'}</span>
+            </button>
+          </Section>
+        )}
 
         {/* About */}
         <Section icon="💎" title={t.settings_about || 'About'} accent={EGGPLANT}>

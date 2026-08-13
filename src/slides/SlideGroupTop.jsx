@@ -1,6 +1,7 @@
 import React from 'react';
 import SlideShell from './SlideShell.jsx';
 import ListSlideDecor from '../components/ListSlideDecor.jsx';
+import Twemoji from '../components/Twemoji.jsx';
 import { interp, typedCopy } from '../i18n';
 
 const SlideGroupTop = React.memo(function SlideGroupTop({ a, t, profile }) {
@@ -41,7 +42,7 @@ const SlideGroupTop = React.memo(function SlideGroupTop({ a, t, profile }) {
               boxShadow: '0 8px 0 rgba(224,168,0,0.30), 0 18px 32px -8px rgba(74,14,78,0.35)',
               transform: 'rotate(-3deg)',
               fontSize: 84, lineHeight: 1,
-            }}>{emoji.emoji}</div>
+            }}><Twemoji>{emoji.emoji}</Twemoji></div>
             <div className="fs-mono" style={{ marginTop: 10, fontSize: 13, color: 'rgba(74,14,78,0.7)', fontWeight: 700 }}>
               {interp(t.gt_emoji, { n: emoji.count.toLocaleString() })}
             </div>

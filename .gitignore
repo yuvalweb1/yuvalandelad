@@ -93,6 +93,10 @@ dist
 # https://nextjs.org/blog/next-9-1#public-directory-support
 # public
 
+# Self-hosted Twemoji SVGs, generated from @twemoji/svg by
+# scripts/copy-twemoji.mjs (runs on predev/prebuild). Not committed.
+public/twemoji/
+
 # vuepress build output
 .vuepress/dist
 
