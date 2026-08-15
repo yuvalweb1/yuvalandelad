@@ -16,6 +16,7 @@ import HowToGuide from './views/HowToGuide.jsx';
 import Welcome from './views/Welcome.jsx';
 import Landing from './views/Landing.jsx';
 import Parsing from './views/Parsing.jsx';
+import LoadingRecap from './views/LoadingRecap.jsx';
 import Onboarding from './views/Onboarding.jsx';
 import Wrapped from './views/Wrapped.jsx';
 import VerifyView from './views/VerifyView.jsx';
@@ -40,6 +41,11 @@ import { detectSeasonTheme } from './lib/seasonTheme.js';
 // ============================================================
 // MAIN
 // ============================================================
+
+// Above this many total messages, opening a recap/game re-runs computeAll()
+// on a long enough array that the synchronous pass is noticeable — worth a
+// full-screen loader instead of just the CTA button's inline spinner.
+const BIG_CHAT_MESSAGE_THRESHOLD = 15000;
 
 // Attach (period-filtered) media to a computed analytics object. Media items
 // carry `.ts`; `makeInRange` keeps everything for the 'all' window and
@@ -417,6 +423,16 @@ function RecappedApp() {
     if (!entry) return;
     const per = periodRef.current;
 
+    // Big chats: computeAll() below is synchronous and will block the main
+    // thread for a beat. Show the full-screen loader and wait two frames so
+    // it actually paints before the freeze begins (its spinner is
+    // transform-based, so the compositor keeps it turning through the block).
+    if ((entry.stats?.totalMessages || 0) >= BIG_CHAT_MESSAGE_THRESHOLD) {
+      setStage('loading_recap');
+      await new Promise(requestAnimationFrame);
+      await new Promise(requestAnimationFrame);
+    }
+
     // Messages: reuse the in-memory session if it's the same recap, else load.
     let msgs = recapMessagesRef.current;
     if (loadedSessionRef.current !== id || !msgs) {
@@ -644,6 +660,9 @@ function RecappedApp() {
           )}
           {stage === 'parsing' && (
             <Parsing fileName={fileName} parsingStage={parsingStage} diagnostics={diagnostics} t={t} />
+          )}
+          {stage === 'loading_recap' && (
+            <LoadingRecap t={t} />
           )}
           {stage === 'ad_post_parse' && (
             <VideoAdSlot

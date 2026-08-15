@@ -516,6 +516,13 @@ export default {
   parsing_detail_read: 'Every message, every timestamp',
   parsing_detail_analyze: 'Hunting for drama and dead zones',
   parsing_detail_build: 'Putting it together',
+  // Big-chat loading screen (full-screen loader shown when opening a recap or
+  // game mode for a chat large enough that the analytics pass is noticeable)
+  loading_big_title: 'This one’s a big chat…',
+  loading_big_c1: 'Counting every message…',
+  loading_big_c2: 'Hunting for drama and dead zones…',
+  loading_big_c3: 'Crunching the chaos…',
+  loading_big_c4: 'Almost there…',
   // Intro
   intro_eyebrow: 'CHATWRAPPED',
   intro_get: 'Here it',
