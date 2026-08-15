@@ -1,186 +1,130 @@
-# Share-card PNG export bug — handoff notes
+# Share-card PNG export bug — RESOLVED
 
-## The bug (still unsolved)
-`SlideShare.jsx` → `captureBlob()` uses `html2canvas` to rasterize a 540×960
-share card (`CardBananaDrop`, `CardStickerZine`, `CardReceipt`,
-`CardY2KChrome` in `shareCards.jsx`) into a PNG for saving/sharing.
+## The bug
+`SlideShare.jsx` → `captureBlob()` rasterized a 540×960 share card
+(`CardBananaDrop`, `CardStickerZine`, `CardReceipt`, `CardY2KChrome` in
+`shareCards.jsx`) into a PNG for saving/sharing. The live in-app preview was
+pixel-perfect, but **the exported PNG did not match it** — hero numbers
+overlapping their labels, opaque bands painted over text, elements shifted out
+of alignment. The symptom changed shape with the data (digit count, group name
+length, Hebrew vs Latin names), which is why it survived ~3 sessions of fixes:
+each fix tuned the card to compensate for one dataset and the next dataset
+moved the error somewhere else.
 
-**On the user's Android device, the exported PNG does not match the live
-in-app preview.** Most recently confirmed symptom (screenshot, "The Team"
-card, `totalMessages: 3652`, Hebrew name "יעל מחובנים"):
+## Root cause
+**html2canvas.** It does not screenshot the browser's render — it re-derives
+it twice, in JS:
 
-- **Live preview: pixel-perfect.** Hero number "3,652" sits cleanly above
-  "MESSAGES SENT THIS YEAR" with correct spacing, nothing overlaps.
-- **Exported PNG: "3,652" overlaps "MESSAGES SENT THIS YEAR"** — the label
-  text renders through/behind the digits and the comma. Other elements
-  (logo, "wrapped" pill, verdict, hero number) have also been seen shifted
-  out of alignment in earlier exports with other data.
+1. **Layout runs again in its own off-screen iframe**
+   (`html2canvas.js:5568`, `createElement('iframe')`). Flex-grow,
+   `justify-content: center` and `minHeight: 0` get resolved from scratch in a
+   differently-sized document. That is exactly the hero-number container.
+2. **Text is painted with hand-rolled baseline math**, not the browser's:
+   ```js
+   // :6589 — how it decides where a font's baseline sits
+   var baseline = img.offsetTop - span.offsetTop + 2;
+   // :6706 — how it paints
+   ctx.fillText(text.text, text.bounds.left, text.bounds.top + baseline);
+   ```
+   A probe element plus a literal `+ 2` fudge factor, per family and per size.
+   `heroSize` comes from `heroNumSize()` and varies with the data, so the error
+   moved with the data.
 
-This is the **same family of symptom** that has persisted across ~3+ sessions
-of attempted fixes — it just resurfaces in different shapes depending on the
-test data (group name length, message count digit count, Hebrew vs Latin
-names, etc).
+html2canvas 1.4.1 is a rendering engine reimplemented in JS, last released
+2022. The card was never broken; the converter was.
 
-## What's CONFIRMED FIXED (do not revert / re-break these)
-These are real, validated fixes already in the working tree (uncommitted,
-on top of commit `9aa2cc6`) — user confirmed "yes!!! not clipped!!!":
+## The fix
+Replaced html2canvas with **html-to-image** (`src/slides/captureCard.js`),
+which wraps the node in an SVG `<foreignObject>`, loads that as an `<img>`, and
+draws it to a canvas. The browser's own layout and text engine do the work, so
+the export matches the preview **by construction**.
 
-1. **Dot texture** (`shareCards.jsx` `DOT_TILE`): html2canvas can't rasterize
-   repeating CSS `radial-gradient` — dots vanished in export. Fixed by
-   switching to a tiled SVG `data:` URI background-image. **Working.**
-2. **`boxSizing: 'border-box'` on all 4 card roots**: html2canvas's clone
-   doesn't reliably inherit `.cw-frame * { box-sizing: border-box }`, so
-   padding added ~72px to the 960px height and the bottom got cropped.
-   **Working.**
-3. **2×2 stat-cell grid → two flex rows** (`CardBananaDrop`): html2canvas
-   mis-sizes CSS grid cells, clipping the 3-line "Carried the chat" cell.
-   Converted to nested flexbox with `align-items: stretch`. **Working.**
-4. **`data-hero-num` + Y2K Chrome gradient-text fallback** (in `onclone`):
-   html2canvas can't rasterize `background-clip: text` gradients (paints an
-   opaque band over the number). The `onclone` callback in `SlideShare.jsx`
-   detects `[data-hero-num]` elements with `webkitBackgroundClip: 'text'`
-   and swaps them to a solid white fill for the export only. **Working —
-   kept in place.**
-5. `lineHeight: 0.95` on `ACell` value / `lineHeight: 1.5` on `sub` lines —
-   minor spacing tweaks, part of the "not clipped" confirmation.
+`html2canvas` has been uninstalled and is gone from `package.json`.
 
-## What was tried THIS session and DID NOT WORK (already reverted)
+Two things the foreignObject approach requires, both handled:
+- **No network inside the SVG document.** Every external resource must be
+  inlined first. html-to-image inlines `<img>` sources itself (the logo);
+  fonts come from `getFontEmbedCSS()`, computed **once per session** and cached
+  (`warmCardFonts`, kicked off on slide mount) because resolving them refetches
+  every `@font-face` as a data URI.
+- **Font failure is now benign.** `warmCardFonts` catches and resolves to `''`
+  (not `null` — html-to-image treats non-null `fontEmbedCSS` as final and skips
+  its own network-dependent pass). Worst case is "wrong typeface, correct
+  layout", never overlapping text.
 
-### The font-loading-race theory (disproven by the live-vs-export comparison)
-Hypothesis: html2canvas's clone document re-fetches Google Fonts over the
-network; mobile WebViews paint before they arrive and fall back to a system
-font with different metrics, shifting every centered/spaced element.
+Also removed: the `onclone` Y2K Chrome `background-clip: text` workaround. It
+existed only because html2canvas painted an opaque band over gradient text. The
+real renderer handles it, so the export now keeps the actual gradient instead of
+a flat white fallback.
 
-This seemed to explain everything — multiple independently-positioned
-elements all shifting together is exactly what a global metrics change would
-cause. Built a full fix:
-- `scripts/embed-fonts.mjs` — fetched the card's Google Fonts, base64-encoded
-  them as woff2 data URIs into `src/embeddedFonts.js`, with family names
-  suffixed `' XCard'` to avoid colliding with the live app's own fonts.
-- `SlideShare.captureBlob`'s `onclone` loaded these directly into the
-  **clone document only** via the `FontFace` API (`new FontFace(...)`,
-  `.load()`, `doc.fonts.add()`), then injected a `<style>` redirecting
-  `.fs-display`/`.fs-mono`/`.fs-sans`/`.fs-serif` to the suffixed families.
+## Measured result
+Playwright probe, real components via the Vite dev server, real capture code,
+`deviceScaleFactor: 3.75`, both datasets, all four cards. Metric is mean
+per-pixel divergence from the live render (0–255, lower = closer):
 
-**v1 of this had a real, separate bug**: it injected fonts globally using the
-SAME family names as the live app — which caused the browser to swap the
-live render to a differently-fetched font binary mid-session (a real
-regression the user caught: "this lowered the big number"). v2 fixed *that*
-specific self-inflicted issue by scoping everything to the clone with unique
-names — confirmed via a Playwright probe (rendering the real component,
-running real html2canvas, blocking Google Fonts at the network level to
-reproduce the device condition) that v2 was clone-safe and didn't touch the
-live render.
+| condition | html2canvas | foreignObject |
+|---|---|---|
+| Google Fonts blocked | 13.22 | **1.39** |
+| Google Fonts allowed | 8.55 | **1.52** |
 
-**But the user's fresh test after v2 shipped (`index-CR9mid_8.js`) showed
-the EXACT SAME overlap symptom in the export — while the live preview was
-flawless.** This means the font-loading-race theory is likely **wrong, or at
-minimum incomplete** as the root cause of THIS symptom. All of that code has
-now been **fully removed**:
-- Deleted `scripts/embed-fonts.mjs` and `src/embeddedFonts.js`.
-- Reverted `captureBlob`'s `onclone` back to just the (working) Y2K gradient
-  fallback — no font loading, no global/clone style overrides.
-- Rebuilt + synced (`index-B_qX1Kzr.js`), verified zero remaining references
-  to `embeddedFonts`/`FONT_FACES`/`FONT_SUFFIX` anywhere in `src/`.
+~1.4 is the antialiasing/resampling noise floor — the diff images show hairline
+glyph outlines, not displacement. Every card and both datasets improved.
 
-## A concrete new lead worth investigating first
-Caught mid-investigation when this session ended — **don't re-chase fonts,
-chase layout measurement instead**:
+The starkest case was `CardY2KChrome`: the html2canvas export painted solid
+magenta rectangles over the stat-cell labels ("CARRIED IT", "30% of messages",
+"FAVE WORD") and rendered blurred background blobs as hard-edged circles. The
+foreignObject export is clean.
 
-The hero-number block in `CardBananaDrop` (`shareCards.jsx` ~line 191) is:
-```jsx
-<div style={{ flex: story ? 1 : '0 0 auto', display: 'flex',
-              flexDirection: 'column', justifyContent: 'center',
-              minHeight: 0, ... }}>
-  <div data-hero-num className="fs-display" style={{ ..., lineHeight: 0.84, ... }}>{heroStr}</div>
-  <div className="fs-mono" style={{ marginTop: story ? 14 : 8, ... }}>messages sent this year</div>
-</div>
-```
-This relies on `flex: 1` + `minHeight: 0` to size the container, then
-`justify-content: center` to position the (number + label) pair within it.
+## Still worth verifying on a real device
+Desktop Chromium can't prove Android WebView behavior. Two things to look at on
+an actual device export:
+- **`backdropFilter`** (`shareCards.jsx` ~line 427, Y2K Chrome stat cells).
+  backdrop-filter inside a foreignObject has historically been spotty in
+  Chromium. Failure mode is cosmetic — the frosted panel loses its blur — not a
+  layout break.
+- **`maskImage`** (`shareCards.jsx` ~line 371, the receipt's notched edges).
+  Unprefixed `mask-image` needs a reasonably current WebView. It renders in the
+  live preview on the same engine, so it should hold, but confirm.
 
-**Overlap between two flow siblings can really only happen if the number's
-rendered box is taller than the browser computed it live** (its declared
-`marginTop: 14` to the label can't go negative on its own). That points at
-html2canvas's text-measurement/layout engine computing a different line-box
-height for the `fs-display` text at `fontSize: heroSize` (a dynamically
-computed size from `heroNumSize()`) than the real browser does — independent
-of which font is *actually* painted. Also worth checking: does
-`documentClone.fonts.ready` (which html2canvas itself already awaits before
-calling `onclone` — confirmed in `node_modules/html2canvas/dist/html2canvas.js`
-line ~5247) resolve before the fonts are *visually correct* in the clone?
-That would mean the "fonts not ready" framing was never quite right — the
-fonts ARE "ready" per the spec, but html2canvas's internal text-measurement
-pass may run against different metrics than what later paints.
+If either misbehaves, the fallback is **native WebView capture** via Capacitor
+(Android `PixelCopy`, iOS `drawViewHierarchyInRect`) — the exported PNG becomes
+literally the pixels the user saw, with zero conversion. ~50 lines of native
+code per platform plus a web fallback.
 
-**Suggested next steps, roughly in order of effort:**
-1. Add a temporary on-device diagnostic: in `onclone`, measure and
-   `console.log` (or render into the card itself, e.g. as a debug overlay)
-   the actual `getBoundingClientRect()` of `[data-hero-num]` and its sibling
-   label, compare to the live DOM's rects for the same element. This tells
-   you definitively whether html2canvas's clone is *measuring* the text
-   differently (font-metrics / line-box issue) or *positioning* the flex
-   container differently (layout-engine issue) — two very different fixes.
-2. If it's a flex/layout measurement issue: try replacing the `flex: 1` +
-   `justify-content: center` centering with fixed/explicit heights or
-   `position: absolute` + `top: 50%; transform: translateY(-50%)` — i.e.
-   remove html2canvas's need to resolve flex-grow at all.
-3. If it's still font-metrics: don't try to *replace* fonts pre-capture;
-   instead make the layout robust to *any* font's metrics — e.g. give the
-   hero-number container a fixed `minHeight` derived from `fontSize *
-   lineHeight` plus headroom, so even a taller fallback glyph box can't
-   physically reach the label.
-4. Nuclear option if html2canvas itself proves unreliable for this layout:
-   render the card to an off-screen `<canvas>` manually (draw text/shapes
-   with the Canvas 2D API at fixed coordinates) instead of DOM rasterization
-   — total control over metrics, zero clone/measurement ambiguity, but a
-   much bigger rewrite of all 4 card components.
-
-## Reproduction technique that actually works (the only one that does)
-Desktop testing CANNOT reproduce this — fonts are cached, DPR is different.
-Use a Playwright probe:
-- Serve the real component via the Vite dev server (`http://localhost:5173`)
-  so it gets the real `GlobalStyles`/fonts/CSS.
-- Run the real `html2canvas` + the real `onclone` from `SlideShare.jsx`.
-- Set `deviceScaleFactor: 3.75` (matches the user's device DPR).
-- Use `ctx.route()` to block `fonts.googleapis.com` / `fonts.gstatic.com` —
-  this reproduces the "fonts not cached" device condition.
-- Compare a Playwright screenshot of the live DOM (ground truth) against the
-  html2canvas export, side by side, for the SAME data.
-- Test with BOTH short-Latin data (e.g. `totalMessages: 4049`, "The Group")
-  AND long/Hebrew data (e.g. `totalMessages: 1450`/`3652`, Hebrew names like
-  "אלעד הימל" / "יעל מחובנים") — the bug's *shape* changes with the data,
-  so single-dataset testing gives false confidence.
-- **Clean up probe scaffolding when done** (`__probe.html`, `__probe.jsx`,
-  `__probe-run.mjs`, temp PNGs) — established workflow in this repo.
-
-## Files touched this session (final state)
-- `src/slides/SlideShare.jsx` — `captureBlob`'s `onclone` is back to ONLY the
-  Y2K gradient-text fallback (no font loading). **Working / minimal.**
-- `src/slides/shareCards.jsx` — unchanged from the confirmed-working state
-  described above (dots, boxSizing, grid→flex, `data-hero-num`, lineHeight).
-- `scripts/embed-fonts.mjs`, `src/embeddedFonts.js` — **deleted** (failed
-  approach).
-- Rebuilt and synced: `index-B_qX1Kzr.js`, confirmed present in both
-  `dist/assets/` and `android/app/src/main/assets/public/assets/`, and
-  confirmed zero remaining references to `embeddedFonts`/`FONT_SUFFIX`/
-  `FONT_FACES` anywhere in `src/`.
-
-## Memory note
-`C:\Users\User\.claude\projects\c--workspace-whatsappRecap\memory\project_share_card_export_fonts.md`
-documents the (now-disproven-as-sufficient) font-loading-race theory in
-detail — useful historical context on what's been tried and ruled out, but
-**do not treat its "root cause" claim as settled** — the live-vs-export
-comparison this session shows the export is still broken with the fonts
-"fixed," so the real root cause is still open. Consider updating that memory
-once the actual root cause is found.
+## Reproduction technique (kept — it's the only one that works)
+Desktop testing alone can't reproduce the device condition. Use a Playwright
+probe:
+- Serve the real components via the Vite dev server (`http://localhost:5173`)
+  so they get the real `GlobalStyles`/fonts/CSS.
+- Run the real capture code from `src/slides/captureCard.js`.
+- `deviceScaleFactor: 3.75` (matches the user's device DPR).
+- `ctx.route()` to block `fonts.googleapis.com` / `fonts.gstatic.com` to
+  reproduce the "fonts not cached" condition — and run once without blocking.
+- Screenshot the live DOM as ground truth, compare against the export with a
+  per-pixel diff (sharp), and emit a visual diff image — the number tells you
+  *whether*, the image tells you *where*.
+- Test with BOTH short-Latin data (`totalMessages: 4049`, "The Group") AND
+  long/Hebrew data (`3652`, "יעל מחובנים"). The bug's shape changed with the
+  data; single-dataset testing gave false confidence more than once.
+- **Always measure the before as well as the after on the same harness.** A
+  good-looking absolute number proves nothing without the baseline.
+- Clean up probe scaffolding when done (`__probe.html`, `__probe.jsx`,
+  `__probe-run.mjs`) — established workflow in this repo.
 
 ## Things NOT to re-try
-- Global font injection with names matching the live app's fonts (caused a
-  measurable live-render regression — confirmed root-caused this session).
-- Per-element `lineHeight`/`marginTop` "compensation" hacks scoped to
-  `onclone` (tried in earlier sessions, made live/export parity worse, fully
-  removed once the (still-unproven) font theory suggested they shouldn't be
-  needed).
-- Testing only on desktop / only with one dataset — both have produced false
-  "looks fixed!" confidence in this saga more than once.
+- **Compensating in the card's CSS.** Per-element `lineHeight`/`marginTop`
+  tweaks scoped to the capture, font-metric fudging, etc. Every one of these
+  fixed one dataset and broke another. The converter was the bug.
+- **Global font injection using the live app's own family names** — caused a
+  measurable live-render regression (it swapped the live font binary
+  mid-session and visibly moved the hero number).
+- **Testing only on desktop / only with one dataset.**
+
+## Historical note
+A font-loading-race theory (html2canvas's clone re-fetching Google Fonts and
+painting before they land) was built out fully across an earlier session —
+`scripts/embed-fonts.mjs`, `src/embeddedFonts.js` — and **disproven**: the
+export stayed broken with fonts embedded while the live preview was flawless.
+That code was deleted and is not the fix here. Font embedding reappears in
+`captureCard.js` for a different and genuine reason: the foreignObject document
+cannot fetch fonts at all.

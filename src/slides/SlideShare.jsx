@@ -1,10 +1,10 @@
 import React, { useState, useRef, useEffect } from 'react';
-import html2canvas from 'html2canvas';
 import { Capacitor } from '@capacitor/core';
 import { Filesystem, Directory } from '@capacitor/filesystem';
 import { Share } from '@capacitor/share';
 import { typedCopy } from '../i18n';
 import { CardBananaDrop, CardStickerZine, CardReceipt, CardY2KChrome, buildCardData } from './shareCards.jsx';
+import { captureCardBlob, warmCardFonts } from './captureCard.js';
 
 // Android/iOS WebViews don't reliably support attaching files via the Web
 // Share API (navigator.canShare often reports false for files), so on native
@@ -285,39 +285,27 @@ const SlideShare = React.memo(function SlideShare({ a, t, profile, diagnostics, 
   const chatName = getChatName(diagnostics) || otherParticipant || typedCopy(t, 'share_highlight', type);
   const titleSize = titleFontSize(t.share_title_lead, chatName);
 
-  // Hidden full-size (540×960) render of the active card. html2canvas
-  // captures THIS node — not the scaled-down preview — so the saved PNG
-  // is sharp at story dimensions. Kept in the DOM at all times so the
-  // capture is one synchronous step away when the user taps share.
+  // Hidden full-size (540×960) render of the active card. The capture reads
+  // THIS node — not the scaled-down preview — so the saved PNG is sharp at
+  // story dimensions. Kept in the DOM at all times so the capture is one
+  // step away when the user taps share.
   const captureRef = useRef(null);
   const activeOpt = OPTIONS.find(o => o.id === pickedId) || OPTIONS[0];
   const ActiveComp = activeOpt.Comp;
 
+  // Embedding the card's webfonts is the slow half of a capture and the
+  // result is shared across all four styles, so kick it off as soon as the
+  // slide mounts — by the time the user picks a card and taps share it is
+  // usually already resolved.
+  useEffect(() => { warmCardFonts(captureRef.current); }, []);
+
+  // See captureCard.js for why this is foreignObject-based and not html2canvas.
+  // Note the Y2K Chrome `background-clip: text` workaround that used to live
+  // here is gone: it existed only because html2canvas painted an opaque band
+  // over gradient text. The real renderer handles it, so the export now keeps
+  // the actual gradient instead of a flat white fallback.
   async function captureBlob() {
-    if (!captureRef.current) return null;
-    const canvas = await html2canvas(captureRef.current, {
-      backgroundColor: null,
-      scale: 2,                       // 2× = retina-sharp 1080×1920
-      useCORS: true,
-      logging: false,
-      width: 540,
-      height: 960,
-      onclone: (doc, clonedWrap) => {
-        const scope = clonedWrap || doc;
-        // Y2K Chrome hero uses a background-clip:text gradient html2canvas can't
-        // rasterize (it paints an opaque band over the text); fall back to a
-        // solid fill so the number stays legible in the export.
-        scope.querySelectorAll('[data-hero-num]').forEach((el) => {
-          const clip = el.style.webkitBackgroundClip || getComputedStyle(el).webkitBackgroundClip;
-          if (clip === 'text') {
-            el.style.background = 'none';
-            el.style.webkitTextFillColor = '#fff';
-            el.style.color = '#fff';
-          }
-        });
-      },
-    });
-    return new Promise(resolve => canvas.toBlob(resolve, 'image/png', 0.95));
+    return captureCardBlob(captureRef.current);
   }
 
   const shareText = `${headline} ${headLabel}. ${t.share_caught || 'on ChatWrapped'} → ${GOOGLE_PLAY_URL}`;
@@ -434,9 +422,9 @@ const SlideShare = React.memo(function SlideShare({ a, t, profile, diagnostics, 
       {/* pushes CTAs to bottom */}
       <div style={{ flex: 1, minHeight: 8 }} />
 
-      {/* Hidden full-size capture target — sits offscreen, always rendered
-          so html2canvas can read the active card synchronously. aria-hidden
-          and pointer-events:none keep it out of the user's way. */}
+      {/* Hidden full-size capture target — sits offscreen, always rendered so
+          the capture can read the active card without a mount round-trip.
+          aria-hidden and pointer-events:none keep it out of the user's way. */}
       <div aria-hidden="true" style={{
         position: 'absolute', left: -99999, top: 0, width: 540, height: 960,
         pointerEvents: 'none',

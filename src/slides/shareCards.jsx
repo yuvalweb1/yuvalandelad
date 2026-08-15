@@ -127,10 +127,11 @@ function Footer({ dark, accent = '#FF8C00' }) {
 // =======================================================================
 const A_INK = '#4A0E4E';
 const BANANA = '#FFD700';
-// Dot texture as a tiled SVG data-URI rather than a CSS radial-gradient:
-// html2canvas can't rasterize repeating radial-gradients (the dots vanished in
-// the exported PNG), but it renders url() image backgrounds fine. Same look,
-// export-safe.
+// Dot texture as a tiled SVG data-URI rather than a CSS radial-gradient.
+// html2canvas couldn't rasterize repeating radial-gradients (the dots vanished
+// from the exported PNG) but rendered url() backgrounds fine. A data URI is
+// still the right call under the foreignObject capture, which can't fetch
+// anything external — inline is the only form that survives either way.
 const DOT_TILE =
   "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='15' height='15'%3E%3Ccircle cx='1.5' cy='1.5' r='1.4' fill='%234A0E4E' fill-opacity='0.13'/%3E%3C/svg%3E\")";
 const dotTexture = {
@@ -161,10 +162,12 @@ export const CardBananaDrop = React.memo(function CardBananaDrop({ format = 'sto
   // content width at native 540px: 540 - 34*2 = 472px
   const heroSize = heroNumSize(heroStr, 472, story ? 142 : 92);
   return (
-    // boxSizing explicit (not inherited from `.cw-frame *`): html2canvas's clone
-    // doesn't reliably carry that ancestor rule, so without it the padding adds
-    // 72px on top of the 960px height — the card overflows and the export crops
-    // its bottom (rounded corners + footer padding). All four card roots set it.
+    // boxSizing explicit rather than inherited from `.cw-frame *`, so the card
+    // is self-contained: padding stays inside the 960px height instead of
+    // adding 72px to it. Originally needed because html2canvas's clone dropped
+    // the ancestor rule and cropped the footer; kept now that capture is
+    // foreignObject-based because a card that doesn't depend on ancestor CSS is
+    // the right shape for something rendered in isolation. All four roots set it.
     <div style={{
       boxSizing: 'border-box',
       width: '100%', height: '100%', background: BANANA, color: A_INK,
@@ -193,10 +196,11 @@ export const CardBananaDrop = React.memo(function CardBananaDrop({ format = 'sto
           <div className="fs-mono" style={{ marginTop: story ? 14 : 8, fontSize: 14, fontWeight: 700, letterSpacing: '0.2em', textTransform: 'uppercase' }}>messages sent this year</div>
         </div>
 
-        {/* Two flex rows instead of a 2×2 CSS grid: html2canvas mis-sizes grid
-            cells (clipping the 3-line "carried the chat" cell on export), but
-            handles flexbox stretch reliably. align-items:stretch keeps each
-            row's two cells equal height. */}
+        {/* Two flex rows instead of a 2×2 CSS grid. Originally a workaround for
+            html2canvas mis-sizing grid cells (it clipped the 3-line "carried
+            the chat" cell on export); the current foreignObject capture handles
+            grid fine, so this is now just a layout choice —
+            align-items:stretch keeps each row's two cells equal height. */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: story ? 20 : 14 }}>
           <div style={{ display: 'flex', alignItems: 'stretch', gap: story ? 20 : 14 }}>
             <ACell label="Days active" value={G.daysActive} accent="#277da1" tilt={-1} />

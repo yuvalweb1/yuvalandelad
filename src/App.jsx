@@ -525,22 +525,24 @@ function RecappedApp() {
   // the most recent one on demand and continue straight into the requested mode.
   const enterMode = useCallback((destination) => {
     // Game modes run on all-time data (fullAnalytics), independent of the
-    // window chosen for the deck.
-    if (fullAnalytics) {
+    // window chosen for the deck. Only reuse it when it actually belongs to
+    // the chat currently selected — otherwise switching chats on Landing and
+    // jumping straight into a game would play the previous chat's data.
+    if (fullAnalytics && currentRecapId && currentRecapId === selectedRecapId) {
       if (destination === 'roastmode') enterRoastMode('modes');
       else setStage(destination);
       return;
     }
-    const mostRecent = history[0];
-    if (!mostRecent) return;
+    const target = history.find(r => r.id === selectedRecapId) || history[0];
+    if (!target) return;
     if (destination === 'roastmode') {
       setRoastReturn('modes');
       const dest = adEnabled('pre_roast') ? 'ad_pre_roast' : 'roastmode';
-      handleLoadRecap(mostRecent.id, dest);
+      handleLoadRecap(target.id, dest);
     } else {
-      handleLoadRecap(mostRecent.id, destination);
+      handleLoadRecap(target.id, destination);
     }
-  }, [fullAnalytics, history, enterRoastMode, handleLoadRecap]);
+  }, [fullAnalytics, currentRecapId, selectedRecapId, history, enterRoastMode, handleLoadRecap]);
 
   const handleDeleteRecap = useCallback((id) => {
     deleteMedia(id);

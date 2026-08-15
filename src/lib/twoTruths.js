@@ -247,6 +247,20 @@ const ATTRS = [
     vars: (v) => ({ m: v < 10 ? v.toFixed(1) : String(Math.round(v)) }),
     fabricate: (v, o, r) => fabNum(v, o, r, { min: 0.3, max: 600, nice: false,
       differs: (x, y) => (x < 10 ? x.toFixed(1) : String(Math.round(x))) !== (y < 10 ? y.toFixed(1) : String(Math.round(y))) }) },
+
+  // How often what they said actually got picked up by someone else within
+  // half an hour — the closest thing the transcript has to "was I heard?".
+  { id: 'replied', key: 'tt_s_replied',
+    eligible: (u) => u.messageCount >= 25 && u.replyReceivedRate > 0,
+    value: (u) => Math.round(u.replyReceivedRate * 100),
+    vars: (v) => ({ pct: v }),
+    fabricate: (v, o, r) => fabNum(v, o, r, { min: 3, max: 95, minRel: 0, differs: (x, y) => Math.abs(Math.round(x) - Math.round(y)) >= 5 }) },
+
+  { id: 'loveyou', key: 'tt_s_loveyou',
+    eligible: (u) => u.loveYouCount >= 3,
+    value: (u) => u.loveYouCount,
+    vars: (v) => ({ n: fmtInt(v) }),
+    fabricate: (v, o, r) => fabNum(v, o, r, { min: 1 }) },
 ];
 
 // ── Subject building ───────────────────────────────────────────────
