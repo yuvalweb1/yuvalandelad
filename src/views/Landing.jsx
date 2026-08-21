@@ -463,66 +463,11 @@ export default function Landing({
                 </span>
               </div>
 
-              {/* illustration + numbered steps */}
-              <div style={{ display: 'flex', alignItems: 'center', gap: 13 }}>
-                {/* mini WhatsApp "Export chat" mock — highlighted menu row + tap */}
-                <div aria-hidden="true" style={{
-                  flexShrink: 0, width: 74, height: 104, borderRadius: 14,
-                  background: '#ECE5DD', border: '3px solid #15151d', overflow: 'hidden',
-                  position: 'relative', boxShadow: '0 8px 18px -8px rgba(74,14,78,0.45)',
-                }}>
-                  <div style={{ height: 22, background: '#075E54', display: 'flex', alignItems: 'center', gap: 4, padding: '0 6px' }}>
-                    <span style={{ fontSize: 9, color: '#fff', lineHeight: 1 }}>‹</span>
-                    <div style={{ width: 11, height: 11, borderRadius: '50%', background: '#25D366' }} />
-                    <div style={{ flex: 1 }} />
-                    <span style={{ fontSize: 11, color: '#fff', lineHeight: 1 }}>⋮</span>
-                  </div>
-                  <div style={{ padding: '8px 6px', display: 'flex', flexDirection: 'column', gap: 5 }}>
-                    <div style={{ height: 9, borderRadius: 3, background: 'rgba(0,0,0,0.10)' }} />
-                    <div style={{
-                      height: 14, borderRadius: 4, background: '#FFD700',
-                      boxShadow: '0 0 0 2px #FF69B4',
-                      display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    }}>
-                      <span style={{ fontSize: 9, lineHeight: 1 }}>⬆️</span>
-                    </div>
-                    <div style={{ height: 9, borderRadius: 3, background: 'rgba(0,0,0,0.10)' }} />
-                  </div>
-                  <span className="a-float" style={{
-                    position: 'absolute', bottom: 5, insetInlineEnd: 7, fontSize: 18,
-                    filter: 'drop-shadow(0 2px 3px rgba(0,0,0,0.3))',
-                  }}>👆</span>
-                </div>
-
-                <ol style={{
-                  flex: 1, minWidth: 0, margin: 0, padding: 0, listStyle: 'none',
-                  display: 'flex', flexDirection: 'column', gap: 8,
-                }}>
-                  {[
-                    t.landing_howto_s1 || 'Open the chat in WhatsApp',
-                    t.landing_howto_s2 || 'Menu ⋮ → Export chat',
-                    t.landing_howto_s3 || 'Send the file here — without media',
-                  ].map((s, i) => (
-                    <li key={i} style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                      <span className="fs-display" aria-hidden="true" style={{
-                        flexShrink: 0, width: 20, height: 20, borderRadius: 999,
-                        background: '#4A0E4E', color: '#FFD700',
-                        display: 'flex', alignItems: 'center', justifyContent: 'center',
-                        fontSize: 11, fontWeight: 800,
-                      }}>{i + 1}</span>
-                      <span className="fs-sans" dir="auto" style={{
-                        fontSize: 12.5, fontWeight: 700, color: '#2a0645', lineHeight: 1.25,
-                      }}>{s}</span>
-                    </li>
-                  ))}
-                </ol>
-              </div>
-
               {/* full step-by-step guide */}
               {onHowTo && (
                 <button onClick={onHowTo} className="press cta-card-ring" style={{
                   display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
-                  width: '100%', marginTop: 13,
+                  width: '100%',
                   background: 'linear-gradient(135deg, #4A0E4E 0%, #6B1A72 100%)',
                   border: '1.5px solid rgba(255,215,0,0.25)', borderRadius: 13,
                   padding: '12px 16px', cursor: 'pointer',

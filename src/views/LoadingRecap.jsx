@@ -1,29 +1,27 @@
-import { useState, useEffect } from 'react';
-
 // Full-screen loader shown when opening a recap or game mode for a chat large
-// enough that the synchronous computeAll() pass is noticeable. Unlike
-// Parsing.jsx (which tracks real worker progress), this pass is a single
-// blocking call with no progress signal — so the ring fills toward (never to)
-// 90% over a fixed duration and the copy rotates underneath, rather than
-// claiming a completion percentage we can't actually measure.
+// enough that the synchronous computeAll() pass is noticeable.
+//
+// The percentage is driven entirely by the `progress` prop, never by a timer.
+// The whole point of this screen is that the main thread is about to be
+// blocked by a synchronous pass — no interval, transition or CSS keyframe can
+// tick while that happens, so a self-animating ring would just sit at 0% and
+// then vanish. handleLoadRecap in App.jsx instead reports where it actually is
+// and yields a paint between steps, so each number the user sees is real work
+// that finished.
 const RADIUS = 36;
 const CIRCUMFERENCE = 2 * Math.PI * RADIUS;
-const FILL_TARGET = 0.90;
 
-export default function LoadingRecap({ t }) {
+export default function LoadingRecap({ t, progress = 0 }) {
+  const pct = Math.max(0, Math.min(100, Math.round(progress)));
+
+  // Caption tracks progress rather than wall-clock, for the same reason.
   const captions = [
     t.loading_big_c1 || 'Counting every message…',
     t.loading_big_c2 || 'Hunting for drama and dead zones…',
     t.loading_big_c3 || 'Crunching the chaos…',
     t.loading_big_c4 || 'Almost there…',
   ];
-  const [capIdx, setCapIdx] = useState(0);
-  const [pct, setPct] = useState(0);
-  useEffect(() => {
-    const capId = setInterval(() => setCapIdx(i => (i + 1) % captions.length), 1400);
-    const pctId = setInterval(() => setPct(p => Math.min(90, p + 3)), 90);
-    return () => { clearInterval(capId); clearInterval(pctId); };
-  }, [captions.length]);
+  const capIdx = Math.min(captions.length - 1, Math.floor((pct / 100) * captions.length));
 
   return (
     <div style={{
@@ -32,17 +30,6 @@ export default function LoadingRecap({ t }) {
       padding: '32px 28px',
       background: '#faf6f0',
     }}>
-      <style>{`
-        @keyframes loading-ring-fill {
-          from { stroke-dashoffset: ${CIRCUMFERENCE}; }
-          to   { stroke-dashoffset: ${CIRCUMFERENCE * (1 - FILL_TARGET)}; }
-        }
-        .loading-ring-progress { animation: loading-ring-fill 2.6s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
-        @media (prefers-reduced-motion: reduce) {
-          .loading-ring-progress { animation-duration: 0.001ms !important; }
-        }
-      `}</style>
-
       {/* Background blobs matching Parsing/Landing */}
       <div style={{
         position: 'absolute', top: -60, right: -70, width: 230, height: 230,
@@ -70,11 +57,10 @@ export default function LoadingRecap({ t }) {
           <svg width="84" height="84" viewBox="0 0 84 84" style={{ transform: 'rotate(-90deg)' }} aria-hidden="true">
             <circle cx="42" cy="42" r={RADIUS} fill="none" stroke="rgba(87,50,128,0.15)" strokeWidth="7" />
             <circle
-              className="loading-ring-progress"
               cx="42" cy="42" r={RADIUS} fill="none"
               stroke="#f06449" strokeWidth="7" strokeLinecap="round"
               strokeDasharray={CIRCUMFERENCE}
-              strokeDashoffset={CIRCUMFERENCE}
+              strokeDashoffset={CIRCUMFERENCE * (1 - pct / 100)}
             />
           </svg>
           <div className="fs-mono" style={{

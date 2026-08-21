@@ -1,6 +1,6 @@
 ﻿import { useState, useMemo, useCallback, useEffect, useRef } from 'react';
 import { parseChat } from './parser/client.js';
-import { computeAll } from './lib/analytics.js';
+import { computeAll, computeAllSteps } from './lib/analytics.js';
 import { generateSampleMedia } from './lib/sample.js';
 import { loadHistory, saveRecap, removeRecap, clearHistory, deriveChatName, updateRecapProfile } from './lib/history.js';
 import { saveMedia, loadMedia, deleteMedia, clearAllMedia } from './lib/mediaStore.js';
@@ -46,6 +46,66 @@ import { detectSeasonTheme } from './lib/seasonTheme.js';
 // on a long enough array that the synchronous pass is noticeable — worth a
 // full-screen loader instead of just the CTA button's inline spinner.
 const BIG_CHAT_MESSAGE_THRESHOLD = 15000;
+
+// Let React commit and the browser actually paint before the next synchronous,
+// main-thread-blocking step. Two frames plus a macrotask is the ordering that
+// holds: React's update flushes in the first frame, the pixels land by the
+// second. Without this the loader's percentage never renders — the blocking
+// pass starts before the commit is on screen.
+function yieldPaint() {
+  // Hidden tab: rAF never fires and setTimeout is throttled to ~1/s, so waiting
+  // for a paint would park the load until the user came back. There are no
+  // pixels to wait for anyway — just yield the thread and keep working.
+  if (typeof document !== 'undefined' && document.hidden) return nextTask();
+  return new Promise(resolve => {
+    let settled = false;
+    const finish = () => {
+      if (settled) return;
+      settled = true;
+      document.removeEventListener('visibilitychange', finish);
+      resolve();
+    };
+    requestAnimationFrame(() => requestAnimationFrame(() => setTimeout(finish, 0)));
+    // The tab can go hidden *during* the yield, which stops the rAF chain from
+    // ever firing. Bail out on that instead of hanging.
+    document.addEventListener('visibilitychange', finish);
+  });
+}
+
+// A macrotask that background tabs don't throttle (unlike setTimeout).
+function nextTask() {
+  return new Promise(resolve => {
+    const ch = new MessageChannel();
+    ch.port1.onmessage = () => { ch.port1.close(); resolve(); };
+    ch.port2.postMessage(0);
+  });
+}
+
+// How often the loader is allowed to repaint mid-computeAll. Each repaint costs
+// a frame, so painting on every generator yield would noticeably slow the pass
+// down; ~90ms is still five updates a second, which reads as continuous.
+const PROGRESS_PAINT_MS = 90;
+
+// Run computeAll while keeping the loader's ring moving. `computeAllSteps`
+// yields its own progress (0..1) every few thousand messages; we remap that
+// onto [from, to] of the loader's 0-100 and paint at most every
+// PROGRESS_PAINT_MS. Identical result to calling computeAll() directly — the
+// generator is the same code path, just interruptible.
+async function computeAllWithProgress(messages, report, from, to) {
+  const it = computeAllSteps(messages);
+  let lastPaint = performance.now();
+  let r = it.next();
+  while (!r.done) {
+    const now = performance.now();
+    if (now - lastPaint >= PROGRESS_PAINT_MS) {
+      lastPaint = now;
+      await report(from + r.value * (to - from));
+      lastPaint = performance.now();
+    }
+    r = it.next();
+  }
+  return r.value;
+}
 
 // Attach (period-filtered) media to a computed analytics object. Media items
 // carry `.ts`; `makeInRange` keeps everything for the 'all' window and
@@ -104,6 +164,9 @@ function RecappedApp() {
   const [fileName, setFileName] = useState('');
   const [slide, setSlide] = useState(0);
   const [parsingStage, setParsingStage] = useState(0);
+  // Real progress for the big-chat loader (0–100), reported by handleLoadRecap
+  // as each blocking step completes.
+  const [loadProgress, setLoadProgress] = useState(0);
   // Lang persists across visits: prefer the user's explicit choice from a
   // previous session, fall back to navigator.language on first visit.
   const [lang, setLangRaw] = useState(() => {
@@ -423,17 +486,26 @@ function RecappedApp() {
     if (!entry) return;
     const per = periodRef.current;
 
-    // Big chats: computeAll() below is synchronous and will block the main
-    // thread for a beat. Show the full-screen loader and wait two frames so
-    // it actually paints before the freeze begins (its spinner is
-    // transform-based, so the compositor keeps it turning through the block).
-    if ((entry.stats?.totalMessages || 0) >= BIG_CHAT_MESSAGE_THRESHOLD) {
+    // Big chats: the computeAll() passes below block the main thread. Show the
+    // full-screen loader and hand it a real percentage — nothing on this screen
+    // can self-animate through the block, so `step` is what makes the ring move
+    // at all. The two computeAll passes report from *inside* (via
+    // computeAllWithProgress) rather than only at their boundaries, so the ring
+    // keeps climbing through them instead of parking on one number until the
+    // pass returns. Small chats skip the loader entirely and `step` is a no-op,
+    // so they pay none of the paint-yield cost.
+    const big = (entry.stats?.totalMessages || 0) >= BIG_CHAT_MESSAGE_THRESHOLD;
+    const step = big
+      ? async (pct) => { setLoadProgress(pct); await yieldPaint(); }
+      : async () => {};
+    if (big) {
+      setLoadProgress(0);
       setStage('loading_recap');
-      await new Promise(requestAnimationFrame);
-      await new Promise(requestAnimationFrame);
+      await yieldPaint();
     }
 
     // Messages: reuse the in-memory session if it's the same recap, else load.
+    await step(6);
     let msgs = recapMessagesRef.current;
     if (loadedSessionRef.current !== id || !msgs) {
       const loaded = await loadMessages(id);
@@ -441,32 +513,54 @@ function RecappedApp() {
     }
     // Media: reuse in-memory if same session (keeps the live blob URLs); else
     // revoke the old set and load fresh from IndexedDB.
+    await step(12);
     let media = recapMediaRef.current;
     if (mediaSessionRef.current !== id || !media) {
       revokeMedia(recapMediaRef.current);
       media = await loadMedia(id);
     }
 
+    // The two computeAll passes are the bulk of the wait, so they get the bulk
+    // of the bar and report from inside. When the window is 'all' there is no
+    // second pass (the deck reuses the all-time object), so the first one owns
+    // the whole remaining band instead of stopping halfway.
+    const needsPeriodPass = per !== 'all' && !!msgs;
+    const fullEnd = needsPeriodPass ? 58 : 96;
+
     // All-time analytics (game modes + onboarding). Legacy recaps with no
     // persisted messages fall back to the saved snapshot.
-    const fullBase = msgs ? computeAll(msgs) : entry.stats;
+    await step(18);
+    const fullBase = msgs
+      ? (big ? await computeAllWithProgress(msgs, step, 18, fullEnd) : computeAll(msgs))
+      : entry.stats;
     const fullA = fullBase ? attachMedia(fullBase, media, 'all', msgs) : null;
     // Period-filtered analytics (the deck). Identical to all-time when the
     // window is 'all' or there are no messages to slice.
-    let filteredA = (per === 'all' || !msgs)
-      ? fullA
-      : attachMedia(computeAll(filterMessagesByPeriod(msgs, per)), media, per, msgs);
+    await step(fullEnd);
+    let filteredA = fullA;
+    if (needsPeriodPass) {
+      const windowed = filterMessagesByPeriod(msgs, per);
+      const periodBase = big
+        ? await computeAllWithProgress(windowed, step, fullEnd, 90)
+        : computeAll(windowed);
+      filteredA = attachMedia(periodBase, media, per, msgs);
+    }
     // The 4-week deck needs month-over-month extras (growth, biggest moment,
     // gm/gn, streaks) the base pipeline never computes — attach them here.
     if (per === 'month' && msgs && filteredA) {
+      await step(92);
       filteredA = { ...filteredA, monthly: computeMonthExtras(msgs) };
     }
     // The season deck needs month-by-month extras + a light seasonal theme
     // (cosmetic only — never touches the numbers).
     if (per === 'season' && msgs && filteredA) {
+      await step(92);
       const season = computeSeasonExtras(msgs);
       filteredA = { ...filteredA, season, seasonTheme: detectSeasonTheme({ ...filteredA, season }) };
     }
+    // Land on 100 and let it paint, so the ring closes instead of cutting away
+    // mid-fill. Slides mount behind this frame either way.
+    await step(100);
 
     const savedProfile = entry.profile || { relationship: null, tone: null, self: null };
     setRecapMessages(msgs);
@@ -664,7 +758,7 @@ function RecappedApp() {
             <Parsing fileName={fileName} parsingStage={parsingStage} diagnostics={diagnostics} t={t} />
           )}
           {stage === 'loading_recap' && (
-            <LoadingRecap t={t} />
+            <LoadingRecap t={t} progress={loadProgress} />
           )}
           {stage === 'ad_post_parse' && (
             <VideoAdSlot
