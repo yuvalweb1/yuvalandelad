@@ -1905,4 +1905,9 @@ export default {
   s3_mm_title_family: 'החודש הכי גדול של כל בן משפחה',
   s3_mm_title_friends: 'חודש השיא של כולם',
   s3_mm_title_couple: 'החודשים העמוסים שלכם',
+
+  // ---- auto-stubbed by i18n-check --fix (translate these) ----
+  m_ignored_award_sub: 'הזמן הכי ארוך שעבר בלי שהם שלחו כלום',
+  m_ignored_award_eyebrow_friends: 'מי משתתק',
+  gt_eyebrow_friends: 'הבדיחה הפנימית',
 };

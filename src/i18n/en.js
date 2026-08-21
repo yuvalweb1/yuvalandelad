@@ -896,6 +896,7 @@ export default {
   go_q_people: 'How many people?',
   go_q_days: 'How long have you been chatting?',
   go_q_peakhour: 'When do you talk most?',
+  reveal_button: 'Reveal',
   lb_eyebrow: 'LEADERBOARD',
   lb_title: 'Who carried the chat',
   lb_least: 'quietest',
